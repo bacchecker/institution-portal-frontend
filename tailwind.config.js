@@ -10,6 +10,7 @@ export default {
     extend: {
       colors: {
         'primaryRed': "#FE0000",
+        'buttonLog': "#F31260",
       },
     },
   },

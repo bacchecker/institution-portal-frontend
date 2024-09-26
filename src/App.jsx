@@ -2,12 +2,15 @@ import React, { Component } from 'react';
 import Sidebar from './components/Sidebar';
 import Navbar from './components/Navbar';
 import Dashboard from './pages/Dashboard';
-
+import { Routes, Route } from "react-router-dom";
+import Login from './pages/auth/Login';
+import withRouter from './components/withRouter';
+import CompleteProfile from './pages/CompleteProfile';
 
 class App extends Component {
   state = {
     isSidebarVisible: false,
-    isSidebarCollapsed: false, // For wide screens partial collapse
+    isSidebarCollapsed: false,
    
   };
 
@@ -39,30 +42,36 @@ class App extends Component {
 
   render() {
     const { isSidebarVisible, isSidebarCollapsed, user } = this.state;
+    const isLoginPage = location.pathname === '/login' || location.pathname === '/institution/complete-profile';
 
     return (
       <div className="flex h-screen bg-gray-100">
+        
         {/* Sidebar */}
-        <Sidebar
+        {!isLoginPage && <Sidebar
           isVisible={isSidebarVisible}
           isCollapsed={isSidebarCollapsed}
           closeSidebar={this.toggleMobileSidebar}
-        />
+        />}
 
         {/* Main content area */}
         <div
-          className={`flex-1 transition-all duration-300 ${isSidebarCollapsed ? 'lg:ml-16' : 'lg:ml-44 xl:ml-64'}`}
+          className={`flex-1 ${!isLoginPage && isSidebarCollapsed ? 'lg:ml-16' : !isLoginPage ? 'lg:ml-44 xl:ml-64' : ''} transition-margin duration-300`}
         >
           {/* Navbar */}
-          <Navbar
+          {!isLoginPage && <Navbar
             toggleSidebar={this.toggleMobileSidebar}
             user={user}
-            toggleSidebarCollapse={this.toggleSidebarCollapse} // To control wide screen collapse
-          />
+            toggleSidebarCollapse={this.toggleSidebarCollapse}
+          />}
 
           {/* Page content */}
-          <div className="p-8">
-            <Dashboard />
+          <div className={`${isLoginPage ? 'p-0' : 'p-8'}`}>
+          <Routes>
+            <Route exact path="/login" element={<Login />} />
+            <Route exact path="/institution/dashboard" element={<Dashboard />} />
+            <Route exact path="/institution/complete-profile" element={<CompleteProfile />} />
+          </Routes>
           </div>
         </div>
       </div>
@@ -70,4 +79,4 @@ class App extends Component {
   }
 }
 
-export default App;
+export default withRouter(App);
