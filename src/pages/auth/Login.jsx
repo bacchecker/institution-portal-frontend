@@ -36,55 +36,70 @@ class Login extends Component {
     e.preventDefault();
     this.setState({ isLoading: true });
     const { email, password, recaptcha_token } = this.state;
-
+  
     if (!recaptcha_token) {
       alert("Please complete the reCAPTCHA");
       return;
     }
-
+  
     try {
-      const response = await axios.post("/auth/login/", {
-        email: email,
-        password: password,
-        recaptcha_token: recaptcha_token,
+      const response = await fetch("https://backend.baccheck.online/api/auth/login/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: email,
+          password: password,
+          recaptcha_token: recaptcha_token,
+        }),
       });
-      const responseData = response.data.data;
-      console.log(responseData);
-
-      localStorage.setItem("authToken", responseData.token);
-      localStorage.setItem("account_type", responseData.user.account_type);
+  
+      const responseData = await response.json();
+  
+      if (!response.ok) {
+        throw new Error(responseData.message || "Failed to login");
+      }
+  
+      console.log(responseData.data);
+  
+      const { data } = responseData;
+  
+      localStorage.setItem("authToken", data.token);
+      localStorage.setItem("account_type", data.user.account_type);
       this.setState({ isLoading: false });
-
+  
       const account_type = localStorage.getItem("account_type");
-
-      if (account_type == "institution") {
-        toast.success(response.data.message, {});
-        if (responseData.two_factor == false) {
+  
+      if (account_type === "institution") {
+        toast.success(responseData.message, {});
+        if (data.two_factor === false) {
           this.props.navigate("/verify-otp");
         }
-        if (responseData.institution.profile_complete == "yes") {
+        if (data.institution.profile_complete === "yes") {
           this.props.navigate("/dashboard", {
             state: {
-              institutionData: responseData.institution,
+              institutionData: data.institution,
             },
           });
         } else {
           this.props.navigate("/complete-profile", {
             state: {
-              institutionData: responseData.institution,
+              institutionData: data.institution,
             },
           });
         }
       } else {
-        toast.error("Your are not an institution");
+        toast.error("You are not an institution");
         this.setState({ isLoading: false });
       }
     } catch (error) {
-      toast.error(error.response.data.message, {});
+      toast.error(error.message, {});
       this.recaptchaRef.current.reset();
       this.setState({ isLoading: false });
     }
   };
+  
 
   state = {};
   render() {
