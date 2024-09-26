@@ -16,6 +16,7 @@ class Login extends Component {
             recaptcha_token: null,
             showPassword: false,
             account_type: '',
+            isLoading: false
         };
         this.recaptchaRef = React.createRef();
     }
@@ -34,6 +35,7 @@ class Login extends Component {
 
     loginUser = async (e) => {
         e.preventDefault();
+        this.setState({isLoading: true})
         const { email, password, recaptcha_token  } = this.state;
         
         if (!recaptcha_token) {
@@ -52,7 +54,8 @@ class Login extends Component {
             
             localStorage.setItem('authToken', responseData.token);
             localStorage.setItem('account_type', responseData.user.account_type);
-            
+            this.setState({isLoading: false})
+
             const account_type = localStorage.getItem('account_type');
 
             if(account_type == 'institution'){
@@ -68,6 +71,7 @@ class Login extends Component {
                 
             }else{
                 console.error('Your are not an institution')
+                this.setState({isLoading: false})
             }
             
                 
@@ -80,7 +84,7 @@ class Login extends Component {
 
     state = {  }
     render() { 
-        const { email, password, emailError, passwordError, showPassword } = this.state;
+        const { email, password, emailError, passwordError, showPassword, isLoading } = this.state;
         return ( 
             <>
                 <div className="h-screen w-full flex justify-center items-center px-4 lg:px-0">
@@ -140,7 +144,20 @@ class Login extends Component {
                             </div>
                             
                             <div className="md:px-0 px-5">
-                                <button type="submit" onClick={this.loginUser} className="w-full text-white bg-buttonLog rounded-full py-2.5 hover:bg-red-600 md:mb-1 mb-5 text-sm uppercase font-semibold">Login</button>
+                                    <button type="submit" 
+                                        onClick={this.loginUser}
+                                        disabled={isLoading}
+                                        className={`w-full flex items-center justify-center mr-2 ${isLoading ? 'bg-gray-400 text-gray-700 cursor-not-allowed' : 'bg-buttonLog hover:bg-red-600 text-white'}  rounded-full py-2.5 md:mb-1 mb-5 text-sm uppercase font-semibold ${isLoading ? 'cursor-not-allowed' : ''}`}>
+                                    {isLoading ? (
+                                        <>
+                                            <svg className="animate-spin h-5 w-5 mr-3 ..." viewBox="0 0 24 24"> </svg>
+                                            Logging In...
+                                        </>
+                                    ) : (
+                                        'Login'
+                                    )}
+                                    </button>
+
                             </div>
                             <p className="text-center text-xs font-semibold text-gray-600">Forgotten Password? <a href="https://backend.baccheck.online/forgot-password">Click Here</a></p>
                             

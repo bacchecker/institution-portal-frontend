@@ -90,11 +90,11 @@ class CompleteProfile extends Component {
                             <Select label="Academic Level" name="academic_level" value={this.state.academic_level} itemNameKey="name" menuItems={this.state.academicLeveData} onChange={this.handleInputChange}/>
                             <Select label="Select Region" name="region" value={this.state.region} itemNameKey="name" menuItems={this.state.regionData} onChange={this.handleInputChange}/>
                         </div>
-                        <div className="">
+                        <div className="w-full">
                         <img
                             src={this.state.logo}
                             alt="Institution Logo"
-                            style={{ width: '100px', height: '100px' }}
+                            style={{ width: '160px', height: '160px' }}
                         />
                         </div>
                         
