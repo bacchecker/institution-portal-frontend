@@ -15,8 +15,8 @@ class Navbar extends React.Component {
           </button>
 
           {/* Sidebar Collapse Button (Wide Screens) */}
-          <button className="hidden md:block focus:outline-none ml-4" onClick={toggleSidebarCollapse}>
-            <FaBars />
+          <button className="hidden md:block focus:outline-none ml-4 bg-red-200 rounded-lg p-2" onClick={toggleSidebarCollapse}>
+            <FaBars size={20}/>
           </button>
 
           <h1 className="text-xl ml-4">Dashboard</h1>
