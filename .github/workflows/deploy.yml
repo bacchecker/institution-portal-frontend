@@ -1,0 +1,33 @@
+name: Continuous Integration and Deployment
+
+on:
+  push:
+    branches: "main"
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18" # or any other version you're using
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build the app
+        run: npm run build
+
+      - name: Deploy to Server
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: institution.baccheck.online
+          username: institution@institution.baccheck.online
+          password: institution@3310
+          server-dir: / # Adjust this to your server's public directory
+          local-dir: dist/ # Adjust this if your build folder is different
