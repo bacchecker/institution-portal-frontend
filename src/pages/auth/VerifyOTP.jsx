@@ -45,13 +45,13 @@ class VerifyOTP extends Component {
       toast.success(response.data.message, {});
 
       if (responseData.institution.profile_complete == "yes") {
-        this.props.navigate("/institution/dashboard", {
+        this.props.navigate("/dashboard", {
           state: {
             institutionData: responseData.institution,
           },
         });
       } else {
-        this.props.navigate("/institution/complete-profile", {
+        this.props.navigate("/complete-profile", {
           state: {
             institutionData: responseData.institution,
           },

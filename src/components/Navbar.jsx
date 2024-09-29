@@ -1,7 +1,20 @@
 import React from "react";
 import { FaBars } from "react-icons/fa";
+import withRouter from '../components/withRouter'
 
 class Navbar extends React.Component {
+  state = {
+    name: "",
+  };
+  componentDidMount() {
+    const { institutionData } = this.props.location.state || {};
+    if (institutionData) {
+      this.setState({
+        name: institutionData.name,
+        
+      });
+    }
+  }
   render() {
     const { toggleSidebar, toggleSidebarCollapse, user } = this.props;
 
@@ -36,7 +49,7 @@ class Navbar extends React.Component {
               className="w-10 h-10 rounded-full"
             />
             <div className="w-44 text-sm">
-              <p>University of Education Winneba</p>
+              <p>{this.state.name}</p>
             </div>
           </div>
         </div>
@@ -45,4 +58,4 @@ class Navbar extends React.Component {
   }
 }
 
-export default Navbar;
+export default withRouter(Navbar);

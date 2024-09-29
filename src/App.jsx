@@ -46,7 +46,7 @@ class App extends Component {
 
   render() {
     const { isSidebarVisible, isSidebarCollapsed, user } = this.state;
-    const isLoginPage = location.pathname === '/institution/login' || location.pathname === '/institution/complete-profile' || location.pathname === '/institution/verify-otp';
+    const isLoginPage = location.pathname === '/login' || location.pathname === '/' || location.pathname === '/complete-profile' || location.pathname === '/verify-otp';
 
     return (
       <div className="flex h-screen bg-gray-100">
@@ -72,12 +72,13 @@ class App extends Component {
           {/* Page content */}
           <div className={`${isLoginPage ? 'p-0' : 'px-5 py-4'}`}>
           <Routes>
-            <Route exact path="/institution/login" element={<Login />} />
-            <Route exact path="/institution/verify-otp" element={<VerifyOTP />} />
-            <Route exact path="/institution/dashboard" element={<Dashboard />} />
-            <Route exact path="/institution/complete-profile" element={<CompleteProfile />} />
-            <Route exact path="/institution/document-requests" element={<DocumentRequest />} />
-            <Route exact path="/institution/staff" element={<InstitutionUsers />} />
+            <Route exact path="/" element={<Login />} />
+            <Route exact path="/login" element={<Login />} />
+            <Route exact path="/verify-otp" element={<VerifyOTP />} />
+            <Route exact path="/dashboard" element={<Dashboard />} />
+            <Route exact path="/complete-profile" element={<CompleteProfile />} />
+            <Route exact path="/document-requests" element={<DocumentRequest />} />
+            <Route exact path="/staff" element={<InstitutionUsers />} />
           </Routes>
           </div>
         </div>

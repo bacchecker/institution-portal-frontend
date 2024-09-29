@@ -161,7 +161,7 @@ class CompleteProfile extends Component {
       );
 
       toast.success(response.data.message, {});
-      this.props.navigate("/institution/dashboard");
+      this.props.navigate("/dashboard");
     } catch (error) {
       toast.error(error.response.data.message, {});
       return false;

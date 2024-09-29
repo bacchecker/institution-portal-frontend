@@ -24,6 +24,7 @@ class Sidebar extends Component {
   isActive = (path) => {
     return this.props.location.pathname === path;
   };
+  
 
   render() {
     const { activeMenu } = this.state;
@@ -52,22 +53,22 @@ class Sidebar extends Component {
           <ul>
             <li
               className={`flex items-center py-3 cursor-pointer ${
-                this.isActive("/institution/dashboard")
+                this.isActive("/dashboard")
                   ? "bg-primaryRed text-white"
                   : "hover:text-primaryRed text-gray-500"
               }`}
             >
               <div
                 className={`w-1 h-6 ${
-                  this.isActive("/institution/dashboard")
+                  this.isActive("/dashboard")
                     ? "bg-white"
                     : "hidden"
                 } rounded-tr-full rounded-br-full`}
               ></div>
-              <Link to="/institution/dashboard" onClick={this.handleLinkClick}>
+              <Link to="/dashboard" onClick={this.handleLinkClick}>
                 <BiSolidDashboard
                   className={`inline-block mr-2 -mt-1 ${
-                    this.isActive("/institution/dashboard")
+                    this.isActive("/dashboard")
                       ? "text-white ml-4"
                       : "text-gray-400 hover:text-primaryRed ml-5"
                   }`}
@@ -84,25 +85,25 @@ class Sidebar extends Component {
 
             <li
               className={`flex items-center py-3 cursor-pointer ${
-                this.isActive("/institution/document-requests")
+                this.isActive("/document-requests")
                   ? "bg-primaryRed text-white"
                   : "hover:text-primaryRed text-gray-500"
               }`}
             >
               <div
                 className={`w-1 h-6 ${
-                  this.isActive("/institution/document-requests")
+                  this.isActive("/document-requests")
                     ? "bg-white"
                     : "hidden"
                 } rounded-tr-full rounded-br-full`}
               ></div>
               <Link
-                to="/institution/document-requests"
+                to="/document-requests"
                 onClick={this.handleLinkClick}
               >
                 <IoDocuments
                   className={`inline-block mr-2 -mt-1 ${
-                    this.isActive("/institution/document-requests")
+                    this.isActive("/document-requests")
                       ? "text-white ml-4"
                       : "text-gray-400 hover:text-primaryRed ml-5"
                   }`}
@@ -118,20 +119,20 @@ class Sidebar extends Component {
 
             <li
               className={`flex items-center py-3 cursor-pointer ${
-                this.isActive("/institution/staff")
+                this.isActive("/staff")
                   ? "bg-primaryRed text-white"
                   : "hover:text-primaryRed text-gray-500"
               }`}
             >
               <div
                 className={`w-1 h-6 ${
-                  this.isActive("/institution/staff") ? "bg-white" : "hidden"
+                  this.isActive("/staff") ? "bg-white" : "hidden"
                 } rounded-tr-full rounded-br-full`}
               ></div>
-              <Link to="/institution/staff" onClick={this.handleLinkClick}>
+              <Link to="/staff" onClick={this.handleLinkClick}>
                 <FaUsers
                   className={`inline-block mr-2 -mt-1 ${
-                    this.isActive("/institution/staff")
+                    this.isActive("/staff")
                       ? "text-white ml-4"
                       : "text-gray-400 hover:text-primaryRed ml-5"
                   }`}
