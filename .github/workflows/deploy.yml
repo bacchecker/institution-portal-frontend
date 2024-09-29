@@ -26,8 +26,8 @@ jobs:
       - name: Deploy to Server
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
-          server: institution.baccheck.online
-          username: institution@institution.baccheck.online
-          password: institution@3310
+          server: demo.baccheck.online
+          username: demo.baccheck.online@demo.baccheck.online
+          password: demo.baccheck.online
           server-dir: / # Adjust this to your server's public directory
           local-dir: dist/ # Adjust this if your build folder is different
