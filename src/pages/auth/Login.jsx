@@ -3,7 +3,7 @@ import logo from '../../images/bclogo.jpg';
 import axios from '../../axiosConfig';
 import withRouter from "../../components/withRouter";
 import ReCAPTCHA from 'react-google-recaptcha';
-import CompleteProfile from '../CompleteProfile';
+import { toast } from 'react-hot-toast';
 
 class Login extends Component {
     constructor(props) {
@@ -59,8 +59,16 @@ class Login extends Component {
             const account_type = localStorage.getItem('account_type');
 
             if(account_type == 'institution'){
+                toast.success(response.data.message, {});
+                if(responseData.two_factor == false){
+                    this.props.navigate('/institution/verify-otp');
+                }
                 if(responseData.institution.profile_complete == 'yes'){
-                    this.props.navigate('/institution/dashboard');
+                    this.props.navigate('/institution/dashboard', {
+                        state: {
+                            institutionData: responseData.institution
+                        }
+                    });
                 }else{
                     this.props.navigate('/institution/complete-profile', {
                         state: {
@@ -70,14 +78,15 @@ class Login extends Component {
                 }
                 
             }else{
-                console.error('Your are not an institution')
+                toast.error('Your are not an institution')
                 this.setState({isLoading: false})
             }
             
                 
         } catch (error) {
-            console.log(error)
+            toast.error(error.response.data.message, {});
             this.recaptchaRef.current.reset();
+            this.setState({isLoading: false})
         }
     };
 
@@ -88,12 +97,12 @@ class Login extends Component {
         return ( 
             <>
                 <div className="h-screen w-full flex justify-center items-center px-4 lg:px-0">
-                    <div className="md:w-2/5 lg:w-1/3 xl:w-1/4 w-full pb-10 md:px-4 lg:px-6 bg-white rounded-3xl shadow-xl">
+                    <div className="md:w-2/5 lg:w-1/3 2xl:w-1/4 w-full pb-10 md:px-4 lg:px-6 bg-white rounded-3xl shadow-xl">
                         <form className="mt-6">
                             
                             <div className="text-center text-yellow-100">
                                 <div className="flex items-center justify-center mx-auto w-24 h-24">
-                                    <img src={logo} alt="" />
+                                    <img src={logo} alt="BacChecker Logo" />
                                 </div>
                             </div>
                             <div className="relative my-6 mx-5 md:mx-0">

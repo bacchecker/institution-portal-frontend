@@ -6,6 +6,10 @@ import { Routes, Route } from "react-router-dom";
 import Login from './pages/auth/Login';
 import withRouter from './components/withRouter';
 import CompleteProfile from './pages/CompleteProfile';
+import DocumentRequest from './pages/DocumentRequest';
+import InstitutionUsers from './pages/InstitutionUsers';
+import VerifyOTP from './pages/auth/VerifyOTP';
+import Toastify from './components/Toastify';
 
 class App extends Component {
   state = {
@@ -42,11 +46,11 @@ class App extends Component {
 
   render() {
     const { isSidebarVisible, isSidebarCollapsed, user } = this.state;
-    const isLoginPage = location.pathname === '/login' || location.pathname === '/institution/complete-profile';
+    const isLoginPage = location.pathname === '/institution/login' || location.pathname === '/institution/complete-profile' || location.pathname === '/institution/verify-otp';
 
     return (
       <div className="flex h-screen bg-gray-100">
-        
+        <Toastify />
         {/* Sidebar */}
         {!isLoginPage && <Sidebar
           isVisible={isSidebarVisible}
@@ -66,11 +70,14 @@ class App extends Component {
           />}
 
           {/* Page content */}
-          <div className={`${isLoginPage ? 'p-0' : 'p-8'}`}>
+          <div className={`${isLoginPage ? 'p-0' : 'px-5 py-4'}`}>
           <Routes>
-            <Route exact path="/login" element={<Login />} />
+            <Route exact path="/institution/login" element={<Login />} />
+            <Route exact path="/institution/verify-otp" element={<VerifyOTP />} />
             <Route exact path="/institution/dashboard" element={<Dashboard />} />
             <Route exact path="/institution/complete-profile" element={<CompleteProfile />} />
+            <Route exact path="/institution/document-requests" element={<DocumentRequest />} />
+            <Route exact path="/institution/staff" element={<InstitutionUsers />} />
           </Routes>
           </div>
         </div>

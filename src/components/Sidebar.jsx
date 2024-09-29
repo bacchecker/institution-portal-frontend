@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { FaHome, FaUser, FaCog } from 'react-icons/fa';
+import { FaHome, FaUser, FaCog, FaUserShield, FaUsers } from 'react-icons/fa';
 import { BsChevronDown } from 'react-icons/bs';
 import { Link } from 'react-router-dom';
 import withRouter from './withRouter';
@@ -63,23 +63,37 @@ class Sidebar extends Component {
 
             <li
               className={`flex items-center py-3 cursor-pointer ${
-                this.isActive('/institution/documents') ? 'bg-primaryRed text-white' : 'hover:text-primaryRed text-gray-500'
+                this.isActive('/institution/document-requests') ? 'bg-primaryRed text-white' : 'hover:text-primaryRed text-gray-500'
               }`}
             >
-              <div className={`w-1 h-6 ${this.isActive('/institution/documents') ? 'bg-white' : 'hidden'} rounded-tr-full rounded-br-full`}></div>
-              <Link to="/institution/documents" onClick={this.handleLinkClick}>
+              <div className={`w-1 h-6 ${this.isActive('/institution/document-requests') ? 'bg-white' : 'hidden'} rounded-tr-full rounded-br-full`}></div>
+              <Link to="/institution/document-requests" onClick={this.handleLinkClick}>
                 <IoDocuments
-                  className={`inline-block mr-2 -mt-1 ${this.isActive('/institution/documents') ? 'text-white ml-4' : 'text-gray-400 hover:text-primaryRed ml-5'}`}
+                  className={`inline-block mr-2 -mt-1 ${this.isActive('/institution/document-requests') ? 'text-white ml-4' : 'text-gray-400 hover:text-primaryRed ml-5'}`}
                   size={20} 
                 />
                 <span className={`${isCollapsed ? 'hidden' : 'inline self-center'}`}>Requests</span>
               </Link>
             </li>
 
+            <li
+              className={`flex items-center py-3 cursor-pointer ${
+                this.isActive('/institution/staff') ? 'bg-primaryRed text-white' : 'hover:text-primaryRed text-gray-500'
+              }`}
+            >
+              <div className={`w-1 h-6 ${this.isActive('/institution/staff') ? 'bg-white' : 'hidden'} rounded-tr-full rounded-br-full`}></div>
+              <Link to="/institution/staff" onClick={this.handleLinkClick}>
+                <FaUsers
+                  className={`inline-block mr-2 -mt-1 ${this.isActive('/institution/staff') ? 'text-white ml-4' : 'text-gray-400 hover:text-primaryRed ml-5'}`}
+                  size={20} 
+                />
+                <span className={`${isCollapsed ? 'hidden' : 'inline self-center'}`}>Staff</span>
+              </Link>
+            </li>
+
             
 
-            {/* User Menu with Submenus */}
-            <li>
+            {/* <li>
               <div
                 className="p-4 hover:bg-gray-700 cursor-pointer flex justify-between"
                 onClick={() => this.toggleSubMenu('user')}
@@ -91,7 +105,6 @@ class Sidebar extends Component {
                 <BsChevronDown />
               </div>
 
-              {/* Submenu Items */}
               {!isCollapsed && activeMenu === 'user' && (
                 <ul className="pl-6">
                   <li className="p-2 hover:bg-gray-600 cursor-pointer">
@@ -108,7 +121,6 @@ class Sidebar extends Component {
               )}
             </li>
 
-            {/* Settings Menu */}
             <li>
               <div
                 className="p-4 hover:bg-gray-700 cursor-pointer flex justify-between"
@@ -121,7 +133,6 @@ class Sidebar extends Component {
                 <BsChevronDown />
               </div>
 
-              {/* Submenu Items */}
               {!isCollapsed && activeMenu === 'settings' && (
                 <ul className="pl-6">
                   <li className="p-2 hover:bg-gray-600 cursor-pointer">
@@ -136,7 +147,7 @@ class Sidebar extends Component {
                   </li>
                 </ul>
               )}
-            </li>
+            </li> */}
           </ul>
         </nav>
       </div>
