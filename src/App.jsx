@@ -60,7 +60,7 @@ class App extends Component {
 
         {/* Main content area */}
         <div
-          className={`flex-1 ${!isLoginPage && isSidebarCollapsed ? 'lg:ml-16' : !isLoginPage ? 'lg:ml-44 xl:ml-64' : ''} transition-margin duration-300`}
+          className={`flex-1 ${!isLoginPage && isSidebarCollapsed ? 'lg:ml-16' : !isLoginPage ? 'lg:ml-52 xl:ml-64' : ''} transition-margin duration-300`}
         >
           {/* Navbar */}
           {!isLoginPage && <Navbar
@@ -70,7 +70,7 @@ class App extends Component {
           />}
 
           {/* Page content */}
-          <div className={`${isLoginPage ? 'p-0' : 'px-5 py-4'}`}>
+          <div className={`${isLoginPage ? 'p-0' : 'px-10 py-6'}`}>
           <Routes>
             <Route exact path="/" element={<Login />} />
             <Route exact path="/login" element={<Login />} />

@@ -49,7 +49,6 @@ class Login extends Component {
         recaptcha_token: recaptcha_token,
       });
       const responseData = response.data.data;
-      console.log(responseData);
 
       localStorage.setItem("authToken", responseData.token);
       localStorage.setItem("account_type", responseData.user.account_type);
