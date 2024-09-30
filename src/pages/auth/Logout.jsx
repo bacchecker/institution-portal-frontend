@@ -46,7 +46,7 @@ export default function Logout() {
       {/* Modal content */}
       {isOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="bg-white p-6 rounded shadow-lg w-1/3">
+          <div className="bg-white p-6 rounded shadow-lg w-2/3 lg:w-1/2 xl:w-1/3">
             <h3 className="text-lg font-semibold mb-4">Logout User</h3>
             <div className="flex items-center justify-center mb-4">
               <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" className="bi bi-exclamation-triangle-fill w-12 h-12 text-red-600" viewBox="0 0 16 16">

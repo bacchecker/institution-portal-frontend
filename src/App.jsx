@@ -70,7 +70,7 @@ class App extends Component {
           />}
 
           {/* Page content */}
-          <div className={`${isLoginPage ? 'p-0' : 'px-10 py-6'}`}>
+          <div className={`${isLoginPage ? 'p-0' : 'px-10 py-6'} bg-gray-100`}>
           <Routes>
             <Route exact path="/" element={<Login />} />
             <Route exact path="/login" element={<Login />} />

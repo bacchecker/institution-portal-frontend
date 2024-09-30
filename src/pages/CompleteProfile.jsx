@@ -160,20 +160,15 @@ class CompleteProfile extends Component {
     try {
       const response = await axios.post(
         "/institution/account-setup",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
+        formData
       );
-
+    
       toast.success(response.data.message, {});
       this.props.navigate("/dashboard", {
         state: {
           institutionData: response.data.institution,
         },
-      })
+      });
     } catch (error) {
       toast.error(error.response.data.message, {});
       return false;
