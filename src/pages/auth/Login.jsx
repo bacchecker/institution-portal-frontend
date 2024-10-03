@@ -43,7 +43,7 @@ class Login extends Component {
     }
 
     try {
-      const response = await axios.post("/auth/login/", {
+      const response = await axios.post("/auth/login", {
         email: email,
         password: password,
         recaptcha_token: recaptcha_token,
