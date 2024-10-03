@@ -10,7 +10,7 @@ class Textarea extends Component {
                 <div className="relative h-auto w-full">
                     
                     <textarea
-                        className="peer h-full w-full border border-blue-200 bg-transparent pl-4 pt-4 pr-9 font-sans font-semibold text-blue-gray-700 outline-0 transition-all placeholder-shown:border placeholder-shown:border-blue-gray-200 placeholder-shown:border-t-blue-gray-200 focus:border-2 focus:border-blue-600 focus:border-t-transparent focus:outline-0 disabled:border-0 disabled:bg-blue-gray-50"
+                        className="peer h-full w-full border border-blue-200 bg-transparent pl-4 pt-2 pr-9 text-blue-gray-700 outline-0 transition-all placeholder-shown:border placeholder-shown:border-blue-gray-200 placeholder-shown:border-t-blue-gray-200 focus:border-2 focus:border-blue-600 focus:border-t-transparent focus:outline-0 disabled:border-0 disabled:bg-blue-gray-50"
                         placeholder="" name={name} onChange={onChange} value={value}
                     />
                     

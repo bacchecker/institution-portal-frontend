@@ -7,6 +7,7 @@ import { SiPinboard } from 'react-icons/si';
 import Textbox from '../components/Textbox';
 import Select from '../components/Select';
 import {toast} from 'react-hot-toast';
+import Spinner from '../components/Spinner';
 
 class InstitutionUsers extends Component {
     constructor(props) {
@@ -28,7 +29,7 @@ class InstitutionUsers extends Component {
             { id: 'other', name: 'Other' },
         ],
         first_name: '',
-        other_names: '',
+        other_name: '',
         last_name: '',
         gender: '',
         role_id: '',
@@ -94,7 +95,7 @@ class InstitutionUsers extends Component {
     handleClear = () =>{
         this.state.first_name = ''
         this.state.last_name = ''
-        this.state.other_names = ''
+        this.state.other_name = ''
         this.state.address = ''
         this.state.email = ''
         this.state.phone = ''
@@ -160,13 +161,25 @@ class InstitutionUsers extends Component {
         }
     }
 
+    handleEditClick(request) {
+        this.setState({ staffToEdit: request, editingStaff: request.id });
+    }
+
+    handleResetPasswordClick(request) {
+        this.setState({ staffToReset: request, resetStaffPassword: request.id });
+    }
+
+    handleSuspendAccountClick(request) {
+        this.setState({ staffToSuspend: request, suspendAccount: request.id });
+    }
+
     handleSubmit = async (e) => {
         e.preventDefault();
-    
-        // Collect form data from state
+        this.setState({isSaving: true})
+
         const formData = {
             first_name: this.state.first_name,
-            other_names: this.state.other_names,
+            other_name: this.state.other_name,
             last_name: this.state.last_name,
             email: this.state.email,
             address: this.state.address,
@@ -184,6 +197,7 @@ class InstitutionUsers extends Component {
             this.toggleCreateModal();
     
             toast.success(response.data.message, {});
+            this.setState({isSaving: false})
         } catch (error) {
             // Show error toast notification in case of an error
             toast.error(error.response?.data?.message || "An error occurred. Please try again.");
@@ -191,7 +205,7 @@ class InstitutionUsers extends Component {
     };
     
     render() {
-        const { createModal, isSaving, institutionUsers, currentPage, lastPage, rowMenuOpen  } = this.state;
+        const { createModal, isSaving, institutionUsers, currentPage, lastPage, rowMenuOpen, editingStaff, staffToEdit, staffToReset, resetStaffPassword, suspendAccount, staffToSuspend  } = this.state;
         return ( 
             <>
             <div className="container mx-auto">
@@ -212,9 +226,9 @@ class InstitutionUsers extends Component {
 
                 {/* Table Section */}
                 <div className="bg-white rounded-lg p-4">
-                    <div className="overflow-x-auto"> {/* Makes table scrollable on small screens */}
-                        <table className="min-w-full table-fixed bg-white text-black text-sm">
-                            <thead className="bg-gray-100 rounded-lg sticky top-0 z-10"> {/* Sticky for fixed header */}
+                    <div className=""> {/* Makes table scrollable on small screens */}
+                        <table className="min-w-full bg-white text-black text-sm">
+                            <thead className="bg-gray-100 rounded-lg top-0 z-10"> {/* Sticky for fixed header */}
                                 <tr className="rounded-lg text-xs">
                                     <th className="text-left px-4 py-3 table-cell rounded-l-lg"> {/* Rounded left for first column */}
                                         Employee Name
@@ -257,11 +271,38 @@ class InstitutionUsers extends Component {
                                                 {/* Menu List - Display only when rowMenuOpen matches the row's request.id */}
                                                 {rowMenuOpen === request.id && (
                                                 <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded shadow-lg z-50">
-                                                    <ul className="py-1">
-                                                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">View</li>
-                                                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Edit</li>
-                                                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Delete</li>
+                                                    <ul className="py-1 text-sm">
+                                                        <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer" onClick={() => this.handleEditClick(request)}>Edit Profile</li>
+                                                        <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer" onClick={() => this.handleResetPasswordClick(request)}>Reset Password</li>
+                                                        <li className="px-4 py-2 hover:bg-red-100 cursor-pointer text-red-600" onClick={() => this.handleSuspendAccountClick(request)}>Suspend Account</li>
                                                     </ul>
+                                                
+                                                    {editingStaff === request.id && (
+                                                        <EditUserProfile
+                                                            fetchInstitutionsUsers={this.fetchInstitutionsUsers}
+                                                            staffProfile={staffToEdit}
+                                                            genderData={this.state.genderData}
+                                                            rolesData={this.state.rolesData}
+                                                            onClose={() => this.setState({ editingStaff: null, staffToEdit: null})}
+                                                        />
+                                                    )}
+                                                    {resetStaffPassword === request.id && (
+                                                    
+                                                        <ResetPassword
+                                                            fetchInstitutionsUsers={this.fetchInstitutionsUsers}
+                                                            staffProfile={staffToReset}
+                                                            onClose={() => this.setState({ resetStaffPassword: null, staffToReset: null})}
+                                                        />
+                                                    )}
+
+                                                    {suspendAccount === request.id && (
+                                                    
+                                                        <SuspendAccount
+                                                            fetchInstitutionsUsers={this.fetchInstitutionsUsers}
+                                                            staffProfile={staffToSuspend}
+                                                            onClose={() => this.setState({ suspendAccount: null, staffToSuspend: null})}
+                                                        />
+                                                    )}
                                                 </div>
                                                 )}
                                             </div>
@@ -332,8 +373,8 @@ class InstitutionUsers extends Component {
                                 />
                                 <Textbox
                                     label="Other Name"
-                                    name="other_names"
-                                    value={this.state.other_names}
+                                    name="other_name"
+                                    value={this.state.other_name}
                                     onChange={this.handleInputChange}
                                 />
                                 <Textbox
@@ -379,35 +420,32 @@ class InstitutionUsers extends Component {
                                     onChange={this.handleInputChange}
                                 />
 
-                              <div className="flex space-x-4">
-                                <button
-                                    onClick={this.toggleCreateModal}
-                                    type="button"
-                                    className="text-xs w-1/2 text-gray-600 border px-4 py-1.5 rounded-full"
-                                >
-                                    Close
-                                </button>
-                                <button
-                                    type="submit"
-                                    disabled={isSaving}
-                                    className={`w-1/2 flex items-center justify-center rounded-full ${
-                                        isSaving ? 'bg-gray-400 text-gray-700' : 'bg-buttonLog text-white'
-                                    } py-1.5 text-xs ${isSaving ? 'cursor-not-allowed' : ''}`}
-                                >
-                                    {isSaving ? (
-                                        <>
-                                            <SiPinboard size={20} className="mr-2" />
-                                            Saving...
-                                        </>
-                                    ) : (
-                                        'Save'
-                                    )}
-                                </button>
-                            </div>  
+                                <div className="flex space-x-4">
+                                    <button
+                                        onClick={this.toggleCreateModal}
+                                        type="button"
+                                        className="text-xs w-1/2 text-gray-600 border px-4 py-1.5 rounded-full"
+                                    >
+                                        Close
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        disabled={isSaving}
+                                        className={`w-1/2 flex items-center justify-center rounded-full ${
+                                            isSaving ? 'bg-gray-400 text-gray-700' : 'bg-buttonLog text-white'
+                                        } py-1.5 text-xs ${isSaving ? 'cursor-not-allowed' : ''}`}
+                                    >
+                                        {isSaving ? (
+                                            <>
+                                                <Spinner size="w-4 h-4 mr-2"/>
+                                                Saving...
+                                            </>
+                                        ) : (
+                                            'Save'
+                                        )}
+                                    </button>
+                                </div>  
                             </div>
-                    
-                            {/* Fixed button section */}
-                            
                         </form>
                     </div>
                 
@@ -424,5 +462,323 @@ class InstitutionUsers extends Component {
          );
     }
 }
- 
+class EditUserProfile extends Component {
+    constructor(props) {
+        super(props);
+            this.state = {
+            staffId: props.staffProfile.id,
+            first_name: props.staffProfile.user.first_name,
+            last_name: props.staffProfile.user.last_name,
+            other_name: props.staffProfile.user.other_name,
+            email: props.staffProfile.user.email,
+            phone: props.staffProfile.user.phone,
+            address: props.staffProfile.user.address,
+            role_id: props.staffProfile.role_id,
+            gender: props.staffProfile.user.gender,
+            isUpdating: false,
+            statusData: [
+                { id: 'active', name: 'Active' },
+                { id: 'inactive', name: 'Inactive' },
+            ],
+            genderData: this.props.genderData,
+            rolesData: this.props.rolesData
+            };
+            
+        }
+    handleInputChange = e => {
+        const { name, value } = e.target;
+        this.setState(prevState => ({
+        ...prevState,
+        [name]: value
+        }));
+    };
+    
+    handleEditProfile = async(e, staffId) => {
+        e.preventDefault()
+        this.setState({isUpdating: true})
+        const formData = {
+            first_name: this.state.first_name,
+            last_name: this.state.last_name,
+            other_name: this.state.other_name,
+            email: this.state.email,
+            address: this.state.address,
+            phone: this.state.phone,
+            gender: this.state.gender,
+            role_id: this.state.role_id,
+        };
+        
+        try {
+            const response = await axios.post(`/institution/update-profile/${staffId}`, formData);
+            this.props.fetchInstitutionsUsers();
+            this.props.onClose()
+            toast.success(response.data.message, {});
+            this.setState({isUpdating: false})
+
+        } catch (error) {
+            if (error.response && error.response.data.message) {
+                toast.error(error.response.data.message, {});
+                this.setState({isUpdating: false})
+            } else {
+                toast.error('An error occurred while updating the staff profile.');
+            }
+        }
+    }
+
+    render() {
+        const { onClose } = this.props;
+        const { staffId, isUpdating, first_name } = this.state;
+        return (
+        <>
+        <div className="fixed z-50 inset-0 bg-black bg-opacity-60 flex justify-end">
+                <form onSubmit={(e) => this.handleEditProfile(e, staffId)} className="w-1/2 lg:w-1/3 h-full bg-white shadow-lg transition-transform duration-700 ease-in-out transform"
+                    style={{ right: 0, position: 'absolute', transform: 'translateX(0)' }}
+                >
+                    <div className="flex justify-between items-center font-medium border-b-2 p-4">
+                        <h2 className="text-lg">Edit Staff Profile</h2>
+                        <button
+                            onClick={onClose}
+                            className="flex items-center justify-center h-8 w-8 bg-red-200 rounded-md"
+                        >
+                            <MdClose size={20} className="text-red-600" />
+                        </button>
+                    </div>
+            
+                    <div className="relative flex flex-col space-y-4 p-6 xl:p-8 overflow-y-auto h-[calc(100%-4rem)]"> 
+                        <Textbox
+                            label="First Name"
+                            name="first_name"
+                            value={first_name}
+                            onChange={this.handleInputChange}
+                        />
+                        <Textbox
+                            label="Other Name"
+                            name="other_name"
+                            value={this.state.other_name}
+                            onChange={this.handleInputChange}
+                        />
+                        <Textbox
+                            label="Last Name"
+                            name="last_name"
+                            value={this.state.last_name}
+                            onChange={this.handleInputChange}
+                        />
+                        
+                        <Textbox
+                            label="Email Address"
+                            name="email"
+                            type="email"
+                            value={this.state.email}
+                            onChange={this.handleInputChange}
+                        />
+                        <Textbox
+                            label="Address"
+                            name="address"
+                            value={this.state.address}
+                            onChange={this.handleInputChange}
+                        />
+                        <Textbox
+                            label="Phone Number"
+                            name="phone"
+                            value={this.state.phone}
+                            onChange={this.handleInputChange}
+                        />
+                        <Select
+                            label="Gender"
+                            name="gender"
+                            value={this.state.gender}
+                            itemNameKey="name"
+                            menuItems={this.state.genderData}
+                            onChange={this.handleInputChange}
+                        />
+                        <Select
+                            label="Role"
+                            name="role_id"
+                            value={this.state.role_id}
+                            itemNameKey="name"
+                            menuItems={this.state.rolesData}
+                            onChange={this.handleInputChange}
+                        />
+
+                        <div className="flex space-x-4">
+                            <button
+                                onClick={onClose}
+                                type="button"
+                                className="text-xs w-1/2 text-gray-600 border px-4 py-1.5 rounded-full"
+                            >
+                                Close
+                            </button>
+                            <button
+                                type="submit"
+                                disabled={isUpdating}
+                                className={`w-1/2 flex items-center justify-center rounded-full ${
+                                    isUpdating ? 'bg-gray-400 text-gray-700' : 'bg-buttonLog text-white'
+                                } py-1.5 text-xs ${isUpdating ? 'cursor-not-allowed' : ''}`}
+                            >
+                                {isUpdating ? (
+                                    <>
+                                        <Spinner size="w-4 h-4 mr-2"/>
+                                        Updating...
+                                    </>
+                                ) : (
+                                    'Update'
+                                )}
+                            </button>
+                        </div>  
+                    </div>
+                </form>
+        </div>
+        
+           
+        
+        </>
+        
+        );
+    }
+}
+class ResetPassword extends Component {
+constructor(props) {
+    super(props);
+    this.state = {
+        staffId: props.staffProfile.id,
+        isReseting: false
+    };
+    
+}
+
+handleResetPassword = async(e, staffId) => {
+    e.preventDefault()
+    this.setState({isReseting: true})
+    try {
+        const response = await axios.post(`/institution/reset-user/${staffId}`);
+            this.props.fetchInstitutionsUsers();
+            this.props.onClose()
+            toast.success(response.data.message, {});
+            this.setState({isReseting: false})
+
+    } catch (error) {
+        if (error.response && error.response.data.message) {
+            toast.error(error.response.data.message);
+            this.setState({isReseting: false})
+        } else {
+            toast.error('An error occurred while reseting users password.');
+            this.setState({isReseting: false})
+        }
+    }
+}
+
+render() {
+    const { onClose } = this.props;
+    const { staffId, isReseting } = this.state;
+    return (
+    <>
+        <div className="fixed z-50 backdrop-blur-sm bg-black inset-0 overflow-y-auto bg-opacity-60">
+            <form onSubmit={(e) => this.handleDeleteQuestion(e, staffId)} className="flex items-center justify-center min-h-screen">
+                <div className="w-full lg:w-1/2 h-44 relative bg-white shadow-lg">
+                    <div className="flex justify-between bg-deepBlue text-white">
+                        <h2 className="text-xl font-medium py-2 px-4 uppercase">Reset Password</h2>
+                        <button onClick={onClose} className="px-4 hover:text-gray-200">
+                        <MdClose size={24}/>
+                        </button>
+                    </div>
+
+                    <div className="w-full text-left font-medium text-sm my-6 mx-4">Are you sure you want to reset this users password? </div>
+
+                                                    
+                    <div className="flex absolute bottom-4 right-4 justify-end gap-x-2">
+                        <button onClick={onClose} type="button" className="text-sm text-gray-400 border px-4 py-2 uppercase">Cancel</button>
+                        <button type="submit" 
+                            disabled={isReseting}
+                            className={`w-full flex items-center justify-center  ${isReseting ? 'bg-gray-400 text-gray-700' : 'bg-deepBlue text-white'}  py-2 px-4 text-sm uppercase ${isReseting ? 'cursor-not-allowed' : ''}`}>
+                            {isReseting ? (
+                                <>
+                                    <Spinner size="w-6 h-6 mr-2" />
+                                    Resetting...
+                                </>
+                            ) : (
+                                'Reset'
+                            )}
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    
+    </>
+    
+    );
+}
+} 
+class SuspendAccount extends Component {
+constructor(props) {
+    super(props);
+    this.state = {
+        staffId: props.staffProfile.id,
+        isSuspending: false
+    };
+    
+}
+
+handleSuspendAccount = async(e, staffId) => {
+    e.preventDefault()
+    this.setState({isSuspending: true})
+    try {
+        const response = await axios.post(`/institution/reset-user/${staffId}`);
+            this.props.fetchInstitutionsUsers();
+            this.props.onClose()
+            toast.success(response.data.message, {});
+            this.setState({isSuspending: false})
+
+    } catch (error) {
+        if (error.response && error.response.data.message) {
+            toast.error(error.response.data.message);
+            this.setState({isSuspending: false})
+        } else {
+            toast.error('An error occurred while reseting users password.');
+            this.setState({isSuspending: false})
+        }
+    }
+}
+
+render() {
+    const { onClose } = this.props;
+    const { staffId, isSuspending } = this.state;
+    return (
+    <>
+        <div className="fixed z-50 backdrop-blur-sm bg-black inset-0 overflow-y-auto bg-opacity-60">
+            <form onSubmit={(e) => this.handleSuspendAccount(e, staffId)} className="flex items-center justify-center min-h-screen">
+                <div className="w-full lg:w-1/2 h-44 relative bg-white shadow-lg">
+                    <div className="flex justify-between bg-red-600 text-white">
+                        <h2 className="text-xl font-medium py-2 px-4 uppercase">Suspend User Account</h2>
+                        <button onClick={onClose} className="px-4 hover:text-gray-200">
+                        <MdClose size={24}/>
+                        </button>
+                    </div>
+
+                    <div className="w-full text-left font-medium text-sm my-6 mx-4">Are you sure you want to suspend this users account? </div>
+
+                                                    
+                    <div className="flex absolute bottom-4 right-4 justify-end gap-x-2">
+                        <button onClick={onClose} type="button" className="text-sm text-gray-400 border px-4 py-2 uppercase">Cancel</button>
+                        <button type="submit" 
+                            disabled={isSuspending}
+                            className={`w-full flex items-center justify-center  ${isSuspending ? 'bg-gray-400 text-gray-700' : 'bg-red-600 text-white'}  py-2 px-4 text-sm uppercase ${isSuspending ? 'cursor-not-allowed' : ''}`}>
+                            {isSuspending ? (
+                                <>
+                                    <Spinner size="w-6 h-6 mr-2" />
+                                    Suspending account...
+                                </>
+                            ) : (
+                                'Suspend'
+                            )}
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    
+    </>
+    
+    );
+}
+} 
 export default InstitutionUsers;

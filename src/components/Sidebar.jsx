@@ -23,8 +23,8 @@ class Sidebar extends Component {
   };
 
   isActive = (path) => {
-    return this.props.location.pathname === path;
-  };
+    return this.props.location.pathname.startsWith(path);
+  };  
 
   toggleSidebar = () => {
     this.setState((prevState) => ({
@@ -175,13 +175,12 @@ class Sidebar extends Component {
                     }`}
                     size={20}
                   />
-                  <span
-                    className={`${isCollapsed ? "hidden" : "inline self-center"}`}
-                  >
+                  <span className={`${isCollapsed ? "hidden" : "inline self-center"}`}>
                     Document Types
                   </span>
                 </Link>
               </li>
+
               
             </ul>
           </nav>
