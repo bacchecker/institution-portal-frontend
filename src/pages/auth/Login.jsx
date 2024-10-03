@@ -49,7 +49,6 @@ class Login extends Component {
         recaptcha_token: recaptcha_token,
       });
       const responseData = response.data.data;
-      console.log(responseData);
 
       localStorage.setItem("authToken", responseData.token);
       localStorage.setItem("account_type", responseData.user.account_type);
@@ -60,16 +59,16 @@ class Login extends Component {
       if (account_type == "institution") {
         toast.success(response.data.message, {});
         if (responseData.two_factor == false) {
-          this.props.navigate("/institution/verify-otp");
+          this.props.navigate("/verify-otp");
         }
         if (responseData.institution.profile_complete == "yes") {
-          this.props.navigate("/institution/dashboard", {
+          this.props.navigate("/dashboard", {
             state: {
               institutionData: responseData.institution,
             },
           });
         } else {
-          this.props.navigate("/institution/complete-profile", {
+          this.props.navigate("/complete-profile", {
             state: {
               institutionData: responseData.institution,
             },

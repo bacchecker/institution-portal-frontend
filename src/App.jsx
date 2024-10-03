@@ -10,6 +10,8 @@ import DocumentRequest from './pages/DocumentRequest';
 import InstitutionUsers from './pages/InstitutionUsers';
 import VerifyOTP from './pages/auth/VerifyOTP';
 import Toastify from './components/Toastify';
+import DocumentTypes from './pages/DocumentTypes';
+import ValidationQuestions from './pages/ValidationQuestions';
 
 class App extends Component {
   state = {
@@ -46,10 +48,10 @@ class App extends Component {
 
   render() {
     const { isSidebarVisible, isSidebarCollapsed, user } = this.state;
-    const isLoginPage = location.pathname === '/institution/login' || location.pathname === '/institution/complete-profile' || location.pathname === '/institution/verify-otp';
+    const isLoginPage = location.pathname === '/login' || location.pathname === '/' || location.pathname === '/complete-profile' || location.pathname === '/verify-otp';
 
     return (
-      <div className="flex h-screen bg-gray-100">
+      <div className="flex h-screen bg-gray-100 font-lato">
         <Toastify />
         {/* Sidebar */}
         {!isLoginPage && <Sidebar
@@ -60,7 +62,7 @@ class App extends Component {
 
         {/* Main content area */}
         <div
-          className={`flex-1 ${!isLoginPage && isSidebarCollapsed ? 'lg:ml-16' : !isLoginPage ? 'lg:ml-44 xl:ml-64' : ''} transition-margin duration-300`}
+          className={`flex-1 ${!isLoginPage && isSidebarCollapsed ? 'lg:ml-16' : !isLoginPage ? 'lg:ml-52 xl:ml-64' : ''} transition-margin duration-300`}
         >
           {/* Navbar */}
           {!isLoginPage && <Navbar
@@ -70,14 +72,17 @@ class App extends Component {
           />}
 
           {/* Page content */}
-          <div className={`${isLoginPage ? 'p-0' : 'px-5 py-4'}`}>
+          <div className={`${isLoginPage ? 'p-0' : 'px-10 py-6'} bg-gray-100`}>
           <Routes>
-            <Route exact path="/institution/login" element={<Login />} />
-            <Route exact path="/institution/verify-otp" element={<VerifyOTP />} />
-            <Route exact path="/institution/dashboard" element={<Dashboard />} />
-            <Route exact path="/institution/complete-profile" element={<CompleteProfile />} />
-            <Route exact path="/institution/document-requests" element={<DocumentRequest />} />
-            <Route exact path="/institution/staff" element={<InstitutionUsers />} />
+            <Route exact path="/" element={<Login />} />
+            <Route exact path="/login" element={<Login />} />
+            <Route exact path="/verify-otp" element={<VerifyOTP />} />
+            <Route exact path="/dashboard" element={<Dashboard />} />
+            <Route exact path="/complete-profile" element={<CompleteProfile />} />
+            <Route exact path="/document-requests" element={<DocumentRequest />} />
+            <Route exact path="/document-types" element={<DocumentTypes />} />
+            <Route exact path="/staff" element={<InstitutionUsers />} />
+            <Route exact path="/document-types/:documentId" element={<ValidationQuestions />} />
           </Routes>
           </div>
         </div>
