@@ -21,7 +21,7 @@ class Navbar extends React.Component {
     const { toggleSidebar, toggleSidebarCollapse, user } = this.props;
 
     return (
-      <div className="text-gray-800 bg-white px-4 py-2 flex justify-between items-center border-b" onClick={this.handleLogoutClick}>
+      <div className="text-gray-800 bg-white px-4 py-2 flex justify-between items-center border-b font-lato" onClick={this.handleLogoutClick}>
         <div className="flex items-center">
           {/* Sidebar Toggle Button (Mobile) */}
           <button

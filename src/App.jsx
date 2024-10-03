@@ -10,6 +10,8 @@ import DocumentRequest from './pages/DocumentRequest';
 import InstitutionUsers from './pages/InstitutionUsers';
 import VerifyOTP from './pages/auth/VerifyOTP';
 import Toastify from './components/Toastify';
+import DocumentTypes from './pages/DocumentTypes';
+import ValidationQuestions from './pages/ValidationQuestions';
 
 class App extends Component {
   state = {
@@ -49,7 +51,7 @@ class App extends Component {
     const isLoginPage = location.pathname === '/login' || location.pathname === '/' || location.pathname === '/complete-profile' || location.pathname === '/verify-otp';
 
     return (
-      <div className="flex h-screen bg-gray-100">
+      <div className="flex h-screen bg-gray-100 font-lato">
         <Toastify />
         {/* Sidebar */}
         {!isLoginPage && <Sidebar
@@ -78,7 +80,9 @@ class App extends Component {
             <Route exact path="/dashboard" element={<Dashboard />} />
             <Route exact path="/complete-profile" element={<CompleteProfile />} />
             <Route exact path="/document-requests" element={<DocumentRequest />} />
+            <Route exact path="/document-types" element={<DocumentTypes />} />
             <Route exact path="/staff" element={<InstitutionUsers />} />
+            <Route exact path="/document-types/:documentId" element={<ValidationQuestions />} />
           </Routes>
           </div>
         </div>

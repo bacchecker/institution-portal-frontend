@@ -25,7 +25,7 @@ class Dashboard extends Component {
 
     fetchInstitution = async () => {
         try {
-        const response = await axios.get('/institution/institutionData/');
+        const response = await axios.get('/institution/institution-data/');
         const institutionData = response.data.institutionData;
         
             if (institutionData) {
@@ -84,7 +84,7 @@ class Dashboard extends Component {
                         <div className="col-span-2 xl:col-span-3 grid grid-cols-2 xl:grid-cols-3 gap-4">
                             <div className="border rounded-md p-4 bg-white">
                                 <div className="flex space-x-2 text-gray-700">
-                                    <div className="bg-orange-500 text-white p-1 rounded-md">
+                                    <div className="flex items-center justify-center w-6 h-6 bg-orange-500 text-white p-1 rounded-md">
                                         <GoGitPullRequest size={16}/>
                                     </div>
                                     <p className='font-medium'>Document Requests</p>
@@ -96,7 +96,7 @@ class Dashboard extends Component {
                             </div>
                             <div className="border rounded-md p-4 bg-white">
                                 <div className="flex space-x-2 text-gray-700">
-                                    <div className="bg-blue-700 text-white p-1 rounded-md">
+                                    <div className="flex items-center justify-center w-6 h-6 bg-blue-700 text-white p-1 rounded-md">
                                         <IoDocuments size={16}/>
                                     </div>
                                     <p className='font-medium'>Reviewed Documents</p>
@@ -108,7 +108,7 @@ class Dashboard extends Component {
                             </div>
                             <div className="border rounded-md p-4 bg-white">
                                 <div className="flex space-x-2 text-gray-700">
-                                    <div className="bg-green-600 text-white p-1 rounded-md">
+                                    <div className="flex items-center justify-center w-6 h-6 bg-green-600 text-white p-1 rounded-md">
                                         <GrValidate size={16}/>
                                     </div>
                                     <p className='font-medium'>Validation Requests</p>
@@ -120,7 +120,7 @@ class Dashboard extends Component {
                             </div>
                             <div className="border rounded-md p-4 bg-white">
                                 <div className="flex space-x-2 text-gray-700">
-                                    <div className="bg-gray-700 text-white p-1 rounded-md">
+                                    <div className="flex items-center justify-center w-6 h-6 bg-gray-700 text-white p-1 rounded-md">
                                         <MdManageHistory size={16}/>
                                     </div>
                                     <p className='font-medium'>Validation History</p>

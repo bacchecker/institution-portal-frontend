@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import withRouter from "./withRouter";
 import { BiSolidDashboard } from "react-icons/bi";
 import { IoDocuments } from "react-icons/io5";
+import { GrDocumentConfig } from "react-icons/gr";
 
 class Sidebar extends Component {
   state = {
@@ -35,7 +36,7 @@ class Sidebar extends Component {
     const { isVisible, isCollapsed } = this.props;
 
     return (
-      <>
+      <div className="font-lato">
         {/* Overlay for mobile screens */}
         {isVisible && (
           <div
@@ -153,10 +154,39 @@ class Sidebar extends Component {
                   </span>
                 </Link>
               </li>
+              <li
+                className={`flex items-center py-3 cursor-pointer ${
+                  this.isActive("/document-types")
+                    ? "bg-primaryRed text-white"
+                    : "hover:text-primaryRed text-gray-500"
+                }`}
+              >
+                <div
+                  className={`w-1 h-6 ${
+                    this.isActive("/document-types") ? "bg-white" : "hidden"
+                  } rounded-tr-full rounded-br-full`}
+                ></div>
+                <Link to="/document-types" onClick={this.handleLinkClick}>
+                  <GrDocumentConfig
+                    className={`inline-block mr-2 -mt-1 ${
+                      this.isActive("/document-types")
+                        ? "text-white ml-4"
+                        : "text-gray-400 hover:text-primaryRed ml-5"
+                    }`}
+                    size={20}
+                  />
+                  <span
+                    className={`${isCollapsed ? "hidden" : "inline self-center"}`}
+                  >
+                    Document Types
+                  </span>
+                </Link>
+              </li>
+              
             </ul>
           </nav>
         </div>
-      </>
+      </div>
     );
   }
 }
