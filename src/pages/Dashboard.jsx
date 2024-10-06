@@ -7,6 +7,7 @@ import { LuClipboardEdit } from 'react-icons/lu';
 import { MdManageHistory, MdOutlineVerifiedUser } from 'react-icons/md';
 import withRouter from '../components/withRouter';
 import axios from '../axiosConfig';
+import {toast} from 'react-hot-toast'
 
 class Dashboard extends Component {
     constructor(props) {

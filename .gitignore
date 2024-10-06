@@ -7,11 +7,6 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-# Environment variables
-.env
-
-# Custom Axios configuration
-src/axiosConfig.js
 
 # Node modules
 node_modules

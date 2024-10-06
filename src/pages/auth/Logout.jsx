@@ -27,7 +27,7 @@ export default function Logout() {
   };
 
   return (
-    <>
+    <div className='font-figtree'>
       <Toastify />
 
       <div className="bg-blue-500 hover:bg-blue-600 rounded-full p-1 cursor-pointer" onClick={openModal}>
@@ -62,6 +62,6 @@ export default function Logout() {
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 }
