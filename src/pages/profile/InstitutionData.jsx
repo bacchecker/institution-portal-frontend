@@ -175,7 +175,7 @@ const InstitutionData = forwardRef((props, ref) => {
 
   const fetchInstitution = async () => {
     try {
-      const response = await axios.get('/institution/institution-data/');
+      const response = await axios.get('/institution/institution-data');
       const institutionData = response.data.institutionData;
 
       if (institutionData) {
