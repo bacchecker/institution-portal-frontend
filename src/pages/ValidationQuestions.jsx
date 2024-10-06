@@ -10,6 +10,7 @@ import Textbox from '../components/Textbox';
 import Textarea from '../components/Textarea';
 import Select from '../components/Select';
 import Spinner from '../components/Spinner';
+import { FaMoneyBill1Wave } from 'react-icons/fa6';
 
 class ValidationQuestions extends Component {
     constructor(props) {
@@ -20,6 +21,7 @@ class ValidationQuestions extends Component {
         document_type_details: {},
         loadingState: false,
         createModal: false,
+        baseFeeModal: false,
         question: '',
         index: '',
         institution_document_type_id: '',
@@ -72,6 +74,10 @@ class ValidationQuestions extends Component {
         this.setState({ createModal: !this.state.createModal });
     }
 
+    toggleBaseFeeModal = () => {
+        this.setState({ baseFeeModal: !this.state.baseFeeModal });
+    }
+
     handleInputChange = (event) => {
         const { name, value } = event.target;
 
@@ -114,7 +120,7 @@ class ValidationQuestions extends Component {
       
 
     render() { 
-        const {document_type_details, createModal, isSaving, validation_questions, editingValidationQuestion, questionToEdit, deleteValidationQuestion, questionToDelete} = this.state
+        const {document_type_details, createModal, baseFeeModal, isSaving, validation_questions, editingValidationQuestion, questionToEdit, deleteValidationQuestion, questionToDelete} = this.state
         return ( 
             <>
                 <div className="bg-white py-4">
@@ -122,14 +128,12 @@ class ValidationQuestions extends Component {
                         <h1 className='font-bold text-deepBlue text-xl mb-1'>{document_type_details.name}</h1>
                         <div className="flex space-x-4 lg:space-x-6">
                             <div className="flex space-x-2 text-sm items-center">
-                                <GiMoneyStack />
-                                <p className='font-medium'>Base Fee</p>
-                                <p>{document_type_details.base_fee}</p>
+                                <FaMoneyBill1Wave size={18} />
+                                <p className='font-medium'>Document Request Fee</p>
+                                <p>{document_type_details.base_fee ??'0.00'}</p>
                             </div>
-                            <div className="flex space-x-2 text-sm items-center">
-                                <MdPrint />
-                                <p className='font-medium'>Printing Fee</p>
-                                <p>{document_type_details.printing_fee}</p>
+                            <div className="flex space-x-2 text-sm items-center bg-blue-700 text-white rounded-lg px-3 py-1 cursor-pointer" onClick={this.toggleBaseFeeModal}>
+                                <p>Edit</p> <MdEdit />
                             </div>
                         </div>
                     </div>
@@ -189,6 +193,15 @@ class ValidationQuestions extends Component {
                                                     onClose={() => this.setState({ deleteValidationQuestion: null, questionToDelete: null})}
                                                 />
                                             )}
+                                            {deleteValidationQuestion === request.id && (
+                                            
+                                                <DeleteValidationQuestion
+                                                    fetchValidationQuestions={this.fetchValidationQuestions}
+                                                    validationQuestion={questionToDelete}
+                                                    onClose={() => this.setState({ deleteValidationQuestion: null, questionToDelete: null})}
+                                                />
+                                            )}
+                                            
                                         </div>
                                     </div>
                                 ))} 
@@ -274,6 +287,13 @@ class ValidationQuestions extends Component {
                 
                 
                 
+                )}
+                {baseFeeModal && (
+                    <UpdateBaseFee 
+                        documentType = {document_type_details} 
+                        onClose={this.toggleBaseFeeModal}
+                        fetchValidationQuestions={this.fetchValidationQuestions}
+                    />
                 )}
             </>
          );
@@ -481,5 +501,113 @@ render() {
     
     );
 }
+}
+class UpdateBaseFee extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+        documentId: props.documentType.id,
+        base_fee: props.documentType.base_fee,
+        isUpdating: false,
+        };
+        
+    }
+    handleInputChange = e => {
+        const { name, value } = e.target;
+        this.setState(prevState => ({
+        ...prevState,
+        [name]: value
+        }));
+    };
+    
+    handleUpdateBaseFee = async (e, id) => {
+        e.preventDefault()
+        const { base_fee } = this.state;
+    
+        if (!base_fee || isNaN(base_fee) || parseFloat(base_fee) < 0) {
+          toast.error("Please enter a valid base fee");
+          return;
+        }
+    
+        this.setState({ isUpdating: true });
+    
+        try {
+         
+          const response = await axios.post(`/institution/update-base-fee/${id}`, {
+            base_fee: base_fee,
+          });
+    
+          toast.success(response.data.message);
+          this.props.fetchValidationQuestions()
+          this.props.onClose()
+        } catch (error) {
+          toast.error(error.response?.data?.message || "An error occurred");
+        } finally {
+          this.setState({ isUpdating: false });
+        }
+    };
+
+    render() {
+        const { onClose } = this.props;
+        const { base_fee, isUpdating, documentId } = this.state;
+        return (
+        <>
+        <div className="fixed z-50 inset-0 bg-black bg-opacity-60 flex justify-end">
+                <form onSubmit={(e) => this.handleUpdateBaseFee(e, documentId)} className="w-1/2 lg:w-1/3 h-full bg-white shadow-lg transition-transform duration-700 ease-in-out transform"
+                    style={{ right: 0, position: 'absolute', transform: 'translateX(0)' }}
+                >
+                    <div className="flex justify-between items-center font-medium border-b-2 p-4">
+                        <h2 className="text-lg">Edit Document Requisition Fee</h2>
+                        <button
+                            onClick={onClose}
+                            className="flex items-center justify-center h-8 w-8 bg-red-200 rounded-md"
+                        >
+                            <MdClose size={20} className="text-red-600" />
+                        </button>
+                    </div>
+            
+                    <div className="relative flex flex-col space-y-4 p-6 xl:p-8 overflow-y-auto h-[calc(100%-4rem)]"> 
+                       
+                        <Textbox
+                            label="Document Fee"
+                            name="base_fee"
+                            value={base_fee}
+                            onChange={this.handleInputChange}
+                        />
+                        <div className="w-full absolute bottom-4 right-0 flex space-x-4 px-4">
+                            <button
+                                onClick={onClose}
+                                type="button"
+                                className="text-xs w-1/2 text-gray-600 border px-4 py-1.5 rounded-full"
+                            >
+                                Close
+                            </button>
+                            <button
+                                type="submit"
+                                disabled={isUpdating}
+                                className={`w-1/2 flex items-center justify-center rounded-full ${
+                                    isUpdating ? 'bg-gray-400 text-gray-700' : 'bg-buttonLog text-white'
+                                } py-1.5 text-xs ${isUpdating ? 'cursor-not-allowed' : ''}`}
+                            >
+                                {isUpdating ? (
+                                    <>
+                                        <Spinner size="w-4 h-4 mr-2"/>
+                                        Updating...
+                                    </>
+                                ) : (
+                                    'Update'
+                                )}
+                            </button>
+                        </div>  
+                    </div>
+                </form>
+        </div>
+        
+           
+        
+        </>
+        
+        );
+    }
 }
 export default withRouter(ValidationQuestions);

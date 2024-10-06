@@ -4,7 +4,7 @@ import App from './App.jsx'
 import './index.css'
 
 createRoot(document.getElementById('root')).render(
-  <BrowserRouter>
+  <BrowserRouter className='font-figtree'>
     <App />
   </BrowserRouter>,
 )

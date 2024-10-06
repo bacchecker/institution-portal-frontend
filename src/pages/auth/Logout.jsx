@@ -6,21 +6,21 @@ import { IoIosLock } from 'react-icons/io';
 import { FaCaretRight } from 'react-icons/fa';
 
 export default function Logout() {
-  const [isOpen, setIsOpen] = useState(false);  // Control modal visibility
+  const [isOpen, setIsOpen] = useState(false);
 
   const closeModal = () => {
-    setIsOpen(false);  // Close the modal
+    setIsOpen(false);
   };
 
   const openModal = () => {
-    setIsOpen(true);   // Open the modal
+    setIsOpen(true);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      localStorage.clear();  // Clear the local storage to log out the user
-      window.location.href = '/login';  // Redirect to login page
+      localStorage.clear(); 
+      window.location.href = '/login';
     } catch (error) {
       toast.error(error.response?.data?.message || 'An error occurred');
     }
@@ -30,7 +30,6 @@ export default function Logout() {
     <>
       <Toastify />
 
-      {/* This is the "Logout" button in your navbar */}
       <div className="bg-blue-500 hover:bg-blue-600 rounded-full p-1 cursor-pointer" onClick={openModal}>
         <div className="grid grid-cols-3 gap-2">
           <div className="flex items-center justify-center bg-blue-800 text-blue-400 py-1 rounded-tl-full rounded-bl-full">
@@ -43,7 +42,6 @@ export default function Logout() {
         </div>
       </div>
 
-      {/* Modal content */}
       {isOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-white p-6 rounded shadow-lg w-2/3 lg:w-1/2 xl:w-1/3">

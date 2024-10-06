@@ -3,6 +3,7 @@ import axios from "../../axiosConfig";
 import withRouter from "../../components/withRouter";
 import ReCAPTCHA from "react-google-recaptcha";
 import { toast } from "react-hot-toast";
+import Spinner from "../../components/Spinner";
 
 class Login extends Component {
   constructor(props) {
@@ -43,7 +44,7 @@ class Login extends Component {
     }
 
     try {
-      const response = await axios.post("/auth/login/", {
+      const response = await axios.post("/auth/login", {
         email: email,
         password: password,
         recaptcha_token: recaptcha_token,
@@ -211,12 +212,7 @@ class Login extends Component {
                 >
                   {isLoading ? (
                     <>
-                      <svg
-                        className="animate-spin h-5 w-5 mr-3 ..."
-                        viewBox="0 0 24 24"
-                      >
-                        {" "}
-                      </svg>
+                      <Spinner size='w-5 h-5 mr-2'/>
                       Logging In...
                     </>
                   ) : (

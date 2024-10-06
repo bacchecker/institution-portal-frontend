@@ -51,7 +51,7 @@ class App extends Component {
     const isLoginPage = location.pathname === '/login' || location.pathname === '/' || location.pathname === '/complete-profile' || location.pathname === '/verify-otp';
 
     return (
-      <div className="flex h-screen bg-gray-100 font-lato">
+      <div className="flex h-screen bg-gray-100 font-figtree">
         <Toastify />
         {/* Sidebar */}
         {!isLoginPage && <Sidebar

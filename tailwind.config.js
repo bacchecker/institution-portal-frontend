@@ -9,7 +9,8 @@ export default {
     
     extend: {
       fontFamily: {
-        "lato": ['Lato', 'sans-serif']
+        "lato": ['Lato', 'sans-serif'],
+        "figtree": ['Figtree', 'sans-serif']
       },
 
       colors: {
