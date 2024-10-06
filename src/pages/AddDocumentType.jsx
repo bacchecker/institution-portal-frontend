@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useImperativeHandle, forwardRef } from 'react';
-import axios from '../../axiosConfig';
+import React, { useState, useEffect, forwardRef } from 'react';
+import axios from '../axiosConfig';
 import { toast } from 'react-hot-toast';
 import { RiInformation2Fill } from 'react-icons/ri';
 import { IoMdAdd, IoMdClose } from 'react-icons/io';
 
-const InstitutionDocTypes = forwardRef((props, ref) => {
+const AddDocumentType = forwardRef(() => {
     
     const [searchAvailableName, setSearchAvailableName] = useState('');
     const [searchInstitutionName, setSearchInstitutionName] = useState('');
@@ -89,15 +89,7 @@ const InstitutionDocTypes = forwardRef((props, ref) => {
         }
     };
 
-    const handleSubmit = async () => {
-        return true;
-    };
-
-    // Expose handleSubmit to parent using useImperativeHandle
-    useImperativeHandle(ref, () => ({
-        submitForm: handleSubmit,
-    }));
-
+    
     return (
         <>
             <div className="bg-white w-full rounded-lg p-6 shadow-md shadow-gray-500">
@@ -302,4 +294,4 @@ const InstitutionDocTypes = forwardRef((props, ref) => {
     );
 });
 
-export default InstitutionDocTypes;
+export default AddDocumentType;

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 
 class BasicTextFields extends Component {
   render() {
-    const { label, name, onChange, value, error, className, type, error_message } = this.props;
+    const { label, name, onChange, value, error, className, type, error_message,caption } = this.props;
     
     return (
       <div className={className}>
@@ -17,6 +17,7 @@ class BasicTextFields extends Component {
             <p>{label}</p>
           </label>
         </div>
+        <p className='text-xs text-blue-800 text-right'>{caption}</p>
         {error_message && <p className='text-sm text-red-600 text-right'>{error_message}</p>}
       </div>
     );

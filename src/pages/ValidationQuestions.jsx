@@ -173,8 +173,8 @@ class ValidationQuestions extends Component {
                                         <div className={`flex-1 ${request.status == 'active' ? 'text-gray-900' : 'text-gray-400'}`}>
                                             {request.question}
                                         </div>
-                                        <div className="hidden group-hover:flex space-x-2">
-                                            <MdEdit size={28} className='text-green-700 bg-green-100 rounded-md p-1 border' onClick={() => this.handleEditClick(request)}/>
+                                        <div className="flex ">
+                                            <MdEdit size={28} className='text-green-700 bg-green-100 rounded-md p-1 border mr-2' onClick={() => this.handleEditClick(request)}/>
                                             <MdDelete size={28} className='text-red-700 bg-red-100 rounded-md p-1 border' onClick={() => this.handleDeleteClick(request)}/>
                                         
                                             {editingValidationQuestion === request.id && (
@@ -183,14 +183,6 @@ class ValidationQuestions extends Component {
                                                     fetchValidationQuestions={this.fetchValidationQuestions}
                                                     validationQuestion={questionToEdit}
                                                     onClose={() => this.setState({ editingValidationQuestion: null, questionToEdit: null})}
-                                                />
-                                            )}
-                                            {deleteValidationQuestion === request.id && (
-                                            
-                                                <DeleteValidationQuestion
-                                                    fetchValidationQuestions={this.fetchValidationQuestions}
-                                                    validationQuestion={questionToDelete}
-                                                    onClose={() => this.setState({ deleteValidationQuestion: null, questionToDelete: null})}
                                                 />
                                             )}
                                             {deleteValidationQuestion === request.id && (
@@ -249,6 +241,7 @@ class ValidationQuestions extends Component {
                                     label="Index"
                                     name="index"
                                     type="number"
+                                    caption="This number decides the order of your verification questions"
                                     value={this.state.index}
                                     onChange={this.handleInputChange}
                                 />
@@ -284,8 +277,6 @@ class ValidationQuestions extends Component {
                             
                         </form>
                     </div>
-                
-                
                 
                 )}
                 {baseFeeModal && (
@@ -381,6 +372,7 @@ class EditValidationQuestion extends Component {
                             label="Index"
                             name="index"
                             value={index}
+                            caption="This number decides the order of your verification questions"
                             onChange={this.handleInputChange}
                         />
                         <Select

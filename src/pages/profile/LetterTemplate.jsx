@@ -26,7 +26,7 @@ const LetterTemplate = forwardRef((props, ref) => {
     const fetchInstitution = async () => {
         setIsLoading(true);
         try {
-            const response = await axios.get('/institution/institution-data/');
+            const response = await axios.get('/institution/institution-data');
             const institutionData = response.data.institutionData;
 
             if (institutionData) {

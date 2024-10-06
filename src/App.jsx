@@ -7,6 +7,7 @@ import Login from './pages/auth/Login';
 import withRouter from './components/withRouter';
 import CompleteProfile from './pages/CompleteProfile';
 import DocumentRequest from './pages/DocumentRequest';
+import AddDocumentType from './pages/AddDocumentType';
 import InstitutionUsers from './pages/InstitutionUsers';
 import VerifyOTP from './pages/auth/VerifyOTP';
 import Toastify from './components/Toastify';
@@ -82,6 +83,7 @@ class App extends Component {
             <Route exact path="/document-requests" element={<DocumentRequest />} />
             <Route exact path="/document-types" element={<DocumentTypes />} />
             <Route exact path="/staff" element={<InstitutionUsers />} />
+            <Route exact path="/document-types/add-remove" element={<AddDocumentType />} />
             <Route exact path="/document-types/:documentId" element={<ValidationQuestions />} />
           </Routes>
           </div>

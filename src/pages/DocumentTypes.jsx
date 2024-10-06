@@ -1,16 +1,11 @@
 import React, { Component } from 'react';
 import { FaChevronLeft, FaChevronRight, FaPlus } from 'react-icons/fa';
-import { LuMoreVertical } from 'react-icons/lu';
 import axios from '../axiosConfig';
-import { MdClose } from 'react-icons/md';
-import { SiPinboard } from 'react-icons/si';
-import Textbox from '../components/Textbox';
-import Select from '../components/Select';
 import {toast} from 'react-hot-toast';
 import { GrDocumentConfig } from 'react-icons/gr';
-import { GiMoneyStack, GiTakeMyMoney } from 'react-icons/gi';
-import { IoArrowForward, IoArrowForwardCircle } from 'react-icons/io5';
+import { IoArrowForwardCircle } from 'react-icons/io5';
 import { NavLink } from 'react-router-dom';
+import { MdAdd } from 'react-icons/md';
 
 class DocumentTypes extends Component {
     constructor(props) {
@@ -89,7 +84,7 @@ class DocumentTypes extends Component {
                 <h1 className="text-xl font-bold mb-4">Document Types</h1>
 
                 {/* Filter Section */}
-                <div className="mb-4 flex space-x-4">
+                <div className="mb-4 flex justify-between">
                     
                     <div className="relative w-full lg:w-2/3">
                         <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
@@ -99,6 +94,7 @@ class DocumentTypes extends Component {
                         </div>
                         <input type="search" onChange={this.handleFilterChange} name='search' id="default-search" className="block w-full focus:outline-0 px-4 py-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-2xl bg-gray-50 focus:ring-blue-500 focus:border-blue-500" placeholder="Search by document name or description" required />
                     </div>
+                    <NavLink to={`/document-types/add-remove`} className={`flex items-center bg-blue-800 text-white px-4 rounded-full`}><MdAdd size={24}/> Add More</NavLink>
                 </div>
 
                 <div className="bg-white rounded-lg py-6 px-8">
