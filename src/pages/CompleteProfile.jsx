@@ -18,16 +18,16 @@ class CompleteProfile extends Component {
     const { isCollapsed } = this.state;
     return (
         <>
-            <div className="fixed w-full z-40 px-4 py-2 border-b border-blue-200 bg-blue-100">
+            <div className="fixed w-full z-40 px-4 py-2 border-b border bg-white">
               <img
                 src="/images/back-logo.png"
                 alt="BacChecker Logo"
                 className="h-10 w-auto"
               />
             </div>
-            <div className='min-h-screen py-10 px-3 lg:px-20 lg:py-16 bg-blue-100'>
+            <div className='min-h-screen py-10 px-3 lg:px-20 lg:py-16 bg-white border'>
               
-                <div className="bg-white rounded-xl w-full min-h-screen shadow-xl">
+                <div className="bg-white rounded-xl w-full min-h-screen shadow-xl border">
                     <div className="flex justify-between px-10 py-5 shadow-md shadow-blue-200 ">
                         <div className="">
                             <p className='font-bold text-2xl text-uewBlue mb-1'>Institution Account Setup</p>

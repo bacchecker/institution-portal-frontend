@@ -59,17 +59,18 @@ class Login extends Component {
 
       const account_type = localStorage.getItem("account_type");
 
+      if(responseData.institution.status == 'inactive'){
+        this.props.navigate("/account-inactive");
+        return
+      }
+
       if (account_type == "institution") {
         toast.success(response.data.message, {});
         if (responseData.two_factor == false) {
           this.props.navigate("/verify-otp");
         }
         if (responseData.institution.profile_complete == "yes") {
-          this.props.navigate("/dashboard", {
-            state: {
-              institutionData: responseData.institution,
-            },
-          });
+          this.props.navigate("/dashboard");
         } else {
           this.props.navigate("/complete-profile", {
             state: {

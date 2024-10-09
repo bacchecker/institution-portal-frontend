@@ -8,6 +8,7 @@ import Textbox from '../components/Textbox';
 import Select from '../components/Select';
 import {toast} from 'react-hot-toast';
 import Spinner from '../components/Spinner';
+import withRouter from '../components/withRouter';
 
 class InstitutionUsers extends Component {
     constructor(props) {
@@ -36,12 +37,28 @@ class InstitutionUsers extends Component {
         email: '',
         phone: '',
         address: '',
-
+        institutionStatus: this.props.institutionStatus,
+        profileComplete: this.props.profileComplete,
     }
 
     componentDidMount() {
-        this.fetchInstitutionsUsers();
-        this.fetchRoles();
+        const { profileComplete, institutionStatus } = this.state;
+  
+        if (institutionStatus == 'inactive') {
+        setTimeout(() => {
+            this.props.navigate("/account-inactive");
+            return
+        }, 0)
+        } else if(profileComplete == 'no') {
+        setTimeout(() => {
+            this.props.navigate("/complete-profile");
+            return
+        }, 0)
+        }else{
+            this.fetchInstitutionsUsers();
+            this.fetchRoles();
+        }
+        
     }
 
     fetchInstitutionsUsers = (page = 1) => {
@@ -61,11 +78,11 @@ class InstitutionUsers extends Component {
             total: response.data.institutionUsers.total,
             });
         } else {
-            toast.error('Error fetching institution users');
+            toast.error(error.response.data.message);
         }
         })
         .catch((error) => {
-        toast.error('Error:', error.response.data.message);
+        toast.error(error.response.data.message);
         });
     };
 
@@ -81,8 +98,6 @@ class InstitutionUsers extends Component {
         toast.error(error);
         }
     }
-
-
 
     toggleCreateModal = () => {
         this.setState({
@@ -243,72 +258,88 @@ class InstitutionUsers extends Component {
                                 </tr>
                             </thead>
                             <tbody className='mt-2'>
-                                {institutionUsers.map((request) => (
-                                    <tr key={request.id} className="bg-white">
-                                        <td className="pl-4 p-2 table-cell">
-                                            <p className='font-semibold text-gray-800 text-base'>{request.user.first_name} {request.user.last_name}</p>
-                                            <p className='text-gray-600 font-medium'>{request.user.phone}</p>
-                                        </td>
-                                        <td className="p-2 table-cell">{request.user.private_code}</td>
-                                        <td className="p-2 table-cell">{request.user.email}</td>
-                                        <td className="p-2 table-cell">{request.role_id}</td>
-                                        <td className="p-2 table-cell text-center">
-                                            <span className={`inline-block text-xs ${this.getStatusClass(request.status)} px-4 py-1.5 rounded-full`}>
-                                                {this.capitalizeFirstLetter(request.status)}
-                                            </span>
-                                        </td>
+                                {institutionUsers.length > 0 ? (
+                                    institutionUsers.map((request) => (
+                                        <tr key={request.id} className="bg-white">
+                                            <td className="pl-4 p-2 table-cell">
+                                                <p className='font-semibold text-gray-800 text-base'>{request.user.first_name} {request.user.last_name}</p>
+                                                <p className='text-gray-600 font-medium'>{request.user.phone}</p>
+                                            </td>
+                                            <td className="p-2 table-cell">{request.user.private_code}</td>
+                                            <td className="p-2 table-cell">{request.user.email}</td>
+                                            <td className="p-2 table-cell">{request.role_id}</td>
+                                            <td className="p-2 table-cell text-center">
+                                                <span className={`inline-block text-xs ${this.getStatusClass(request.status)} px-4 py-1.5 rounded-full`}>
+                                                    {this.capitalizeFirstLetter(request.status)}
+                                                </span>
+                                            </td>
 
-                                        <td className="p-2">
-                                            <div className="relative">
-                                                {/* Toggle Menu Button */}
-                                                <div
-                                                className="flex items-center justify-center cursor-pointer hover:border-blue-500 border-2 rounded-md w-8 h-8"
-                                                onClick={() => this.handleMenuToggle(request.id)}
-                                                >
-                                                <LuMoreVertical />
-                                                </div>
+                                            <td className="p-2">
+                                                <div className="relative">
+                                                    {/* Toggle Menu Button */}
+                                                    <div
+                                                    className="flex items-center justify-center cursor-pointer hover:border-blue-500 border-2 rounded-md w-8 h-8"
+                                                    onClick={() => this.handleMenuToggle(request.id)}
+                                                    >
+                                                    <LuMoreVertical />
+                                                    </div>
 
-                                                {/* Menu List - Display only when rowMenuOpen matches the row's request.id */}
-                                                {rowMenuOpen === request.id && (
-                                                <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded shadow-lg z-50">
-                                                    <ul className="py-1 text-sm">
-                                                        <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer" onClick={() => this.handleEditClick(request)}>Edit Profile</li>
-                                                        <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer" onClick={() => this.handleResetPasswordClick(request)}>Reset Password</li>
-                                                        <li className="px-4 py-2 hover:bg-red-100 cursor-pointer text-red-600" onClick={() => this.handleSuspendAccountClick(request)}>Suspend Account</li>
-                                                    </ul>
-                                                
-                                                    {editingStaff === request.id && (
-                                                        <EditUserProfile
-                                                            fetchInstitutionsUsers={this.fetchInstitutionsUsers}
-                                                            staffProfile={staffToEdit}
-                                                            genderData={this.state.genderData}
-                                                            rolesData={this.state.rolesData}
-                                                            onClose={() => this.setState({ editingStaff: null, staffToEdit: null})}
-                                                        />
-                                                    )}
-                                                    {resetStaffPassword === request.id && (
+                                                    {/* Menu List - Display only when rowMenuOpen matches the row's request.id */}
+                                                    {rowMenuOpen === request.id && (
+                                                    <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded shadow-lg z-50">
+                                                        <ul className="py-1 text-sm">
+                                                            <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer" onClick={() => this.handleEditClick(request)}>Edit Profile</li>
+                                                            <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer" onClick={() => this.handleResetPasswordClick(request)}>Reset Password</li>
+                                                            <li className="px-4 py-2 hover:bg-red-100 cursor-pointer text-red-600" onClick={() => this.handleSuspendAccountClick(request)}>Suspend Account</li>
+                                                        </ul>
                                                     
-                                                        <ResetPassword
-                                                            fetchInstitutionsUsers={this.fetchInstitutionsUsers}
-                                                            staffProfile={staffToReset}
-                                                            onClose={() => this.setState({ resetStaffPassword: null, staffToReset: null})}
-                                                        />
-                                                    )}
+                                                        {editingStaff === request.id && (
+                                                            <EditUserProfile
+                                                                fetchInstitutionsUsers={this.fetchInstitutionsUsers}
+                                                                staffProfile={staffToEdit}
+                                                                genderData={this.state.genderData}
+                                                                rolesData={this.state.rolesData}
+                                                                onClose={() => this.setState({ editingStaff: null, staffToEdit: null})}
+                                                            />
+                                                        )}
+                                                        {resetStaffPassword === request.id && (
+                                                        
+                                                            <ResetPassword
+                                                                fetchInstitutionsUsers={this.fetchInstitutionsUsers}
+                                                                staffProfile={staffToReset}
+                                                                onClose={() => this.setState({ resetStaffPassword: null, staffToReset: null})}
+                                                            />
+                                                        )}
 
-                                                    {suspendAccount === request.id && (
-                                                    
-                                                        <SuspendAccount
-                                                            fetchInstitutionsUsers={this.fetchInstitutionsUsers}
-                                                            staffProfile={staffToSuspend}
-                                                            onClose={() => this.setState({ suspendAccount: null, staffToSuspend: null})}
-                                                        />
+                                                        {suspendAccount === request.id && (
+                                                        
+                                                            <SuspendAccount
+                                                                fetchInstitutionsUsers={this.fetchInstitutionsUsers}
+                                                                staffProfile={staffToSuspend}
+                                                                onClose={() => this.setState({ suspendAccount: null, staffToSuspend: null})}
+                                                            />
+                                                        )}
+                                                    </div>
                                                     )}
                                                 </div>
-                                                )}
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))}
+                                            </td>
+                                        </tr>
+                                    ))
+                                ):(
+                                    <tr>
+                                    <td colSpan="7" className="p-6 text-center">
+                                        <div className="flex flex-col justify-center items-center">
+                                            <img
+                                                src="/images/nodata.png"
+                                                alt="No data available"
+                                                className="w-1/4 h-auto object-contain"
+                                            />
+                                            <p className="text-gray-500 text-sm font-medium -mt-5 xl:-mt-12">No staff data found</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                                )
+                                }
                             </tbody>
                         </table>
                     </div>
@@ -781,4 +812,4 @@ render() {
     );
 }
 } 
-export default InstitutionUsers;
+export default withRouter(InstitutionUsers);

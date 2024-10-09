@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import axios from '../axiosConfig';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import { LuMoreVertical } from 'react-icons/lu';
-
+import {toast} from 'react-hot-toast';
+import withRouter from '../components/withRouter';
 class DocumentRequest extends Component {
     constructor(props) {
         super(props);
@@ -15,10 +16,27 @@ class DocumentRequest extends Component {
         lastPage: 1,
         total: 0,
         rowMenuOpen: null,
+        institutionStatus: this.props.institutionStatus,
+        profileComplete: this.props.profileComplete,
     }
 
     componentDidMount() {
-        this.fetchDocumentRequests();
+        const { profileComplete, institutionStatus } = this.state;
+  
+        if (institutionStatus == 'inactive') {
+        setTimeout(() => {
+            this.props.navigate("/account-inactive");
+            return
+        }, 0)
+        } else if(profileComplete == 'no') {
+        setTimeout(() => {
+            this.props.navigate("/complete-profile");
+            return
+        }, 0)
+        }else{
+            this.fetchDocumentRequests();
+        }
+        
     }
 
     fetchDocumentRequests = (page = 1) => {
@@ -39,11 +57,11 @@ class DocumentRequest extends Component {
             total: response.data.documentRequests.total,  // Capture total number of records
             });
         } else {
-            console.error('Error fetching document requests:', response.data.message);
+            toast.error(error.response.data.message);
         }
         })
         .catch((error) => {
-        console.error('Error:', error);
+        toast.error(error.response.data.message);
         });
     };
 
@@ -144,7 +162,8 @@ class DocumentRequest extends Component {
                                 </tr>
                             </thead>
                             <tbody className='mt-2'>
-                                {documentRequests.map((request) => (
+                                {documentRequests.length > 0 ? (
+                                    documentRequests.map((request) => (
                                     <tr key={request.id} className="bg-white">
                                         <td className="pl-4 p-2 table-cell">
                                             <p className='font-semibold text-gray-800 text-base'>{request.user.first_name} {request.user.last_name}</p>
@@ -183,7 +202,22 @@ class DocumentRequest extends Component {
                                             </div>
                                         </td>
                                     </tr>
-                                ))}
+                                ))
+                                ):(
+                                    <tr>
+                                    <td colSpan="6" className="p-6 text-center">
+                                        <div className="flex flex-col justify-center items-center">
+                                            <img
+                                                src="/images/nodata.png"
+                                                alt="No data available"
+                                                className="w-1/4 h-auto object-contain"
+                                            />
+                                            <p className="text-gray-500 text-sm font-medium -mt-5 xl:-mt-12">No document request found</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                                )
+                                }
                             </tbody>
                         </table>
                     </div>
@@ -224,4 +258,4 @@ class DocumentRequest extends Component {
     }
 }
  
-export default DocumentRequest;
+export default withRouter(DocumentRequest);

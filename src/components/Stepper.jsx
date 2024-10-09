@@ -5,10 +5,10 @@ import { IoCheckmarkDoneCircleSharp, IoDocuments, IoDocumentText } from 'react-i
 import { GiFinishLine } from 'react-icons/gi';
 
 const steps = [
-  { label: 'Institution Data', icon: FaUser, component: lazy(() => import('../pages/profile/InstitutionData')) },
-  { label: 'Institution Document Types', icon: IoDocuments, component: lazy(() => import('../pages/profile/InstitutionDocTypes')) },
-  { label: 'Letter Template', icon: IoDocumentText, component: lazy(() => import('../pages/profile/LetterTemplate')) },
-  { label: 'Complete Profile', icon: IoCheckmarkDoneCircleSharp, component: lazy(() => import('../pages/profile/Final')) },
+  { label: 'Institution Data', icon: FaUser, component: lazy(() => import('../pages/complete-profile/InstitutionData')) },
+  { label: 'Institution Document Types', icon: IoDocuments, component: lazy(() => import('../pages/complete-profile/InstitutionDocTypes')) },
+  { label: 'Letter Template', icon: IoDocumentText, component: lazy(() => import('../pages/complete-profile/LetterTemplate')) },
+  { label: 'Complete Profile', icon: IoCheckmarkDoneCircleSharp, component: lazy(() => import('../pages/complete-profile/Final')) },
 ];
 
 const HorizontalLinearStepper = () => {
@@ -30,7 +30,7 @@ const HorizontalLinearStepper = () => {
     const currentRef = stepRefs[activeStep];
     
     if (currentRef.current) {
-      const isSubmitted = await currentRef.current.submitForm(); // Wait for the submission to complete
+      const isSubmitted = await currentRef.current.submitForm();
       if (isSubmitted) {
         setActiveStep((prevStep) => prevStep + 1); // Only increment if submission was successful
         window.scrollTo(0, 0); // Scroll to the top if submission is successful

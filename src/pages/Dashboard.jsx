@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { GoGitPullRequest } from "react-icons/go";
 import { GrValidate } from "react-icons/gr";
-import { IoIosNotificationsOutline } from "react-icons/io";
+import { IoIosMail, IoIosNotificationsOutline } from "react-icons/io";
 import { IoDocumentAttach, IoDocuments } from "react-icons/io5";
 import { LuClipboardEdit } from "react-icons/lu";
 import { MdManageHistory, MdOutlineVerifiedUser } from "react-icons/md";
@@ -17,12 +17,28 @@ class Dashboard extends Component {
     name: "",
     description: "",
     prefix: "",
+    institutionStatus: this.props.institutionStatus,
+    profileComplete: this.props.profileComplete,
   };
 
   componentDidMount() {
-    this.fetchInstitution();
+    const { profileComplete, institutionStatus } = this.state;
+  
+    if (institutionStatus == 'inactive') {
+      setTimeout(() => {
+        this.props.navigate("/account-inactive");
+        return
+      }, 0)
+    } else if(profileComplete == 'no') {
+      setTimeout(() => {
+        this.props.navigate("/complete-profile");
+        return
+      }, 0)
+    }else{
+      this.fetchInstitution();
+    }
   }
-
+  
   fetchInstitution = async () => {
     try {
       const response = await axios.get("/institution/institution-data");
@@ -48,7 +64,7 @@ class Dashboard extends Component {
   render() {
     return (
       <>
-        <div className="w-full">
+      <div className="w-full">
           <div className="grid grid-cols-2 xl:grid-cols-4 gap-8">
             <div className="col-span-3 flex items-center xl:space-x-8 space-x-4">
               <div className="">
@@ -209,7 +225,9 @@ class Dashboard extends Component {
               </div>
             </div>
           </div>
-        </div>
+      </div>
+      
+        
       </>
     );
   }

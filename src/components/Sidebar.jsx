@@ -1,16 +1,17 @@
 import React, { Component } from "react";
-import { FaUserCircle } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import withRouter from "./withRouter";
 import { BiSolidDashboard } from "react-icons/bi";
 import { IoDocuments } from "react-icons/io5";
 import { GrDocumentConfig } from "react-icons/gr";
 import { FaCircleUser } from "react-icons/fa6";
+import axios from "../axiosConfig";
 
 class Sidebar extends Component {
   state = {
     activeMenu: "",
     isCollapsed: this.props.isCollapsed,
+    institutionInfo: []
   };
 
   toggleSubMenu = (menu) => {
@@ -33,6 +34,25 @@ class Sidebar extends Component {
     }));
   };
 
+  componentDidMount() {
+    this.fetchInstitution();
+  }
+
+  fetchInstitution = async () => {
+    try {
+      const response = await axios.get("/institution/institution-data");
+      const institutionData = response.data.institutionData;
+
+      if (institutionData) {
+        this.setState({
+          institutionInfo: institutionData,
+        });
+      }
+    } catch (error) {
+      toast.error(error.response.data.message);
+    }
+  };
+
   render() {
     const { isVisible, isCollapsed } = this.props;
 
@@ -41,13 +61,13 @@ class Sidebar extends Component {
         {/* Overlay for mobile screens */}
         {isVisible && (
           <div
-            className="fixed inset-0 bg-gray-500 bg-opacity-50 backdrop-blur-sm z-40 md:hidden"
+            className="fixed inset-0 bg-gray-500 bg-opacity-50 backdrop-blur-sm z-20 md:hidden"
             onClick={this.props.closeSidebar} // Close sidebar on click outside
           ></div>
         )}
         
         <div
-          className={`fixed inset-y-0 left-0 text-gray-800 bg-white transition-all duration-700 z-50 border-r
+          className={`fixed inset-y-0 left-0 text-gray-800 bg-white transition-all duration-700 z-40 border-r
             ${isCollapsed ? "w-16" : "w-60 lg:w-[17%]"} 
             ${isVisible ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
           `}
@@ -65,7 +85,7 @@ class Sidebar extends Component {
           </div>
 
           <nav className="mt-10">
-            <ul>
+            <ul className={`${this.state.institutionInfo.status == 'inactive' ? 'cursor-not-allowed' : ''}`}>
               <li
                 className={`flex items-center py-3 cursor-pointer ${
                   this.isActive("/dashboard")

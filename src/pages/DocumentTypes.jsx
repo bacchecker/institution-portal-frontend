@@ -6,6 +6,7 @@ import { GrDocumentConfig } from 'react-icons/gr';
 import { IoArrowForwardCircle } from 'react-icons/io5';
 import { NavLink } from 'react-router-dom';
 import { MdAdd } from 'react-icons/md';
+import withRouter from '../components/withRouter';
 
 class DocumentTypes extends Component {
     constructor(props) {
@@ -17,10 +18,26 @@ class DocumentTypes extends Component {
         currentPage: 1,
         lastPage: 1,
         total: 0,
+        institutionStatus: this.props.institutionStatus,
+        profileComplete: this.props.profileComplete,
     }
 
     componentDidMount() {
-        this.fetchDocumentTypes();
+        const { profileComplete, institutionStatus } = this.state;
+  
+        if (institutionStatus == 'inactive') {
+        setTimeout(() => {
+            this.props.navigate("/account-inactive");
+            return
+        }, 0)
+        } else if(profileComplete == 'no') {
+        setTimeout(() => {
+            this.props.navigate("/complete-profile");
+            return
+        }, 0)
+        }else{
+            this.fetchDocumentTypes();
+        }
     }
 
     fetchDocumentTypes = (page = 1) => {
@@ -40,11 +57,11 @@ class DocumentTypes extends Component {
             total: response.data.documentTypes.total,
             });
         } else {
-            toast.error('Error fetching institution users');
+            toast.error(error.response.data.message);
         }
         })
         .catch((error) => {
-        toast.error('Error:', error.response.data.message);
+        toast.error(error.response.data.message);
         });
     };
 
@@ -94,7 +111,7 @@ class DocumentTypes extends Component {
                         </div>
                         <input type="search" onChange={this.handleFilterChange} name='search' id="default-search" className="block w-full focus:outline-0 px-4 py-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-2xl bg-gray-50 focus:ring-blue-500 focus:border-blue-500" placeholder="Search by document name or description" required />
                     </div>
-                    <NavLink to={`/document-types/add-remove`} className={`flex items-center bg-blue-800 text-white px-4 rounded-full`}><MdAdd size={24}/> Add More</NavLink>
+                    <NavLink to={`/document-types/add-remove`} className={`flex items-center bg-purple-800 text-white px-4 rounded-full`}><MdAdd size={24}/> Add More</NavLink>
                 </div>
 
                 <div className="bg-white rounded-lg py-6 px-8">
@@ -164,4 +181,4 @@ class DocumentTypes extends Component {
     }
 }
  
-export default DocumentTypes;
+export default withRouter(DocumentTypes);
