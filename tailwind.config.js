@@ -15,6 +15,7 @@ export default {
 
       colors: {
         'primaryRed': "#FE0000",
+        'bChkRed': "#FD0D0E",
         'buttonLog': "#F31260",
         'deepBlue': "#232263",
       },

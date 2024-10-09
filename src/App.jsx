@@ -63,7 +63,7 @@ class App extends Component {
 
         {/* Main content area */}
         <div
-          className={`flex-1 ${!isLoginPage && isSidebarCollapsed ? 'lg:ml-16' : !isLoginPage ? 'lg:ml-52 xl:ml-64' : ''} transition-margin duration-300`}
+          className={`flex-1 ${!isLoginPage && isSidebarCollapsed ? 'lg:ml-16' : !isLoginPage ? 'lg:ml-[17%]' : ''} transition-margin duration-300`}
         >
           {/* Navbar */}
           {!isLoginPage && <Navbar

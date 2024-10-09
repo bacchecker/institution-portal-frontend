@@ -4,6 +4,7 @@ import withRouter from "../../components/withRouter";
 import ReCAPTCHA from "react-google-recaptcha";
 import { toast } from "react-hot-toast";
 import Spinner from "../../components/Spinner";
+import { LuEye, LuEyeOff } from "react-icons/lu";
 
 class Login extends Component {
   constructor(props) {
@@ -39,7 +40,8 @@ class Login extends Component {
     const { email, password, recaptcha_token } = this.state;
 
     if (!recaptcha_token) {
-      alert("Please complete the reCAPTCHA");
+      toast.error("Please complete the reCAPTCHA");
+      this.setState({ isLoading: false });
       return;
     }
 
@@ -98,13 +100,17 @@ class Login extends Component {
     } = this.state;
     return (
       <>
-        <div className="h-screen w-full flex justify-center items-center px-4 lg:px-0">
-          <div className="md:w-2/5 lg:w-1/3 2xl:w-1/4 w-full pb-10 md:px-4 lg:px-6 bg-white rounded-3xl shadow-xl">
+        <div className="h-screen w-full flex justify-center items-center md:px-4 lg:px-0 bg-white md:bg-gray-100">
+          <div className="md:w-2/5 lg:w-1/3 2xl:w-1/4 w-full pb-10 md:px-4 lg:px-6 bg-white md:shadow-xl">
             <form className="mt-6">
               <div className="text-center text-yellow-100">
-                <div className="flex items-center justify-center mx-auto w-24 h-24">
+                <div className="flex items-center justify-center mx-auto w-32 h-32">
                   <img src="/images/bclogo.jpg" alt="BacChecker Logo" />
                 </div>
+              </div>
+              <div className="flex flex-col text-center mt-4">
+                <p className="font-bold text-gray-700 text-lg">Login to your account</p>
+                <p className="text-gray-700 text-sm">Access your Institution account by logging in</p>
               </div>
               <div className="relative my-6 mx-5 md:mx-0">
                 <input
@@ -112,7 +118,7 @@ class Login extends Component {
                   name="email"
                   value={email}
                   onChange={(e) => this.setState({ email: e.target.value })}
-                  className="block rounded-full px-2.5 pb-1 pt-5 pl-10 w-full text-sm text-gray-900 bg-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+                  className="block rounded-md px-2.5 pb-1 pt-5 pl-10 w-full text-sm text-gray-900 bg-blue-50 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
                   placeholder=" "
                 />
 
@@ -129,7 +135,7 @@ class Login extends Component {
                 <div className="text-xs text-red-600 italic">{emailError}</div>
                 <label
                   htmlFor="floating_filled"
-                  className="absolute text-sm text-gray-500 duration-300 pl-10 transform -translate-y-4 scale-75 top-4 z-10 origin-[0] left-2.5 peer-focus:text-blue-gray-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4"
+                  className="absolute text-base text-gray-500 duration-300 pl-10 transform -translate-y-4 scale-75 top-4 z-10 origin-[0] left-2.5 peer-focus:text-blue-gray-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4"
                 >
                   Email
                 </label>
@@ -141,7 +147,7 @@ class Login extends Component {
                   name="password"
                   value={password}
                   onChange={(e) => this.setState({ password: e.target.value })}
-                  className="block rounded-full pr-6 pb-1 pt-5 pl-10 w-full text-sm text-gray-900 bg-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+                  className="block rounded-md pr-6 pb-1 pt-5 pl-10 w-full text-sm text-gray-900 bg-blue-50 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
                   placeholder=" "
                 />
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -155,28 +161,10 @@ class Login extends Component {
                   </svg>
                 </div>
                 <div className="flex absolute inset-y-0 items-center right-0 pr-4">
-                  {showPassword ? (
-                    <svg
-                      onClick={this.handleClickShowPassword}
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="currentColor"
-                      className="bi bi-eye-fill w-5 h-5 text-gray-700 cursor-pointer"
-                      viewBox="0 0 16 16"
-                    >
-                      <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0" />
-                      <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8m8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7" />
-                    </svg>
+                  {!showPassword ? (
+                    <LuEye size={24} onClick={this.handleClickShowPassword} className="cursor-pointer text-gray-700"/>
                   ) : (
-                    <svg
-                      onClick={this.handleClickShowPassword}
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="currentColor"
-                      className="bi bi-eye-slash-fill w-5 h-5 text-gray-700 cursor-pointer"
-                      viewBox="0 0 16 16"
-                    >
-                      <path d="m10.79 12.912-1.614-1.615a3.5 3.5 0 0 1-4.474-4.474l-2.06-2.06C.938 6.278 0 8 0 8s3 5.5 8 5.5a7 7 0 0 0 2.79-.588M5.21 3.088A7 7 0 0 1 8 2.5c5 0 8 5.5 8 5.5s-.939 1.721-2.641 3.238l-2.062-2.062a3.5 3.5 0 0 0-4.474-4.474z" />
-                      <path d="M5.525 7.646a2.5 2.5 0 0 0 2.829 2.829zm4.95.708-2.829-2.83a2.5 2.5 0 0 1 2.829 2.829zm3.171 6-12-12 .708-.708 12 12z" />
-                    </svg>
+                    <LuEyeOff size={24} onClick={this.handleClickShowPassword} className="cursor-pointer text-gray-700"/>
                   )}
                 </div>
                 <div className="text-sm text-red-600 italic">
@@ -184,7 +172,7 @@ class Login extends Component {
                 </div>
                 <label
                   htmlFor="floating_filled"
-                  className="absolute text-sm text-gray-500 duration-300 transform -translate-y-4 pl-10 scale-75 top-4 z-10 origin-[0] left-2.5 peer-focus:text-blue-gray-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4"
+                  className="absolute text-base text-gray-500 duration-300 transform -translate-y-4 pl-10 scale-75 top-4 z-10 origin-[0] left-2.5 peer-focus:text-blue-gray-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4"
                 >
                   Password
                 </label>
@@ -205,8 +193,8 @@ class Login extends Component {
                   className={`w-full flex items-center justify-center mr-2 ${
                     isLoading
                       ? "bg-gray-400 text-gray-700 cursor-not-allowed"
-                      : "bg-buttonLog hover:bg-red-600 text-white"
-                  }  rounded-full py-2.5 md:mb-1 mb-5 text-sm uppercase font-semibold ${
+                      : "hover:bg-buttonLog bg-bChkRed text-white"
+                  }  rounded-md py-2.5 md:mb-1 mb-5 ${
                     isLoading ? "cursor-not-allowed" : ""
                   }`}
                 >
@@ -216,14 +204,14 @@ class Login extends Component {
                       Logging In...
                     </>
                   ) : (
-                    "Login"
+                    "Log In"
                   )}
                 </button>
               </div>
-              <p className="text-center text-xs font-semibold text-gray-600">
-                Forgotten Password?{" "}
-                <a href="https://backend.baccheck.online/forgot-password">
-                  Click Here
+              <p className="text-center text-base text-gray-600">
+                Forgot your Password?{" "}
+                <a href="https://backend.baccheck.online/forgot-password" className="text-red-600">
+                  Reset
                 </a>
               </p>
             </form>

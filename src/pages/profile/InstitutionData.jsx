@@ -52,7 +52,6 @@ const InstitutionData = forwardRef((props, ref) => {
   const [errors, setErrors] = useState({});
   const [isSaving, setIsSaving] = useState(false);
 
-  // Handle input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevState) => ({
@@ -61,7 +60,6 @@ const InstitutionData = forwardRef((props, ref) => {
     }));
   };
 
-  // Handle image change
   const handleImageChange = (event) => {
     const file = event.target.files[0];
     if (file) {
@@ -77,7 +75,6 @@ const InstitutionData = forwardRef((props, ref) => {
     }
   };
 
-  // Validate form
   const validateForm = () => {
     const {
       name,
@@ -117,10 +114,9 @@ const InstitutionData = forwardRef((props, ref) => {
     return Object.keys(newErrors).length === 0;
   };
 
-  // Handle form submission
   const handleSubmit = async (event) => {
     if (event) event.preventDefault();
-      setIsSaving(true); // Set isSaving to true
+      setIsSaving(true);
       onSavingChange(true);
 
     if (!validateForm()) {
@@ -152,7 +148,6 @@ const InstitutionData = forwardRef((props, ref) => {
   };
 
 
-  // Set form data from props if available
   useEffect(() => {
     const { institutionData } = location.state || {};
     if (institutionData) {
