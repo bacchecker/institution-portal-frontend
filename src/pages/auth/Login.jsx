@@ -58,9 +58,9 @@ class Login extends Component {
       this.setState({ isLoading: false });
 
       const account_type = localStorage.getItem("account_type");
-
+      
       if(responseData.institution.status == 'inactive'){
-        this.props.navigate("/account-inactive");
+        toast.error('Your account is currently under review by our management team we will revert to you once the review is complete.')
         return
       }
 
@@ -72,11 +72,7 @@ class Login extends Component {
         if (responseData.institution.profile_complete == "yes") {
           this.props.navigate("/dashboard");
         } else {
-          this.props.navigate("/complete-profile", {
-            state: {
-              institutionData: responseData.institution,
-            },
-          });
+          this.props.navigate("/account-profile");
         }
       } else {
         toast.error("Your are not an institution");
@@ -110,8 +106,8 @@ class Login extends Component {
                 </div>
               </div>
               <div className="flex flex-col text-center mt-4">
-                <p className="font-bold text-gray-700 text-lg">Login to your account</p>
-                <p className="text-gray-700 text-sm">Access your Institution account by logging in</p>
+                <p className="font-bold text-gray-700 text-base">Login to your account</p>
+                <p className="text-gray-700 text-xs">Access your Institution account by logging in</p>
               </div>
               <div className="relative my-6 mx-5 md:mx-0">
                 <input
@@ -209,7 +205,7 @@ class Login extends Component {
                   )}
                 </button>
               </div>
-              <p className="text-center text-base text-gray-600">
+              <p className="text-center text-sm text-gray-600">
                 Forgot your Password?{" "}
                 <a href="https://backend.baccheck.online/forgot-password" className="text-red-600">
                   Reset

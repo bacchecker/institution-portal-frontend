@@ -22,21 +22,7 @@ class Dashboard extends Component {
   };
 
   componentDidMount() {
-    const { profileComplete, institutionStatus } = this.state;
-  
-    if (institutionStatus == 'inactive') {
-      setTimeout(() => {
-        this.props.navigate("/account-inactive");
-        return
-      }, 0)
-    } else if(profileComplete == 'no') {
-      setTimeout(() => {
-        this.props.navigate("/complete-profile");
-        return
-      }, 0)
-    }else{
       this.fetchInstitution();
-    }
   }
   
   fetchInstitution = async () => {

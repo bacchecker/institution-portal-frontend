@@ -24,7 +24,6 @@ class Profile extends Component {
         phone: '',
         address: '',
         photo: '',
-        address: '',
         digital_address: '',
         isUpdating: false,
         isChanging: false,

@@ -5,10 +5,10 @@ class SelectSmall extends Component {
     const { label, value, onChange, menuItems, name, itemNameKey, error_message } = this.props;
 
     return (
-      <form className="w-full">
+      <div className="w-full">
         <label
           htmlFor={name}
-          className="block mb-1 text-sm text-gray-900"
+          className="block ml-3 text-sm text-gray-900 -mt-4"
         >
           {label}
         </label>
@@ -17,7 +17,7 @@ class SelectSmall extends Component {
           name={name}
           value={value}
           onChange={onChange}
-          className="bg-gray-100 text-gray-900 focus:outline-0 focus:ring-blue-500 focus:border-blue-500 block w-full px-2.5 py-3 rounded-md"
+          className="bg-gray-100 text-gray-900 focus:outline-0 focus:ring-blue-500 focus:border-blue-500 block w-full px-2.5 py-2.5 rounded-md"
         >
           <option value="" disabled>
             Select an option
@@ -29,7 +29,7 @@ class SelectSmall extends Component {
           ))}
         </select>
         {error_message && <p className='text-sm text-red-600 text-right'>{error_message}</p>}
-      </form>
+      </div>
     );
   }
 }

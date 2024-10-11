@@ -17,6 +17,7 @@ import Profile from './pages/user-profile/Profile';
 import AccountInactive from './pages/complete-profile/AccountInactive';
 import axios from './axiosConfig';
 import {toast} from 'react-hot-toast';
+import InstitutionData from './pages/complete-profile/InstitutionData';
 
 class App extends Component {
   state = {
@@ -93,18 +94,20 @@ class App extends Component {
           />}
 
           {/* Page content */}
-          <div className={`${isLoginPage ? 'p-0' : 'px-10 py-6'} bg-gray-100`}>
+          <div className={`${isLoginPage ? 'p-0' : 'p-3'} bg-gray-100`}>
             <Routes>
               <Route exact path="/" element={<Login />} />
               <Route exact path="/login" element={<Login />} />
               <Route exact path="/user-profile" element={<Profile />} />
               <Route exact path="/verify-otp" element={<VerifyOTP />} />
               <Route exact path="/account-inactive" element={<AccountInactive />} />
-              <Route exact path="/dashboard" element={<Dashboard institutionStatus={institutionStatus} profileComplete={profileComplete}/>} />
+              <Route exact path="/account-profile" element={<InstitutionData />} />
+              <Route exact path="/team-setup" element={<InstitutionUsers />} />
+              <Route exact path="/dashboard" element={<Dashboard/>} />
               <Route exact path="/complete-profile" element={<CompleteProfile />} />
-              <Route exact path="/document-requests" element={<DocumentRequest institutionStatus={institutionStatus} profileComplete={profileComplete}/>} />
-              <Route exact path="/document-types" element={<DocumentTypes institutionStatus={institutionStatus} profileComplete={profileComplete}/>} />
-              <Route exact path="/staff" element={<InstitutionUsers institutionStatus={institutionStatus} profileComplete={profileComplete}/>} />
+              <Route exact path="/document-requests" element={<DocumentRequest/>} />
+              <Route exact path="/document-types" element={<DocumentTypes/>} />
+              <Route exact path="/staff" element={<InstitutionUsers/>} />
               <Route exact path="/document-types/add-remove" element={<AddDocumentType />} />
               <Route exact path="/document-types/:documentId" element={<ValidationQuestions />} />
             </Routes>

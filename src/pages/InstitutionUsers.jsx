@@ -395,7 +395,7 @@ class InstitutionUsers extends Component {
                                 </button>
                             </div>
                     
-                            <div className="flex flex-col space-y-4 p-6 xl:p-8 overflow-y-auto h-[calc(100%-4rem)]"> 
+                            <div className="flex flex-col space-y-7 p-6 overflow-y-auto h-[calc(100%-4rem)]"> 
                                 <Textbox
                                     label="First Name"
                                     name="first_name"
