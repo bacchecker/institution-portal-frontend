@@ -46,7 +46,7 @@ class Login extends Component {
     }
 
     try {
-      const response = await axios.post("/auth/login", {
+      const response = await axios.post("/auth/institutionLogin", {
         email: email,
         password: password,
         recaptcha_token: recaptcha_token,
@@ -60,7 +60,9 @@ class Login extends Component {
       const account_type = localStorage.getItem("account_type");
       
       if(responseData.institution.status == 'inactive'){
-        toast.error('Your account is currently under review by our management team we will revert to you once the review is complete.')
+        toast.error('Your institutions\' account is currently under review by our management team we will revert to you once the review is complete.')
+        localStorage.clear(); 
+        window.location.href = '/login';
         return
       }
 

@@ -119,7 +119,7 @@ class Profile extends Component {
                         <p className='text-lg font-semibold'>Profile Information</p>
                         <p className='text-sm font-medium text-gray-500 mt-1'>Update your account's profile information.</p>
                     </div>
-                    <div className="relative flex flex-col space-y-4 p-4 mt-2"> 
+                    <div className="relative flex flex-col space-y-8 p-4 mt-2"> 
                         <Textbox
                             label="First Name"
                             name="first_name"
@@ -192,7 +192,7 @@ class Profile extends Component {
                         <p className='text-lg font-semibold'>Update Password</p>
                         <p className='text-sm font-medium text-gray-500 mt-1'>Ensure your account is using a long, random password to stay secure.</p>
                     </div>
-                    <form onSubmit={this.handleSubmit} className="relative flex flex-col space-y-4 p-4 mt-2"> 
+                    <form onSubmit={this.handleSubmit} className="relative flex flex-col space-y-8 p-4 mt-2"> 
                         <Textbox
                             label="Current Password"
                             name="current_password"

@@ -2,18 +2,21 @@ import React, { Component } from 'react';
 
 class BasicTextFields extends Component {
   render() {
-    const { label, name, onChange, value, error, className, type, error_message,caption } = this.props;
+    const { label, name, onChange, value, error, className, type, error_message, caption, disabled } = this.props;
     
     return (
       <div className={className}>
         <div className="relative h-10 w-full"> {/* Adjusted height */}
           <input
-            className="peer h-full w-full bg-gray-100 pl-3 py-2 pr-9 rounded-md text-blue-gray-700 outline-0 transition-all placeholder-shown:border-0 placeholder-shown:border-blue-gray-200 focus:border focus:border-blue-600 focus:outline-0 disabled:border-0 disabled:bg-blue-gray-50"
+            className={`peer h-full w-full bg-gray-100 pl-3 py-2 pr-9 rounded-md text-blue-gray-700 outline-0 transition-all placeholder-shown:border-0 placeholder-shown:border-blue-gray-200 focus:border focus:border-blue-600 focus:outline-0 disabled:border-0 disabled:bg-blue-gray-50 ${
+              disabled ? 'cursor-not-allowed opacity-50' : ''
+            }`}
             placeholder="" 
             name={name} 
             onChange={onChange} 
             value={value} 
             type={type}
+            disabled={disabled} // Passing disabled prop here
           />
           {error}
           <label className="absolute left-3 -top-[18px] text-gray-900 transition-all pointer-events-none text-sm font-normal text-blue-gray-700 leading-tight 
@@ -25,7 +28,6 @@ class BasicTextFields extends Component {
         <p className="text-xs text-blue-800 text-right">{caption}</p>
         {error_message && <p className="text-sm text-red-600 text-right">{error_message}</p>}
       </div>
-
     );
   }
 }

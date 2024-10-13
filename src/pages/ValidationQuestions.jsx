@@ -2,8 +2,7 @@ import React, { Component } from 'react';
 import withRouter from '../components/withRouter';
 import {toast} from 'react-hot-toast';
 import axios from '../axiosConfig';
-import { GiMoneyStack } from 'react-icons/gi';
-import { MdClose, MdDelete, MdEdit, MdPrint } from 'react-icons/md';
+import { MdClose, MdDelete, MdEdit } from 'react-icons/md';
 import { IoWarning } from 'react-icons/io5';
 import { FaPlus } from 'react-icons/fa';
 import Textbox from '../components/Textbox';
@@ -123,16 +122,22 @@ class ValidationQuestions extends Component {
         const {document_type_details, createModal, baseFeeModal, isSaving, validation_questions, editingValidationQuestion, questionToEdit, deleteValidationQuestion, questionToDelete} = this.state
         return ( 
             <>
-                <div className="bg-white py-4">
+                <div className="bg-white py-4 rounded-md">
                     <div className="w-full flex flex-col justify-center items-center border-b pb-2">
                         <h1 className='font-bold text-deepBlue text-xl mb-1'>{document_type_details.name}</h1>
-                        <div className="flex space-x-4 lg:space-x-6">
-                            <div className="flex space-x-2 text-sm items-center">
-                                <FaMoneyBill1Wave size={18} />
-                                <p className='font-medium'>Document Request Fee</p>
-                                <p>{document_type_details.base_fee ??'0.00'}</p>
+                        <div className="flex space-x-4 lg:space-x-6 my-2">
+                            <div className="">
+                                <div className="flex space-x-2 text-sm items-center">
+                                    <p className='font-bold'>Document Validation Fee</p>
+                                    <p>GH₵{document_type_details.validation_fee ??'0.00'}</p>
+                                </div>
+                                <div className="flex space-x-2 text-sm items-center">
+                                    <p className='font-bold'>Document Verification Fee</p>
+                                    <p>GH₵{document_type_details.verification_fee ??'0.00'}</p>
+                                </div>
                             </div>
-                            <div className="flex space-x-2 text-sm items-center bg-blue-700 text-white rounded-lg px-3 py-1 cursor-pointer" onClick={this.toggleBaseFeeModal}>
+                            
+                            <div className="flex space-x-2 text-sm self-center items-center bg-blue-700 text-white rounded-lg px-3 h-8 cursor-pointer" onClick={this.toggleBaseFeeModal}>
                                 <p>Edit</p> <MdEdit />
                             </div>
                         </div>
@@ -217,7 +222,7 @@ class ValidationQuestions extends Component {
                 </div>
                 {createModal && (
                     <div className="fixed z-50 inset-0 bg-black bg-opacity-60 flex justify-end">
-                        <form onSubmit={this.handleSubmit} className="w-1/2 lg:w-1/3 h-full bg-white shadow-lg transition-transform duration-700 ease-in-out transform"
+                        <form onSubmit={this.handleSubmit} className="w-1/2 lg:w-1/3 xl:w-[28%] h-full bg-white shadow-lg transition-transform duration-700 ease-in-out transform"
                             style={{ right: 0, position: 'absolute', transform: createModal ? 'translateX(0)' : 'translateX(100%)' }}
                         >
                             <div className="flex justify-between items-center font-medium border-b-2 p-4">
@@ -230,7 +235,7 @@ class ValidationQuestions extends Component {
                                 </button>
                             </div>
                     
-                            <div className="relative flex flex-col space-y-4 p-6 xl:p-8 overflow-y-auto h-[calc(100%-4rem)]"> 
+                            <div className="relative flex flex-col space-y-7 px-4 py-6 overflow-y-auto h-[calc(100%-4rem)]"> 
                                 <Textarea
                                     label="Question"
                                     name="question"
@@ -246,41 +251,40 @@ class ValidationQuestions extends Component {
                                     onChange={this.handleInputChange}
                                 />
 
-                              <div className="w-full absolute bottom-4 right-0 flex space-x-4 px-4">
-                                <button
-                                    onClick={this.toggleCreateModal}
-                                    type="button"
-                                    className="text-xs w-1/2 text-gray-600 border px-4 py-1.5 rounded-full"
-                                >
-                                    Close
-                                </button>
-                                <button
-                                    type="submit"
-                                    disabled={isSaving}
-                                    className={`w-1/2 flex items-center justify-center rounded-full ${
-                                        isSaving ? 'bg-gray-400 text-gray-700' : 'bg-buttonLog text-white'
-                                    } py-1.5 text-xs ${isSaving ? 'cursor-not-allowed' : ''}`}
-                                >
-                                    {isSaving ? (
-                                        <>
-                                            <Spinner size="w-4 h-4 mr-2"/>
-                                            Saving...
-                                        </>
-                                    ) : (
-                                        'Save'
-                                    )}
-                                </button>
-                            </div>  
+                                <div className="w-full absolute bottom-4 right-0 flex space-x-4 px-4">
+                                    <button
+                                        onClick={this.toggleCreateModal}
+                                        type="button"
+                                        className="text-xs w-1/2 text-gray-600 border px-4 py-1.5 rounded-full"
+                                    >
+                                        Close
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        disabled={isSaving}
+                                        className={`w-1/2 flex items-center justify-center rounded-full ${
+                                            isSaving ? 'bg-gray-400 text-gray-700' : 'bg-buttonLog text-white'
+                                        } py-1.5 text-xs ${isSaving ? 'cursor-not-allowed' : ''}`}
+                                    >
+                                        {isSaving ? (
+                                            <>
+                                                <Spinner size="w-4 h-4 mr-2"/>
+                                                Saving...
+                                            </>
+                                        ) : (
+                                            'Save'
+                                        )}
+                                    </button>
+                                </div>   
                             </div>
                     
-                            {/* Fixed button section */}
                             
                         </form>
                     </div>
                 
                 )}
                 {baseFeeModal && (
-                    <UpdateBaseFee 
+                    <UpdateDocumentFee 
                         documentType = {document_type_details} 
                         onClose={this.toggleBaseFeeModal}
                         fetchValidationQuestions={this.fetchValidationQuestions}
@@ -348,7 +352,7 @@ class EditValidationQuestion extends Component {
         return (
         <>
         <div className="fixed z-50 inset-0 bg-black bg-opacity-60 flex justify-end">
-                <form onSubmit={(e) => this.handleEditQuestion(e, documentId)} className="w-1/2 lg:w-1/3 h-full bg-white shadow-lg transition-transform duration-700 ease-in-out transform"
+                <form onSubmit={(e) => this.handleEditQuestion(e, documentId)} className="w-1/2 lg:w-1/3 xl:w-[28%] h-full bg-white shadow-lg transition-transform duration-700 ease-in-out transform"
                     style={{ right: 0, position: 'absolute', transform: 'translateX(0)' }}
                 >
                     <div className="flex justify-between items-center font-medium border-b-2 p-4">
@@ -494,13 +498,16 @@ render() {
     );
 }
 }
-class UpdateBaseFee extends Component {
+class UpdateDocumentFee extends Component {
     constructor(props) {
         super(props);
         this.state = {
         documentId: props.documentType.id,
-        base_fee: props.documentType.base_fee,
+        validation_fee: props.documentType.validation_fee,
+        verification_fee: props.documentType.verification_fee,
         isUpdating: false,
+        confirmPasswordModal: false,
+        password: ''
         };
         
     }
@@ -511,22 +518,28 @@ class UpdateBaseFee extends Component {
         [name]: value
         }));
     };
+
+    togglePasswordModal = () => {
+        this.setState({ confirmPasswordModal: !this.state.confirmPasswordModal });
+    }
     
     handleUpdateBaseFee = async (e, id) => {
         e.preventDefault()
-        const { base_fee } = this.state;
+        const { validation_fee, verification_fee, password } = this.state;
     
-        if (!base_fee || isNaN(base_fee) || parseFloat(base_fee) < 0) {
-          toast.error("Please enter a valid base fee");
+        if (!validation_fee || isNaN(validation_fee) || parseFloat(validation_fee) < 0) {
+          toast.error("Please enter a valid validation fee");
           return;
         }
     
-        this.setState({ isUpdating: true });
+        this.setState({ isUpdating: true });        
     
         try {
          
           const response = await axios.post(`/institution/update-base-fee/${id}`, {
-            base_fee: base_fee,
+            validation_fee: validation_fee,
+            verification_fee: verification_fee,
+            password: password,
           });
     
           toast.success(response.data.message);
@@ -534,6 +547,7 @@ class UpdateBaseFee extends Component {
           this.props.onClose()
         } catch (error) {
           toast.error(error.response?.data?.message || "An error occurred");
+          this.setState({ isUpdating: false });
         } finally {
           this.setState({ isUpdating: false });
         }
@@ -541,14 +555,14 @@ class UpdateBaseFee extends Component {
 
     render() {
         const { onClose } = this.props;
-        const { base_fee, isUpdating, documentId } = this.state;
+        const { validation_fee, verification_fee, isUpdating, documentId, confirmPasswordModal } = this.state;
         return (
         <>
         <div className="fixed z-50 inset-0 bg-black bg-opacity-60 flex justify-end">
-                <form onSubmit={(e) => this.handleUpdateBaseFee(e, documentId)} className="w-1/2 lg:w-1/3 h-full bg-white shadow-lg transition-transform duration-700 ease-in-out transform"
+                <div className="w-1/2 lg:w-1/3 xl:w-[28%] h-full bg-white shadow-lg transition-transform duration-700 ease-in-out transform"
                     style={{ right: 0, position: 'absolute', transform: 'translateX(0)' }}
                 >
-                    <div className="flex justify-between items-center font-medium border-b-2 p-4">
+                    <div className="flex justify-between items-center font-medium border-b-2 p-4 mb-2">
                         <h2 className="text-lg">Edit Document Requisition Fee</h2>
                         <button
                             onClick={onClose}
@@ -558,12 +572,18 @@ class UpdateBaseFee extends Component {
                         </button>
                     </div>
             
-                    <div className="relative flex flex-col space-y-4 p-6 xl:p-8 overflow-y-auto h-[calc(100%-4rem)]"> 
+                    <div className="relative flex flex-col space-y-8 px-4 py-6 overflow-y-auto h-[calc(100%-4rem)]"> 
                        
                         <Textbox
-                            label="Document Fee"
-                            name="base_fee"
-                            value={base_fee}
+                            label="Document Validation Fee"
+                            name="validation_fee"
+                            value={validation_fee}
+                            onChange={this.handleInputChange}
+                        />
+                        <Textbox
+                            label="Document Request Fee"
+                            name="verification_fee"
+                            value={verification_fee}
                             onChange={this.handleInputChange}
                         />
                         <div className="w-full absolute bottom-4 right-0 flex space-x-4 px-4">
@@ -575,25 +595,55 @@ class UpdateBaseFee extends Component {
                                 Close
                             </button>
                             <button
-                                type="submit"
-                                disabled={isUpdating}
-                                className={`w-1/2 flex items-center justify-center rounded-full ${
-                                    isUpdating ? 'bg-gray-400 text-gray-700' : 'bg-buttonLog text-white'
-                                } py-1.5 text-xs ${isUpdating ? 'cursor-not-allowed' : ''}`}
+                                type="button" onClick={this.togglePasswordModal}
+                                className={`w-1/2 flex items-center justify-center rounded-full bg-buttonLog text-white py-1.5 text-xs `}
                             >
-                                {isUpdating ? (
-                                    <>
-                                        <Spinner size="w-4 h-4 mr-2"/>
-                                        Updating...
-                                    </>
-                                ) : (
-                                    'Update'
-                                )}
+                                Update
                             </button>
                         </div>  
                     </div>
-                </form>
+                </div>
         </div>
+        {confirmPasswordModal && 
+            (<div className="fixed z-50 backdrop-blur-sm bg-black inset-0 overflow-y-auto bg-opacity-60">
+                <div className="flex items-center justify-center min-h-screen">
+                    <div className="w-full lg:w-1/2 h-44 relative bg-white shadow-lg">
+                        <div className="flex justify-between bg-bChkRed text-white">
+                            <h2 className="text-xl font-semibold py-2 px-4">Confirm You Password</h2>
+                            <button onClick={onClose} className="px-4 hover:text-gray-200">
+                            <MdClose size={24}/>
+                            </button>
+                        </div>
+                        <div className="py-6 px-4">
+                            <Textbox
+                                label="Password"
+                                name="password"
+                                type="password"
+                                value={this.state.password}
+                                onChange={this.handleInputChange}
+                            />
+                        </div>
+                        
+                                                        
+                        <div className="flex absolute bottom-4 right-4 justify-end gap-x-2">
+                            <button onClick={onClose} type="button" className="text-sm text-gray-400 border px-4 py-2 uppercase">Cancel</button>
+                            <button type="button" onClick={(e) => this.handleUpdateBaseFee(e, documentId)} 
+                                disabled={isUpdating}
+                                className={`w-full flex items-center justify-center  ${isUpdating ? 'bg-gray-400 text-gray-700' : 'bg-bChkRed text-white'}  py-2 px-4 text-sm uppercase ${isUpdating ? 'cursor-not-allowed' : ''}`}>
+                                {isUpdating ? (
+                                    <>
+                                        <Spinner size="w-5 h-5 mr-2" />
+                                        Updating...
+                                    </>
+                                ) : (
+                                    'Confirm'
+                                )}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>)
+        }
         
            
         

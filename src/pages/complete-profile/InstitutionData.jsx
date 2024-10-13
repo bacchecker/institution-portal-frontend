@@ -7,6 +7,7 @@ import { IoMdClose } from "react-icons/io";
 import axios from "../../axiosConfig";
 import toast from "react-hot-toast";
 import { FaAnglesRight } from "react-icons/fa6";
+import Spinner from "../../components/Spinner";
 
 class InstitutionData extends Component {
   constructor(props) {
@@ -21,6 +22,8 @@ class InstitutionData extends Component {
         region: "",
         academic_level: "",
         institution_email: "",
+        website_url: "",
+        alternate_contacts: "",
         helpline_contact: "",
         logo: "",
         logoFile: null,
@@ -69,6 +72,8 @@ class InstitutionData extends Component {
           mailing_address: institutionData.mailing_address,
           region: institutionData.region,
           academic_level: institutionData.academic_level,
+          website_url: institutionData.website_url,
+          alternate_contacts: institutionData.alternate_contacts,
           logo: institutionData.logo,
           logoFile: null,
         },
@@ -89,17 +94,13 @@ class InstitutionData extends Component {
   handleImageChange = (event) => {
     const file = event.target.files[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        this.setState((prevState) => ({
-          formData: {
-            ...prevState.formData,
-            logo: reader.result,
-            logoFile: file,
-          },
-        }));
-      };
-      reader.readAsDataURL(file);
+      this.setState((prevState) => ({
+        formData: {
+          ...prevState.formData,
+          logoFile: file,
+          logo: null,
+        },
+      }));
     }
   };
 
@@ -116,6 +117,7 @@ class InstitutionData extends Component {
       digital_address,
       mailing_address,
       logoFile,
+      logo,
     } = this.state.formData;
     let newErrors = {};
     const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -134,9 +136,9 @@ class InstitutionData extends Component {
     if (!prefix) newErrors.prefix = "Prefix is required";
     if (!digital_address) newErrors.digital_address = "Digital address is required";
     if (!mailing_address) newErrors.mailing_address = "Mailing address is required";
-    if (!logoFile || logoFile.name === "default-logo.png") {
+    if ((!logoFile && !logo) || (logoFile && logoFile.name === "default-logo.png")) {
       newErrors.logoFile = "Institution Logo is required and cannot be default.";
-    }
+    }    
 
     this.setState({ errors: newErrors });
     return Object.keys(newErrors).length === 0;
@@ -164,7 +166,7 @@ class InstitutionData extends Component {
     try {
       const response = await axios.post("/institution/account-setup", form);
       toast.success(response.data.message);
-      return true;
+      this.props.navigate('/document-types')
     } catch (error) {
       toast.error(error.response?.data?.message || "An error occurred");
     } finally {
@@ -191,6 +193,8 @@ class InstitutionData extends Component {
             mailing_address: institutionData.mailing_address,
             region: institutionData.region,
             academic_level: institutionData.academic_level,
+            website_url: institutionData.website_url,
+            alternate_contacts: institutionData.alternate_contacts,
             logo: institutionData.logo,
             logoFile: null,
           },
@@ -202,7 +206,7 @@ class InstitutionData extends Component {
   };
   
 render() {
-  const { formData, errors, academicLeveData, regionData } = this.state;
+  const { formData, errors, academicLeveData, regionData, isSaving } = this.state;
   const defaultLogoUrl = `${import.meta.env.VITE_BASE_URL}/images/profile/default-logo.png`;
   return (
     <div className="w-full flex flex-col bg-white rounded-md">
@@ -224,6 +228,7 @@ render() {
                 name="name"
                 value={formData.name}
                 onChange={this.handleInputChange}
+                disabled={true}
                 error_message={errors.name}
               />
             </div>
@@ -233,19 +238,11 @@ render() {
                 name="prefix"
                 value={formData.prefix}
                 onChange={this.handleInputChange}
+                disabled={true}
                 error_message={errors.prefix}
               />
             </div>
           </div>
-
-          <Textarea
-            label="Description"
-            name="description"
-            value={formData.description}
-            onChange={this.handleInputChange}
-            error_message={errors.description}
-          />
-
           <div className="flex flex-col xl:flex-row xl:space-x-4 space-y-8 xl:space-y-0">
             <div className="flex-1">
               <Textbox
@@ -266,6 +263,15 @@ render() {
               />
             </div>
           </div>
+          <Textarea
+            label="Description"
+            name="description"
+            value={formData.description}
+            onChange={this.handleInputChange}
+            error_message={errors.description}
+          />
+
+          
           <div className="flex flex-col xl:flex-row xl:space-x-4 space-y-8 xl:space-y-0">
             <Select
               label="Academic Level"
@@ -290,7 +296,6 @@ render() {
           <div className="flex flex-col xl:flex-row xl:space-x-4 space-y-8 xl:space-y-0">
             <div className="flex-1">
               <Textbox
-                className="col-span-2"
                 label="Address"
                 name="address"
                 value={formData.address}
@@ -308,15 +313,37 @@ render() {
               />
             </div>
           </div>
-            
+          <div className="flex flex-col xl:flex-row xl:space-x-4 space-y-8 xl:space-y-0">
+            <div className="flex-1">
+              <Textbox
+                label="Institution Website URL"
+                name="website_url"
+                value={formData.website_url}
+                onChange={this.handleInputChange}
+                error_message={errors.website_url}
+              />
+            </div>
+            <div className="flex-1">
+              <Textbox
+                label="Post Office Mail Address"
+                name="mailing_address"
+                value={formData.mailing_address}
+                onChange={this.handleInputChange}
+                error_message={errors.mailing_address}
+              />
+            </div>
+          </div>
+          
           <div className="">
             <Textbox
-              label="Post Office Mail Address"
-              name="mailing_address"
-              value={formData.mailing_address}
+              label="Other Contacts"
+              name="alternate_contacts"
+              value={formData.alternate_contacts}
               onChange={this.handleInputChange}
-              error_message={errors.mailing_address}
+              caption="Note: Use commas (,) to seperate different numbers"
+              error_message={errors.alternate_contacts}
             />
+            
           </div>
 
           <div className="space-y-6">
@@ -341,7 +368,7 @@ render() {
                   this.state.formData.logo && this.state.formData.logo.startsWith('data:image/')
                     ? this.state.formData.logo
                     : this.state.formData.logo
-                    ? `${import.meta.env.VITE_BASE_URL}/storage/app/public/${this.state.formData.logo}`
+                    ? `${import.meta.env.VITE_BASE_URL}/storage/${this.state.formData.logo}`
                     : defaultLogoUrl
                 }
                 alt="Institution Logo"
@@ -355,9 +382,28 @@ render() {
               </div>
             </div>
           </div>
-                <div className="flex justify-end">
-                  <button type="submit" className="flex items-center bg-green-700 hover:bg-green-600 text-white px-4 py-1.5 rounded-md font-medium">Save and Continue <FaAnglesRight className="ml-2"/></button>
-                </div>
+          <div className="flex justify-end">
+            <button
+              type="submit"
+              className={`flex items-center bg-green-700 hover:bg-green-600 text-white px-4 py-1.5 rounded-md font-medium ${
+                isSaving ? 'cursor-not-allowed bg-gray-400' : ''
+              }`}
+              disabled={isSaving} 
+            >
+              {isSaving ? (
+                <>
+                  <Spinner size="w-5 h-5"/> 
+                  <span className="ml-2">Saving...</span>
+                </>
+              ) : (
+                <>
+                  Save and Continue
+                  <FaAnglesRight className="ml-2" />
+                </>
+              )}
+            </button>
+          </div>
+
         </form>
 
       </div>

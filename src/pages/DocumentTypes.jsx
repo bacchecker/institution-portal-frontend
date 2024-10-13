@@ -18,30 +18,16 @@ class DocumentTypes extends Component {
         currentPage: 1,
         lastPage: 1,
         total: 0,
-        institutionStatus: this.props.institutionStatus,
-        profileComplete: this.props.profileComplete,
+        isLoading: false
     }
 
     componentDidMount() {
-        const { profileComplete, institutionStatus } = this.state;
-  
-        if (institutionStatus == 'inactive') {
-        setTimeout(() => {
-            this.props.navigate("/account-inactive");
-            return
-        }, 0)
-        } else if(profileComplete == 'no') {
-        setTimeout(() => {
-            this.props.navigate("/complete-profile");
-            return
-        }, 0)
-        }else{
-            this.fetchDocumentTypes();
-        }
+        this.fetchDocumentTypes();
     }
 
     fetchDocumentTypes = (page = 1) => {
         const { search } = this.state;
+        this.setState({ isLoading: true })
         axios.get(`/institution/document-types`, {
             params: {
                 page,
@@ -51,17 +37,20 @@ class DocumentTypes extends Component {
         .then((response) => {
         if (response.data.status === 200) {
             this.setState({
-            documentTypes: response.data.documentTypes.data,
-            currentPage: response.data.documentTypes.current_page,
-            lastPage: response.data.documentTypes.last_page,
-            total: response.data.documentTypes.total,
+                documentTypes: response.data.documentTypes.data,
+                currentPage: response.data.documentTypes.current_page,
+                lastPage: response.data.documentTypes.last_page,
+                total: response.data.documentTypes.total,
             });
+            this.setState({ isLoading: false })
         } else {
             toast.error(error.response.data.message);
+            this.setState({ isLoading: false })
         }
         })
         .catch((error) => {
-        toast.error(error.response.data.message);
+            toast.error(error.response.data.message);
+            this.setState({ isLoading: false })
         });
     };
 
@@ -94,7 +83,7 @@ class DocumentTypes extends Component {
 
     
     render() {
-        const { documentTypes, currentPage, lastPage  } = this.state;
+        const { documentTypes, currentPage, lastPage, isLoading  } = this.state;
         return ( 
             <>
             <div className="container mx-auto">
@@ -111,12 +100,47 @@ class DocumentTypes extends Component {
                         </div>
                         <input type="search" onChange={this.handleFilterChange} name='search' id="default-search" className="block w-full focus:outline-0 px-4 py-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-2xl bg-gray-50 focus:ring-blue-500 focus:border-blue-500" placeholder="Search by document name or description" required />
                     </div>
-                    <NavLink to={`/document-types/add-remove`} className={`flex items-center bg-purple-800 text-white px-4 rounded-full`}><MdAdd size={24}/> Add More</NavLink>
+                    <NavLink to={`/document-types/add-remove`} className={`flex items-center bg-purple-800 text-white px-4 rounded-full`}><MdAdd size={24}/> Add / Remove</NavLink>
                 </div>
 
                 <div className="bg-white rounded-lg py-6 px-8">
                     <div className="">
-                       
+                       {isLoading ? (
+                        <div role="status" className="space-y-2.5 animate-pulse max-w-lg">
+                            <div className="flex items-center w-full">
+                                <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-32"></div>
+                                <div className="h-2.5 ms-2 bg-gray-300 rounded-full dark:bg-gray-600 w-24"></div>
+                                <div className="h-2.5 ms-2 bg-gray-300 rounded-full dark:bg-gray-600 w-full"></div>
+                            </div>
+                            <div className="flex items-center w-full max-w-[480px]">
+                                <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-full"></div>
+                                        <div className="h-2.5 ms-2 bg-gray-300 rounded-full dark:bg-gray-600 w-full"></div>
+                                <div className="h-2.5 ms-2 bg-gray-300 rounded-full dark:bg-gray-600 w-24"></div>
+                            </div>
+                            <div className="flex items-center w-full max-w-[400px]">
+                                <div className="h-2.5 bg-gray-300 rounded-full dark:bg-gray-600 w-full"></div>
+                                <div className="h-2.5 ms-2 bg-gray-200 rounded-full dark:bg-gray-700 w-80"></div>
+                                <div className="h-2.5 ms-2 bg-gray-300 rounded-full dark:bg-gray-600 w-full"></div>
+                            </div>
+                            <div className="flex items-center w-full max-w-[480px]">
+                                <div className="h-2.5 ms-2 bg-gray-200 rounded-full dark:bg-gray-700 w-full"></div>
+                                        <div className="h-2.5 ms-2 bg-gray-300 rounded-full dark:bg-gray-600 w-full"></div>
+                                <div className="h-2.5 ms-2 bg-gray-300 rounded-full dark:bg-gray-600 w-24"></div>
+                            </div>
+                            <div className="flex items-center w-full max-w-[440px]">
+                                <div className="h-2.5 ms-2 bg-gray-300 rounded-full dark:bg-gray-600 w-32"></div>
+                                <div className="h-2.5 ms-2 bg-gray-300 rounded-full dark:bg-gray-600 w-24"></div>
+                                <div className="h-2.5 ms-2 bg-gray-200 rounded-full dark:bg-gray-700 w-full"></div>
+                            </div>
+                            <div className="flex items-center w-full max-w-[360px]">
+                                <div className="h-2.5 ms-2 bg-gray-300 rounded-full dark:bg-gray-600 w-full"></div>
+                                <div className="h-2.5 ms-2 bg-gray-200 rounded-full dark:bg-gray-700 w-80"></div>
+                                <div className="h-2.5 ms-2 bg-gray-300 rounded-full dark:bg-gray-600 w-full"></div>
+                            </div>
+                            <span className="sr-only">Loading...</span>
+                        </div>
+                       ):(
+                        documentTypes.length > 0 ? (
                             <div className='grid grid-cols-1 xl:grid-cols-2 gap-5 mt-2'>
                                 {documentTypes.map((request) => (
                                     <NavLink to={`/document-types/${request.id}`} key={request.id} className="relative bg-white shadow-md shadow-gray-300 hover:cursor-pointer hover:shadow-gray-500 group">
@@ -139,6 +163,14 @@ class DocumentTypes extends Component {
                                     </NavLink>
                                 ))}
                             </div>
+                        ):(
+                            <div className="flex flex-col justify-center items-center h-full">
+                                <img src="/images/nodata.png" alt="No data available" className="w-1/4 h-auto" />
+                                <p className='text-gray-500 text-sm -mt-10 font-medium'>No document type found</p>
+                            </div>
+                        )
+                       )}
+                            
                     </div>
 
                     {/* Pagination */}

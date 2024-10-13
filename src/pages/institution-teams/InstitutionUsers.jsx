@@ -1,14 +1,13 @@
 import React, { Component } from 'react';
 import { FaChevronLeft, FaChevronRight, FaPlus } from 'react-icons/fa';
 import { LuMoreVertical } from 'react-icons/lu';
-import axios from '../axiosConfig';
+import axios from '../../axiosConfig';
 import { MdClose } from 'react-icons/md';
-import { SiPinboard } from 'react-icons/si';
-import Textbox from '../components/Textbox';
-import Select from '../components/Select';
+import Textbox from '../../components/Textbox';
+import Select from '../../components/Select';
 import {toast} from 'react-hot-toast';
-import Spinner from '../components/Spinner';
-import withRouter from '../components/withRouter';
+import Spinner from '../../components/Spinner';
+import withRouter from '../../components/withRouter';
 
 class InstitutionUsers extends Component {
     constructor(props) {
@@ -37,54 +36,43 @@ class InstitutionUsers extends Component {
         email: '',
         phone: '',
         address: '',
-        institutionStatus: this.props.institutionStatus,
-        profileComplete: this.props.profileComplete,
+        instititution_team_id: '',
+        team_name: '',
     }
 
     componentDidMount() {
-        const { profileComplete, institutionStatus } = this.state;
-  
-        if (institutionStatus == 'inactive') {
-        setTimeout(() => {
-            this.props.navigate("/account-inactive");
-            return
-        }, 0)
-        } else if(profileComplete == 'no') {
-        setTimeout(() => {
-            this.props.navigate("/complete-profile");
-            return
-        }, 0)
-        }else{
-            this.fetchInstitutionsUsers();
-            this.fetchRoles();
-        }
-        
+        this.fetchInstitutionsUsers();
+        this.fetchRoles();
     }
 
-    fetchInstitutionsUsers = (page = 1) => {
+    fetchInstitutionsUsers = async (page = 1) => {
+        const { institutionId } = this.props.params;  // Access params from match
+    
         const { search } = this.state;
-        axios.get(`/institution/institution-users`, {
+        const response = await axios.get(`/institution/institution-teams/${institutionId}`, {
             params: {
                 page,
                 search,
             },
         })
         .then((response) => {
-        if (response.data.status === 200) {
-            this.setState({
-            institutionUsers: response.data.institutionUsers.data,
-            currentPage: response.data.institutionUsers.current_page,
-            lastPage: response.data.institutionUsers.last_page,
-            total: response.data.institutionUsers.total,
-            });
-        } else {
-            toast.error(error.response.data.message);
-        }
+            if (response.data.status === 200) {
+                this.setState({
+                    institutionUsers: response.data.institutionUsers.data,
+                    team_name: response.data.teamName,
+                    currentPage: response.data.institutionUsers.current_page,
+                    lastPage: response.data.institutionUsers.last_page,
+                    total: response.data.institutionUsers.total,
+                });
+            } else {
+                toast.error(error.response.data.message);
+            }
         })
         .catch((error) => {
-        toast.error(error.response.data.message);
+            toast.error(error.response.data.message);
         });
     };
+    
 
     fetchRoles = async () => {
         try {
@@ -201,8 +189,9 @@ class InstitutionUsers extends Component {
             phone: this.state.phone,
             gender: this.state.gender,
             role_id: this.state.role_id,
+            institution_team_id: this.props.params.institutionId,
         };
-    
+       
         try {
             // Send POST request to API endpoint
             const response = await axios.post('/institution/store-users', formData);
@@ -216,15 +205,16 @@ class InstitutionUsers extends Component {
         } catch (error) {
             // Show error toast notification in case of an error
             toast.error(error.response?.data?.message || "An error occurred. Please try again.");
+            this.setState({isSaving: false})
         }
     };
     
     render() {
-        const { createModal, isSaving, institutionUsers, currentPage, lastPage, rowMenuOpen, editingStaff, staffToEdit, staffToReset, resetStaffPassword, suspendAccount, staffToSuspend  } = this.state;
+        const { createModal, isSaving, institutionUsers, team_name, currentPage, lastPage, rowMenuOpen, editingStaff, staffToEdit, staffToReset, resetStaffPassword, suspendAccount, staffToSuspend  } = this.state;
         return ( 
             <>
-            <div className="container mx-auto">
-                <h1 className="text-xl font-bold mb-4">Employee Directory</h1>
+            <div className="container mx-auto p-2">
+                <h1 className="text-xl font-bold mb-2">{team_name}</h1>
 
                 {/* Filter Section */}
                 <div className="mb-4 flex space-x-4">
@@ -248,7 +238,7 @@ class InstitutionUsers extends Component {
                                     <th className="text-left px-4 py-3 table-cell rounded-l-lg"> {/* Rounded left for first column */}
                                         Employee Name
                                     </th>
-                                    <th className="text-left p-2 table-cell">Private Code</th>
+                                    <th className="text-left p-2 table-cell">Phone Number</th>
                                     <th className="text-left p-2 table-cell">Email</th>
                                     <th className="text-left p-2 table-cell">User Role</th>
                                     <th className="p-2 table-cell text-center">Status</th>
@@ -263,9 +253,8 @@ class InstitutionUsers extends Component {
                                         <tr key={request.id} className="bg-white">
                                             <td className="pl-4 p-2 table-cell">
                                                 <p className='font-semibold text-gray-800 text-base'>{request.user.first_name} {request.user.last_name}</p>
-                                                <p className='text-gray-600 font-medium'>{request.user.phone}</p>
                                             </td>
-                                            <td className="p-2 table-cell">{request.user.private_code}</td>
+                                            <td className="p-2 table-cell">{request.user.phone}</td>
                                             <td className="p-2 table-cell">{request.user.email}</td>
                                             <td className="p-2 table-cell">{request.role_id}</td>
                                             <td className="p-2 table-cell text-center">
@@ -289,7 +278,7 @@ class InstitutionUsers extends Component {
                                                     <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded shadow-lg z-50">
                                                         <ul className="py-1 text-sm">
                                                             <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer" onClick={() => this.handleEditClick(request)}>Edit Profile</li>
-                                                            <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer" onClick={() => this.handleResetPasswordClick(request)}>Reset Password</li>
+                                                            {/* <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer" onClick={() => this.handleResetPasswordClick(request)}>Reset Password</li> */}
                                                             <li className="px-4 py-2 hover:bg-red-100 cursor-pointer text-red-600" onClick={() => this.handleSuspendAccountClick(request)}>Suspend Account</li>
                                                         </ul>
                                                     
@@ -382,7 +371,7 @@ class InstitutionUsers extends Component {
 
                 {createModal && (
                     <div className="fixed z-50 inset-0 bg-black bg-opacity-60 flex justify-end">
-                        <form onSubmit={this.handleSubmit} className="w-1/2 lg:w-1/3 h-full bg-white shadow-lg transition-transform duration-700 ease-in-out transform"
+                        <form onSubmit={this.handleSubmit} className="w-1/2 lg:w-1/3 xl:w-[30%] h-full bg-white shadow-lg transition-transform duration-700 ease-in-out transform"
                             style={{ right: 0, position: 'absolute', transform: createModal ? 'translateX(0)' : 'translateX(100%)' }}
                         >
                             <div className="flex justify-between items-center font-medium border-b-2 p-4">
@@ -479,14 +468,7 @@ class InstitutionUsers extends Component {
                             </div>
                         </form>
                     </div>
-                
-                
-                
                 )}
-
-
-
-                
 
             </div>
             </>
@@ -561,7 +543,7 @@ class EditUserProfile extends Component {
         return (
         <>
         <div className="fixed z-50 inset-0 bg-black bg-opacity-60 flex justify-end">
-                <form onSubmit={(e) => this.handleEditProfile(e, staffId)} className="w-1/2 lg:w-1/3 h-full bg-white shadow-lg transition-transform duration-700 ease-in-out transform"
+                <form onSubmit={(e) => this.handleEditProfile(e, staffId)} className="w-1/2 lg:w-1/3 xl:w-[30%] h-full bg-white shadow-lg transition-transform duration-700 ease-in-out transform"
                     style={{ right: 0, position: 'absolute', transform: 'translateX(0)' }}
                 >
                     <div className="flex justify-between items-center font-medium border-b-2 p-4">
@@ -574,7 +556,7 @@ class EditUserProfile extends Component {
                         </button>
                     </div>
             
-                    <div className="relative flex flex-col space-y-4 p-6 xl:p-8 overflow-y-auto h-[calc(100%-4rem)]"> 
+                    <div className="relative flex flex-col space-y-8 p-6 xl:p-8 overflow-y-auto h-[calc(100%-4rem)]"> 
                         <Textbox
                             label="First Name"
                             name="first_name"
@@ -744,10 +726,19 @@ constructor(props) {
     super(props);
     this.state = {
         staffId: props.staffProfile.id,
-        isSuspending: false
+        isSuspending: false,
+        reason: ''
     };
     
 }
+
+handleInputChange = e => {
+    const { name, value } = e.target;
+    this.setState(prevState => ({
+    ...prevState,
+    [name]: value
+    }));
+};
 
 handleSuspendAccount = async(e, staffId) => {
     e.preventDefault()
@@ -772,7 +763,7 @@ handleSuspendAccount = async(e, staffId) => {
 
 render() {
     const { onClose } = this.props;
-    const { staffId, isSuspending } = this.state;
+    const { staffId, isSuspending, reason } = this.state;
     return (
     <>
         <div className="fixed z-50 backdrop-blur-sm bg-black inset-0 overflow-y-auto bg-opacity-60">
@@ -789,6 +780,12 @@ render() {
 
                                                     
                     <div className="flex absolute bottom-4 right-4 justify-end gap-x-2">
+                        <Textbox
+                            label="Reason for suspension"
+                            name="reason"
+                            value={reason}
+                            onChange={this.handleInputChange}
+                        />
                         <button onClick={onClose} type="button" className="text-sm text-gray-400 border px-4 py-2 uppercase">Cancel</button>
                         <button type="submit" 
                             disabled={isSuspending}
