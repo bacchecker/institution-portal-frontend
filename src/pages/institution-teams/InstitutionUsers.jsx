@@ -76,7 +76,7 @@ class InstitutionUsers extends Component {
 
     fetchRoles = async () => {
         try {
-        const response = await axios.get('/roles/');
+        const response = await axios.get('/roles');
         const responseData = response.data;
       
         this.setState({ 
