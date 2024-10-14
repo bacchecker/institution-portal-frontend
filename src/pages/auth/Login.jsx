@@ -16,7 +16,7 @@ class Login extends Component {
       passwordError: "",
       recaptcha_token: null,
       showPassword: false,
-      account_type: "",
+      type: "",
       isLoading: false,
     };
     this.recaptchaRef = React.createRef();
@@ -54,19 +54,19 @@ class Login extends Component {
       const responseData = response.data.data;
 
       localStorage.setItem("authToken", responseData.token);
-      localStorage.setItem("account_type", responseData.user.account_type);
+      localStorage.setItem("type", responseData.user.type);
       this.setState({ isLoading: false });
 
-      const account_type = localStorage.getItem("account_type");
+      const type = localStorage.getItem("type");
       
       if(responseData.institution.status == 'inactive'){
         toast.error('Your institutions\' account is currently under review by our management team we will revert to you once the review is complete.')
         localStorage.clear(); 
-        window.location.href = '/login';
+        
         return
       }
 
-      if (account_type == "institution") {
+      if (type == "institution") {
         toast.success(response.data.message, {});
         if (responseData.two_factor == false) {
           this.props.navigate("/verify-otp");
