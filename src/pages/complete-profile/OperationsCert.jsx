@@ -67,7 +67,7 @@ class OperationsCert extends Component {
         let previewPDF = null;
   
         // Check if the file is an image or a PDF
-        const certificateFileUrl = `${import.meta.env.VITE_BASE_URL}/storage/${certificateData.certificate_file}`;
+        const certificateFileUrl = `${import.meta.env.VITE_BASE_URL}/storage/app/public/${certificateData.certificate_file}`;
         const fileType = certificateFileUrl.split('.').pop().toLowerCase();
   
         if (fileType === 'pdf') {

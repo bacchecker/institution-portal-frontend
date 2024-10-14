@@ -207,7 +207,7 @@ class InstitutionData extends Component {
   
 render() {
   const { formData, errors, academicLeveData, regionData, isSaving } = this.state;
-  const defaultLogoUrl = `${import.meta.env.VITE_BASE_URL}/images/profile/default-logo.png`;
+  const defaultLogoUrl = `${import.meta.env.VITE_BASE_URL}/public/images/profile/default-logo.png`;
   return (
     <div className="w-full flex flex-col bg-white rounded-md">
       <div className="mx-auto my-6 px-4 w-full md:w-4/5">
@@ -368,7 +368,7 @@ render() {
                   this.state.formData.logo && this.state.formData.logo.startsWith('data:image/')
                     ? this.state.formData.logo
                     : this.state.formData.logo
-                    ? `${import.meta.env.VITE_BASE_URL}/storage/${this.state.formData.logo}`
+                    ? `${import.meta.env.VITE_BASE_URL}/storage/app/public/${this.state.formData.logo}`
                     : defaultLogoUrl
                 }
                 alt="Institution Logo"
