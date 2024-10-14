@@ -93,16 +93,25 @@ class InstitutionData extends Component {
 
   handleImageChange = (event) => {
     const file = event.target.files[0];
+    
     if (file) {
-      this.setState((prevState) => ({
-        formData: {
-          ...prevState.formData,
-          logoFile: file,
-          logo: null,
-        },
-      }));
+      const reader = new FileReader();
+      
+      reader.onloadend = () => {
+        // Set the base64 string to `logo` to preview the image
+        this.setState((prevState) => ({
+          formData: {
+            ...prevState.formData,
+            logoFile: file, // Keep the actual file
+            logo: reader.result, // Set base64 string for preview
+          },
+        }));
+      };
+  
+      reader.readAsDataURL(file); // Read file as base64 string
     }
   };
+  
 
   validateForm = () => {
     const {
@@ -363,16 +372,17 @@ render() {
             </div>
 
             <div className="relative h-32 w-32 group">
-              <img
-                src={
-                  this.state.formData.logo && this.state.formData.logo.startsWith('data:image/')
-                    ? this.state.formData.logo
-                    : this.state.formData.logo
-                    ? `${import.meta.env.VITE_BASE_URL}/storage/app/public/${this.state.formData.logo}`
-                    : defaultLogoUrl
-                }
-                alt="Institution Logo"
-              />
+            <img
+              src={
+                this.state.formData.logo // If logo is base64 (file preview)
+                  ? this.state.formData.logo
+                  : this.state.formData.logoFile // If file from backend exists, display it
+                  ? `${import.meta.env.VITE_BASE_URL}/storage/app/public/${this.state.formData.logoFile}`
+                  : defaultLogoUrl // If no file or logo, use the default image
+              }
+              alt="Institution Logo"
+            />
+
 
               <div
                 className="absolute cursor-pointer opacity-0 group-hover:opacity-100 inset-0 bg-white/50 text-gray-600 grid place-items-center"
