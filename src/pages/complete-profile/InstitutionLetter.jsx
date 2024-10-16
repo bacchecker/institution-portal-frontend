@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, createRef } from 'react';
 import SunEditor from 'suneditor-react';
 import 'suneditor/dist/css/suneditor.min.css';
 import Handlebars from 'handlebars';
@@ -36,10 +36,7 @@ class InstitutionLetter extends Component {
             mailing_address: "",
             isSaving: false
         };
-        this.validationApprovedEditorRef = null;
-        this.validationDeclinedEditorRef = null;
-        this.verificationApprovedEditorRef = null;
-        this.verificationDeclinedEditorRef = null;
+        this.editorRef = createRef();
     }
 
     switchTab = (tab) => {
@@ -54,23 +51,28 @@ class InstitutionLetter extends Component {
         this.fetchInstitution();
         this.fetchInstitutionLetters();
     }
-
-    componentDidUpdate(prevState) {
-        // Check if editor reference exists before calling setContents
-        if (this.validationApprovedEditorRef && prevState.validation_approved_content !== this.state.validation_approved_content) {
-          this.validationApprovedEditorRef.setContents(this.state.validation_approved_content);
-        }
-        if (this.validationDeclinedEditorRef && prevState.validation_declined_content !== this.state.validation_declined_content) {
-          this.validationDeclinedEditorRef.setContents(this.state.validation_declined_content);
-        }
-        if (this.verificationApprovedEditorRef && prevState.verification_approved_content !== this.state.verification_approved_content) {
-          this.verificationApprovedEditorRef.setContents(this.state.verification_approved_content);
-        }
-        if (this.verificationDeclinedEditorRef && prevState.verification_declined_content !== this.state.verification_declined_content) {
-          this.verificationDeclinedEditorRef.setContents(this.state.verification_declined_content);
+    
+    componentDidUpdate(prevProps, prevState) {
+        // Ensure editorRef.current is not null before accessing editor
+        if (this.editorRef.current && this.editorRef.current.editor) {
+          if (prevState.validation_approved_content !== this.state.validation_approved_content) {
+            this.editorRef.current.editor.setContents(this.state.validation_approved_content);
+          }
+    
+          if (prevState.validation_declined_content !== this.state.validation_declined_content) {
+            this.editorRef.current.editor.setContents(this.state.validation_declined_content);
+          }
+    
+          if (prevState.verification_approved_content !== this.state.verification_approved_content) {
+            this.editorRef.current.editor.setContents(this.state.verification_approved_content);
+          }
+    
+          if (prevState.verification_declined_content !== this.state.verification_declined_content) {
+            this.editorRef.current.editor.setContents(this.state.verification_declined_content);
+          }
         }
       }
-      
+    
 
     fetchInstitution = async () => {
         try {
@@ -324,7 +326,7 @@ class InstitutionLetter extends Component {
                                         <div className="w-full ">
                                     
                                             <SunEditor
-                                            getSunEditorInstance={editor => { this.validationApprovedEditorRef = editor; }}
+                                            ref={this.editorRef} 
                                             height="100%"
                                             setContents={this.state.validation_approved_content}
                                             onChange={this.validationApprovedContentChange}
@@ -349,112 +351,112 @@ class InstitutionLetter extends Component {
                                             </button>
                                         </div>
                                     </div>
-                                    <div className="col-span-1 overflow-x-auto">
-                                        <table className="min-w-full bg-white border border-gray-300">
+                                    <div class="col-span-1 overflow-x-auto">
+                                        <table class="min-w-full bg-white border border-gray-300">
                                             <thead>
                                             <tr>
-                                                <th className="px-1 py-2 border-b-2 border-r border-gray-200 bg-gray-100 text-left text-gray-600 uppercase">
+                                                <th class="px-1 py-2 border-b-2 border-r border-gray-200 bg-gray-100 text-left text-gray-600 uppercase">
                                                 Placeholder
                                                 </th>
-                                                <th className="px-4 py-2 border-b-2 border-gray-200 bg-gray-100 text-left text-gray-600 uppercase tracking-wider">
+                                                <th class="px-4 py-2 border-b-2 border-gray-200 bg-gray-100 text-left text-gray-600 uppercase tracking-wider">
                                                 Description
                                                 </th>
                                             </tr>
                                             </thead>
                                             <tbody className='text-sm'>
                                             <tr>
-                                                <td className="px-2 py-1 border-b border-r border-gray-200">
+                                                <td class="px-2 py-1 border-b border-r border-gray-200">
                                                 {"{{institution_email}}"}
                                                 </td>
-                                                <td className="px-2 py-1 border-b border-gray-200">
+                                                <td class="px-2 py-1 border-b border-gray-200">
                                                 Your institution's email address.
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td className="px-2 py-1 border-b border-r border-gray-200">
+                                                <td class="px-2 py-1 border-b border-r border-gray-200">
                                                 {"{{institution_address}}"}
                                                 </td>
-                                                <td className="px-2 py-1 border-b border-gray-200">
+                                                <td class="px-2 py-1 border-b border-gray-200">
                                                 Your institution's geographic address.
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td className="px-2 py-1 border-b border-r border-gray-200">
+                                                <td class="px-2 py-1 border-b border-r border-gray-200">
                                                 {"{{helpline_contact}}"}
                                                 </td>
-                                                <td className="px-2 py-1 border-b border-gray-200">
+                                                <td class="px-2 py-1 border-b border-gray-200">
                                                 Your institution's primary phone number.
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td className="px-2 py-1 border-b border-r border-gray-200">
+                                                <td class="px-2 py-1 border-b border-r border-gray-200">
                                                 {"{{mailing_address}}"}
                                                 </td>
-                                                <td className="px-2 py-1 border-b border-gray-200">
+                                                <td class="px-2 py-1 border-b border-gray-200">
                                                 Your institution's postal address eg P.O.Box 123
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td className="px-2 py-1 border-b border-r border-gray-200">
+                                                <td class="px-2 py-1 border-b border-r border-gray-200">
                                                 {"{{date_of_letter}}"}
                                                 </td>
-                                                <td className="px-2 py-1 border-b border-gray-200">
+                                                <td class="px-2 py-1 border-b border-gray-200">
                                                 Date that the letter is being issued to applicant.
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td className="px-2 py-1 border-b border-r border-gray-200">
+                                                <td class="px-2 py-1 border-b border-r border-gray-200">
                                                 {"{{recepient_institution}}"}
                                                 </td>
-                                                <td className="px-2 py-1 border-b border-gray-200">
+                                                <td class="px-2 py-1 border-b border-gray-200">
                                                 The recipient institution's name.
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td className="px-2 py-1 border-b border-r border-gray-200">
+                                                <td class="px-2 py-1 border-b border-r border-gray-200">
                                                 {"{{recepient_institution_mail}}"}
                                                 </td>
-                                                <td className="px-2 py-1 border-b border-gray-200">
+                                                <td class="px-2 py-1 border-b border-gray-200">
                                                 The recipient institution's email address.
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td className="px-2 py-1 border-b border-r border-gray-200">
+                                                <td class="px-2 py-1 border-b border-r border-gray-200">
                                                 {"{{recepient_institution_address}}"}
                                                 </td>
-                                                <td className="px-2 py-1 border-b border-gray-200">
+                                                <td class="px-2 py-1 border-b border-gray-200">
                                                 The recipient institution's geographic address.
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td className="px-2 py-1 border-b border-r border-gray-200">
+                                                <td class="px-2 py-1 border-b border-r border-gray-200">
                                                 {"{{date_of_request}}"}
                                                 </td>
-                                                <td className="px-2 py-1 border-b border-gray-200">
+                                                <td class="px-2 py-1 border-b border-gray-200">
                                                 Date the document was requested by applicant
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td className="px-2 py-1 border-b border-r border-gray-200">
+                                                <td class="px-2 py-1 border-b border-r border-gray-200">
                                                 {"{{document_owner_name}}"}
                                                 </td>
-                                                <td className="px-2 py-1 border-b border-gray-200">
+                                                <td class="px-2 py-1 border-b border-gray-200">
                                                 Personal owner of the document being verified
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td className="px-2 py-1 border-b border-r border-gray-200">
+                                                <td class="px-2 py-1 border-b border-r border-gray-200">
                                                 {"{{document_type_name}}"}
                                                 </td>
-                                                <td className="px-2 py-1 border-b border-gray-200">
+                                                <td class="px-2 py-1 border-b border-gray-200">
                                                 Name of the document type in question
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td className="px-2 py-1 border-b border-r border-gray-200">
+                                                <td class="px-2 py-1 border-b border-r border-gray-200">
                                                 {"{{verification_review_results}}"}
                                                 </td>
-                                                <td className="px-2 py-1 border-b border-gray-200">
+                                                <td class="px-2 py-1 border-b border-gray-200">
                                                 Verification template question results
                                                 </td>
                                             </tr>
@@ -511,7 +513,7 @@ class InstitutionLetter extends Component {
                                         <div className="w-full ">
                                     
                                             <SunEditor
-                                            getSunEditorInstance={editor => { this.validationDeclinedEditorRef = editor; }}
+                                            ref={this.editorRef} 
                                             height="100%"
                                             setContents={this.state.validation_declined_content}
                                             onChange={this.validationDeclinedContentChange}
@@ -536,112 +538,112 @@ class InstitutionLetter extends Component {
                                             </button>
                                         </div>
                                     </div>
-                                    <div className="col-span-1 overflow-x-auto">
-                                        <table className="min-w-full bg-white border border-gray-300">
+                                    <div class="col-span-1 overflow-x-auto">
+                                        <table class="min-w-full bg-white border border-gray-300">
                                             <thead>
                                             <tr>
-                                                <th className="px-1 py-2 border-b-2 border-r border-gray-200 bg-gray-100 text-left text-gray-600 uppercase">
+                                                <th class="px-1 py-2 border-b-2 border-r border-gray-200 bg-gray-100 text-left text-gray-600 uppercase">
                                                 Placeholder
                                                 </th>
-                                                <th className="px-4 py-2 border-b-2 border-gray-200 bg-gray-100 text-left text-gray-600 uppercase tracking-wider">
+                                                <th class="px-4 py-2 border-b-2 border-gray-200 bg-gray-100 text-left text-gray-600 uppercase tracking-wider">
                                                 Description
                                                 </th>
                                             </tr>
                                             </thead>
                                             <tbody className='text-sm'>
                                             <tr>
-                                                <td className="px-2 py-1 border-b border-r border-gray-200">
+                                                <td class="px-2 py-1 border-b border-r border-gray-200">
                                                 {"{{institution_email}}"}
                                                 </td>
-                                                <td className="px-2 py-1 border-b border-gray-200">
+                                                <td class="px-2 py-1 border-b border-gray-200">
                                                 Your institution's email address.
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td className="px-2 py-1 border-b border-r border-gray-200">
+                                                <td class="px-2 py-1 border-b border-r border-gray-200">
                                                 {"{{institution_address}}"}
                                                 </td>
-                                                <td className="px-2 py-1 border-b border-gray-200">
+                                                <td class="px-2 py-1 border-b border-gray-200">
                                                 Your institution's geographic address.
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td className="px-2 py-1 border-b border-r border-gray-200">
+                                                <td class="px-2 py-1 border-b border-r border-gray-200">
                                                 {"{{helpline_contact}}"}
                                                 </td>
-                                                <td className="px-2 py-1 border-b border-gray-200">
+                                                <td class="px-2 py-1 border-b border-gray-200">
                                                 Your institution's primary phone number.
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td className="px-2 py-1 border-b border-r border-gray-200">
+                                                <td class="px-2 py-1 border-b border-r border-gray-200">
                                                 {"{{mailing_address}}"}
                                                 </td>
-                                                <td className="px-2 py-1 border-b border-gray-200">
+                                                <td class="px-2 py-1 border-b border-gray-200">
                                                 Your institution's postal address eg P.O.Box 123
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td className="px-2 py-1 border-b border-r border-gray-200">
+                                                <td class="px-2 py-1 border-b border-r border-gray-200">
                                                 {"{{date_of_letter}}"}
                                                 </td>
-                                                <td className="px-2 py-1 border-b border-gray-200">
+                                                <td class="px-2 py-1 border-b border-gray-200">
                                                 Date that the letter is being issued to applicant.
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td className="px-2 py-1 border-b border-r border-gray-200">
+                                                <td class="px-2 py-1 border-b border-r border-gray-200">
                                                 {"{{recepient_institution}}"}
                                                 </td>
-                                                <td className="px-2 py-1 border-b border-gray-200">
+                                                <td class="px-2 py-1 border-b border-gray-200">
                                                 The recipient institution's name.
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td className="px-2 py-1 border-b border-r border-gray-200">
+                                                <td class="px-2 py-1 border-b border-r border-gray-200">
                                                 {"{{recepient_institution_mail}}"}
                                                 </td>
-                                                <td className="px-2 py-1 border-b border-gray-200">
+                                                <td class="px-2 py-1 border-b border-gray-200">
                                                 The recipient institution's email address.
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td className="px-2 py-1 border-b border-r border-gray-200">
+                                                <td class="px-2 py-1 border-b border-r border-gray-200">
                                                 {"{{recepient_institution_address}}"}
                                                 </td>
-                                                <td className="px-2 py-1 border-b border-gray-200">
+                                                <td class="px-2 py-1 border-b border-gray-200">
                                                 The recipient institution's geographic address.
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td className="px-2 py-1 border-b border-r border-gray-200">
+                                                <td class="px-2 py-1 border-b border-r border-gray-200">
                                                 {"{{date_of_request}}"}
                                                 </td>
-                                                <td className="px-2 py-1 border-b border-gray-200">
+                                                <td class="px-2 py-1 border-b border-gray-200">
                                                 Date the document was requested by applicant
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td className="px-2 py-1 border-b border-r border-gray-200">
+                                                <td class="px-2 py-1 border-b border-r border-gray-200">
                                                 {"{{document_owner_name}}"}
                                                 </td>
-                                                <td className="px-2 py-1 border-b border-gray-200">
+                                                <td class="px-2 py-1 border-b border-gray-200">
                                                 Personal owner of the document being verified
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td className="px-2 py-1 border-b border-r border-gray-200">
+                                                <td class="px-2 py-1 border-b border-r border-gray-200">
                                                 {"{{document_type_name}}"}
                                                 </td>
-                                                <td className="px-2 py-1 border-b border-gray-200">
+                                                <td class="px-2 py-1 border-b border-gray-200">
                                                 Name of the document type in question
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td className="px-2 py-1 border-b border-r border-gray-200">
+                                                <td class="px-2 py-1 border-b border-r border-gray-200">
                                                 {"{{verification_review_results}}"}
                                                 </td>
-                                                <td className="px-2 py-1 border-b border-gray-200">
+                                                <td class="px-2 py-1 border-b border-gray-200">
                                                 Verification template question results
                                                 </td>
                                             </tr>
@@ -702,7 +704,7 @@ class InstitutionLetter extends Component {
                                         <div className="w-full ">
                                     
                                             <SunEditor
-                                            getSunEditorInstance={editor => { this.verificationApprovedEditorRef = editor; }}
+                                            ref={this.editorRef} 
                                             height="100%"
                                             setContents={this.state.verification_approved_content}
                                             onChange={this.verificationApprovedContentChange}
@@ -727,112 +729,112 @@ class InstitutionLetter extends Component {
                                             </button>
                                         </div>
                                     </div>
-                                    <div className="col-span-1 overflow-x-auto">
-                                        <table className="min-w-full bg-white border border-gray-300">
+                                    <div class="col-span-1 overflow-x-auto">
+                                        <table class="min-w-full bg-white border border-gray-300">
                                             <thead>
                                             <tr>
-                                                <th className="px-1 py-2 border-b-2 border-r border-gray-200 bg-gray-100 text-left text-gray-600 uppercase">
+                                                <th class="px-1 py-2 border-b-2 border-r border-gray-200 bg-gray-100 text-left text-gray-600 uppercase">
                                                 Placeholder
                                                 </th>
-                                                <th className="px-4 py-2 border-b-2 border-gray-200 bg-gray-100 text-left text-gray-600 uppercase tracking-wider">
+                                                <th class="px-4 py-2 border-b-2 border-gray-200 bg-gray-100 text-left text-gray-600 uppercase tracking-wider">
                                                 Description
                                                 </th>
                                             </tr>
                                             </thead>
                                             <tbody className='text-sm'>
                                             <tr>
-                                                <td className="px-2 py-1 border-b border-r border-gray-200">
+                                                <td class="px-2 py-1 border-b border-r border-gray-200">
                                                 {"{{institution_email}}"}
                                                 </td>
-                                                <td className="px-2 py-1 border-b border-gray-200">
+                                                <td class="px-2 py-1 border-b border-gray-200">
                                                 Your institution's email address.
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td className="px-2 py-1 border-b border-r border-gray-200">
+                                                <td class="px-2 py-1 border-b border-r border-gray-200">
                                                 {"{{institution_address}}"}
                                                 </td>
-                                                <td className="px-2 py-1 border-b border-gray-200">
+                                                <td class="px-2 py-1 border-b border-gray-200">
                                                 Your institution's geographic address.
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td className="px-2 py-1 border-b border-r border-gray-200">
+                                                <td class="px-2 py-1 border-b border-r border-gray-200">
                                                 {"{{helpline_contact}}"}
                                                 </td>
-                                                <td className="px-2 py-1 border-b border-gray-200">
+                                                <td class="px-2 py-1 border-b border-gray-200">
                                                 Your institution's primary phone number.
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td className="px-2 py-1 border-b border-r border-gray-200">
+                                                <td class="px-2 py-1 border-b border-r border-gray-200">
                                                 {"{{mailing_address}}"}
                                                 </td>
-                                                <td className="px-2 py-1 border-b border-gray-200">
+                                                <td class="px-2 py-1 border-b border-gray-200">
                                                 Your institution's postal address eg P.O.Box 123
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td className="px-2 py-1 border-b border-r border-gray-200">
+                                                <td class="px-2 py-1 border-b border-r border-gray-200">
                                                 {"{{date_of_letter}}"}
                                                 </td>
-                                                <td className="px-2 py-1 border-b border-gray-200">
+                                                <td class="px-2 py-1 border-b border-gray-200">
                                                 Date that the letter is being issued to applicant.
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td className="px-2 py-1 border-b border-r border-gray-200">
+                                                <td class="px-2 py-1 border-b border-r border-gray-200">
                                                 {"{{recepient_institution}}"}
                                                 </td>
-                                                <td className="px-2 py-1 border-b border-gray-200">
+                                                <td class="px-2 py-1 border-b border-gray-200">
                                                 The recipient institution's name.
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td className="px-2 py-1 border-b border-r border-gray-200">
+                                                <td class="px-2 py-1 border-b border-r border-gray-200">
                                                 {"{{recepient_institution_mail}}"}
                                                 </td>
-                                                <td className="px-2 py-1 border-b border-gray-200">
+                                                <td class="px-2 py-1 border-b border-gray-200">
                                                 The recipient institution's email address.
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td className="px-2 py-1 border-b border-r border-gray-200">
+                                                <td class="px-2 py-1 border-b border-r border-gray-200">
                                                 {"{{recepient_institution_address}}"}
                                                 </td>
-                                                <td className="px-2 py-1 border-b border-gray-200">
+                                                <td class="px-2 py-1 border-b border-gray-200">
                                                 The recipient institution's geographic address.
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td className="px-2 py-1 border-b border-r border-gray-200">
+                                                <td class="px-2 py-1 border-b border-r border-gray-200">
                                                 {"{{date_of_request}}"}
                                                 </td>
-                                                <td className="px-2 py-1 border-b border-gray-200">
+                                                <td class="px-2 py-1 border-b border-gray-200">
                                                 Date the document was requested by applicant
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td className="px-2 py-1 border-b border-r border-gray-200">
+                                                <td class="px-2 py-1 border-b border-r border-gray-200">
                                                 {"{{document_owner_name}}"}
                                                 </td>
-                                                <td className="px-2 py-1 border-b border-gray-200">
+                                                <td class="px-2 py-1 border-b border-gray-200">
                                                 Personal owner of the document being verified
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td className="px-2 py-1 border-b border-r border-gray-200">
+                                                <td class="px-2 py-1 border-b border-r border-gray-200">
                                                 {"{{document_type_name}}"}
                                                 </td>
-                                                <td className="px-2 py-1 border-b border-gray-200">
+                                                <td class="px-2 py-1 border-b border-gray-200">
                                                 Name of the document type in question
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td className="px-2 py-1 border-b border-r border-gray-200">
+                                                <td class="px-2 py-1 border-b border-r border-gray-200">
                                                 {"{{verification_review_results}}"}
                                                 </td>
-                                                <td className="px-2 py-1 border-b border-gray-200">
+                                                <td class="px-2 py-1 border-b border-gray-200">
                                                 Verification template question results
                                                 </td>
                                             </tr>
@@ -889,7 +891,7 @@ class InstitutionLetter extends Component {
                                         <div className="w-full ">
                                     
                                             <SunEditor
-                                            getSunEditorInstance={editor => { this.verificationDeclinedEditorRef = editor; }}
+                                            ref={this.editorRef} 
                                             height="100%"
                                             setContents={this.state.verification_declined_content}
                                             onChange={this.verificationDeclinedContentChange}
@@ -914,112 +916,112 @@ class InstitutionLetter extends Component {
                                             </button>
                                         </div>
                                     </div>
-                                    <div className="col-span-1 overflow-x-auto">
-                                        <table className="min-w-full bg-white border border-gray-300">
+                                    <div class="col-span-1 overflow-x-auto">
+                                        <table class="min-w-full bg-white border border-gray-300">
                                             <thead>
                                             <tr>
-                                                <th className="px-1 py-2 border-b-2 border-r border-gray-200 bg-gray-100 text-left text-gray-600 uppercase">
+                                                <th class="px-1 py-2 border-b-2 border-r border-gray-200 bg-gray-100 text-left text-gray-600 uppercase">
                                                 Placeholder
                                                 </th>
-                                                <th className="px-4 py-2 border-b-2 border-gray-200 bg-gray-100 text-left text-gray-600 uppercase tracking-wider">
+                                                <th class="px-4 py-2 border-b-2 border-gray-200 bg-gray-100 text-left text-gray-600 uppercase tracking-wider">
                                                 Description
                                                 </th>
                                             </tr>
                                             </thead>
                                             <tbody className='text-sm'>
                                             <tr>
-                                                <td className="px-2 py-1 border-b border-r border-gray-200">
+                                                <td class="px-2 py-1 border-b border-r border-gray-200">
                                                 {"{{institution_email}}"}
                                                 </td>
-                                                <td className="px-2 py-1 border-b border-gray-200">
+                                                <td class="px-2 py-1 border-b border-gray-200">
                                                 Your institution's email address.
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td className="px-2 py-1 border-b border-r border-gray-200">
+                                                <td class="px-2 py-1 border-b border-r border-gray-200">
                                                 {"{{institution_address}}"}
                                                 </td>
-                                                <td className="px-2 py-1 border-b border-gray-200">
+                                                <td class="px-2 py-1 border-b border-gray-200">
                                                 Your institution's geographic address.
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td className="px-2 py-1 border-b border-r border-gray-200">
+                                                <td class="px-2 py-1 border-b border-r border-gray-200">
                                                 {"{{helpline_contact}}"}
                                                 </td>
-                                                <td className="px-2 py-1 border-b border-gray-200">
+                                                <td class="px-2 py-1 border-b border-gray-200">
                                                 Your institution's primary phone number.
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td className="px-2 py-1 border-b border-r border-gray-200">
+                                                <td class="px-2 py-1 border-b border-r border-gray-200">
                                                 {"{{mailing_address}}"}
                                                 </td>
-                                                <td className="px-2 py-1 border-b border-gray-200">
+                                                <td class="px-2 py-1 border-b border-gray-200">
                                                 Your institution's postal address eg P.O.Box 123
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td className="px-2 py-1 border-b border-r border-gray-200">
+                                                <td class="px-2 py-1 border-b border-r border-gray-200">
                                                 {"{{date_of_letter}}"}
                                                 </td>
-                                                <td className="px-2 py-1 border-b border-gray-200">
+                                                <td class="px-2 py-1 border-b border-gray-200">
                                                 Date that the letter is being issued to applicant.
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td className="px-2 py-1 border-b border-r border-gray-200">
+                                                <td class="px-2 py-1 border-b border-r border-gray-200">
                                                 {"{{recepient_institution}}"}
                                                 </td>
-                                                <td className="px-2 py-1 border-b border-gray-200">
+                                                <td class="px-2 py-1 border-b border-gray-200">
                                                 The recipient institution's name.
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td className="px-2 py-1 border-b border-r border-gray-200">
+                                                <td class="px-2 py-1 border-b border-r border-gray-200">
                                                 {"{{recepient_institution_mail}}"}
                                                 </td>
-                                                <td className="px-2 py-1 border-b border-gray-200">
+                                                <td class="px-2 py-1 border-b border-gray-200">
                                                 The recipient institution's email address.
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td className="px-2 py-1 border-b border-r border-gray-200">
+                                                <td class="px-2 py-1 border-b border-r border-gray-200">
                                                 {"{{recepient_institution_address}}"}
                                                 </td>
-                                                <td className="px-2 py-1 border-b border-gray-200">
+                                                <td class="px-2 py-1 border-b border-gray-200">
                                                 The recipient institution's geographic address.
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td className="px-2 py-1 border-b border-r border-gray-200">
+                                                <td class="px-2 py-1 border-b border-r border-gray-200">
                                                 {"{{date_of_request}}"}
                                                 </td>
-                                                <td className="px-2 py-1 border-b border-gray-200">
+                                                <td class="px-2 py-1 border-b border-gray-200">
                                                 Date the document was requested by applicant
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td className="px-2 py-1 border-b border-r border-gray-200">
+                                                <td class="px-2 py-1 border-b border-r border-gray-200">
                                                 {"{{document_owner_name}}"}
                                                 </td>
-                                                <td className="px-2 py-1 border-b border-gray-200">
+                                                <td class="px-2 py-1 border-b border-gray-200">
                                                 Personal owner of the document being verified
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td className="px-2 py-1 border-b border-r border-gray-200">
+                                                <td class="px-2 py-1 border-b border-r border-gray-200">
                                                 {"{{document_type_name}}"}
                                                 </td>
-                                                <td className="px-2 py-1 border-b border-gray-200">
+                                                <td class="px-2 py-1 border-b border-gray-200">
                                                 Name of the document type in question
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td className="px-2 py-1 border-b border-r border-gray-200">
+                                                <td class="px-2 py-1 border-b border-r border-gray-200">
                                                 {"{{verification_review_results}}"}
                                                 </td>
-                                                <td className="px-2 py-1 border-b border-gray-200">
+                                                <td class="px-2 py-1 border-b border-gray-200">
                                                 Verification template question results
                                                 </td>
                                             </tr>
