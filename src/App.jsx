@@ -6,7 +6,7 @@ import { Routes, Route } from "react-router-dom";
 import Login from './pages/auth/Login';
 import withRouter from './components/withRouter';
 import CompleteProfile from './pages/CompleteProfile';
-import DocumentRequest from './pages/DocumentRequest';
+import DocumentRequest from './pages/document-request/DocumentRequest';
 import AddDocumentType from './pages/AddDocumentType';
 import VerifyOTP from './pages/auth/VerifyOTP';
 import Toastify from './components/Toastify';
@@ -18,6 +18,7 @@ import OperationsCert from './pages/complete-profile/OperationsCert';
 import InstitutionTeams from './pages/institution-teams/InstitutionTeams';
 import InstitutionUsers from './pages/institution-teams/InstitutionUsers';
 import InstitutionLetter from './pages/complete-profile/InstitutionLetter';
+import DocumentDetails from './pages/document-request/DocumentDetails';
 
 class App extends Component {
   state = {
@@ -39,6 +40,7 @@ class App extends Component {
       this.setState({ isSidebarVisible: false });
     }
   };
+  
 
   componentDidMount() {
     document.addEventListener('mousedown', this.handleClickOutside);
@@ -88,9 +90,10 @@ class App extends Component {
               <Route exact path="/dashboard" element={<Dashboard/>} />
               <Route exact path="/complete-profile" element={<CompleteProfile />} />
               <Route exact path="/document-requests" element={<DocumentRequest/>} />
+              <Route exact path="/document-requests/:documentId" element={<DocumentDetails/>} />
               <Route exact path="/document-types" element={<DocumentTypes/>} />
               <Route exact path="/document-types/add-remove" element={<AddDocumentType />} />
-              <Route exact path="/document-types/:documentId" element={<ValidationQuestions />} />
+              <Route exact path="/docu  ment-types/:documentId" element={<ValidationQuestions />} />
               <Route exact path="/institution-teams/:institutionId" element={<InstitutionUsers />} />
             </Routes>
           </div>

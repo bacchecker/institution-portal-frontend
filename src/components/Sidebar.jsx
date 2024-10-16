@@ -54,7 +54,7 @@ class Sidebar extends Component {
         this.setState({
           institutionProfile: true,
         });
-        this.props.navigate("/dashboard")
+        //this.props.navigate("/dashboard")
       }
     } catch (error) {
       toast.error(error.response.data.message);

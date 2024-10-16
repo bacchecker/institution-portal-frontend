@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
-import axios from '../axiosConfig';
+import axios from '../../axiosConfig';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import { LuMoreVertical } from 'react-icons/lu';
 import {toast} from 'react-hot-toast';
-import withRouter from '../components/withRouter';
+import withRouter from '../../components/withRouter';
+import { FaRegFolderOpen } from 'react-icons/fa6';
+import { NavLink } from 'react-router-dom';
 class DocumentRequest extends Component {
     constructor(props) {
         super(props);
@@ -65,12 +67,6 @@ class DocumentRequest extends Component {
         });
     };
 
-    handleMenuToggle = (requestId) => {
-        this.setState((prevState) => ({
-          rowMenuOpen: prevState.rowMenuOpen === requestId ? null : requestId, // Toggle the menu for the specific row
-        }));
-    };
-
     handleFilterChange = (e) => {
         this.setState({ [e.target.name]: e.target.value }, () => this.fetchDocumentRequests());
     };
@@ -114,7 +110,7 @@ class DocumentRequest extends Component {
                 return 'bg-orange-100 text-orange-700';
             case 'completed':
                 return 'bg-green-100 text-green-700';
-            case 'declined':
+            case 'rejected':
                 return 'bg-red-100 text-red-700';
             default:
                 return 'bg-gray-100 text-gray-700';
@@ -155,7 +151,7 @@ class DocumentRequest extends Component {
                                     <th className="text-left p-2 table-cell">Unique Code</th>
                                     <th className="p-2 table-cell text-center">Status</th>
                                     <th className="text-left p-2 table-cell">Format</th>
-                                    <th className="text-left p-2 table-cell">Copies</th>
+                                    <th className="text-center p-2 table-cell">Copies</th>
                                     <th className="text-left p-2 table-cell rounded-r-lg">
                                         Action
                                     </th>
@@ -178,27 +174,16 @@ class DocumentRequest extends Component {
                                         </td>
 
                                         <td className="p-2 table-cell">{request.document_format === 'soft_copy' ? 'Soft copy' : 'Hard copy'}</td>
-                                        <td className="p-2 table-cell">{request.number_of_copies}</td>
+                                        <td className="p-2 table-cell text-center">{request.number_of_copies}</td>
                                         <td className="p-2">
                                             <div className="relative">
-                                                {/* Toggle Menu Button */}
-                                                <div
-                                                className="flex items-center justify-center cursor-pointer hover:border-blue-500 border-2 rounded-md w-8 h-8"
-                                                onClick={() => this.handleMenuToggle(request.id)}
+                                                <NavLink to={`/document-requests/${request.id}`}
+                                                className="flex items-center justify-center cursor-pointer hover:border-blue-400 border text-blue-600 rounded-md w-8 h-8"
                                                 >
-                                                <LuMoreVertical />
-                                                </div>
+                                                <FaRegFolderOpen />
+                                                </NavLink>
 
-                                                {/* Menu List - Display only when rowMenuOpen matches the row's request.id */}
-                                                {rowMenuOpen === request.id && (
-                                                <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded shadow-lg z-50">
-                                                    <ul className="py-1">
-                                                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">View</li>
-                                                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Edit</li>
-                                                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Delete</li>
-                                                    </ul>
-                                                </div>
-                                                )}
+                                                
                                             </div>
                                         </td>
                                     </tr>
