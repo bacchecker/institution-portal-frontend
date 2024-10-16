@@ -122,103 +122,140 @@ class ValidationQuestions extends Component {
         const {document_type_details, createModal, baseFeeModal, isSaving, validation_questions, editingValidationQuestion, questionToEdit, deleteValidationQuestion, questionToDelete} = this.state
         return ( 
             <>
-                <div className="bg-white py-4 rounded-md">
-                    <div className="w-full flex flex-col justify-center items-center border-b pb-2">
-                        <h1 className='font-bold text-deepBlue text-xl mb-1'>{document_type_details.name}</h1>
-                        <div className="flex space-x-4 lg:space-x-6 my-2">
-                            <div className="">
-                                <div className="flex space-x-2 text-sm items-center">
-                                    <p className='font-bold'>Document Validation Fee</p>
-                                    <p>GH₵{document_type_details.validation_fee ??'0.00'}</p>
-                                </div>
-                                <div className="flex space-x-2 text-sm items-center">
-                                    <p className='font-bold'>Document Verification Fee</p>
-                                    <p>GH₵{document_type_details.verification_fee ??'0.00'}</p>
-                                </div>
-                            </div>
-                            
-                            <div className="flex space-x-2 text-sm self-center items-center bg-blue-700 text-white rounded-lg px-3 h-8 cursor-pointer" onClick={this.toggleBaseFeeModal}>
-                                <p>Edit</p> <MdEdit />
-                            </div>
-                        </div>
+                <div className="bg-white py-4 rounded-md min-h-screen">
+                    <div className="w-full flex flex-col justify-center border-b items-center pb-2">
+                        <h1 className='font-bold text-deepBlue uppercase text-xl mb-1'>{document_type_details.name}</h1>
+                        
                     </div>
-                    {this.state.isVisible &&(
-                        <div className="px-2 xl:px-0">
-                            <div className="w-full xl:w-4/5 bg-red-100 px-4 py-3 mt-2 mx-auto rounded-lg">
-                                <div className="flex justify-between border-b border-white pb-2 items-center">
-                                    <div className="flex space-x-2">
-                                        <IoWarning size={24} className='text-yellow-500'/>
-                                        <p className='font-semibold'>Setup Document Validation Process</p>
+                    <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-2">
+                        <div className="min-h-screen border-r">
+                            <h2 className="bg-blue-700 text-white pl-6 pr-4 py-2">Document Billings</h2>
+                            <div className="my-4 px-2">
+                                <div className="flex flex-col space-y-4">
+                                    <div className="grid grid-cols-3 text-sm items-center">
+                                        <p className='font-semibold col-span-2'>Validation Fee</p>
+                                        <p>GH₵{document_type_details.validation_fee ??'0.00'}</p>
                                     </div>
-                                    <div className="flex items-center justify-center w-8 h-8 rounded bg-red-200 text-red-600 cursor-pointer hover:bg-red-300" onClick={this.handleCloseDiv}>
-                                        <MdClose/>
+                                    <div className="grid grid-cols-3 text-sm items-center">
+                                        <p className='font-semibold col-span-2'>Verification Fee</p>
+                                        <p>GH₵{document_type_details.verification_fee ??'0.00'}</p>
+                                    </div>
+                                    <div className="grid grid-cols-3 text-sm items-center">
+                                        <p className='font-semibold col-span-2'>Requisition Fee</p>
+                                        <p>GH₵{document_type_details.base_fee ??'0.00'}</p>
+                                    </div>
+                                    <div className="grid grid-cols-3 text-sm items-center">
+                                        <p className='font-semibold col-span-2'>Printing Fee</p>
+                                        <p>GH₵{document_type_details.printing_fee ??'0.00'}</p>
+                                    </div>
+                                </div>
+                                
+                                <div className="flex space-x-2 text-sm self-center items-center justify-center mt-8 bg-blue-700 text-white rounded-lg px-3 h-8 cursor-pointer" onClick={this.toggleBaseFeeModal}>
+                                    <p>Edit Fees</p> <MdEdit />
+                                </div>
+                                <div className="mt-6">
+                                    <div className="my-2">
+                                        <p className='text-sm font-medium text-gray-800 underline'>Validation Fee</p>
+                                        <p className='italic text-xs text-gray-700 ml-1'>Fees applicant pay when they request for a document to be validated</p>
+                                    </div>
+                                    <div className="my-2">
+                                        <p className='text-sm font-medium text-gray-800 underline'>Verification Fee</p>
+                                        <p className='italic text-xs text-gray-700 ml-1'>Fees institutions pay when they request for a document to be verified for authenticity</p>
+                                    </div>
+                                    <div className="my-2">
+                                        <p className='text-sm font-medium text-gray-800 underline'>Requisition Fee</p>
+                                        <p className='italic text-xs text-gray-700 ml-1'>Fees applicant pay when they request for a document</p>
+                                    </div>
+                                    <div className="my-2">
+                                        <p className='text-sm font-medium text-gray-800 underline'>Printing Fee</p>
+                                        <p className='italic text-xs text-gray-700 ml-1'>In instances of hard copy format the fee for printing the document</p>
                                     </div>
                                     
                                 </div>
-                                
-                                <div className="text-base mt-1">
-                                    <p>To ensure efficient document review and validation, please define the necessary steps or questions for the process. 
-                                    </p>
-                                    <ul className='px-4 mt-1'>
-                                        <li className='list-disc'>Each question represents a step in the validation process.</li>
-                                        <li className='list-disc'>Ensure that all required steps are covered to maintain the integrity of the document review.</li>
-                                        <li className='list-disc'>You can add as many validation questions as needed to complete the process.</li>
-                                    </ul>
-                                </div>
                             </div>
                         </div>
-                        
-                    )}
-                    <div className="mt-6 px-6">
-                        {validation_questions.length > 0 ? (
-                            <div className="">
-                                {validation_questions.map((request) => (
-                                    <div key={request.id} className="flex space-x-4 group bg-gray-100 items-center p-2 rounded-md mb-2 cursor-pointer">
-                                        <div className={`flex items-center justify-center ${request.status == 'active' ? 'bg-green-600' : 'bg-gray-400'}  text-white w-6 h-6 rounded-full font-bold`}>{request.index}</div>
-                                        <div className={`flex-1 ${request.status == 'active' ? 'text-gray-900' : 'text-gray-400'}`}>
-                                            {request.question}
+                        <div className="col-span-3">
+                            {this.state.isVisible &&(
+                                <div className="px-2">
+                                    <div className="w-full bg-red-100 px-4 py-3 mx-auto rounded-lg">
+                                        <div className="flex justify-between border-b border-white pb-2 items-center">
+                                            <div className="flex space-x-2">
+                                                <IoWarning size={24} className='text-yellow-500'/>
+                                                <p className='font-semibold'>Setup Document Verification Process</p>
+                                            </div>
+                                            {/* <div className="flex items-center justify-center w-8 h-8 rounded bg-red-200 text-red-600 cursor-pointer hover:bg-red-300" onClick={this.handleCloseDiv}>
+                                                <MdClose/>
+                                            </div> */}
+                                            
                                         </div>
-                                        <div className="flex ">
-                                            <MdEdit size={28} className='text-green-700 bg-green-100 rounded-md p-1 border mr-2' onClick={() => this.handleEditClick(request)}/>
-                                            <MdDelete size={28} className='text-red-700 bg-red-100 rounded-md p-1 border' onClick={() => this.handleDeleteClick(request)}/>
                                         
-                                            {editingValidationQuestion === request.id && (
-                        
-                                                <EditValidationQuestion
-                                                    fetchValidationQuestions={this.fetchValidationQuestions}
-                                                    validationQuestion={questionToEdit}
-                                                    onClose={() => this.setState({ editingValidationQuestion: null, questionToEdit: null})}
-                                                />
-                                            )}
-                                            {deleteValidationQuestion === request.id && (
-                                            
-                                                <DeleteValidationQuestion
-                                                    fetchValidationQuestions={this.fetchValidationQuestions}
-                                                    validationQuestion={questionToDelete}
-                                                    onClose={() => this.setState({ deleteValidationQuestion: null, questionToDelete: null})}
-                                                />
-                                            )}
-                                            
+                                        <div className="text-sm mt-1">
+                                            <p>To ensure efficient document review and validation, please define the necessary steps or questions for the process. 
+                                            </p>
+                                            <ul className='px-4 mt-1'>
+                                                <li className='list-disc'>Each question represents a step in the validation process.</li>
+                                                <li className='list-disc'>Ensure that all required steps are covered to maintain the integrity of the document review.</li>
+                                                <li className='list-disc'>You can add as many validation questions as needed to complete the process.</li>
+                                            </ul>
                                         </div>
                                     </div>
-                                ))} 
+                                </div>
+                                
+                            )}
+                            <div className="mt-6 px-4">
+                                {validation_questions.length > 0 ? (
+                                    <div className="">
+                                        {validation_questions.map((request) => (
+                                            <div key={request.id} className="flex space-x-4 group bg-gray-100 items-center p-2 rounded-md mb-2 cursor-pointer">
+                                                <div className={`flex items-center justify-center ${request.status == 'active' ? 'bg-green-600' : 'bg-gray-400'}  text-white w-6 h-6 rounded-full font-bold`}>{request.index}</div>
+                                                <div className={`flex-1 ${request.status == 'active' ? 'text-gray-900' : 'text-gray-400'}`}>
+                                                    {request.question}
+                                                </div>
+                                                <div className="flex ">
+                                                    <MdEdit size={28} className='text-green-700 bg-green-100 rounded-md p-1 border mr-2' onClick={() => this.handleEditClick(request)}/>
+                                                    <MdDelete size={28} className='text-red-700 bg-red-100 rounded-md p-1 border' onClick={() => this.handleDeleteClick(request)}/>
+                                                
+                                                    {editingValidationQuestion === request.id && (
+                                
+                                                        <EditValidationQuestion
+                                                            fetchValidationQuestions={this.fetchValidationQuestions}
+                                                            validationQuestion={questionToEdit}
+                                                            onClose={() => this.setState({ editingValidationQuestion: null, questionToEdit: null})}
+                                                        />
+                                                    )}
+                                                    {deleteValidationQuestion === request.id && (
+                                                    
+                                                        <DeleteValidationQuestion
+                                                            fetchValidationQuestions={this.fetchValidationQuestions}
+                                                            validationQuestion={questionToDelete}
+                                                            onClose={() => this.setState({ deleteValidationQuestion: null, questionToDelete: null})}
+                                                        />
+                                                    )}
+                                                    
+                                                </div>
+                                            </div>
+                                        ))} 
+                                    </div>
+                                ):(
+                                    <div className="flex flex-col justify-center items-center h-full">
+                                        <img src="/images/nodata.png" alt="No data available" className="w-1/4 h-auto" />
+                                        <p className='text-gray-500 text-sm -mt-10 font-medium'>No validation questions</p>
+                                    </div>
+                                )}
+                            
+                                
                             </div>
-                        ):(
-                            <div className="flex flex-col justify-center items-center h-full">
-                                <img src="/images/nodata.png" alt="No data available" className="w-1/4 h-auto" />
-                                <p className='text-gray-500 text-sm -mt-10 font-medium'>No validation questions</p>
-                            </div>
-                        )}
-                    
-                        
+                            <button
+                                className='absolute right-6 xl:right-12 bottom-10 flex space-x-2 bg-deepBlue text-white px-4 rounded-full py-1.5 text-sm font-light shadow-md shadow-gray-500'
+                                onClick={this.toggleCreateModal}
+                            >
+                                <FaPlus className='self-center'/>
+                                <p>New Question</p>
+                            </button>
+                        </div>
                     </div>
-                    <button
-                        className='absolute right-6 xl:right-12 bottom-10 flex space-x-2 bg-deepBlue text-white px-4 rounded-full py-1.5 text-sm font-light shadow-md shadow-gray-500'
-                        onClick={this.toggleCreateModal}
-                    >
-                        <FaPlus className='self-center'/>
-                        <p>New Question</p>
-                    </button>
+                    
+                    
                 </div>
                 {createModal && (
                     <div className="fixed z-50 inset-0 bg-black bg-opacity-60 flex justify-end">
@@ -505,6 +542,8 @@ class UpdateDocumentFee extends Component {
         documentId: props.documentType.id,
         validation_fee: props.documentType.validation_fee,
         verification_fee: props.documentType.verification_fee,
+        base_fee: props.documentType.base_fee,
+        printing_fee: props.documentType.printing_fee,
         isUpdating: false,
         confirmPasswordModal: false,
         password: ''
@@ -525,7 +564,7 @@ class UpdateDocumentFee extends Component {
     
     handleUpdateBaseFee = async (e, id) => {
         e.preventDefault()
-        const { validation_fee, verification_fee, password } = this.state;
+        const { validation_fee, verification_fee, base_fee, printing_fee, password } = this.state;
     
         if (!validation_fee || isNaN(validation_fee) || parseFloat(validation_fee) < 0) {
           toast.error("Please enter a valid validation fee");
@@ -539,6 +578,8 @@ class UpdateDocumentFee extends Component {
           const response = await axios.post(`/institution/update-base-fee/${id}`, {
             validation_fee: validation_fee,
             verification_fee: verification_fee,
+            base_fee: base_fee,
+            printing_fee: printing_fee,
             password: password,
           });
     
@@ -555,7 +596,7 @@ class UpdateDocumentFee extends Component {
 
     render() {
         const { onClose } = this.props;
-        const { validation_fee, verification_fee, isUpdating, documentId, confirmPasswordModal } = this.state;
+        const { validation_fee, verification_fee, base_fee, printing_fee, isUpdating, documentId, confirmPasswordModal } = this.state;
         return (
         <>
         <div className="fixed z-50 inset-0 bg-black bg-opacity-60 flex justify-end">
@@ -581,9 +622,21 @@ class UpdateDocumentFee extends Component {
                             onChange={this.handleInputChange}
                         />
                         <Textbox
-                            label="Document Request Fee"
+                            label="Document Verification Fee"
                             name="verification_fee"
                             value={verification_fee}
+                            onChange={this.handleInputChange}
+                        />
+                        <Textbox
+                            label="Document Requisition Fee"
+                            name="base_fee"
+                            value={base_fee}
+                            onChange={this.handleInputChange}
+                        />
+                        <Textbox
+                            label="Printing Fee"
+                            name="printing_fee"
+                            value={printing_fee}
                             onChange={this.handleInputChange}
                         />
                         <div className="w-full absolute bottom-4 right-0 flex space-x-4 px-4">
@@ -606,8 +659,8 @@ class UpdateDocumentFee extends Component {
         </div>
         {confirmPasswordModal && 
             (<div className="fixed z-50 backdrop-blur-sm bg-black inset-0 overflow-y-auto bg-opacity-60">
-                <div className="flex items-center justify-center min-h-screen">
-                    <div className="w-full lg:w-1/2 h-44 relative bg-white shadow-lg">
+                <div className="flex items-center justify-center min-h-screen px-2">
+                    <div className="w-full md:w-2/3 lg:w-1/2 xl:w-1/3 h-44 relative bg-white shadow-lg mx-2">
                         <div className="flex justify-between bg-bChkRed text-white">
                             <h2 className="text-xl font-semibold py-2 px-4">Confirm You Password</h2>
                             <button onClick={onClose} className="px-4 hover:text-gray-200">

@@ -60,8 +60,7 @@ class Login extends Component {
       const type = localStorage.getItem("type");
       
       if(responseData.institution.status == 'inactive'){
-        toast.error('Your institutions\' account is currently under review by our management team we will revert to you once the review is complete.')
-        localStorage.clear(); 
+        this.props.navigate('/account-inactive')
         
         return
       }

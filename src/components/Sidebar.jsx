@@ -13,7 +13,8 @@ class Sidebar extends Component {
   state = {
     activeMenu: "",
     isCollapsed: this.props.isCollapsed,
-    institutionProfile: null
+    institutionProfile: null,
+    institutionStatus: null,
   };
 
   toggleSubMenu = (menu) => {
@@ -45,17 +46,11 @@ class Sidebar extends Component {
       const response = await axios.get("/institution/institution-data");
       const institutionData = response.data.institutionData;
 
-      if (institutionData.profile_complete == 'no') {
+      const { status, profile_complete } = institutionData;
         this.setState({
-          institutionProfile: false,
+          institutionStatus: status !== 'inactive',  // Set to true if status is not 'inactive'
+          institutionProfile: profile_complete === 'yes'  // Set to true if profile is complete
         });
-        
-      }else{
-        this.setState({
-          institutionProfile: true,
-        });
-        //this.props.navigate("/dashboard")
-      }
     } catch (error) {
       toast.error(error.response.data.message);
     }
@@ -133,6 +128,104 @@ class Sidebar extends Component {
                   </div>
                 </div>
                 <span className="sr-only">Loading...</span>
+            </div>
+            ): this.state.institutionStatus === false ? (
+
+            <div>
+              <ul>
+                <li
+                  className={`flex items-center py-3 cursor-pointer ${
+                    this.isActive("/dashboard")
+                      ? "bg-primaryRed text-white"
+                      : "hover:text-primaryRed text-gray-500"
+                  }`}
+                >
+                  <div
+                    className={`w-1 h-6 ${
+                      this.isActive("/dashboard") ? "bg-white" : "hidden"
+                    } rounded-tr-full rounded-br-full`}
+                  ></div>
+                  <Link onClick={this.handleLinkClick}>
+                    <BiSolidDashboard
+                      className={`inline-block mr-2 -mt-1 ${
+                        this.isActive("/dashboard")
+                          ? "text-white ml-4"
+                          : "text-gray-400 hover:text-primaryRed ml-5"
+                      }`}
+                      size={17}
+                    />
+                    <span
+                      className={`${isCollapsed ? "hidden" : "inline self-center"}`}
+                    >
+                      Dashboard
+                    </span>
+                  </Link>
+                </li>
+
+                <li
+                  className={`flex items-center py-3 cursor-pointer ${
+                    this.isActive("/document-requests")
+                      ? "bg-primaryRed text-white"
+                      : "hover:text-primaryRed text-gray-500"
+                  }`}
+                >
+                  <div
+                    className={`w-1 h-6 ${
+                      this.isActive("/document-requests") ? "bg-white" : "hidden"
+                    } rounded-tr-full rounded-br-full`}
+                  ></div>
+                  <Link
+                    
+                    onClick={this.handleLinkClick}
+                  >
+                    <IoDocuments
+                      className={`inline-block mr-2 -mt-1 ${
+                        this.isActive("/document-requests")
+                          ? "text-white ml-4"
+                          : "text-gray-400 hover:text-primaryRed ml-5"
+                      }`}
+                      size={17}
+                    />
+                    <span
+                      className={`${isCollapsed ? "hidden" : "inline self-center"}`}
+                    >
+                      Requests
+                    </span>
+                  </Link>
+                </li>
+
+                <li
+                  className={`flex items-center py-3 cursor-pointer ${
+                    this.isActive("/staff")
+                      ? "bg-primaryRed text-white"
+                      : "hover:text-primaryRed text-gray-500"
+                  }`}
+                >
+                  <div
+                    className={`w-1 h-6 ${
+                      this.isActive("/staff") ? "bg-white" : "hidden"
+                    } rounded-tr-full rounded-br-full`}
+                  ></div>
+                  <Link onClick={this.handleLinkClick}>
+                    <FaCircleUser
+                      className={`inline-block mr-2 -mt-1 ${
+                        this.isActive("/staff")
+                          ? "text-white ml-4"
+                          : "text-gray-400 hover:text-primaryRed ml-5"
+                      }`}
+                      size={17}
+                    />
+                    <span
+                      className={`${isCollapsed ? "hidden" : "inline self-center"}`}
+                    >
+                      Staff
+                    </span>
+                  </Link>
+                </li>
+                
+
+                
+              </ul>
             </div>
             ): this.state.institutionProfile === true ? (
 
@@ -392,7 +485,6 @@ class Sidebar extends Component {
                   </Link>
                 </li>
               </ul>
-              
             )}
           </nav>
             

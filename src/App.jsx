@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import Sidebar from './components/Sidebar';
 import Navbar from './components/Navbar';
 import Dashboard from './pages/Dashboard';
+import {toast} from 'react-hot-toast';
 import { Routes, Route } from "react-router-dom";
 import Login from './pages/auth/Login';
 import withRouter from './components/withRouter';
@@ -19,6 +20,7 @@ import InstitutionTeams from './pages/institution-teams/InstitutionTeams';
 import InstitutionUsers from './pages/institution-teams/InstitutionUsers';
 import InstitutionLetter from './pages/complete-profile/InstitutionLetter';
 import DocumentDetails from './pages/document-request/DocumentDetails';
+import AccountInactive from './pages/complete-profile/AccountInactive'
 
 class App extends Component {
   state = {
@@ -40,9 +42,22 @@ class App extends Component {
       this.setState({ isSidebarVisible: false });
     }
   };
-  
+
+  fetchInstitution = async () => {
+    try {
+      const response = await axios.get("/institution/institution-data");
+      const institutionData = response.data.institutionData;
+
+      if (institutionData.status == 'inactive') {
+        this.props.navigate('/account-inactive')
+      }
+    } catch (error) {
+      toast.error(error.response.data.message);
+    }
+  };
 
   componentDidMount() {
+    this.fetchInstitution()
     document.addEventListener('mousedown', this.handleClickOutside);
   }
 
@@ -81,6 +96,7 @@ class App extends Component {
             <Routes>
               <Route exact path="/" element={<Login />} />
               <Route exact path="/login" element={<Login />} />
+              <Route exact path="/account-inactive" element={<AccountInactive />} />
               <Route exact path="/user-profile" element={<Profile />} />
               <Route exact path="/verify-otp" element={<VerifyOTP />} />
               <Route exact path="/account-profile" element={<InstitutionData />} />
@@ -93,7 +109,7 @@ class App extends Component {
               <Route exact path="/document-requests/:documentId" element={<DocumentDetails/>} />
               <Route exact path="/document-types" element={<DocumentTypes/>} />
               <Route exact path="/document-types/add-remove" element={<AddDocumentType />} />
-              <Route exact path="/docu  ment-types/:documentId" element={<ValidationQuestions />} />
+              <Route exact path="/document-types/:documentId" element={<ValidationQuestions />} />
               <Route exact path="/institution-teams/:institutionId" element={<InstitutionUsers />} />
             </Routes>
           </div>

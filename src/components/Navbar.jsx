@@ -11,8 +11,9 @@ class Navbar extends React.Component {
     super(props);
     this.state = {
       isLogoutModalOpen: false,
-    userData: [],
+      userData: [],
       showMenu: false,
+      institutionStatus: null
     };
     this.menuRef = React.createRef();
   }
@@ -43,6 +44,20 @@ class Navbar extends React.Component {
           userData: institutionData
         });
       }
+    } catch (error) {
+      toast.error(error.response.data.message);
+    }
+  };
+
+  fetchInstitution = async () => {
+    try {
+      const response = await axios.get("/institution/institution-data");
+      const institutionData = response.data.institutionData;
+
+      const { status } = institutionData;
+        this.setState({
+          institutionStatus: status !== 'inactive'
+        });
     } catch (error) {
       toast.error(error.response.data.message);
     }
@@ -127,13 +142,24 @@ class Navbar extends React.Component {
               <p className="text-xs font-medium text-gray-400">{userData.email}</p>
             </div>
             <ul className="text-sm">
-              <NavLink to={`/user-profile`}
-                className="flex items-center gap-4 px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                onClick={this.handleMenuItemClick}
-              >
-                <FaUser size={16} />
-                <span>My Profile</span>
-              </NavLink>
+              {this.state.institutionStatus ? (
+                <NavLink to={`/user-profile`}
+                  className="flex items-center gap-4 px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                  onClick={this.handleMenuItemClick}
+                >
+                  <FaUser size={16} />
+                  <span>My Profile</span>
+                </NavLink>
+              ):(
+                <NavLink
+                  className="flex items-center gap-4 px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                  onClick={this.handleMenuItemClick}
+                >
+                  <FaUser size={16} />
+                  <span>My Profile</span>
+                </NavLink>
+              )}
+              
               <Logout />
             </ul>
           </div>
