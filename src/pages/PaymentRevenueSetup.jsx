@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import withRouter from "../components/withRouter";
 import CustomTable from "../components/CustomTable";
 import Drawer from "../components/Drawer";
@@ -7,23 +7,23 @@ import {
   Card,
   CardBody,
   Input,
+  Select,
+  SelectItem,
   Switch,
+  TableCell,
+  TableRow,
   useDisclosure,
 } from "@nextui-org/react";
 import { IoSearch } from "react-icons/io5";
 import axios from "../axiosConfig";
 
 const PaymentRevenueSetup = () => {
+  const [paymentAccounts, setPaymentAccounts] = useState([]);
   const [data, setData] = useState({});
   const [processing, setProcessing] = useState(false);
+  const [loadingData, setLoadingData] = useState(false);
   const [errors, setErrors] = useState({});
-  const [filters, setFilters] = useState({
-    region: "",
-    search_query: "",
-    status: "",
-  });
 
-  const disclosure = useDisclosure();
   const deleteDisclosure = useDisclosure();
   const [openDrawer, setOpenDrawer] = useState(false);
   const [drawerTitle, setDrawerTitle] = useState("Add new Payment Account");
@@ -33,11 +33,11 @@ const PaymentRevenueSetup = () => {
   const save = async () => {
     setProcessing(true);
     try {
-      const response = await axios.post("/institution/payment-account", data);
+      const response = await axios.post("/institution/payment-accounts", data);
       // toast.success(response.data.message);
+      fetchPaymentAccounts();
       setProcessing(false);
       setOpenDrawer(false);
-      reset();
     } catch (error) {
       console.log(error);
       // setErrors(error.response.data.errors);
@@ -45,12 +45,36 @@ const PaymentRevenueSetup = () => {
     }
   };
 
+  const fetchPaymentAccounts = async () => {
+    try {
+      const response = await axios.get("/institution/payment-accounts");
+      setPaymentAccounts(response.data?.data?.accounts);
+      setLoadingData(false);
+    } catch (error) {
+      console.log(error);
+      setLoadingData(false);
+    }
+  };
+
+  useEffect(() => {
+    setLoadingData(true);
+    fetchPaymentAccounts();
+  }, []);
+
+  useEffect(() => {
+    if (!openDrawer) {
+      setData({});
+    }
+  }, [openDrawer]);
+
+  console.log(paymentAccounts);
+
   return (
     <div className="flex flex-col">
       <section className="md:px-3">
         <Card className="my-3 md:w-full w-[98vw] mx-auto dark:bg-slate-900 ">
           <CardBody className="overflow-x-auto justify-between flex-row">
-            <form method="get" className="flex flex-row gap-3 items-center">
+            {/* <form method="get" className="flex flex-row gap-3 items-center">
               <Input
                 name="search_query"
                 placeholder="Search"
@@ -63,7 +87,7 @@ const PaymentRevenueSetup = () => {
               <Button size="sm" type="submit" color="danger">
                 Search
               </Button>
-            </form>
+            </form> */}
 
             <Button
               size="sm"
@@ -80,7 +104,15 @@ const PaymentRevenueSetup = () => {
 
       <section className="md:px-3 md:w-full w-[98vw] mx-auto">
         <CustomTable
-          columns={["Name", "Email", "Phone", "Digital Address", ""]}
+          loadingState={loadingData}
+          columns={[
+            "Account Name",
+            "Account No.",
+            "Bank Name",
+            "Bank Branch",
+            "Currency",
+            "",
+          ]}
           page={1}
           setPage={
             (page) => console.log(page)
@@ -94,21 +126,22 @@ const PaymentRevenueSetup = () => {
           totalPages={1}
           // totalPages={Math.ceil(institutions?.total / institutions?.per_page)}
         >
-          {[].map((institution) => (
-            <TableRow key={institution?.id}>
+          {paymentAccounts.map((account) => (
+            <TableRow key={account?.id}>
               <TableCell className="flex flex-col justify-center">
-                {institution?.name}
+                {account?.account_name}
               </TableCell>
-              <TableCell>{institution?.email}</TableCell>
-              <TableCell>{institution?.phone}</TableCell>
-              <TableCell>{institution?.digital_address}</TableCell>
+              <TableCell>{account?.account_number}</TableCell>
+              <TableCell>{account?.bank_name}</TableCell>
+              <TableCell>{account?.bank_branch}</TableCell>
+              <TableCell>{account?.currency}</TableCell>
               <TableCell className="flex items-center h-16 gap-3">
                 <Button
                   size="sm"
                   color="success"
                   onClick={() => {
                     setOpenDrawer(true);
-                    setData(institution);
+                    setData(account);
                   }}
                 >
                   View
@@ -128,7 +161,6 @@ const PaymentRevenueSetup = () => {
               type="text"
               name="account_name"
               value={data.account_name}
-              id="name"
               onChange={(e) =>
                 setData((prev) => ({ ...prev, account_name: e.target.value }))
               }
@@ -156,7 +188,6 @@ const PaymentRevenueSetup = () => {
               type="text"
               name="bank_name"
               value={data.bank_name}
-              id="name"
               onChange={(e) =>
                 setData((prev) => ({ ...prev, bank_name: e.target.value }))
               }
@@ -170,13 +201,40 @@ const PaymentRevenueSetup = () => {
               type="text"
               name="bank_branch"
               value={data.bank_branch}
-              id="name"
               onChange={(e) =>
                 setData((prev) => ({ ...prev, bank_branch: e.target.value }))
               }
               errorMessage={errors.bank_branch}
               isInvalid={!!errors.bank_branch}
             />
+
+            <Select
+              size="sm"
+              label="Account Type"
+              className="w-full"
+              name="account_type"
+              defaultSelectedKeys={[data?.account_type]}
+              onChange={(e) =>
+                setData((prev) => ({ ...prev, account_type: e.target.value }))
+              }
+            >
+              {[
+                {
+                  key: "savings",
+                  label: "Savings",
+                },
+                {
+                  key: "current",
+                  label: "Current",
+                },
+                {
+                  key: "domiciliary",
+                  label: "Domiciliary",
+                },
+              ].map((item) => (
+                <SelectItem key={item.key}>{item.label}</SelectItem>
+              ))}
+            </Select>
 
             <Input
               size="sm"
@@ -197,7 +255,7 @@ const PaymentRevenueSetup = () => {
               type="text"
               name="currency"
               value={data.currency}
-              id="name"
+              maxLength={3}
               onChange={(e) =>
                 setData((prev) => ({ ...prev, currency: e.target.value }))
               }
