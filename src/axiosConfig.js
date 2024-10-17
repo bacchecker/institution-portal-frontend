@@ -1,8 +1,8 @@
 import axios from "axios";
 
 const instance = axios.create({
-  //baseURL: "https://backend.baccheck.online/api/",
-  baseURL: "http://localhost:8000/api/",
+  baseURL: "https://backend.baccheck.online/api/",
+  // baseURL: "http://localhost:8000/api/",
   headers: {
     "Content-Type": "multipart/form-data",
     Accept: "application/json",

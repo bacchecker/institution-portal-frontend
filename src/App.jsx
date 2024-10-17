@@ -23,6 +23,7 @@ import DocumentDetails from "./pages/document-request/DocumentDetails";
 import AccountInactive from "./pages/complete-profile/AccountInactive";
 import PaymentRevenueSetup from "./pages/PaymentRevenueSetup";
 import { motion } from "framer-motion";
+import RevenueOverview from "./pages/reports/RevenueOverview";
 
 const App = () => {
   const navigate = useNavigate();
@@ -71,19 +72,19 @@ const App = () => {
     location.pathname === "/verify-otp";
 
   return (
-    <motion.div className="min-h-screen relative bg-slate-300/30 dark:bg-slate-950 flex !transition-all duration-300">
+    <>
       <Toastify />
       {/* Sidebar */}
-      {!isLoginPage && (
+      {/* {!isLoginPage && (
         <Sidebar
           mobileNavRef={mobileNavRef}
           isDesktopExpanded={isDesktopExpanded}
           isMobileExpanded={isMobileExpanded}
         />
-      )}
+      )} */}
 
       {/* Main content area */}
-      <motion.div
+      {/* <motion.div
         // className={`flex-1 ${
         //   !isLoginPage && isSidebarCollapsed
         //     ? "lg:ml-16"
@@ -95,9 +96,9 @@ const App = () => {
         className={`transition-all duration-400 flex-grow ${
           isDesktopExpanded ? "lg:ml-[17%] ml-0" : "ml-16"
         }`}
-      >
-        {/* Navbar */}
-        {!isLoginPage && (
+      > */}
+      {/* Navbar */}
+      {/* {!isLoginPage && (
           <Navbar
             toggleSidebar={() => setIsMobileExpanded(!isMobileExpanded)}
             user={{ name: "John Doe" }}
@@ -109,77 +110,66 @@ const App = () => {
               );
             }}
           />
-        )}
+        )} */}
 
-        {/* Page content */}
-        <div className={`${isLoginPage ? "p-0" : "p-3"} `}>
-          <Routes>
-            <Route exact path="/" element={<Login />} />
-            <Route exact path="/login" element={<Login />} />
-            <Route
-              exact
-              path="/account-inactive"
-              element={<AccountInactive />}
-            />
-            <Route exact path="/user-profile" element={<Profile />} />
-            <Route exact path="/verify-otp" element={<VerifyOTP />} />
+      {/* Page content */}
+      {/* <div className={`${isLoginPage ? "p-0" : "p-3"} `}> */}
+      <Routes>
+        <Route exact path="/" element={<Login />} />
+        <Route exact path="/login" element={<Login />} />
+        <Route exact path="/account-inactive" element={<AccountInactive />} />
+        <Route exact path="/user-profile" element={<Profile />} />
+        <Route exact path="/verify-otp" element={<VerifyOTP />} />
 
-            {/* Account Setup Routes */}
-            <Route path="/account-setup" element={<Outlet />}>
-              <Route path="profile" element={<InstitutionData />} />
-              <Route path="institution-teams" element={<InstitutionTeams />} />
-              <Route
-                path="operations-certificate"
-                element={<OperationsCert />}
-              />
-              <Route path="letter-templates" element={<InstitutionLetter />} />
+        {/* Account Setup Routes */}
+        <Route path="/account-setup" element={<Outlet />}>
+          <Route path="profile" element={<InstitutionData />} />
+          <Route path="institution-teams" element={<InstitutionTeams />} />
+          <Route path="operations-certificate" element={<OperationsCert />} />
+          <Route path="letter-templates" element={<InstitutionLetter />} />
 
-              <Route path="document-types" element={<DocumentTypes />} />
-              <Route
-                path="document-types/add-remove"
-                element={<AddDocumentType />}
-              />
-              <Route
-                path="document-types/:documentId"
-                element={<ValidationQuestions />}
-              />
-              <Route
-                path="institution-teams/:institutionId"
-                element={<InstitutionUsers />}
-              />
-            </Route>
+          <Route path="document-types" element={<DocumentTypes />} />
+          <Route
+            path="document-types/add-remove"
+            element={<AddDocumentType />}
+          />
+          <Route
+            path="document-types/:documentId"
+            element={<ValidationQuestions />}
+          />
+          <Route
+            path="institution-teams/:institutionId"
+            element={<InstitutionUsers />}
+          />
+        </Route>
 
-            <Route exact path="/dashboard" element={<Dashboard />} />
-            <Route
-              exact
-              path="/complete-profile"
-              element={<CompleteProfile />}
-            />
+        <Route exact path="/dashboard" element={<Dashboard />} />
+        <Route exact path="/complete-profile" element={<CompleteProfile />} />
 
-            {/* Requests Routes */}
-            <Route exact path="/requests" element={<Outlet />}>
-              <Route
-                exact
-                path="document-requests"
-                element={<DocumentRequest />}
-              />
-              <Route
-                exact
-                path="document-requests/:documentId"
-                element={<DocumentDetails />}
-              />
-            </Route>
+        {/* Requests Routes */}
+        <Route exact path="/requests" element={<Outlet />}>
+          <Route exact path="document-requests" element={<DocumentRequest />} />
+          <Route
+            exact
+            path="document-requests/:documentId"
+            element={<DocumentDetails />}
+          />
+        </Route>
 
-            {/* // Kwamina */}
-            <Route
-              exact
-              path="/payment-revenue-setup"
-              element={<PaymentRevenueSetup />}
-            />
-          </Routes>
-        </div>
-      </motion.div>
-    </motion.div>
+        {/* // Kwamina */}
+        <Route
+          exact
+          path="/payment-revenue-setup"
+          element={<PaymentRevenueSetup />}
+        />
+
+        <Route exact path="/reports" element={<Outlet />}>
+          <Route exact path="revenue-overview" element={<RevenueOverview />} />
+        </Route>
+      </Routes>
+      {/* </div> */}
+      {/* </motion.div> */}
+    </>
   );
 };
 // }

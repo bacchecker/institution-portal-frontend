@@ -53,7 +53,7 @@ export default function Sidebar({
   }, [instutituion]);
 
   return (
-    <div>
+    <>
       <motion.div
         className={`${
           isDesktopExpanded ? "xl:w-[17%] w-[17%] " : "w-16 "
@@ -248,6 +248,6 @@ export default function Sidebar({
           ))}
         </div>
       </motion.aside>
-    </div>
+    </>
   );
 }
