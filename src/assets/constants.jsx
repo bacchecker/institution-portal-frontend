@@ -18,11 +18,14 @@ export const navLinks = [
     path: "/dashboard",
     icon: <DashboardIcon />,
     children: [],
+    showOn: ["inactive", "active"],
   },
+
   {
     label: "Requests",
     path: "/requests",
     icon: <TasksListIcon />,
+    showOn: ["active"],
     children: [
       {
         label: "Document Requests",
@@ -43,6 +46,7 @@ export const navLinks = [
     path: "/account-setup",
     icon: <PersonCircleIcon />,
     acl: ["view users", "view institutions"],
+    showOn: ["inactive", "active"],
     children: [
       {
         label: "Profile",
@@ -73,6 +77,7 @@ export const navLinks = [
     path: "/payment-revenue-setup",
     icon: <MoneyIcon />,
     acl: ["view payments"],
+    showOn: ["active"],
     children: [],
   },
   // {

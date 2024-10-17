@@ -4,21 +4,20 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Link, useLocation } from "react-router-dom";
 import axios from "../axiosConfig";
 
-export default function Sidebar() {
-  const [isDesktopExpanded, setIsDesktopExpanded] = useState(true);
-  const [isMobileExpanded, setIsMobileExpanded] = useState(false);
+export default function Sidebar({
+  isDesktopExpanded,
+  isMobileExpanded,
+  mobileNavRef,
+}) {
   const url = useLocation().pathname;
-  const [institutionProfile, setInstitutionProfile] = useState(null);
-  const [institutionStatus, setInstitutionStatus] = useState(null);
+  const [instutituion, setInstutituion] = useState({});
+  const [accessibleRoutes, setAccessibleRoutes] = useState([]);
 
   const fetchInstitution = async () => {
     try {
       const response = await axios.get("/institution/institution-data");
       const institutionData = response.data.institutionData;
-
-      const { status, profile_complete } = institutionData;
-      setInstitutionProfile(profile_complete === "yes");
-      setInstitutionStatus(status !== "inactive");
+      setInstutituion(institutionData);
     } catch (error) {
       // toast.error(error.response.data.message);
       console.log(error);
@@ -26,29 +25,23 @@ export default function Sidebar() {
   };
 
   useEffect(() => {
-    setIsDesktopExpanded(
-      localStorage.getItem("isDesktopExpanded") === "true"
-        ? true
-        : localStorage.getItem("isDesktopExpanded") === null
-        ? true
-        : false
-    );
-  }, []);
-  const mobileNavRef = useRef(null);
-
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (mobileNavRef.current && !mobileNavRef.current.contains(e.target)) {
-        setIsMobileExpanded(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  useEffect(() => {
     fetchInstitution();
+    // filter accessible routes
+    // const filteredRoutes = navLinks.filter((route) => {
+    //   if (route.acl) {
+    //     return route.acl.some((acl) => instutituion?.roles?.includes(acl));
+    //   }
+    //   return true;
+    // });
+    // setAccessibleRoutes(filteredRoutes);
+
+    const filteredRoutes = navLinks.filter((route) => {
+      if (route.showOn) {
+        return route.showOn.includes(instutituion?.status);
+      }
+      // return true;
+    });
+    setAccessibleRoutes(filteredRoutes);
   }, []);
 
   return (
@@ -76,7 +69,7 @@ export default function Sidebar() {
 
         {/* nav links */}
         <div className="flex flex-col mt-11 overflow-hidden relative">
-          {navLinks.map((link, index) => (
+          {accessibleRoutes.map((link, index) => (
             <div key={index} className={`relative `}>
               <Link
                 key={index}
@@ -174,7 +167,7 @@ export default function Sidebar() {
 
         {/* nav links */}
         <div className="flex flex-col overflow-hidden relative">
-          {navLinks.map((link, index) => (
+          {accessibleRoutes.map((link, index) => (
             <div key={index} className="relative">
               <Link
                 href={link.path}
@@ -224,7 +217,6 @@ export default function Sidebar() {
                   className="left-0 top-full mt-1 z-50 bg-white dark:bg-gray-800 w-full"
                 >
                   {link?.children.map((child, childIndex) => {
-                    // Strip query parameters for comparison
                     const currentPath = new URL(url, window.location.origin)
                       .pathname;
 
