@@ -74,7 +74,7 @@ class Login extends Component {
         if (responseData.institution.profile_complete == "yes") {
           this.props.navigate("/dashboard");
         } else {
-          this.props.navigate("/account-profile");
+          this.props.navigate("/account-setup/profile");
         }
       } else {
         toast.error("Your are not an institution");
