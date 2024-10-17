@@ -21,6 +21,7 @@ import InstitutionUsers from "./pages/institution-teams/InstitutionUsers";
 import InstitutionLetter from "./pages/complete-profile/InstitutionLetter";
 import DocumentDetails from "./pages/document-request/DocumentDetails";
 import AccountInactive from "./pages/complete-profile/AccountInactive";
+import PaymentRevenueSetup from "./pages/PaymentRevenueSetup";
 
 class App extends Component {
   state = {
@@ -171,6 +172,13 @@ class App extends Component {
                 exact
                 path="/institution-teams/:institutionId"
                 element={<InstitutionUsers />}
+              />
+
+              {/* // Kwamina */}
+              <Route
+                exact
+                path="/payment-revenue-setup"
+                element={<PaymentRevenueSetup />}
               />
             </Routes>
           </div>
