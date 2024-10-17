@@ -1,3 +1,4 @@
+import secureLocalStorage from "react-secure-storage";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
@@ -23,7 +24,7 @@ const useAuthStore = create(
     }),
     {
       name: "auth-storage", // Name of the localStorage key
-      getStorage: () => localStorage, // Store in localStorage
+      getStorage: () => secureLocalStorage, // Store in localStorage
     }
   )
 );

@@ -25,10 +25,11 @@ import DeleteModal from "../components/DeleteModal";
 import toast from "react-hot-toast";
 import AuthLayout from "../components/AuthLayout";
 import useAuthStore from "../store/authStore";
+import useSWR from "swr";
 
 const PaymentRevenueSetup = () => {
   const [paymentAccounts, setPaymentAccounts] = useState([]);
-  const [data, setData] = useState({});
+  const [selectedData, setSelectedData] = useState({});
   const [processing, setProcessing] = useState(false);
   const [loadingData, setLoadingData] = useState(false);
   const [errors, setErrors] = useState({});
@@ -41,23 +42,23 @@ const PaymentRevenueSetup = () => {
   const save = async () => {
     setProcessing(true);
     try {
-      if (data?.id) {
+      if (selectedData?.id) {
         const response = await axios.post(
-          `/institution/payment-accounts/${data?.id}`,
-          data
+          `/institution/payment-accounts/${selectedData?.id}`,
+          selectedData
         );
         console.log(response?.data);
         // toast.success(response.data);
-        fetchPaymentAccounts();
+        // fetchPaymentAccounts();
         setProcessing(false);
         setOpenDrawer(false);
       } else {
         const response = await axios.post(
           "/institution/payment-accounts",
-          data
+          selectedData
         );
         toast.success(response.data.message);
-        fetchPaymentAccounts();
+        // fetchPaymentAccounts();
         setProcessing(false);
         setOpenDrawer(false);
       }
@@ -68,29 +69,21 @@ const PaymentRevenueSetup = () => {
     }
   };
 
-  const fetchPaymentAccounts = async () => {
-    try {
-      const response = await axios.get("/institution/payment-accounts");
-      setPaymentAccounts(response.data?.data?.accounts);
-      setLoadingData(false);
-    } catch (error) {
-      console.log(error);
-      setLoadingData(false);
-    }
-  };
+  // const fetcher =
+  const { data, error } = useSWR("/institution/payment-accounts", (url) =>
+    axios.get(url).then((res) => res.data)
+  );
 
   useEffect(() => {
     setLoadingData(true);
-    fetchPaymentAccounts();
+    // fetchPaymentAccounts();
   }, []);
 
   useEffect(() => {
     if (!openDrawer) {
-      setData({});
+      setSelectedData({});
     }
   }, [openDrawer]);
-
-  console.log(paymentAccounts);
 
   return (
     <AuthLayout title="Payment Setup" className="flex flex-col">
@@ -128,7 +121,7 @@ const PaymentRevenueSetup = () => {
 
       <section className="md:px-3 md:w-full w-[98vw] mx-auto">
         <CustomTable
-          loadingState={loadingData}
+          loadingState={data?.data?.accounts ? false : true}
           columns={[
             "Account Name",
             "Account No.",
@@ -150,7 +143,7 @@ const PaymentRevenueSetup = () => {
           totalPages={1}
           // totalPages={Math.ceil(institutions?.total / institutions?.per_page)}
         >
-          {paymentAccounts.map((account) => (
+          {data?.data?.accounts?.map((account) => (
             <TableRow key={account?.id}>
               <TableCell className="flex flex-col justify-center">
                 {account?.account_name}
@@ -172,7 +165,7 @@ const PaymentRevenueSetup = () => {
                       color="success"
                       onClick={() => {
                         setDrawerTitle("Edit Account Details");
-                        setData(account);
+                        setSelectedData(account);
                         setOpenDrawer(true);
                       }}
                     >
@@ -183,7 +176,7 @@ const PaymentRevenueSetup = () => {
                       color="danger"
                       onClick={() => {
                         deleteDisclosure.onOpen();
-                        setData(account);
+                        setSelectedData(account);
                       }}
                     >
                       Delete
@@ -204,9 +197,12 @@ const PaymentRevenueSetup = () => {
               label="Account Name"
               type="text"
               name="account_name"
-              value={data.account_name}
+              value={selectedData.account_name}
               onChange={(e) =>
-                setData((prev) => ({ ...prev, account_name: e.target.value }))
+                setSelectedData((prev) => ({
+                  ...prev,
+                  account_name: e.target.value,
+                }))
               }
               errorMessage={errors.account_name}
               isInvalid={!!errors.account_name}
@@ -217,10 +213,13 @@ const PaymentRevenueSetup = () => {
               label="Account Number"
               type="text"
               name="account_number"
-              value={data.account_number}
+              value={selectedData.account_number}
               id="name"
               onChange={(e) =>
-                setData((prev) => ({ ...prev, account_number: e.target.value }))
+                setSelectedData((prev) => ({
+                  ...prev,
+                  account_number: e.target.value,
+                }))
               }
               errorMessage={errors.account_number}
               isInvalid={!!errors.account_number}
@@ -231,9 +230,12 @@ const PaymentRevenueSetup = () => {
               label="Bank Name"
               type="text"
               name="bank_name"
-              value={data.bank_name}
+              value={selectedData.bank_name}
               onChange={(e) =>
-                setData((prev) => ({ ...prev, bank_name: e.target.value }))
+                setSelectedData((prev) => ({
+                  ...prev,
+                  bank_name: e.target.value,
+                }))
               }
               errorMessage={errors.bank_name}
               isInvalid={!!errors.bank_name}
@@ -244,9 +246,12 @@ const PaymentRevenueSetup = () => {
               label="Bank Branch"
               type="text"
               name="bank_branch"
-              value={data.bank_branch}
+              value={selectedData.bank_branch}
               onChange={(e) =>
-                setData((prev) => ({ ...prev, bank_branch: e.target.value }))
+                setSelectedData((prev) => ({
+                  ...prev,
+                  bank_branch: e.target.value,
+                }))
               }
               errorMessage={errors.bank_branch}
               isInvalid={!!errors.bank_branch}
@@ -257,9 +262,12 @@ const PaymentRevenueSetup = () => {
               label="Account Type"
               className="w-full"
               name="account_type"
-              defaultSelectedKeys={[data?.account_type]}
+              defaultSelectedKeys={[selectedData?.account_type]}
               onChange={(e) =>
-                setData((prev) => ({ ...prev, account_type: e.target.value }))
+                setSelectedData((prev) => ({
+                  ...prev,
+                  account_type: e.target.value,
+                }))
               }
             >
               {[
@@ -285,9 +293,12 @@ const PaymentRevenueSetup = () => {
               label="Swift Code"
               type="text"
               name="swift_code"
-              value={data.swift_code}
+              value={selectedData.swift_code}
               onChange={(e) =>
-                setData((prev) => ({ ...prev, swift_code: e.target.value }))
+                setSelectedData((prev) => ({
+                  ...prev,
+                  swift_code: e.target.value,
+                }))
               }
               errorMessage={errors.swift_code}
               isInvalid={!!errors.swift_code}
@@ -298,10 +309,13 @@ const PaymentRevenueSetup = () => {
               label="Currency"
               type="text"
               name="currency"
-              value={data.currency}
+              value={selectedData.currency}
               maxLength={3}
               onChange={(e) =>
-                setData((prev) => ({ ...prev, currency: e.target.value }))
+                setSelectedData((prev) => ({
+                  ...prev,
+                  currency: e.target.value,
+                }))
               }
               errorMessage={errors.currency}
               isInvalid={!!errors.currency}
@@ -310,9 +324,9 @@ const PaymentRevenueSetup = () => {
             <Switch
               size="sm"
               name="is_default"
-              checked={data.is_default}
+              checked={selectedData.is_default}
               onValueChange={(value) =>
-                setData((prev) => ({ ...prev, is_default: value }))
+                setSelectedData((prev) => ({ ...prev, is_default: value }))
               }
               errorMessage={errors.is_default}
               isInvalid={!!errors.is_default}
@@ -325,10 +339,10 @@ const PaymentRevenueSetup = () => {
                             size="sm"
                             label="Institution Type"
                             name="institution_type"
-                            // value={data.institution_type}
-                            defaultSelectedKeys={[data.institution_type]}
+                            // value={selectedData.institution_type}
+                            defaultSelectedKeys={[selectedData.institution_type]}
                             onChange={(e) =>
-                                setData("institution_type", e.target.value)
+                                setSelectedData("institution_type", e.target.value)
                             }
                             errorMessage={errors.institution_type}
                             isInvalid={!!errors.institution_type}
@@ -386,11 +400,11 @@ const PaymentRevenueSetup = () => {
         onButtonClick={async () => {
           try {
             const response = await axios.delete(
-              `/institution/payment-accounts/${data?.id}`
+              `/institution/payment-accounts/${selectedData?.id}`
             );
             deleteDisclosure.onClose();
             toast.success(response.data.message);
-            fetchPaymentAccounts();
+            // fetchPaymentAccounts();
           } catch (error) {
             console.log(error);
             setErrors(error.response.data.message);
@@ -399,7 +413,7 @@ const PaymentRevenueSetup = () => {
       >
         <p className="font-quicksand">
           Are you sure you want to delete this payment account?{" "}
-          <span className="font-semibold">{data?.account_name}</span>
+          <span className="font-semibold">{selectedData?.account_name}</span>
         </p>
       </DeleteModal>
     </AuthLayout>
