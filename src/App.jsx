@@ -3,7 +3,7 @@ import Sidebar from "./components/Sidebar";
 import Navbar from "./components/Navbar";
 import Dashboard from "./pages/Dashboard";
 import { toast } from "react-hot-toast";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Outlet } from "react-router-dom";
 import Login from "./pages/auth/Login";
 import withRouter from "./components/withRouter";
 import CompleteProfile from "./pages/CompleteProfile";
@@ -22,7 +22,6 @@ import InstitutionLetter from "./pages/complete-profile/InstitutionLetter";
 import DocumentDetails from "./pages/document-request/DocumentDetails";
 import AccountInactive from "./pages/complete-profile/AccountInactive";
 import PaymentRevenueSetup from "./pages/PaymentRevenueSetup";
-
 
 class App extends Component {
   state = {
@@ -122,58 +121,58 @@ class App extends Component {
               />
               <Route exact path="/user-profile" element={<Profile />} />
               <Route exact path="/verify-otp" element={<VerifyOTP />} />
-              <Route
-                exact
-                path="/account-profile"
-                element={<InstitutionData />}
-              />
-              <Route
-                exact
-                path="/institution-teams"
-                element={<InstitutionTeams />}
-              />
-              <Route
-                exact
-                path="/operations-certificate"
-                element={<OperationsCert />}
-              />
-              <Route
-                exact
-                path="/letter-templates"
-                element={<InstitutionLetter />}
-              />
+
+              {/* Account Setup Routes */}
+              <Route path="/account-setup" element={<Outlet />}>
+                <Route path="profile" element={<InstitutionData />} />
+                <Route
+                  path="institution-teams"
+                  element={<InstitutionTeams />}
+                />
+                <Route
+                  path="operations-certificate"
+                  element={<OperationsCert />}
+                />
+                <Route
+                  path="letter-templates"
+                  element={<InstitutionLetter />}
+                />
+
+                <Route path="document-types" element={<DocumentTypes />} />
+                <Route
+                  path="document-types/add-remove"
+                  element={<AddDocumentType />}
+                />
+                <Route
+                  path="document-types/:documentId"
+                  element={<ValidationQuestions />}
+                />
+                <Route
+                  path="institution-teams/:institutionId"
+                  element={<InstitutionUsers />}
+                />
+              </Route>
+
               <Route exact path="/dashboard" element={<Dashboard />} />
               <Route
                 exact
                 path="/complete-profile"
                 element={<CompleteProfile />}
               />
-              <Route
-                exact
-                path="/document-requests"
-                element={<DocumentRequest />}
-              />
-              <Route
-                exact
-                path="/document-requests/:documentId"
-                element={<DocumentDetails />}
-              />
-              <Route exact path="/document-types" element={<DocumentTypes />} />
-              <Route
-                exact
-                path="/document-types/add-remove"
-                element={<AddDocumentType />}
-              />
-              <Route
-                exact
-                path="/document-types/:documentId"
-                element={<ValidationQuestions />}
-              />
-              <Route
-                exact
-                path="/institution-teams/:institutionId"
-                element={<InstitutionUsers />}
-              />
+
+              {/* Requests Routes */}
+              <Route exact path="/requests" element={<Outlet />}>
+                <Route
+                  exact
+                  path="document-requests"
+                  element={<DocumentRequest />}
+                />
+                <Route
+                  exact
+                  path="document-requests/:documentId"
+                  element={<DocumentDetails />}
+                />
+              </Route>
 
               {/* // Kwamina */}
               <Route

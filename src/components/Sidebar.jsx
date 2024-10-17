@@ -1,484 +1,253 @@
-import React, { Component } from "react";
-import { Link } from "react-router-dom";
-import withRouter from "./withRouter";
-import { BiSolidDashboard } from "react-icons/bi";
-import { IoDocuments } from "react-icons/io5";
-import { GrDocumentConfig } from "react-icons/gr";
-import { FaCircleUser, FaUser, FaUsers } from "react-icons/fa6";
+import React, { useEffect, useRef, useState } from "react";
+import { navLinks } from "../assets/constants";
+import { AnimatePresence, motion } from "framer-motion";
+import { Link, useLocation } from "react-router-dom";
 import axios from "../axiosConfig";
-import { MdAssignmentInd, MdAttachEmail } from "react-icons/md";
-import { PiCertificateLight } from "react-icons/pi";
 
-class Sidebar extends Component {
-  state = {
-    activeMenu: "",
-    isCollapsed: this.props.isCollapsed,
-    institutionProfile: null,
-    institutionStatus: null,
-  };
+export default function Sidebar() {
+  const [isDesktopExpanded, setIsDesktopExpanded] = useState(true);
+  const [isMobileExpanded, setIsMobileExpanded] = useState(false);
+  const url = useLocation().pathname;
+  const [institutionProfile, setInstitutionProfile] = useState(null);
+  const [institutionStatus, setInstitutionStatus] = useState(null);
 
-  toggleSubMenu = (menu) => {
-    this.setState({ activeMenu: this.state.activeMenu === menu ? "" : menu });
-  };
-
-  handleLinkClick = () => {
-    if (window.innerWidth < 768) {
-      this.props.closeSidebar();
-    }
-  };
-
-  isActive = (path) => {
-    return this.props.location.pathname.startsWith(path);
-  };
-
-  toggleSidebar = () => {
-    this.setState((prevState) => ({
-      isCollapsed: !prevState.isCollapsed,
-    }));
-  };
-
-  componentDidMount() {
-    this.fetchInstitution();
-  }
-
-  fetchInstitution = async () => {
+  const fetchInstitution = async () => {
     try {
       const response = await axios.get("/institution/institution-data");
       const institutionData = response.data.institutionData;
 
       const { status, profile_complete } = institutionData;
-      this.setState({
-        institutionStatus: status !== "inactive", // Set to true if status is not 'inactive'
-        institutionProfile: profile_complete === "yes", // Set to true if profile is complete
-      });
+      setInstitutionProfile(profile_complete === "yes");
+      setInstitutionStatus(status !== "inactive");
     } catch (error) {
-      toast.error(error.response.data.message);
+      // toast.error(error.response.data.message);
+      console.log(error);
     }
   };
 
-  render() {
-    const { isVisible, isCollapsed } = this.props;
-
-    return (
-      <div className="font-figtree">
-        {/* Overlay for mobile screens */}
-        {isVisible && (
-          <div
-            className="fixed inset-0 bg-gray-500 bg-opacity-50 backdrop-blur-sm z-20 md:hidden"
-            onClick={this.props.closeSidebar} // Close sidebar on click outside
-          ></div>
-        )}
-
-        <div
-          className={`fixed inset-y-0 left-0 text-gray-800 bg-white transition-all duration-700 z-40 border-r
-            ${isCollapsed ? "w-16" : "w-60 lg:w-[17%]"} 
-            ${
-              isVisible ? "translate-x-0" : "-translate-x-full md:translate-x-0"
-            }
-          `}
-        >
-          <div
-            className={`flex justify-center items-center ${
-              isCollapsed ? "p-0" : "py-1.5 xl:py-[3px] px-4"
-            } bg-white border-b`}
-          >
-            <img
-              src={isCollapsed ? "/images/bclogo.jpg" : "/images/back-logo.png"}
-              alt=""
-              className={`${
-                isCollapsed ? "h-14 w-auto" : "lg:h-[42px] xl:h-12 w-auto"
-              }`}
-            />
-          </div>
-          <nav className="mt-10">
-            {this.state.institutionProfile == null ? (
-              <div role="status" className="p-4 rounded animate-pulse">
-                <div className="flex items-center mb-8">
-                  <svg
-                    className="w-6 h-6 me-3 text-gray-200"
-                    aria-hidden="true"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path d="M10 0a10 10 0 1 0 10 10A10.011 10.011 0 0 0 10 0Zm0 5a3 3 0 1 1 0 6 3 3 0 0 1 0-6Zm0 13a8.949 8.949 0 0 1-4.951-1.488A3.987 3.987 0 0 1 9 13h2a3.987 3.987 0 0 1 3.951 3.512A8.949 8.949 0 0 1 10 18Z" />
-                  </svg>
-                  <div>
-                    <div className="h-2.5 bg-gray-200 rounded-full w-16 mb-2"></div>
-                    <div className="w-20 h-2 bg-gray-200 rounded-full"></div>
-                  </div>
-                </div>
-                <div className="flex items-center mb-8">
-                  <svg
-                    className="w-6 h-6 me-3 text-gray-200"
-                    aria-hidden="true"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path d="M10 0a10 10 0 1 0 10 10A10.011 10.011 0 0 0 10 0Zm0 5a3 3 0 1 1 0 6 3 3 0 0 1 0-6Zm0 13a8.949 8.949 0 0 1-4.951-1.488A3.987 3.987 0 0 1 9 13h2a3.987 3.987 0 0 1 3.951 3.512A8.949 8.949 0 0 1 10 18Z" />
-                  </svg>
-                  <div>
-                    <div className="h-2.5 bg-gray-200 rounded-full w-16 mb-2"></div>
-                    <div className="w-20 h-2 bg-gray-200 rounded-full"></div>
-                  </div>
-                </div>
-                <div className="flex items-center mb-8">
-                  <svg
-                    className="w-6 h-6 me-3 text-gray-200"
-                    aria-hidden="true"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path d="M10 0a10 10 0 1 0 10 10A10.011 10.011 0 0 0 10 0Zm0 5a3 3 0 1 1 0 6 3 3 0 0 1 0-6Zm0 13a8.949 8.949 0 0 1-4.951-1.488A3.987 3.987 0 0 1 9 13h2a3.987 3.987 0 0 1 3.951 3.512A8.949 8.949 0 0 1 10 18Z" />
-                  </svg>
-                  <div>
-                    <div className="h-2.5 bg-gray-200 rounded-full w-16 mb-2"></div>
-                    <div className="w-20 h-2 bg-gray-200 rounded-full"></div>
-                  </div>
-                </div>
-                <div className="flex items-center">
-                  <svg
-                    className="w-6 h-6 me-3 text-gray-200"
-                    aria-hidden="true"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path d="M10 0a10 10 0 1 0 10 10A10.011 10.011 0 0 0 10 0Zm0 5a3 3 0 1 1 0 6 3 3 0 0 1 0-6Zm0 13a8.949 8.949 0 0 1-4.951-1.488A3.987 3.987 0 0 1 9 13h2a3.987 3.987 0 0 1 3.951 3.512A8.949 8.949 0 0 1 10 18Z" />
-                  </svg>
-                  <div>
-                    <div className="h-2.5 bg-gray-200 rounded-full w-16 mb-2"></div>
-                    <div className="w-20 h-2 bg-gray-200 rounded-full"></div>
-                  </div>
-                </div>
-                <span className="sr-only">Loading...</span>
-              </div>
-            ) : this.state.institutionStatus === false ? (
-              <div>
-                <ul>
-                  <li
-                    className={`flex items-center py-3 cursor-pointer ${
-                      this.isActive("/dashboard")
-                        ? "bg-primaryRed text-white"
-                        : "hover:text-primaryRed text-gray-500"
-                    }`}
-                  >
-                    <div
-                      className={`w-1 h-6 ${
-                        this.isActive("/dashboard") ? "bg-white" : "hidden"
-                      } rounded-tr-full rounded-br-full`}
-                    ></div>
-                    <Link onClick={this.handleLinkClick}>
-                      <BiSolidDashboard
-                        className={`inline-block mr-2 -mt-1 ${
-                          this.isActive("/dashboard")
-                            ? "text-white ml-4"
-                            : "text-gray-400 hover:text-primaryRed ml-5"
-                        }`}
-                        size={17}
-                      />
-                      <span
-                        className={`${
-                          isCollapsed ? "hidden" : "inline self-center"
-                        }`}
-                      >
-                        Dashboard
-                      </span>
-                    </Link>
-                  </li>
-
-                  <li
-                    className={`flex items-center py-3 cursor-pointer ${
-                      this.isActive("/document-requests")
-                        ? "bg-primaryRed text-white"
-                        : "hover:text-primaryRed text-gray-500"
-                    }`}
-                  >
-                    <div
-                      className={`w-1 h-6 ${
-                        this.isActive("/document-requests")
-                          ? "bg-white"
-                          : "hidden"
-                      } rounded-tr-full rounded-br-full`}
-                    ></div>
-                    <Link onClick={this.handleLinkClick}>
-                      <IoDocuments
-                        className={`inline-block mr-2 -mt-1 ${
-                          this.isActive("/document-requests")
-                            ? "text-white ml-4"
-                            : "text-gray-400 hover:text-primaryRed ml-5"
-                        }`}
-                        size={17}
-                      />
-                      <span
-                        className={`${
-                          isCollapsed ? "hidden" : "inline self-center"
-                        }`}
-                      >
-                        Requests
-                      </span>
-                    </Link>
-                  </li>
-
-                  <li
-                    className={`flex items-center py-3 cursor-pointer ${
-                      this.isActive("/staff")
-                        ? "bg-primaryRed text-white"
-                        : "hover:text-primaryRed text-gray-500"
-                    }`}
-                  >
-                    <div
-                      className={`w-1 h-6 ${
-                        this.isActive("/staff") ? "bg-white" : "hidden"
-                      } rounded-tr-full rounded-br-full`}
-                    ></div>
-                    <Link onClick={this.handleLinkClick}>
-                      <FaCircleUser
-                        className={`inline-block mr-2 -mt-1 ${
-                          this.isActive("/staff")
-                            ? "text-white ml-4"
-                            : "text-gray-400 hover:text-primaryRed ml-5"
-                        }`}
-                        size={17}
-                      />
-                      <span
-                        className={`${
-                          isCollapsed ? "hidden" : "inline self-center"
-                        }`}
-                      >
-                        Staff
-                      </span>
-                    </Link>
-                  </li>
-                </ul>
-              </div>
-            ) : this.state.institutionProfile === true ? (
-              <div>
-                <ul>
-                  <li
-                    className={`flex items-center py-3 cursor-pointer ${
-                      this.isActive("/dashboard")
-                        ? "bg-primaryRed text-white"
-                        : "hover:text-primaryRed text-gray-500"
-                    }`}
-                  >
-                    <div
-                      className={`w-1 h-6 ${
-                        this.isActive("/dashboard") ? "bg-white" : "hidden"
-                      } rounded-tr-full rounded-br-full`}
-                    ></div>
-                    <Link to="/dashboard" onClick={this.handleLinkClick}>
-                      <BiSolidDashboard
-                        className={`inline-block mr-2 -mt-1 ${
-                          this.isActive("/dashboard")
-                            ? "text-white ml-4"
-                            : "text-gray-400 hover:text-primaryRed ml-5"
-                        }`}
-                        size={17}
-                      />
-                      <span
-                        className={`${
-                          isCollapsed ? "hidden" : "inline self-center"
-                        }`}
-                      >
-                        Dashboard
-                      </span>
-                    </Link>
-                  </li>
-
-                  <li
-                    className={`flex items-center py-3 cursor-pointer ${
-                      this.isActive("/document-requests")
-                        ? "bg-primaryRed text-white"
-                        : "hover:text-primaryRed text-gray-500"
-                    }`}
-                  >
-                    <div
-                      className={`w-1 h-6 ${
-                        this.isActive("/document-requests")
-                          ? "bg-white"
-                          : "hidden"
-                      } rounded-tr-full rounded-br-full`}
-                    ></div>
-                    <Link
-                      to="/document-requests"
-                      onClick={this.handleLinkClick}
-                    >
-                      <IoDocuments
-                        className={`inline-block mr-2 -mt-1 ${
-                          this.isActive("/document-requests")
-                            ? "text-white ml-4"
-                            : "text-gray-400 hover:text-primaryRed ml-5"
-                        }`}
-                        size={17}
-                      />
-                      <span
-                        className={`${
-                          isCollapsed ? "hidden" : "inline self-center"
-                        }`}
-                      >
-                        Requests
-                      </span>
-                    </Link>
-                  </li>
-
-                  <li
-                    className={`flex items-center py-3 cursor-pointer ${
-                      this.isActive("/staff")
-                        ? "bg-primaryRed text-white"
-                        : "hover:text-primaryRed text-gray-500"
-                    }`}
-                  >
-                    <div
-                      className={`w-1 h-6 ${
-                        this.isActive("/staff") ? "bg-white" : "hidden"
-                      } rounded-tr-full rounded-br-full`}
-                    ></div>
-                    <Link to="/staff" onClick={this.handleLinkClick}>
-                      <FaCircleUser
-                        className={`inline-block mr-2 -mt-1 ${
-                          this.isActive("/staff")
-                            ? "text-white ml-4"
-                            : "text-gray-400 hover:text-primaryRed ml-5"
-                        }`}
-                        size={17}
-                      />
-                      <span
-                        className={`${
-                          isCollapsed ? "hidden" : "inline self-center"
-                        }`}
-                      >
-                        Staff
-                      </span>
-                    </Link>
-                  </li>
-                </ul>
-              </div>
-            ) : (
-              <ul>
-                {/* <li
-                  className={`flex items-center py-3 cursor-pointer ${
-                    this.isActive("/roles-permissions")
-                      ? "bg-primaryRed text-white"
-                      : "hover:text-primaryRed text-gray-500"
-                  }`}
-                >
-                  <div
-                    className={`w-1 h-6 ${
-                      this.isActive("/roles-permissions") ? "bg-white" : "hidden"
-                    } rounded-tr-full rounded-br-full`}
-                  ></div>
-                  <Link to="/roles-permissions" onClick={this.handleLinkClick}>
-                    <MdAssignmentInd
-                      className={`inline-block mr-2 -mt-1 ${
-                        this.isActive("/roles-permissions")
-                          ? "text-white ml-4"
-                          : "text-gray-400 hover:text-primaryRed ml-5"
-                      }`}
-                      size={17}
-                    />
-                    <span className={`${isCollapsed ? "hidden" : "inline self-center"}`}>
-                      Roles & Permissions
-                    </span>
-                  </Link>
-                </li> */}
-
-                {[
-                  {
-                    label: "Account Profile",
-                    path: "/account-profile",
-                    icon: (
-                      <FaUser
-                        size={17}
-                        className="inline-block ml-4 mr-2 -mt-1"
-                      />
-                    ),
-                  },
-                  {
-                    label: "Document Types",
-                    path: "/document-types",
-                    icon: (
-                      <GrDocumentConfig
-                        size={17}
-                        className="inline-block ml-4 mr-2 -mt-1"
-                      />
-                    ),
-                  },
-                  {
-                    label: "Operations Certificate",
-                    path: "/operations-certificate",
-                    icon: (
-                      <PiCertificateLight
-                        size={17}
-                        className="inline-block ml-4 mr-2 -mt-1"
-                      />
-                    ),
-                  },
-                  {
-                    label: "Setup Team",
-                    path: "/institution-teams",
-                    icon: (
-                      <FaUsers
-                        size={17}
-                        className="inline-block ml-4 mr-2 -mt-1"
-                      />
-                    ),
-                  },
-                  {
-                    label: "Letter Templates",
-                    path: "/letter-templates",
-                    icon: (
-                      <MdAttachEmail
-                        size={17}
-                        className="inline-block ml-4 mr-2 -mt-1"
-                      />
-                    ),
-                  },
-                  {
-                    label: "Payment/Revenue Setup",
-                    path: "/payment-revenue-setup",
-                    icon: (
-                      <MdAttachEmail
-                        size={17}
-                        className="inline-block ml-4 mr-2 -mt-1"
-                      />
-                    ),
-                  },
-                ].map((item) => (
-                  <li
-                    key={item.path}
-                    className={`flex items-center py-3 cursor-pointer ${
-                      this.isActive(item.path)
-                        ? "bg-primaryRed text-white"
-                        : "hover:text-primaryRed text-gray-500"
-                    }`}
-                  >
-                    <div
-                      className={`w-1 h-6 ${
-                        this.isActive(item.path) ? "bg-white" : "hidden"
-                      } rounded-tr-full rounded-br-full`}
-                    ></div>
-                    <Link to={item.path} onClick={this.handleLinkClick}>
-                      {item.icon}
-                      <span
-                        className={`${
-                          isCollapsed ? "hidden" : "inline self-center"
-                        }`}
-                      >
-                        {item.label}
-                      </span>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </nav>
-        </div>
-      </div>
+  useEffect(() => {
+    setIsDesktopExpanded(
+      localStorage.getItem("isDesktopExpanded") === "true"
+        ? true
+        : localStorage.getItem("isDesktopExpanded") === null
+        ? true
+        : false
     );
-  }
-}
+  }, []);
+  const mobileNavRef = useRef(null);
 
-export default withRouter(Sidebar);
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (mobileNavRef.current && !mobileNavRef.current.contains(e.target)) {
+        setIsMobileExpanded(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  useEffect(() => {
+    fetchInstitution();
+  }, []);
+
+  return (
+    <div>
+      <motion.div
+        className={`${
+          isDesktopExpanded ? "xl:w-[17%] w-[17%] " : "w-16 "
+        } h-screen fixed flex-col  top-0 left-0 transition-all hidden lg:flex duration-400  bg-white dark:bg-slate-900 border-r dark:border-white/10 `}
+      >
+        <div
+          className={`flex h-14 gap-3 border-b dark:border-white/10 flex-col items-center ${
+            isDesktopExpanded ? "px-4" : "px-1 justify-center"
+          } py-2`}
+        >
+          <img
+            src={
+              isDesktopExpanded ? "/images/back-logo.png" : "/images/bclogo.jpg"
+            }
+            alt="logo"
+            className={` transition-all ${
+              isDesktopExpanded ? "h-12" : "w-full"
+            } `}
+          />
+        </div>
+
+        {/* nav links */}
+        <div className="flex flex-col mt-11 overflow-hidden relative">
+          {navLinks.map((link, index) => (
+            <div key={index} className={`relative `}>
+              <Link
+                key={index}
+                to={
+                  link.children.length > 0 ? link.children[0].path : link.path
+                }
+                className={`h-12 hover:text-red-600 flex items-center ${
+                  isDesktopExpanded ? "gap-4" : "gap-2"
+                } transition-colors duration-300 ${
+                  url.startsWith(link.path)
+                    ? "text-white dark:text-white hover:text-white/60 bg-[#ff0000]"
+                    : "text-slate-500 dark:text-slate-300"
+                }`}
+              >
+                {url.startsWith(link.path) ? (
+                  <span className="h-6 w-1 rounded-r bg-white"></span>
+                ) : (
+                  <span className="h-6 w-1 rounded-r bg-transparent"></span>
+                )}
+
+                <p
+                  className={`${
+                    isDesktopExpanded ? "text-lg" : "text-xl mx-2"
+                  } ${
+                    url.startsWith(link.path)
+                      ? "text-white dark:text-white"
+                      : "text-slate-400/80 hover:text-[#ff0000]"
+                  } transition-all duration-500 ease-in-out`}
+                >
+                  {link.icon}
+                </p>
+
+                {isDesktopExpanded && (
+                  <AnimatePresence>
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                    >
+                      <p>{link.label}</p>
+                    </motion.div>
+                  </AnimatePresence>
+                )}
+              </Link>
+
+              {/* Child Links */}
+              {url.startsWith(link.path) &&
+                isDesktopExpanded &&
+                link?.children?.length > 0 && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="left-0 ml-4 top-full mt-1 z-50 bg-white dark:bg-gray-800 w-full"
+                  >
+                    {link?.children.map((child, childIndex) => {
+                      // Strip query parameters for comparison
+                      const currentPath = new URL(url, window.location.origin)
+                        .pathname;
+                      console.log({ currentPath });
+
+                      return (
+                        <Link
+                          key={childIndex}
+                          to={child.path}
+                          className={`block px-4 py-2 pl-9 text-sm ${
+                            new RegExp(`^${child.path}`).test(currentPath)
+                              ? "bg-red-500 text-white"
+                              : "text-gray-700 hover:bg-gray-200 dark:text-gray-300 dark:hover:bg-gray-700"
+                          }`}
+                        >
+                          {child.label}
+                        </Link>
+                      );
+                    })}
+                  </motion.div>
+                )}
+            </div>
+          ))}
+        </div>
+      </motion.div>
+
+      {/* mobile sidenav */}
+      <motion.aside
+        ref={mobileNavRef}
+        className={`h-full fixed top-0 left-0 z-50 bg-white dark:bg-slate-900 overflow-hidden shadow-2xl ${
+          isMobileExpanded ? "w-[65%] sm:w-[17%]" : "w-0"
+        } transition-all duration-300 ease-in-out`}
+      >
+        <div className="px-2 py-3">
+          <div className="rounded-2xl px-4 py-3 flex flex-col gap-2 shadow-2xl shadow-blue-800/30 mb-10">
+            <img src={"/images/bclogo.jpg"} alt="logo" className="" />
+          </div>
+        </div>
+
+        {/* nav links */}
+        <div className="flex flex-col overflow-hidden relative">
+          {navLinks.map((link, index) => (
+            <div key={index} className="relative">
+              <Link
+                href={link.path}
+                className={`h-12 hover:text-red-600 flex items-center ${
+                  isDesktopExpanded ? "gap-4" : "gap-2"
+                } transition-colors duration-300 ${
+                  url.startsWith(link.path)
+                    ? "text-white dark:text-white hover:text-white/60 bg-[#ff0000]"
+                    : "text-slate-500 dark:text-slate-300"
+                }`}
+              >
+                {url.startsWith(link.path) ? (
+                  <span className="h-6 w-1 rounded-r bg-white"></span>
+                ) : (
+                  <span className="h-6 w-1 rounded-r bg-transparent"></span>
+                )}
+
+                <p
+                  className={`${
+                    isDesktopExpanded ? "text-lg" : "text-xl mx-2"
+                  } ${
+                    url.startsWith(link.path)
+                      ? "text-white dark:text-white"
+                      : "text-slate-400/80 hover:text-[#ff0000]"
+                  } transition-all duration-500 ease-in-out`}
+                >
+                  {link.icon}
+                </p>
+
+                <AnimatePresence>
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                  >
+                    <p>{link.label}</p>
+                  </motion.div>
+                </AnimatePresence>
+              </Link>
+
+              {/* Child Links */}
+              {url.startsWith(link.path) && link?.children?.length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="left-0 top-full mt-1 z-50 bg-white dark:bg-gray-800 w-full"
+                >
+                  {link?.children.map((child, childIndex) => {
+                    // Strip query parameters for comparison
+                    const currentPath = new URL(url, window.location.origin)
+                      .pathname;
+
+                    return (
+                      <Link
+                        key={childIndex}
+                        href={child?.path}
+                        className={`ml-4 block px-4 py-2 pl-9 text-sm ${
+                          new RegExp(`^${child.path}`).test(currentPath)
+                            ? "bg-red-500 text-white"
+                            : "text-gray-700 hover:bg-gray-200 dark:text-gray-300 dark:hover:bg-gray-700"
+                        }`}
+                      >
+                        {child.label}
+                      </Link>
+                    );
+                  })}
+                </motion.div>
+              )}
+            </div>
+          ))}
+        </div>
+      </motion.aside>
+    </div>
+  );
+}
