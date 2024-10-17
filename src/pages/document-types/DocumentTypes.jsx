@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
 import { FaChevronLeft, FaChevronRight, FaPlus } from 'react-icons/fa';
-import axios from '../axiosConfig';
+import axios from '../../axiosConfig';
 import {toast} from 'react-hot-toast';
 import { GrDocumentConfig } from 'react-icons/gr';
 import { IoArrowForwardCircle } from 'react-icons/io5';
 import { NavLink } from 'react-router-dom';
 import { MdAdd } from 'react-icons/md';
-import withRouter from '../components/withRouter';
+import withRouter from '../../components/withRouter';
 
 class DocumentTypes extends Component {
     constructor(props) {
@@ -23,33 +23,26 @@ class DocumentTypes extends Component {
 
     componentDidMount() {
         this.fetchDocumentTypes();
+        
     }
 
-    fetchDocumentTypes = (page = 1) => {
+    fetchDocumentTypes = () => {
         const { search } = this.state;
         this.setState({ isLoading: true })
         axios.get(`/institution/document-types`, {
             params: {
-                page,
                 search,
             },
         })
-        .then((response) => {
-        if (response.data.status === 200) {
+        .then( response => {
             this.setState({
-                documentTypes: response.data.documentTypes.data,
-                currentPage: response.data.documentTypes.current_page,
-                lastPage: response.data.documentTypes.last_page,
-                total: response.data.documentTypes.total,
+                documentTypes: response.data.data.types,
             });
+            
             this.setState({ isLoading: false })
-        } else {
-            toast.error(error.response.data.message);
-            this.setState({ isLoading: false })
-        }
         })
         .catch((error) => {
-            toast.error(error.response.data.message);
+            console.error(error);
             this.setState({ isLoading: false })
         });
     };
@@ -58,32 +51,10 @@ class DocumentTypes extends Component {
         this.setState({ [e.target.name]: e.target.value }, () => this.fetchDocumentTypes());
     };
 
-    handlePageChange = (page) => {
-        this.fetchDocumentTypes(page);
-    };
-
-    renderPageNumbers = () => {
-        const { currentPage, lastPage } = this.state;
-        const pageNumbers = [];
-
-        for (let i = 1; i <= lastPage; i++) {
-            pageNumbers.push(
-                <button
-                    key={i}
-                    onClick={() => this.handlePageChange(i)}
-                    className={`px-2.5 py-1 border rounded-lg text-sm ${i === currentPage ? 'bg-buttonLog text-white border-0' : 'bg-white text-gray-800'}`}
-                >
-                    {i}
-                </button>
-            );
-        }
-
-        return pageNumbers;
-    };
 
     
     render() {
-        const { documentTypes, currentPage, lastPage, isLoading  } = this.state;
+        const { documentTypes, isLoading  } = this.state;
         return ( 
             <>
             <div className="container mx-auto">
@@ -174,7 +145,7 @@ class DocumentTypes extends Component {
                     </div>
 
                     {/* Pagination */}
-                    <div className="flex justify-between items-center mt-4">
+                    {/* <div className="flex justify-between items-center mt-4">
                         <div>
                             <span className="text-gray-600 font-medium text-sm">
                                 Page {currentPage} of {lastPage}
@@ -199,7 +170,7 @@ class DocumentTypes extends Component {
                                 <FaChevronRight size={12} />
                             </button>
                         </div>
-                    </div>
+                    </div> */}
                 </div>
 
               

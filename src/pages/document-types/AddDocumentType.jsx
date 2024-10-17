@@ -1,9 +1,12 @@
 import React, { Component } from "react";
-import axios from "../axiosConfig";
+import axios from "../../axiosConfig";
 import { toast } from "react-hot-toast";
 import { RiInformation2Fill } from "react-icons/ri";
 import { IoMdAdd, IoMdClose } from "react-icons/io";
-import Spinner from "../components/Spinner";
+import Spinner from "../../components/Spinner";
+import { MdClose } from "react-icons/md";
+import Textarea from "../../components/Textarea";
+import Textbox from "../../components/Textbox";
 
 class AddDocumentType extends Component {
   constructor(props) {
@@ -17,6 +20,9 @@ class AddDocumentType extends Component {
       isLoading: false,
       isSaving: false,
       isDeleting: false,
+      addNewModal: false,
+      name: '',
+      description: ''
     };
 
     // Binding methods
@@ -34,7 +40,7 @@ class AddDocumentType extends Component {
     this.fetchDocumentTypes();
   }
 
-  componentDidUpdate(prevProps, prevState) {
+  /* componentDidUpdate(prevState) {
     const { searchAvailableName, searchInstitutionName } = this.state;
     if (
       prevState.searchAvailableName !== searchAvailableName ||
@@ -42,11 +48,11 @@ class AddDocumentType extends Component {
     ) {
       this.fetchDocumentTypes();
     }
-  }
+  } */
 
-  async fetchDocumentTypes() {
+  /* async fetchDocumentTypes() {
     this.setState({ isLoading: true });
-    const { searchAvailableName, searchInstitutionName } = this.state;
+    const { searchInstitutionName } = this.state;
     try {
       const response = await axios.get("/institutions/document-types", {
         params: {
@@ -58,10 +64,7 @@ class AddDocumentType extends Component {
 
       const insResponse = await axios.get("/institution/document-types");
 
-      console.log(insResponse.data);
-
       this.setState({
-        availableDocumentTypes: response.data?.data?.types,
         institutionDocumentTypes: insResponse.data?.data?.types,
         isLoading: false,
       });
@@ -69,7 +72,26 @@ class AddDocumentType extends Component {
       toast.error("Error fetching document types: " + (error.message || ""));
       this.setState({ isLoading: false });
     }
-  }
+  } */
+
+    fetchDocumentTypes = () => {
+    const { search } = this.state;
+    this.setState({ isLoading: true })
+    axios.get(`/institution/available-document-types`, {
+    })
+    .then( response => {
+        this.setState({
+            availableDocumentTypes: response.data.data.available_types,
+            institutionDocumentTypes: response.data.data.institution_doc_types,
+        });
+        
+        this.setState({ isLoading: false })
+    })
+    .catch((error) => {
+        console.error(error);
+        this.setState({ isLoading: false })
+    });
+  };
 
   handleSearchAvailableNameChange(event) {
     this.setState({ searchAvailableName: event.target.value });
@@ -78,6 +100,19 @@ class AddDocumentType extends Component {
   handleSearchInstitutionNameChange(event) {
     this.setState({ searchInstitutionName: event.target.value });
   }
+
+  toggleAddNewModal = () => {
+    this.setState({ addNewModal: !this.state.addNewModal });
+  }
+
+  handleInputChange = (event) => {
+    const { name, value } = event.target;
+
+    this.setState(prevState => ({
+        ...prevState,
+      [name]: value,
+    }));
+}
 
   handleCheckboxChange(id) {
     this.setState((prevState) => {
@@ -146,6 +181,36 @@ class AddDocumentType extends Component {
     }
   }
 
+  handleClear = () =>{
+    this.state.name = ''
+    this.state.description = ''
+  };
+
+  handleAddNew = async (event) => {
+    event.preventDefault();
+    this.setState({isSaving: true})
+    const { name, description } = this.state;
+  
+    try {
+      const response = await axios.post('/institution/add-document-type', {
+        name,                   
+        description              
+      });
+  
+      if (response.status === 201) {
+        toast.success(response.data.message);
+      }
+      this.setState({isSaving: false})
+      this.fetchDocumentTypes();
+      this.handleClear(); 
+      this.toggleAddNewModal();
+
+    } catch (error) {
+     
+      toast.error(error.response.data.message);
+    }
+};
+
   render() {
     const {
       searchAvailableName,
@@ -155,7 +220,7 @@ class AddDocumentType extends Component {
       selectedDocumentTypes,
       isLoading,
       isSaving,
-      isDeleting,
+      addNewModal,
     } = this.state;
 
     return (
@@ -171,7 +236,7 @@ class AddDocumentType extends Component {
               <p className="font-semibold">Information</p>
             </div>
             <p className="ml-8">
-              Select fred all document types that your institution issues to
+              Select all document types that your institution issues to
               applicants and can validate for employees or other stakeholders
             </p>
           </div>
@@ -280,11 +345,11 @@ class AddDocumentType extends Component {
                 )}
                 <div className="flex justify-end mt-4">
                   <button
-                    className={`flex items-center ${
+                    className={`flex items-center text-base ${
                       isSaving
                         ? "bg-gray-300 text-gray-500"
-                        : "bg-green-200 text-green-700 hover:bg-green-300"
-                    } border border-green-700 px-4 py-1 rounded-md`}
+                        : "bg-blue-200 text-blue-700 hover:bg-blue-300"
+                    } border border-blue-700 px-4 py-1 rounded-md`}
                     type="submit"
                     disabled={isSaving}
                   >
@@ -315,7 +380,7 @@ class AddDocumentType extends Component {
             <div className="relative w-full lg:w-2/3">
               <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
                 <svg
-                  className="w-4 h-4 text-gray-500 "
+                  className="w-4 h-4 text-gray-500"
                   aria-hidden="true"
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
@@ -410,7 +475,93 @@ class AddDocumentType extends Component {
               </div>
             )}
           </div>
+          <div className="flex justify-end mt-4">
+            <button
+              onClick={this.toggleAddNewModal}
+              className={`flex items-center ${
+                isSaving
+                  ? "bg-gray-300 text-gray-500"
+                  : "bg-green-200 text-green-700 hover:bg-green-300"
+              } border border-green-700 px-4 py-1 rounded-md`}
+              type="button"
+              disabled={isSaving}
+            >
+              {isSaving ? (
+                <>
+                  <Spinner size="w-5 h-5" />
+                  <span className="ml-2">Adding</span>
+                </>
+              ) : (
+                <>
+                  <IoMdAdd size={20} className="mr-2" />
+                  <span>Add New</span>
+                </>
+              )}
+            </button>
+          </div>
         </div>
+        {addNewModal && (
+          <div className="fixed z-50 inset-0 bg-black bg-opacity-60 flex justify-end">
+              <form onSubmit={this.handleAddNew} className="w-1/2 lg:w-1/3 xl:w-[28%] h-full bg-white shadow-lg transition-transform duration-700 ease-in-out transform"
+                  style={{ right: 0, position: 'absolute', transform: addNewModal ? 'translateX(0)' : 'translateX(100%)' }}
+              >
+                  <div className="flex justify-between items-center font-medium border-b-2 p-4">
+                      <h2 className="text-lg">Add New Document Type</h2>
+                      <button
+                          onClick={this.toggleAddNewModal}
+                          className="flex items-center justify-center h-8 w-8 bg-red-200 rounded-md"
+                      >
+                          <MdClose size={20} className="text-red-600" />
+                      </button>
+                  </div>
+          
+                  <div className="relative flex flex-col space-y-7 px-4 py-6 overflow-y-auto h-[calc(100%-4rem)]">
+                      <Textbox
+                        label="Name"
+                        name="name"
+                        value={this.state.name}
+                        onChange={this.handleInputChange}
+                      />
+                      <Textarea
+                          label="Description"
+                          name="description"
+                          value={this.state.description}
+                          onChange={this.handleInputChange}
+                      />
+                      
+
+                      <div className="w-full absolute bottom-4 right-0 flex space-x-4 px-4">
+                          <button
+                              onClick={this.toggleAddNewModal}
+                              type="button"
+                              className="text-xs w-1/2 text-gray-600 border px-4 py-1.5 rounded-full"
+                          >
+                              Close
+                          </button>
+                          <button
+                              type="submit"
+                              disabled={isSaving}
+                              className={`w-1/2 flex items-center justify-center rounded-full ${
+                                  isSaving ? 'bg-gray-400 text-gray-700' : 'bg-buttonLog text-white'
+                              } py-1.5 text-xs ${isSaving ? 'cursor-not-allowed' : ''}`}
+                          >
+                              {isSaving ? (
+                                  <>
+                                      <Spinner size="w-4 h-4 mr-2"/>
+                                      Saving...
+                                  </>
+                              ) : (
+                                  'Save'
+                              )}
+                          </button>
+                      </div>   
+                  </div>
+          
+                  
+              </form>
+          </div>
+      
+      )}
       </>
     );
   }

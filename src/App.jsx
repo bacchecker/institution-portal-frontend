@@ -8,11 +8,11 @@ import Login from "./pages/auth/Login";
 import withRouter from "./components/withRouter";
 import CompleteProfile from "./pages/CompleteProfile";
 import DocumentRequest from "./pages/document-request/DocumentRequest";
-import AddDocumentType from "./pages/AddDocumentType";
+import AddDocumentType from "./pages/document-types/AddDocumentType";
 import VerifyOTP from "./pages/auth/VerifyOTP";
 import Toastify from "./components/Toastify";
-import DocumentTypes from "./pages/DocumentTypes";
-import ValidationQuestions from "./pages/ValidationQuestions";
+import DocumentTypes from "./pages/document-types/DocumentTypes";
+import ValidationQuestions from "./pages/document-types/ValidationQuestions";
 import Profile from "./pages/user-profile/Profile";
 import InstitutionData from "./pages/complete-profile/InstitutionData";
 import OperationsCert from "./pages/complete-profile/OperationsCert";
@@ -22,6 +22,7 @@ import InstitutionLetter from "./pages/complete-profile/InstitutionLetter";
 import DocumentDetails from "./pages/document-request/DocumentDetails";
 import AccountInactive from "./pages/complete-profile/AccountInactive";
 import PaymentRevenueSetup from "./pages/PaymentRevenueSetup";
+
 
 class App extends Component {
   state = {
@@ -57,12 +58,12 @@ class App extends Component {
         this.props.navigate("/account-inactive");
       }
     } catch (error) {
-      toast.error(error.response.data.message);
+      console.error(error);
     }
   };
 
   componentDidMount() {
-    this.fetchInstitution();
+    //this.fetchInstitution();
     document.addEventListener("mousedown", this.handleClickOutside);
   }
 

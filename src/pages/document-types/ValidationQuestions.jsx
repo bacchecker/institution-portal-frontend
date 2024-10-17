@@ -1,14 +1,14 @@
 import React, { Component } from 'react';
-import withRouter from '../components/withRouter';
+import withRouter from '../../components/withRouter';
 import {toast} from 'react-hot-toast';
-import axios from '../axiosConfig';
-import { MdClose, MdDelete, MdEdit } from 'react-icons/md';
-import { IoWarning } from 'react-icons/io5';
+import axios from '../../axiosConfig';
+import { MdClose, MdDelete, MdEdit, MdSave } from 'react-icons/md';
+import { IoDocumentText, IoWarning } from 'react-icons/io5';
 import { FaPlus } from 'react-icons/fa';
-import Textbox from '../components/Textbox';
-import Textarea from '../components/Textarea';
-import Select from '../components/Select';
-import Spinner from '../components/Spinner';
+import Textbox from '../../components/Textbox';
+import Textarea from '../../components/Textarea';
+import Select from '../../components/Select';
+import Spinner from '../../components/Spinner';
 import { FaMoneyBill1Wave } from 'react-icons/fa6';
 
 class ValidationQuestions extends Component {
@@ -26,6 +26,8 @@ class ValidationQuestions extends Component {
         institution_document_type_id: '',
         isVisible: true,
         isSaving: false,
+        soft_copy: false,
+        hard_copy: false,
      }
 
     componentDidMount(){
@@ -48,6 +50,8 @@ class ValidationQuestions extends Component {
                 validation_questions: questionsData.questions,
                 document_type_details: questionsData.documentType,
                 institution_document_type_id: documentId,
+                soft_copy: questionsData.documentType.soft_copy,
+                hard_copy: questionsData.documentType.hard_copy,
                 loadingState: false,
             });
         } catch (error) {
@@ -91,6 +95,32 @@ class ValidationQuestions extends Component {
         this.state.index = ''
     };
 
+    handleCheckboxChange = (e) => {
+        const { name, checked } = e.target;
+        this.setState({
+          [name]: checked,
+        });
+    };
+
+    handleDocumentFormatSubmit = (e) => {
+        e.preventDefault();
+        
+        const { soft_copy, hard_copy, institution_document_type_id } = this.state;
+
+        const payload = {
+            soft_copy: soft_copy ? 1 : 0,
+            hard_copy: hard_copy ? 1 : 0,
+          };
+    
+        axios.post(`/institution/update-document-format/${institution_document_type_id}`, payload)
+          .then((response) => {
+            toast.success(response.data.message);
+          })
+          .catch((error) => {
+            toast.error(error.response.data.message);
+          });
+    };
+
     handleSubmit = async (event) => {
         event.preventDefault();
         this.setState({isSaving: true})
@@ -119,7 +149,7 @@ class ValidationQuestions extends Component {
       
 
     render() { 
-        const {document_type_details, createModal, baseFeeModal, isSaving, validation_questions, editingValidationQuestion, questionToEdit, deleteValidationQuestion, questionToDelete} = this.state
+        const {document_type_details, createModal, baseFeeModal, isSaving, validation_questions, editingValidationQuestion, questionToEdit, deleteValidationQuestion, questionToDelete, soft_copy, hard_copy} = this.state
         return ( 
             <>
                 <div className="bg-white py-4 rounded-md min-h-screen">
@@ -127,11 +157,11 @@ class ValidationQuestions extends Component {
                         <h1 className='font-bold text-deepBlue uppercase text-xl mb-1'>{document_type_details.name}</h1>
                         
                     </div>
-                    <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-2">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 lg:gap-2">
                         <div className="min-h-screen border-r">
                             <h2 className="bg-blue-700 text-white pl-6 pr-4 py-2">Document Billings</h2>
-                            <div className="my-4 px-2">
-                                <div className="flex flex-col space-y-4">
+                            <div className="my-4">
+                                <div className="flex flex-col space-y-4 px-3">
                                     <div className="grid grid-cols-3 text-sm items-center">
                                         <p className='font-semibold col-span-2'>Validation Fee</p>
                                         <p>GH₵{document_type_details.validation_fee ??'0.00'}</p>
@@ -148,12 +178,44 @@ class ValidationQuestions extends Component {
                                         <p className='font-semibold col-span-2'>Printing Fee</p>
                                         <p>GH₵{document_type_details.printing_fee ??'0.00'}</p>
                                     </div>
+                                    <div className="w-1/2 self-end flex space-x-2 text-sm items-center justify-center mt-8 border border-blue-700 text-blue-700 hover:bg-blue-600 hover:text-white rounded-md px-3 h-8 cursor-pointer" onClick={this.toggleBaseFeeModal}>
+                                        <p>Edit Fees</p> <MdEdit />
+                                    </div>
                                 </div>
                                 
-                                <div className="flex space-x-2 text-sm self-center items-center justify-center mt-8 bg-blue-700 text-white rounded-lg px-3 h-8 cursor-pointer" onClick={this.toggleBaseFeeModal}>
-                                    <p>Edit Fees</p> <MdEdit />
-                                </div>
-                                <div className="mt-6">
+                                <h2 className="bg-blue-700 text-white pl-6 pr-4 py-2 mt-4">Document Formats</h2>
+                                <form onSubmit={this.handleDocumentFormatSubmit} className="border-b pb-4">
+                                    <div className="flex space-x-5 mt-6 px-4">
+                                        <div className="flex items-center mb-4">
+                                            <input
+                                                name="soft_copy"
+                                                type="checkbox"
+                                                checked={soft_copy} 
+                                                onChange={this.handleCheckboxChange}
+                                                className="w-5 h-5 text-blue-700 bg-gray-100 border-gray-300 cursor-pointer rounded-lg"
+                                            />
+                                            <label className="ms-2 text-sm font-medium text-gray-900">Soft Copy</label>
+                                        </div>
+                                        <div className="flex items-center mb-4">
+                                            <input
+                                                name="hard_copy"
+                                                type="checkbox"
+                                                checked={hard_copy}
+                                                onChange={this.handleCheckboxChange}
+                                                className="w-5 h-5 text-blue-700 bg-gray-100 border-gray-300 cursor-pointer rounded-lg"
+                                            />
+                                            <label className="ms-2 text-sm font-medium text-gray-900">Hard Copy</label>
+                                        </div>
+                                    </div>
+                                    <div className="flex justify-end pr-4">
+                                        <button type='submit' className="w-1/2 flex space-x-2 text-sm items-center justify-center mt-8 border border-blue-700 text-blue-700 hover:bg-blue-600 hover:text-white rounded-md px-3 h-8 cursor-pointer">
+                                            <p>Update</p> <MdSave />
+                                        </button>
+                                    </div>
+                                    
+                                </form>
+                                
+                                <div className="mt-6 px-4">
                                     <div className="my-2">
                                         <p className='text-sm font-medium text-gray-800 underline'>Validation Fee</p>
                                         <p className='italic text-xs text-gray-700 ml-1'>Fees applicant pay when they request for a document to be validated</p>
