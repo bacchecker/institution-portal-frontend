@@ -1,6 +1,3 @@
-import React, { Component, useEffect, useRef, useState } from "react";
-import Sidebar from "./components/Sidebar";
-import Navbar from "./components/Navbar";
 import Dashboard from "./pages/Dashboard";
 import { toast } from "react-hot-toast";
 import { Routes, Route, Outlet, useNavigate } from "react-router-dom";
@@ -27,43 +24,6 @@ import { Button } from "@nextui-org/react";
 
 const App = () => {
   const navigate = useNavigate();
-  const [isDesktopExpanded, setIsDesktopExpanded] = useState(true);
-  const [isMobileExpanded, setIsMobileExpanded] = useState(false);
-  const mobileNavRef = useRef(null);
-
-  useEffect(() => {
-    setIsDesktopExpanded(
-      localStorage.getItem("isDesktopExpanded") === "true"
-        ? true
-        : localStorage.getItem("isDesktopExpanded") === null
-        ? true
-        : false
-    );
-  }, []);
-
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (mobileNavRef.current && !mobileNavRef.current.contains(e.target)) {
-        setIsMobileExpanded(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  const fetchInstitution = async () => {
-    try {
-      const response = await axios.get("/institution/institution-data");
-      const institutionData = response.data.institutionData;
-
-      if (institutionData.status === "inactive") {
-        navigate("/account-inactive");
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  };
 
   const isLoginPage =
     location.pathname === "/login" ||
@@ -74,46 +34,7 @@ const App = () => {
   return (
     <>
       <Toastify />
-      {/* Sidebar */}
-      {/* {!isLoginPage && (
-        <Sidebar
-          mobileNavRef={mobileNavRef}
-          isDesktopExpanded={isDesktopExpanded}
-          isMobileExpanded={isMobileExpanded}
-        />
-      )} */}
 
-      {/* Main content area */}
-      {/* <motion.div
-        // className={`flex-1 ${
-        //   !isLoginPage && isSidebarCollapsed
-        //     ? "lg:ml-16"
-        //     : !isLoginPage
-        //     ? "lg:ml-[17%]"
-        //     : ""
-        // } transition-margin duration-300`}
-
-        className={`transition-all duration-400 flex-grow ${
-          isDesktopExpanded ? "lg:ml-[17%] ml-0" : "ml-16"
-        }`}
-      > */}
-      {/* Navbar */}
-      {/* {!isLoginPage && (
-          <Navbar
-            toggleSidebar={() => setIsMobileExpanded(!isMobileExpanded)}
-            user={{ name: "John Doe" }}
-            toggleSidebarCollapse={() => {
-              setIsDesktopExpanded(!isDesktopExpanded);
-              localStorage.setItem(
-                "isDesktopExpanded",
-                !isDesktopExpanded ? "true" : "false"
-              );
-            }}
-          />
-        )} */}
-
-      {/* Page content */}
-      {/* <div className={`${isLoginPage ? "p-0" : "p-3"} `}> */}
       <Routes>
         <Route exact path="/" element={<Login />} />
         <Route exact path="/login" element={<Login />} />
@@ -188,8 +109,6 @@ const App = () => {
           }
         />
       </Routes>
-      {/* </div> */}
-      {/* </motion.div> */}
     </>
   );
 };

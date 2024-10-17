@@ -24,6 +24,7 @@ import Elipsis from "../assets/icons/elipsis";
 import DeleteModal from "../components/DeleteModal";
 import toast from "react-hot-toast";
 import AuthLayout from "../components/AuthLayout";
+import useAuthStore from "../store/authStore";
 
 const PaymentRevenueSetup = () => {
   const [paymentAccounts, setPaymentAccounts] = useState([]);
@@ -31,12 +32,11 @@ const PaymentRevenueSetup = () => {
   const [processing, setProcessing] = useState(false);
   const [loadingData, setLoadingData] = useState(false);
   const [errors, setErrors] = useState({});
+  const { isAuthenticated } = useAuthStore();
 
   const deleteDisclosure = useDisclosure();
   const [openDrawer, setOpenDrawer] = useState(false);
   const [drawerTitle, setDrawerTitle] = useState("Add new Payment Account");
-
-  console.log(data);
 
   const save = async () => {
     setProcessing(true);
@@ -384,7 +384,6 @@ const PaymentRevenueSetup = () => {
         disclosure={deleteDisclosure}
         title="Delete Payment Account"
         onButtonClick={async () => {
-          console.log("logic for deleting payment account...");
           try {
             const response = await axios.delete(
               `/institution/payment-accounts/${data?.id}`
