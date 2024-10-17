@@ -43,8 +43,8 @@ const CustomTable = ({
         </TableHeader>
 
         <TableBody
-          loadingState={loadingState}
-          loadingContent={<Spinner />}
+          loadingState={loadingState ? "loading" : "idle"}
+          loadingContent={<Spinner color="danger" />}
           emptyContent={
             <div className="md:!h-[65vh] h-[60vh] flex flex-col gap-8 items-center justify-center">
               {/* <img src={noDataIllustration} alt="No data" className="w-1/3" /> */}
