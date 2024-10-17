@@ -10,7 +10,7 @@ import {
 
 const CustomTable = ({
   columns,
-  // loadingState,
+  loadingState,
   children,
   page,
   setPage,
@@ -43,7 +43,7 @@ const CustomTable = ({
         </TableHeader>
 
         <TableBody
-          // loadingState={loadingState}
+          loadingState={loadingState}
           loadingContent={<Spinner />}
           emptyContent={
             <div className="md:!h-[65vh] h-[60vh] flex flex-col gap-8 items-center justify-center">
