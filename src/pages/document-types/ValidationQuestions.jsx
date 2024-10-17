@@ -104,7 +104,7 @@ class ValidationQuestions extends Component {
 
     handleDocumentFormatSubmit = (e) => {
         e.preventDefault();
-        
+        this.setState({isSaving: true})
         const { soft_copy, hard_copy, institution_document_type_id } = this.state;
 
         const payload = {
@@ -115,9 +115,11 @@ class ValidationQuestions extends Component {
         axios.post(`/institution/update-document-format/${institution_document_type_id}`, payload)
           .then((response) => {
             toast.success(response.data.message);
+            this.setState({isSaving: false})
           })
           .catch((error) => {
             toast.error(error.response.data.message);
+            this.setState({isSaving: false})
           });
     };
 
@@ -208,8 +210,20 @@ class ValidationQuestions extends Component {
                                         </div>
                                     </div>
                                     <div className="flex justify-end pr-4">
-                                        <button type='submit' className="w-1/2 flex space-x-2 text-sm items-center justify-center mt-8 border border-blue-700 text-blue-700 hover:bg-blue-600 hover:text-white rounded-md px-3 h-8 cursor-pointer">
-                                            <p>Update</p> <MdSave />
+                                        <button 
+                                            type='submit'
+                                            disabled={isSaving}
+                                            className="w-1/2 flex space-x-2 text-sm items-center justify-center mt-8 border border-blue-700 text-blue-700 hover:bg-blue-600 hover:text-white rounded-md px-3 h-8 cursor-pointer"
+                                        >
+                                        {isSaving ? (
+                                            <>
+                                                <Spinner size="w-4 h-4 mr-2"/>
+                                                Updating...
+                                            </>
+                                        ) : (
+                                             <div className="flex items-center space-x-2"><p>Update</p> <MdSave /></div>
+                                        )}
+                                           
                                         </button>
                                     </div>
                                     
