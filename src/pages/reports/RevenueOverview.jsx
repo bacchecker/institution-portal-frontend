@@ -4,7 +4,9 @@ import AuthLayout from "../../components/AuthLayout";
 export default function RevenueOverview() {
   return (
     <AuthLayout title="Revenue Overview">
-      <p>RevenueReport</p>
+      <section className="md:px-3 md:w-full w-[98vw] mx-auto">
+        <p>RevenueReport</p>
+      </section>
     </AuthLayout>
   );
 }

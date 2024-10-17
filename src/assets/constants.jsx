@@ -74,7 +74,7 @@ export const navLinks = [
     ],
   },
   {
-    label: "Payment/Revenue Setup",
+    label: "Payment Setup",
     path: "/payment-revenue-setup",
     icon: <MoneyIcon />,
     acl: ["view payments"],

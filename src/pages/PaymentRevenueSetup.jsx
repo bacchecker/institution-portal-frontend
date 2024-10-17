@@ -93,7 +93,7 @@ const PaymentRevenueSetup = () => {
   console.log(paymentAccounts);
 
   return (
-    <AuthLayout className="flex flex-col">
+    <AuthLayout title="Payment Setup" className="flex flex-col">
       <section className="md:px-3">
         <Card className="my-3 md:w-full w-[98vw] mx-auto dark:bg-slate-900 ">
           <CardBody className="overflow-x-auto justify-between flex-row">
@@ -113,6 +113,7 @@ const PaymentRevenueSetup = () => {
             </form> */}
 
             <Button
+              className="ml-auto"
               size="sm"
               color="danger"
               onClick={() => {

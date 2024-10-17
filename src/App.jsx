@@ -22,8 +22,8 @@ import InstitutionLetter from "./pages/complete-profile/InstitutionLetter";
 import DocumentDetails from "./pages/document-request/DocumentDetails";
 import AccountInactive from "./pages/complete-profile/AccountInactive";
 import PaymentRevenueSetup from "./pages/PaymentRevenueSetup";
-import { motion } from "framer-motion";
 import RevenueOverview from "./pages/reports/RevenueOverview";
+import { Button } from "@nextui-org/react";
 
 const App = () => {
   const navigate = useNavigate();
@@ -122,6 +122,7 @@ const App = () => {
         <Route exact path="/verify-otp" element={<VerifyOTP />} />
 
         {/* Account Setup Routes */}
+
         <Route path="/account-setup" element={<Outlet />}>
           <Route path="profile" element={<InstitutionData />} />
           <Route path="institution-teams" element={<InstitutionTeams />} />
@@ -166,6 +167,26 @@ const App = () => {
         <Route exact path="/reports" element={<Outlet />}>
           <Route exact path="revenue-overview" element={<RevenueOverview />} />
         </Route>
+
+        <Route
+          path="*"
+          element={
+            <section className="h-screen w-screen flex items-center justify-center flex-col gap-4">
+              <p className="text-6xl text-danger font-bold">404</p>
+
+              <p>Page Not found</p>
+
+              <Button
+                color="danger"
+                onClick={() => {
+                  navigate(-1);
+                }}
+              >
+                Go Back
+              </Button>
+            </section>
+          }
+        />
       </Routes>
       {/* </div> */}
       {/* </motion.div> */}
