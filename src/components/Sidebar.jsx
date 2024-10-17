@@ -26,7 +26,9 @@ export default function Sidebar({
 
   useEffect(() => {
     fetchInstitution();
+  }, []);
 
+  useEffect(() => {
     /**
      *  TODO: Dont delete this code, Will be used later when roles and permissions are implemented
      *
@@ -48,7 +50,7 @@ export default function Sidebar({
       // return true;
     });
     setAccessibleRoutes(filteredRoutes);
-  }, []);
+  }, [instutituion]);
 
   return (
     <div>
