@@ -1,8 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import axios from "../axiosConfig";
-
 //     import { toast, Toaster } from "sonner";
-import moment from "moment";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   Button,
@@ -18,30 +16,19 @@ import {
 import BellIcon from "../assets/icons/bell";
 import ThemeSwitcher from "./ThemeSwitcher";
 import { navLinks } from "../assets/constants";
-import { Link, useLocation } from "react-router-dom";
+import { Link, Navigate, useLocation } from "react-router-dom";
+import useAuthStore from "../store/authStore";
 
 export default function AuthLayout({ children, title = "Page Title" }) {
   const [isDesktopExpanded, setIsDesktopExpanded] = useState(true);
   const [isMobileExpanded, setIsMobileExpanded] = useState(false);
   const url = useLocation().pathname;
-  const [instutituion, setInstutituion] = useState({});
   const [accessibleRoutes, setAccessibleRoutes] = useState([]);
-  const [user, setUser] = useState({});
+  const { isAuthenticated, user, institution } = useAuthStore();
 
-  const fetchInstitution = async () => {
-    try {
-      const response = await axios.get("/institution/institution-data");
-      const institutionData = response.data.institutionData;
-      setInstutituion(institutionData);
-    } catch (error) {
-      // toast.error(error.response.data.message);
-      console.log(error);
-    }
-  };
-
-  useEffect(() => {
-    fetchInstitution();
-  }, []);
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
 
   useEffect(() => {
     setIsDesktopExpanded(
@@ -56,7 +43,7 @@ export default function AuthLayout({ children, title = "Page Title" }) {
   const mobileNavRef = useRef(null);
 
   useEffect(() => {
-    fetchUserData();
+    // fetchUserData();
     const handleClickOutside = (e) => {
       if (mobileNavRef.current && !mobileNavRef.current.contains(e.target)) {
         setIsMobileExpanded(false);
@@ -103,7 +90,7 @@ export default function AuthLayout({ children, title = "Page Title" }) {
     // filter accessible routes
     // const filteredRoutes = navLinks.filter((route) => {
     //   if (route.acl) {
-    //     return route.acl.some((acl) => instutituion?.roles?.includes(acl));
+    //     return route.acl.some((acl) => institution?.roles?.includes(acl));
     //   }
     //   return true;
     // });
@@ -111,25 +98,26 @@ export default function AuthLayout({ children, title = "Page Title" }) {
 
     const filteredRoutes = navLinks.filter((route) => {
       if (route.showOn) {
-        return route.showOn.includes(instutituion?.status);
+        return route.showOn.includes(institution?.status);
       }
       // return true;
     });
     setAccessibleRoutes(filteredRoutes);
-  }, [instutituion]);
+  }, [institution]);
 
-  const fetchUserData = async () => {
-    try {
-      const response = await axios.get("/institution/user-data");
-      const institutionData = response.data.userData;
+  // const fetchUserData = async () => {
+  //   try {
+  //     const response = await axios.get("/institution/user-data");
+  //     const userData = response.data.userData;
+  //     // console.log({ userData });
 
-      if (institutionData) {
-        setUser(institutionData);
-      }
-    } catch (error) {
-      //   toast.error(error.response.data.message);
-    }
-  };
+  //     if (userData) {
+  //       // setUser(institutionData);
+  //     }
+  //   } catch (error) {
+  //     //   toast.error(error.response.data.message);
+  //   }
+  // };
 
   return (
     <AnimatePresence>
@@ -220,7 +208,6 @@ export default function AuthLayout({ children, title = "Page Title" }) {
                         // Strip query parameters for comparison
                         const currentPath = new URL(url, window.location.origin)
                           .pathname;
-                        console.log({ currentPath });
 
                         return (
                           <Link

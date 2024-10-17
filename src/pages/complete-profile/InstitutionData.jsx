@@ -201,7 +201,6 @@ class InstitutionData extends Component {
     try {
       const response = await axios.get("/institution/institution-data");
       const institutionData = response.data.institutionData;
-      console.log(institutionData);
 
       if (institutionData) {
         this.setState({

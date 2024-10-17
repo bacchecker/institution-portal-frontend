@@ -28,7 +28,8 @@
     "react-icons": "^5.3.0",
     "react-pdf": "^9.1.1",
     "react-router-dom": "^6.26.2",
-    "suneditor-react": "^3.6.1"
+    "suneditor-react": "^3.6.1",
+    "zustand": "^5.0.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.9.0",
