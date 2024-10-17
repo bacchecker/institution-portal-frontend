@@ -152,7 +152,7 @@ class AccountInactive extends Component {
 
               <div className="my-4 flex items-center justify-center">
                 <NavLink
-                  to={`/account-profile`}
+                  to={`/account-setup/profile`}
                   className="flex items-center w-44 space-x-2 bg-green-700 hover:bg-green-600 text-white px-4 py-1.5 rounded-md"
                 >
                   <FaUser /> <p>Setup Account</p>
