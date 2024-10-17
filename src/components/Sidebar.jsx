@@ -26,6 +26,12 @@ export default function Sidebar({
 
   useEffect(() => {
     fetchInstitution();
+
+    /**
+     *  TODO: Dont delete this code, Will be used later when roles and permissions are implemented
+     *
+     * Filter accessible routes based on the user's role
+     */
     // filter accessible routes
     // const filteredRoutes = navLinks.filter((route) => {
     //   if (route.acl) {
