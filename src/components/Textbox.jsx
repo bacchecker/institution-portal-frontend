@@ -8,7 +8,7 @@ class BasicTextFields extends Component {
       <div className={className}>
         <div className="relative h-10 w-full"> {/* Adjusted height */}
           <input
-            className={`peer h-full w-full bg-gray-100 pl-3 py-2 pr-9 rounded-md text-blue-gray-700 outline-0 transition-all placeholder-shown:border-0 placeholder-shown:border-blue-gray-200 focus:border focus:border-blue-600 focus:outline-0 disabled:border-0 disabled:bg-blue-gray-50 ${
+            className={`peer h-full w-full bg-gray-100 pl-3 py-2 pr-9 rounded-md text-sm text-blue-gray-700 outline-0 transition-all placeholder-shown:border-0 placeholder-shown:border-blue-gray-200 focus:border focus:border-blue-600 focus:outline-0 disabled:border-0 disabled:bg-blue-gray-50 ${
               disabled ? 'cursor-not-allowed opacity-50' : ''
             }`}
             placeholder="" 

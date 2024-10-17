@@ -22,7 +22,11 @@ class AddDocumentType extends Component {
       isDeleting: false,
       addNewModal: false,
       name: '',
-      description: ''
+      description: '',
+      base_fee: '',
+      printing_fee: '',
+      validation_fee: '',
+      verification_fee: '',
     };
 
     // Binding methods
@@ -189,12 +193,16 @@ class AddDocumentType extends Component {
   handleAddNew = async (event) => {
     event.preventDefault();
     this.setState({isSaving: true})
-    const { name, description } = this.state;
+    const { name, description, base_fee, printing_fee, validation_fee, verification_fee } = this.state;
   
     try {
       const response = await axios.post('/institution/add-document-type', {
         name,                   
-        description              
+        description,            
+        base_fee,            
+        printing_fee,            
+        validation_fee,            
+        verification_fee,            
       });
   
       if (response.status === 201) {
@@ -204,10 +212,9 @@ class AddDocumentType extends Component {
       this.fetchDocumentTypes();
       this.handleClear(); 
       this.toggleAddNewModal();
-
     } catch (error) {
-     
       toast.error(error.response.data.message);
+      this.setState({isSaving: false})
     }
 };
 
@@ -526,6 +533,34 @@ class AddDocumentType extends Component {
                           label="Description"
                           name="description"
                           value={this.state.description}
+                          onChange={this.handleInputChange}
+                      />
+                      <Textbox
+                          label="Document Validation Fee"
+                          name="validation_fee"
+                          type="number"
+                          value={this.state.validation_fee}
+                          onChange={this.handleInputChange}
+                      />
+                      <Textbox
+                          label="Document Verification Fee"
+                          name="verification_fee"
+                          type="number"
+                          value={this.state.verification_fee}
+                          onChange={this.handleInputChange}
+                      />
+                      <Textbox
+                          label="Document Requisition Fee"
+                          name="base_fee"
+                          type="number"
+                          value={this.state.base_fee}
+                          onChange={this.handleInputChange}
+                      />
+                      <Textbox
+                          label="Printing Fee"
+                          name="printing_fee"
+                          type="number"
+                          value={this.state.printing_fee}
                           onChange={this.handleInputChange}
                       />
                       

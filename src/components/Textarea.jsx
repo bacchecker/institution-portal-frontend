@@ -9,7 +9,7 @@ class Textarea extends Component {
             <div className={className}>
                 <div className="relative h-16 w-full">
                     <textarea
-                        className="peer h-full w-full bg-gray-100 pl-3 pt-2 pr-9 outline-0 transition-all focus:border focus:border-blue-600 focus:outline-0 disabled:border-0 rounded-lg"
+                        className="peer h-full w-full bg-gray-100 pl-3 text-sm pt-2 pr-9 outline-0 transition-all focus:border focus:border-blue-600 focus:outline-0 disabled:border-0 rounded-lg"
                         placeholder="" 
                         name={name} 
                         onChange={onChange} 
