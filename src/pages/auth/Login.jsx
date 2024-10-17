@@ -3,8 +3,7 @@ import axios from "../../axiosConfig";
 import withRouter from "../../components/withRouter";
 import ReCAPTCHA from "react-google-recaptcha";
 import { toast } from "react-hot-toast";
-import Spinner from "../../components/Spinner";
-import { LuEye, LuEyeOff, LuUser } from "react-icons/lu";
+import { IoLockOpen, IoPerson, IoEyeOff, IoEye } from "react-icons/io5";
 import { Button, Card, Input } from "@nextui-org/react";
 import ThemeSwitcher from "../../components/ThemeSwitcher";
 
@@ -126,7 +125,7 @@ class Login extends Component {
                 autoComplete="email"
                 autoFocus
                 onChange={(e) => this.setState({ email: e.target.value })}
-                startContent={<LuUser />}
+                startContent={<IoPerson />}
                 isInvalid={emailError}
                 errorMessage={emailError}
               />
@@ -136,23 +135,21 @@ class Login extends Component {
                 id="password"
                 name="password"
                 value={password}
-                label="Email"
+                label="Password"
                 className="mt-1 block w-full"
-                autoComplete="email"
-                autoFocus
                 onChange={(e) => this.setState({ password: e.target.value })}
-                startContent={<LuUser />}
+                startContent={<IoLockOpen />}
                 isInvalid={emailError}
                 errorMessage={emailError}
                 endContent={
                   !showPassword ? (
-                    <LuEye
+                    <IoEye
                       size={24}
                       onClick={this.handleClickShowPassword}
                       className="cursor-pointer"
                     />
                   ) : (
-                    <LuEyeOff
+                    <IoEyeOff
                       size={24}
                       onClick={this.handleClickShowPassword}
                       className="cursor-pointer"
