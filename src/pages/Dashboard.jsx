@@ -8,6 +8,7 @@ import { MdManageHistory, MdOutlineVerifiedUser } from "react-icons/md";
 import withRouter from "../components/withRouter";
 import axios from "../axiosConfig";
 import { toast } from "react-hot-toast";
+import AuthLayout from "../components/AuthLayout";
 
 class Dashboard extends Component {
   constructor(props) {
@@ -22,9 +23,9 @@ class Dashboard extends Component {
   };
 
   componentDidMount() {
-      this.fetchInstitution();
+    this.fetchInstitution();
   }
-  
+
   fetchInstitution = async () => {
     try {
       const response = await axios.get("/institution/institution-data");
@@ -49,8 +50,8 @@ class Dashboard extends Component {
 
   render() {
     return (
-      <>
-      <div className="w-full">
+      <AuthLayout>
+        <div className="w-full md:px-3">
           <div className="grid grid-cols-2 xl:grid-cols-4 gap-8">
             <div className="col-span-3 flex items-center xl:space-x-8 space-x-4">
               <div className="">
@@ -211,10 +212,8 @@ class Dashboard extends Component {
               </div>
             </div>
           </div>
-      </div>
-      
-        
-      </>
+        </div>
+      </AuthLayout>
     );
   }
 }

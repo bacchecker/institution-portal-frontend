@@ -8,9 +8,11 @@ import {
   TasksListIcon,
 } from "./icons/nav";
 import { SecurityIcon } from "./icons/security";
+import { AnalysisIcon } from "./icons/analysis";
 import SupportIcon from "./icons/support";
 import { FaUsers } from "react-icons/fa";
 import { MdAttachEmail } from "react-icons/md";
+//
 
 export const navLinks = [
   {
@@ -71,43 +73,56 @@ export const navLinks = [
       },
     ],
   },
-
   {
-    label: "Payment/Revenue Setup",
+    label: "Payment Setup",
     path: "/payment-revenue-setup",
     icon: <MoneyIcon />,
     acl: ["view payments"],
     showOn: ["active"],
     children: [],
   },
-  // {
-  //   label: "Support",
-  //   path: "/supports",
-  //   icon: <SupportIcon />,
-  //   acl: ["view support tickets", "view support ticket categories"],
-  //   children: [
-  //     {
-  //       label: "Tickets",
-  //       path: "/supports/tickets",
-  //       acl: ["view support tickets"],
-  //     },
-  //     {
-  //       label: "My Tickets",
-  //       path: "/supports/my-tickets",
-  //       acl: ["view assigned tickets"],
-  //     },
-  //     // {
-  //     //     label: "Disputes",
-  //     //     path: "/supports/disputes",
-  //     //     acl: ["view disputes"],
-  //     // },
-  //     // {
-  //     //     label: "Feedback",
-  //     //     path: "/supports/feedback/general",
-  //     //     acl: ["view general feedback"],
-  //     // },
-  //   ],
-  // },
+  {
+    label: "Reports",
+    path: "/reports",
+    icon: <AnalysisIcon />,
+    acl: ["view payments"],
+    showOn: ["active"],
+    children: [
+      {
+        label: "Revenue Overview ",
+        path: "/reports/revenue-overview",
+      },
+    ],
+  },
+  {
+    label: "Support",
+    path: "/supports",
+    icon: <SupportIcon />,
+    acl: ["view support tickets", "view support ticket categories"],
+    showOn: ["active"],
+    children: [
+      {
+        label: "Tickets",
+        path: "/supports/tickets",
+        acl: ["view support tickets"],
+      },
+      // {
+      //   label: "Feedback",
+      //   path: "/supports/my-tickets",
+      //   acl: ["view assigned tickets"],
+      // },
+      // {
+      //     label: "Disputes",
+      //     path: "/supports/disputes",
+      //     acl: ["view disputes"],
+      // },
+      // {
+      //     label: "Feedback",
+      //     path: "/supports/feedback/general",
+      //     acl: ["view general feedback"],
+      // },
+    ],
+  },
   // {
   //   label: "Messages",
   //   path: "/messages",

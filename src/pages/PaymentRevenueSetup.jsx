@@ -6,6 +6,10 @@ import {
   Button,
   Card,
   CardBody,
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownTrigger,
   Input,
   Select,
   SelectItem,
@@ -16,6 +20,10 @@ import {
 } from "@nextui-org/react";
 import { IoSearch } from "react-icons/io5";
 import axios from "../axiosConfig";
+import Elipsis from "../assets/icons/elipsis";
+import DeleteModal from "../components/DeleteModal";
+import toast from "react-hot-toast";
+import AuthLayout from "../components/AuthLayout";
 
 const PaymentRevenueSetup = () => {
   const [paymentAccounts, setPaymentAccounts] = useState([]);
@@ -33,14 +41,29 @@ const PaymentRevenueSetup = () => {
   const save = async () => {
     setProcessing(true);
     try {
-      const response = await axios.post("/institution/payment-accounts", data);
-      // toast.success(response.data.message);
-      fetchPaymentAccounts();
-      setProcessing(false);
-      setOpenDrawer(false);
+      if (data?.id) {
+        const response = await axios.post(
+          `/institution/payment-accounts/${data?.id}`,
+          data
+        );
+        console.log(response?.data);
+        // toast.success(response.data);
+        fetchPaymentAccounts();
+        setProcessing(false);
+        setOpenDrawer(false);
+      } else {
+        const response = await axios.post(
+          "/institution/payment-accounts",
+          data
+        );
+        toast.success(response.data.message);
+        fetchPaymentAccounts();
+        setProcessing(false);
+        setOpenDrawer(false);
+      }
     } catch (error) {
       console.log(error);
-      // setErrors(error.response.data.errors);
+      setErrors(error.response.data.message);
       setProcessing(false);
     }
   };
@@ -70,7 +93,7 @@ const PaymentRevenueSetup = () => {
   console.log(paymentAccounts);
 
   return (
-    <div className="flex flex-col">
+    <AuthLayout title="Payment Setup" className="flex flex-col">
       <section className="md:px-3">
         <Card className="my-3 md:w-full w-[98vw] mx-auto dark:bg-slate-900 ">
           <CardBody className="overflow-x-auto justify-between flex-row">
@@ -90,6 +113,7 @@ const PaymentRevenueSetup = () => {
             </form> */}
 
             <Button
+              className="ml-auto"
               size="sm"
               color="danger"
               onClick={() => {
@@ -136,16 +160,36 @@ const PaymentRevenueSetup = () => {
               <TableCell>{account?.bank_branch}</TableCell>
               <TableCell>{account?.currency}</TableCell>
               <TableCell className="flex items-center h-16 gap-3">
-                <Button
-                  size="sm"
-                  color="success"
-                  onClick={() => {
-                    setOpenDrawer(true);
-                    setData(account);
-                  }}
-                >
-                  View
-                </Button>
+                <Dropdown>
+                  <DropdownTrigger>
+                    <Button variant="bordered" size="sm" isIconOnly>
+                      <Elipsis />
+                    </Button>
+                  </DropdownTrigger>
+                  <DropdownMenu aria-label="Static Actions">
+                    <DropdownItem
+                      key="edit"
+                      color="success"
+                      onClick={() => {
+                        setDrawerTitle("Edit Account Details");
+                        setData(account);
+                        setOpenDrawer(true);
+                      }}
+                    >
+                      Update
+                    </DropdownItem>
+                    <DropdownItem
+                      key="edit"
+                      color="danger"
+                      onClick={() => {
+                        deleteDisclosure.onOpen();
+                        setData(account);
+                      }}
+                    >
+                      Delete
+                    </DropdownItem>
+                  </DropdownMenu>
+                </Dropdown>
               </TableCell>
             </TableRow>
           ))}
@@ -262,7 +306,7 @@ const PaymentRevenueSetup = () => {
               errorMessage={errors.currency}
               isInvalid={!!errors.currency}
             />
-
+            {/* 
             <Switch
               size="sm"
               name="is_default"
@@ -274,7 +318,7 @@ const PaymentRevenueSetup = () => {
               isInvalid={!!errors.is_default}
             >
               Default Account
-            </Switch>
+            </Switch> */}
 
             {/* 
                         <Select
@@ -335,8 +379,32 @@ const PaymentRevenueSetup = () => {
           </div>
         </form>
       </Drawer>
-    </div>
+
+      <DeleteModal
+        disclosure={deleteDisclosure}
+        title="Delete Payment Account"
+        onButtonClick={async () => {
+          console.log("logic for deleting payment account...");
+          try {
+            const response = await axios.delete(
+              `/institution/payment-accounts/${data?.id}`
+            );
+            deleteDisclosure.onClose();
+            toast.success(response.data.message);
+            fetchPaymentAccounts();
+          } catch (error) {
+            console.log(error);
+            setErrors(error.response.data.message);
+          }
+        }}
+      >
+        <p className="font-quicksand">
+          Are you sure you want to delete this payment account?{" "}
+          <span className="font-semibold">{data?.account_name}</span>
+        </p>
+      </DeleteModal>
+    </AuthLayout>
   );
 };
 
-export default withRouter(PaymentRevenueSetup);
+export default PaymentRevenueSetup;

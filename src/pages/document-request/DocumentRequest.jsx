@@ -6,6 +6,7 @@ import { toast } from "react-hot-toast";
 import withRouter from "../../components/withRouter";
 import { FaRegFolderOpen } from "react-icons/fa6";
 import { NavLink } from "react-router-dom";
+import AuthLayout from "../../components/AuthLayout";
 class DocumentRequest extends Component {
   constructor(props) {
     super(props);
@@ -132,8 +133,8 @@ class DocumentRequest extends Component {
       rowMenuOpen,
     } = this.state;
     return (
-      <>
-        <div className="container mx-auto">
+      <AuthLayout title="Document Requests">
+        <div className="container mx-auto md:px-3">
           <h1 className="text-xl font-bold mb-4">Document Requests</h1>
 
           {/* Filter Section */}
@@ -290,7 +291,7 @@ class DocumentRequest extends Component {
             </div>
           </div>
         </div>
-      </>
+      </AuthLayout>
     );
   }
 }

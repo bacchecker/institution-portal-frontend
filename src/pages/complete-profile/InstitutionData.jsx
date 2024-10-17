@@ -8,6 +8,7 @@ import toast from "react-hot-toast";
 import { FaAnglesRight } from "react-icons/fa6";
 import Spinner from "../../components/Spinner";
 import { Input, Textarea } from "@nextui-org/react";
+import AuthLayout from "../../components/AuthLayout";
 
 class InstitutionData extends Component {
   constructor(props) {
@@ -237,217 +238,219 @@ class InstitutionData extends Component {
     }/public/images/profile/default-logo.png`;
 
     return (
-      <div className="w-full flex flex-col bg-white dark:bg-slate-900 rounded-md">
-        <div className="mx-auto my-6 px-4 w-full md:w-4/5">
-          <div>
-            <p className="text-gray-500 text-lg">Let's get started</p>
-            <p className="text-2xl font-bold my-2">
-              Complete your account setup
-            </p>
-            <p className="font-medium text-gray-700 text-sm">
-              Every Institution is unique, we want to know about yours. <br />
-              Make sure the information you submitted during registration is
-              your exact institutional details.
-            </p>
-          </div>
-          <form
-            onSubmit={this.handleSubmit}
-            className="flex flex-col space-y-10 mt-10"
-          >
-            <div className="flex flex-col xl:flex-row xl:space-x-4 space-y-8 xl:space-y-0">
-              <Input
-                label="Institution Name"
-                name="name"
-                value={formData.name}
-                onChange={this.handleInputChange}
-                disabled={true}
-                isInvalid={errors.name}
-                errorMessage={errors.name}
-                className="w-[80%]"
-              />
-              <Input
-                label="Institution Prefix"
-                name="prefix"
-                value={formData.prefix}
-                onChange={this.handleInputChange}
-                disabled={true}
-                isInvalid={errors.prefix}
-                errorMessage={errors.prefix}
-                className="flex-1"
-              />
+      <AuthLayout title="Account Profile">
+        <div className="w-full flex flex-col bg-white dark:bg-slate-900 rounded-md md:px-3">
+          <div className="mx-auto my-6 px-4 w-full md:w-4/5">
+            <div>
+              <p className="text-gray-500 text-lg">Let's get started</p>
+              <p className="text-2xl font-bold my-2">
+                Complete your account setup
+              </p>
+              <p className="font-medium text-gray-700 text-sm">
+                Every Institution is unique, we want to know about yours. <br />
+                Make sure the information you submitted during registration is
+                your exact institutional details.
+              </p>
             </div>
-            <div className="flex flex-col xl:flex-row xl:space-x-4 space-y-8 xl:space-y-0">
-              <div className="flex-1">
+            <form
+              onSubmit={this.handleSubmit}
+              className="flex flex-col space-y-10 mt-10"
+            >
+              <div className="flex flex-col xl:flex-row xl:space-x-4 space-y-8 xl:space-y-0">
                 <Input
-                  label="Institution Email"
-                  name="institution_email"
-                  value={formData.institution_email}
+                  label="Institution Name"
+                  name="name"
+                  value={formData.name}
                   onChange={this.handleInputChange}
-                  isInvalid={errors.institution_email}
-                  errorMessage={errors.institution_email}
+                  disabled={true}
+                  isInvalid={errors.name}
+                  errorMessage={errors.name}
+                  className="w-[80%]"
                 />
-              </div>
-              <div className="flex-1">
                 <Input
-                  label="Help Line Contact"
-                  name="helpline_contact"
-                  value={formData.helpline_contact}
+                  label="Institution Prefix"
+                  name="prefix"
+                  value={formData.prefix}
                   onChange={this.handleInputChange}
-                  isInvalid={errors.helpline_contact}
-                  errorMessage={errors.helpline_contact}
+                  disabled={true}
+                  isInvalid={errors.prefix}
+                  errorMessage={errors.prefix}
+                  className="flex-1"
                 />
               </div>
-            </div>
-            <Textarea
-              label="Description"
-              name="description"
-              value={formData.description}
-              onChange={this.handleInputChange}
-              isInvalid={errors.description}
-              errorMessage={errors.description}
-            />
-
-            <div className="flex flex-col xl:flex-row xl:space-x-4 space-y-8 xl:space-y-0">
-              <Select
-                label="Academic Level"
-                name="academic_level"
-                value={formData.academic_level}
-                itemNameKey="name"
-                menuItems={academicLeveData}
-                onChange={this.handleInputChange}
-                error_message={errors.academic_level}
-              />
-              <Select
-                label="Select Region"
-                name="region"
-                value={formData.region}
-                itemNameKey="name"
-                menuItems={regionData}
-                onChange={this.handleInputChange}
-                error_message={errors.region}
-              />
-            </div>
-
-            <div className="flex flex-col xl:flex-row xl:space-x-4 space-y-8 xl:space-y-0">
-              <div className="flex-1">
-                <Textbox
-                  label="Address"
-                  name="address"
-                  value={formData.address}
-                  onChange={this.handleInputChange}
-                  error_message={errors.address}
-                />
-              </div>
-              <div className="flex-1">
-                <Textbox
-                  label="Digital Address"
-                  name="digital_address"
-                  value={formData.digital_address}
-                  onChange={this.handleInputChange}
-                  error_message={errors.digital_address}
-                />
-              </div>
-            </div>
-            <div className="flex flex-col xl:flex-row xl:space-x-4 space-y-8 xl:space-y-0">
-              <div className="flex-1">
-                <Textbox
-                  label="Institution Website URL"
-                  name="website_url"
-                  value={formData.website_url}
-                  onChange={this.handleInputChange}
-                  error_message={errors.website_url}
-                />
-              </div>
-              <div className="flex-1">
-                <Textbox
-                  label="Post Office Mail Address"
-                  name="mailing_address"
-                  value={formData.mailing_address}
-                  onChange={this.handleInputChange}
-                  error_message={errors.mailing_address}
-                />
-              </div>
-            </div>
-
-            <div className="">
-              <Textbox
-                label="Other Contacts"
-                name="alternate_contacts"
-                value={formData.alternate_contacts}
-                onChange={this.handleInputChange}
-                caption="Note: Use commas (,) to seperate different numbers"
-                error_message={errors.alternate_contacts}
-              />
-            </div>
-
-            <div className="space-y-6">
-              <div className="space-y-3 flex flex-col w-full">
-                <label htmlFor="logo" className="form-label">
-                  Institution Logo
-                </label>
-                <input
-                  id="logo"
-                  type="file"
-                  accept="image/*"
-                  onChange={this.handleImageChange}
-                />
-                {this.state.errors.logoFile && (
-                  <span className="text-red-600 text-sm">
-                    {this.state.errors.logoFile}
-                  </span>
-                )}
-              </div>
-
-              <div className="relative h-32 w-32 group">
-                <img
-                  src={
-                    this.state.formData.logo // If logo is base64 (file preview)
-                      ? `https://backend.baccheck.online/storage/app/public/${this.state.formData.logo}`
-                      : this.state.formData.logoFile // If file from backend exists, display it
-                      ? `${import.meta.env.VITE_BASE_URL}/storage/app/public/${
-                          this.state.formData.logoFile
-                        }`
-                      : defaultLogoUrl // If no file or logo, use the default image
-                  }
-                  alt="Institution Logo"
-                />
-
-                <div
-                  className="absolute cursor-pointer opacity-0 group-hover:opacity-100 inset-0 bg-white/50 text-gray-600 grid place-items-center"
-                  onClick={() =>
-                    this.setState((prevState) => ({
-                      formData: { ...prevState.formData, logo: null },
-                    }))
-                  }
-                >
-                  <IoMdClose size={25} />
+              <div className="flex flex-col xl:flex-row xl:space-x-4 space-y-8 xl:space-y-0">
+                <div className="flex-1">
+                  <Input
+                    label="Institution Email"
+                    name="institution_email"
+                    value={formData.institution_email}
+                    onChange={this.handleInputChange}
+                    isInvalid={errors.institution_email}
+                    errorMessage={errors.institution_email}
+                  />
+                </div>
+                <div className="flex-1">
+                  <Input
+                    label="Help Line Contact"
+                    name="helpline_contact"
+                    value={formData.helpline_contact}
+                    onChange={this.handleInputChange}
+                    isInvalid={errors.helpline_contact}
+                    errorMessage={errors.helpline_contact}
+                  />
                 </div>
               </div>
-            </div>
-            <div className="flex justify-end">
-              <button
-                type="submit"
-                className={`flex items-center bg-green-700 hover:bg-green-600 text-white px-4 py-1.5 rounded-md font-medium ${
-                  isSaving ? "cursor-not-allowed bg-gray-400" : ""
-                }`}
-                disabled={isSaving}
-              >
-                {isSaving ? (
-                  <>
-                    <Spinner size="w-5 h-5" />
-                    <span className="ml-2">Saving...</span>
-                  </>
-                ) : (
-                  <>
-                    Save and Continue
-                    <FaAnglesRight className="ml-2" />
-                  </>
-                )}
-              </button>
-            </div>
-          </form>
+              <Textarea
+                label="Description"
+                name="description"
+                value={formData.description}
+                onChange={this.handleInputChange}
+                isInvalid={errors.description}
+                errorMessage={errors.description}
+              />
+
+              <div className="flex flex-col xl:flex-row xl:space-x-4 space-y-8 xl:space-y-0">
+                <Select
+                  label="Academic Level"
+                  name="academic_level"
+                  value={formData.academic_level}
+                  itemNameKey="name"
+                  menuItems={academicLeveData}
+                  onChange={this.handleInputChange}
+                  error_message={errors.academic_level}
+                />
+                <Select
+                  label="Select Region"
+                  name="region"
+                  value={formData.region}
+                  itemNameKey="name"
+                  menuItems={regionData}
+                  onChange={this.handleInputChange}
+                  error_message={errors.region}
+                />
+              </div>
+
+              <div className="flex flex-col xl:flex-row xl:space-x-4 space-y-8 xl:space-y-0">
+                <div className="flex-1">
+                  <Textbox
+                    label="Address"
+                    name="address"
+                    value={formData.address}
+                    onChange={this.handleInputChange}
+                    error_message={errors.address}
+                  />
+                </div>
+                <div className="flex-1">
+                  <Textbox
+                    label="Digital Address"
+                    name="digital_address"
+                    value={formData.digital_address}
+                    onChange={this.handleInputChange}
+                    error_message={errors.digital_address}
+                  />
+                </div>
+              </div>
+              <div className="flex flex-col xl:flex-row xl:space-x-4 space-y-8 xl:space-y-0">
+                <div className="flex-1">
+                  <Textbox
+                    label="Institution Website URL"
+                    name="website_url"
+                    value={formData.website_url}
+                    onChange={this.handleInputChange}
+                    error_message={errors.website_url}
+                  />
+                </div>
+                <div className="flex-1">
+                  <Textbox
+                    label="Post Office Mail Address"
+                    name="mailing_address"
+                    value={formData.mailing_address}
+                    onChange={this.handleInputChange}
+                    error_message={errors.mailing_address}
+                  />
+                </div>
+              </div>
+
+              <div className="">
+                <Textbox
+                  label="Other Contacts"
+                  name="alternate_contacts"
+                  value={formData.alternate_contacts}
+                  onChange={this.handleInputChange}
+                  caption="Note: Use commas (,) to seperate different numbers"
+                  error_message={errors.alternate_contacts}
+                />
+              </div>
+
+              <div className="space-y-6">
+                <div className="space-y-3 flex flex-col w-full">
+                  <label htmlFor="logo" className="form-label">
+                    Institution Logo
+                  </label>
+                  <input
+                    id="logo"
+                    type="file"
+                    accept="image/*"
+                    onChange={this.handleImageChange}
+                  />
+                  {this.state.errors.logoFile && (
+                    <span className="text-red-600 text-sm">
+                      {this.state.errors.logoFile}
+                    </span>
+                  )}
+                </div>
+
+                <div className="relative h-32 w-32 group">
+                  <img
+                    src={
+                      this.state.formData.logo // If logo is base64 (file preview)
+                        ? `https://backend.baccheck.online/storage/app/public/${this.state.formData.logo}`
+                        : this.state.formData.logoFile // If file from backend exists, display it
+                        ? `${
+                            import.meta.env.VITE_BASE_URL
+                          }/storage/app/public/${this.state.formData.logoFile}`
+                        : defaultLogoUrl // If no file or logo, use the default image
+                    }
+                    alt="Institution Logo"
+                  />
+
+                  <div
+                    className="absolute cursor-pointer opacity-0 group-hover:opacity-100 inset-0 bg-white/50 text-gray-600 grid place-items-center"
+                    onClick={() =>
+                      this.setState((prevState) => ({
+                        formData: { ...prevState.formData, logo: null },
+                      }))
+                    }
+                  >
+                    <IoMdClose size={25} />
+                  </div>
+                </div>
+              </div>
+              <div className="flex justify-end">
+                <button
+                  type="submit"
+                  className={`flex items-center bg-green-700 hover:bg-green-600 text-white px-4 py-1.5 rounded-md font-medium ${
+                    isSaving ? "cursor-not-allowed bg-gray-400" : ""
+                  }`}
+                  disabled={isSaving}
+                >
+                  {isSaving ? (
+                    <>
+                      <Spinner size="w-5 h-5" />
+                      <span className="ml-2">Saving...</span>
+                    </>
+                  ) : (
+                    <>
+                      Save and Continue
+                      <FaAnglesRight className="ml-2" />
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
-      </div>
+      </AuthLayout>
     );
   }
 }
