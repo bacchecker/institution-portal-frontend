@@ -65,8 +65,9 @@ const App = () => {
           />
         </Route>
 
-        <Route exact path="/dashboard" element={<Dashboard />} />
         <Route exact path="/complete-profile" element={<CompleteProfile />} />
+
+        <Route exact path="/dashboard" element={<Dashboard />} />
 
         {/* Requests Routes */}
         <Route exact path="/requests" element={<Outlet />}>

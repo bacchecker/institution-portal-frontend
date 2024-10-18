@@ -6,7 +6,7 @@ import { toast } from "react-hot-toast";
 import { IoLockOpen, IoPerson, IoEyeOff, IoEye } from "react-icons/io5";
 import { Button, Card, Input } from "@nextui-org/react";
 import ThemeSwitcher from "../../components/ThemeSwitcher";
-import { useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import useAuthStore from "../../store/authStore";
 
 const Login = () => {
@@ -24,7 +24,7 @@ const Login = () => {
   const recaptchaRef = useRef();
   const navigate = useNavigate();
 
-  const { login } = useAuthStore();
+  const { login, isAuthenticated } = useAuthStore();
 
   const handleMouseDownPassword = (event) => {
     event.preventDefault();
@@ -50,8 +50,14 @@ const Login = () => {
         password: formData.password,
         recaptcha_token: recaptchaToken,
       });
+      let responseData = response.data;
 
-      const responseData = response.data.data;
+      if (responseData?.show_otp) {
+        navigate("/verify-otp");
+      }
+
+      console.log(response.data);
+      responseData = response.data?.data;
 
       localStorage.setItem("authToken", responseData.token);
       localStorage.setItem("type", responseData.user.type);
@@ -68,9 +74,7 @@ const Login = () => {
 
       if (type === "institution") {
         toast.success(response.data.message, {});
-        if (!responseData.two_factor) {
-          navigate("/verify-otp");
-        } else if (responseData.institution.profile_complete === "yes") {
+        if (responseData.institution.profile_complete === "yes") {
           navigate("/dashboard");
         } else {
           navigate("/account-setup/profile");
@@ -80,11 +84,16 @@ const Login = () => {
         setIsLoading(false);
       }
     } catch (error) {
+      console.log(error?.response);
       toast.error(error.response.data.message, {});
       recaptchaRef.current.reset();
       setIsLoading(false);
     }
   };
+
+  if (isAuthenticated) {
+    return <Navigate to="/dashboard" replace />;
+  }
 
   return (
     <>
