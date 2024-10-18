@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import AuthLayout from "@components/AuthLayout";
 import {
   Button,
@@ -7,6 +7,11 @@ import {
   Chip,
   DateRangePicker,
   Input,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
   Popover,
   PopoverContent,
   PopoverTrigger,
@@ -15,6 +20,7 @@ import {
   TableCell,
   TableRow,
   Textarea,
+  useDisclosure,
 } from "@nextui-org/react";
 import CustomTable from "@components/CustomTable";
 import useSWR from "swr";
@@ -28,6 +34,14 @@ import ClipIcon from "@assets/icons/clip";
 import { IoDocumentText } from "react-icons/io5";
 import { FaRegNoteSticky } from "react-icons/fa6";
 import { FaUser } from "react-icons/fa";
+import DownloadIcon from "@assets/icons/download";
+import PdfIcon from "../../../assets/icons/pdf";
+import WordIcon from "../../../assets/icons/word";
+import { filesize } from "filesize";
+import { PlusIcon } from "../../../assets/icons/plus";
+import ExcelIcon from "../../../assets/icons/excel";
+import Elipsis from "../../../assets/icons/elipsis";
+import ConfirmModal from "../../../components/confirm-modal";
 
 const ItemCard = ({ title, value }) => (
   <div className="grid grid-cols-5 w-full items-center">
@@ -45,12 +59,118 @@ export default function DocumentRequest() {
   const [openDrawer, setOpenDrawer] = useState(false);
   const [data, setData] = useState(null);
   const navigate = useNavigate();
+  const [bulkDownloadLoading, setBulkDownloadLoading] = useState(false);
+
+  const fileUploadDisclosure = useDisclosure();
+  const changeStatusDisclosure = useDisclosure();
 
   const { data: resData, error } = useSWR(
     "/institution/requests/document-requests",
     (url) => axios.get(url).then((res) => res.data)
   );
 
+  const handleBulkDownload = async (filePaths) => {
+    try {
+      const csrfTokenMeta = document?.querySelector('meta[name="csrf-token"]');
+      const csrfToken = csrfTokenMeta?.getAttribute("content");
+
+      const headers = {
+        "Content-Type": "application/json",
+      };
+
+      // Only add X-CSRF-TOKEN if the token exists
+      if (csrfToken) {
+        headers["X-CSRF-TOKEN"] = csrfToken;
+      }
+
+      const response = await fetch("https://bulk-download-api-endpoint", {
+        method: "POST",
+        headers: headers,
+        body: JSON.stringify({ files: filePaths }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "bulk_download.zip"; // You can set a dynamic name if needed
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+      setBulkDownloadLoading(false);
+    } catch (error) {
+      console.error("Error downloading files:", error);
+    }
+  };
+
+  const [dragActive, setDragActive] = useState(false);
+
+  const handleDrag = useCallback((e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setDragActive(true);
+    } else if (e.type === "dragleave") {
+      setDragActive(false);
+    }
+  }, []);
+
+  const handleDrop = useCallback((e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      handleFiles(e.dataTransfer.files);
+    }
+  }, []);
+
+  const handleChange = (e) => {
+    e.preventDefault();
+    const fileInput = e.target;
+    if (fileInput.files.length > 0) {
+      handleFiles(fileInput.files);
+    }
+  };
+
+  const handleFiles = (files) => {
+    const allowedTypes = [
+      "application/pdf",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "application/vnd.ms-excel",
+    ];
+
+    const validFiles = Array.from(files).filter((file) =>
+      allowedTypes.includes(file.type)
+    );
+
+    if (validFiles.length > 0) {
+      setData("documents", validFiles); // Update state with all valid files
+    } else {
+      setData("documents", []);
+    }
+  };
+
+  const getFileIcon = (fileType) => {
+    switch (fileType) {
+      case "application/pdf":
+        return <PdfIcon className="size-6 text-danger" />;
+      case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+        return <WordIcon className="size-6 text-blue-600 dark:text-blue-400" />;
+      case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
+      case "application/vnd.ms-excel":
+        return (
+          <ExcelIcon className="size-6 text-green-500 dark:text-green-400" />
+        );
+      default:
+        return <Elipsis />;
+    }
+  };
   console.log(resData);
 
   //         resData,
@@ -303,7 +423,7 @@ export default function DocumentRequest() {
         title="Request Details"
         isOpen={openDrawer}
         setIsOpen={setOpenDrawer}
-        classNames="w-[100vw] md:w-[50vw]"
+        classNames="w-[100vw] md:w-[40vw]"
       >
         <div className="h-full flex flex-col justify-between">
           <div className="flex flex-col gap-2 mb-6">
@@ -311,9 +431,7 @@ export default function DocumentRequest() {
               <div className="flex space-x-2 items-center">
                 <p className="font-semibold">
                   Unique Code:{" "}
-                  <span className="uppercase">
-                    {data?.unique_code}
-                  </span>
+                  <span className="uppercase">{data?.unique_code}</span>
                 </p>
                 <div
                   className={`flex items-center border px-4 py-1 rounded-full text-xs uppercase ${
@@ -332,15 +450,14 @@ export default function DocumentRequest() {
             <div className="mb-2">
               <div className="border rounded-lg p-4 text-sm flex space-x-4">
                 <div className="flex items-center justify-center w-12 h-12 bg-gray-100  text-gray-700 shadow-md shadow-gray-400 rounded-full">
-                    <FaUser size={20} />
+                  <FaUser size={20} />
                 </div>
                 <div className="">
                   <p className="font-bold mb-2 text-base">Applicant Info:</p>
                   <div className="grid grid-cols-5 gap-1">
                     <p className="font-semibold">Name:</p>
                     <p className="col-span-4">
-                      {data?.user.first_name}{" "}
-                      {data?.user.last_name}
+                      {data?.user.first_name} {data?.user.last_name}
                     </p>
                   </div>
                   <div className="grid grid-cols-5 gap-1 my-1">
@@ -361,58 +478,57 @@ export default function DocumentRequest() {
                 value={<StatusChip status={data?.status} />}
               />
               <div className="w-full flex px-2">
-                  
-                  
-                  {data?.records?.map((item, index) => (
-                    <div key={index} className="w-full grid grid-cols-2 xl:grid-cols-3 gap-2">
-                      {/* Document type and description */}
-                      <div className="col-span-2 flex items-center space-x-4 w-full">
-                        <div className="flex items-center justify-center text-gray-700 bg-gray-100 rounded-full w-12 h-12 shadow-md shadow-gray-400">
-                          <IoDocumentText size={30} />
-                        </div>
-                        <div>
-                          <p className="font-medium text-gray-700">
-                            {item?.document_type.name}
-                          </p>
-                          <p className="text-sm text-gray-500">
-                            {item?.document_type.description}
-                          </p>
-                        </div>
+                {data?.records?.map((item, index) => (
+                  <div
+                    key={index}
+                    className="w-full grid grid-cols-2 xl:grid-cols-3 gap-2"
+                  >
+                    {/* Document type and description */}
+                    <div className="col-span-2 flex items-center space-x-4 w-full">
+                      <div className="flex items-center justify-center text-gray-700 bg-gray-100 rounded-full w-12 h-12 shadow-md shadow-gray-400">
+                        <IoDocumentText size={30} />
                       </div>
-                      
-                      {/* Copies, Format, and Total Amount */}
-                      <div className="text-sm font-semibold text-gray-700">
-                        <div className="grid grid-cols-2 gap-2">
-                          <p className="">Copies:</p>
-                          <p className="">{item?.number_of_copies}</p>
-                        </div>
-                        <div className="grid grid-cols-2 gap-2">
-                          <p className="">Format:</p>
-                          <p className="">
-                            {item?.document_type.document_format === "soft_copy"
-                              ? "Soft Copy"
-                              : "Hard Copy"}
-                          </p>
-                        </div>
-                        <div className="grid grid-cols-2 gap-2">
-                          <p className="">Total Amt:</p>
-                          <p>
-                            GH¢{" "}
-                            {Math.floor(
-                              item?.document_type?.base_fee +
-                                item?.number_of_copies *
-                                  item?.document_type?.printing_fee
-                            ).toFixed(2)}
-                          </p>
-                        </div>
+                      <div>
+                        <p className="font-medium text-gray-700">
+                          {item?.document_type.name}
+                        </p>
+                        <p className="text-sm text-gray-500">
+                          {item?.document_type.description}
+                        </p>
                       </div>
                     </div>
-                  ))}
-              </div>
 
+                    {/* Copies, Format, and Total Amount */}
+                    <div className="text-sm font-semibold text-gray-700">
+                      <div className="grid grid-cols-2 gap-2">
+                        <p className="">Copies:</p>
+                        <p className="">{item?.number_of_copies}</p>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        <p className="">Format:</p>
+                        <p className="">
+                          {item?.document_type.document_format === "soft_copy"
+                            ? "Soft Copy"
+                            : "Hard Copy"}
+                        </p>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        <p className="">Total Amt:</p>
+                        <p>
+                          GH¢{" "}
+                          {Math.floor(
+                            item?.document_type?.base_fee +
+                              item?.number_of_copies *
+                                item?.document_type?.printing_fee
+                          ).toFixed(2)}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
 
-            
             {/* <div className="grid grid-cols-2 gap-2 gap-y-4">
               <ItemCard title="Request ID" value={data?.unique_code} />
               <ItemCard
@@ -500,7 +616,7 @@ export default function DocumentRequest() {
                   <ClipIcon />
                   <p className="font-semibold ">Attachmets</p>
                 </div>
-                {/* 
+
                 {data?.files.length >= 1 && (
                   <Button
                     variant="ghost"
@@ -516,7 +632,7 @@ export default function DocumentRequest() {
                   >
                     Download all
                   </Button>
-                )} */}
+                )}
               </section>
 
               <section className="grid grid-cols-2 gap-3">
@@ -542,7 +658,7 @@ export default function DocumentRequest() {
                             className="cursor-pointer"
                             onClick={() => {
                               window.location.href =
-                                route("download-document") +
+                                "download-doc-api-endpoint" +
                                 "?path=" +
                                 encodeURIComponent(item.path);
                             }}
@@ -557,7 +673,7 @@ export default function DocumentRequest() {
                   <p>Nothing here</p>
                 )}
 
-                {/* {data?.status == "processing" && (
+                {data?.status == "processing" && (
                   <div className="flex items-center">
                     <Button
                       size="sm"
@@ -565,38 +681,45 @@ export default function DocumentRequest() {
                       onClick={() => {
                         fileUploadDisclosure.onOpen();
                       }}
+                      startContent={<PlusIcon />}
                     >
-                      <PlusIcon />
                       Upload Document
                     </Button>
                   </div>
-                )} */}
+                )}
               </section>
             </div>
           </div>
 
           <div className="flex items-center gap-3 justify-end">
             <Button
-              // className="w-1/2"
               size="sm"
               color="default"
               onClick={() => {
                 setOpenDrawer(false);
-                reset();
+                setData(null);
               }}
             >
               Close
             </Button>
 
-            {data?.status !== "created" && data?.status !== "received" && (
+            {data?.status !== "created" && data?.status !== "completed" && (
               <Button
                 color="secondary"
                 className="font-montserrat font-semibold w-1/2"
                 // isLoading={processing}
-                type="submit"
                 size="sm"
                 onClick={() => {
-                  console.log("submit");
+                  changeStatusDisclosure.onOpen();
+                  // setData((prev) => ({
+                  //   ...prev,
+                  //   status:
+                  // data?.status == "submitted"
+                  //   ? "received"
+                  //   : data?.status == "received"
+                  //   ? "processing"
+                  //   : "completed",
+                  // }));
                 }}
               >
                 {data?.status === "submitted"
@@ -612,170 +735,157 @@ export default function DocumentRequest() {
         </div>
       </Drawer>
 
-      {/* <Modal
-                isOpen={fileUploadDisclosure.isOpen}
-                onOpenChange={fileUploadDisclosure.onOpenChange}
-                isDismissable={false}
-                isKeyboardDismissDisabled={true}
-                className="z-[99]"
-                backdrop="blur"
-            >
-                <ModalContent>
-                    {(onClose) => (
-                        <>
-                            <ModalHeader className="flex flex-col gap-1">
-                                Upload Documents
-                            </ModalHeader>
-                            <ModalBody>
-                                <div>
-                                    <div className="sticky top-0 z-50 bg-white dark:bg-slate-900 pb-5">
-                                        <div className="border-2 border-primary shadow-sm rounded-xl p-4 bg-gray-50 dark:bg-slate-900">
-                                            <div
-                                                className={`p-3 border-2 border-dashed rounded-lg ${
-                                                    dragActive
-                                                        ? "border-blue-400 bg-blue-50"
-                                                        : "border-gray-300"
-                                                }`}
-                                            >
-                                                <input
-                                                    type="file"
-                                                    multiple
-                                                    id="file-upload"
-                                                    name="document"
-                                                    className="hidden"
-                                                    onChange={handleChange}
-                                                    accept=".pdf,.docx,.doc,.txt,.xlsx,.xls"
-                                                />
+      <Modal
+        isOpen={fileUploadDisclosure.isOpen}
+        onOpenChange={fileUploadDisclosure.onOpenChange}
+        isDismissable={false}
+        isKeyboardDismissDisabled={true}
+        className="z-[99]"
+        backdrop="blur"
+      >
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1">
+                Upload Documents
+              </ModalHeader>
+              <ModalBody>
+                <div>
+                  <div className="sticky top-0 z-50 bg-white dark:bg-slate-900 pb-5">
+                    <div className="border-2 border-primary shadow-sm rounded-xl p-4 bg-gray-50 dark:bg-slate-900">
+                      <div
+                        className={`p-3 border-2 border-dashed rounded-lg ${
+                          dragActive
+                            ? "border-blue-400 bg-blue-50"
+                            : "border-gray-300"
+                        }`}
+                      >
+                        <input
+                          type="file"
+                          multiple
+                          id="file-upload"
+                          name="document"
+                          className="hidden"
+                          onChange={handleChange}
+                          accept=".pdf,.docx,.doc,.txt,.xlsx,.xls"
+                        />
 
-                                                {data.documents &&
-                                                data.documents.length > 0 ? (
-                                                    <div className="flex flex-col">
-                                                        {data.documents.map(
-                                                            (
-                                                                file,
-                                                                index: number
-                                                            ) => (
-                                                                <label
-                                                                    key={index}
-                                                                    htmlFor="file-upload"
-                                                                    className="flex items-center cursor-pointer mb-2"
-                                                                >
-                                                                    <p className="flex items-center text-base font-semibold text-slate-600 dark:text-slate-200">
-                                                                        <span className="mr-2">
-                                                                            {getFileIcon(
-                                                                                file.type
-                                                                            )}
-                                                                        </span>
-                                                                        {
-                                                                            file.name
-                                                                        }
-                                                                    </p>
-                                                                </label>
-                                                            )
-                                                        )}
-                                                    </div>
-                                                ) : (
-                                                    <label
-                                                        htmlFor="file-upload"
-                                                        className="flex items-center justify-center h-full py-0 text-center cursor-pointer gap-x-2"
-                                                    >
-                                                        <svg
-                                                            className="w-8 h-8 text-primary"
-                                                            fill="none"
-                                                            stroke="currentColor"
-                                                            viewBox="0 0 24 24"
-                                                            xmlns="http://www.w3.org/2000/svg"
-                                                        >
-                                                            <path
-                                                                strokeLinecap="round"
-                                                                strokeLinejoin="round"
-                                                                strokeWidth="2"
-                                                                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-                                                            ></path>
-                                                        </svg>
-                                                        <div className="text-left">
-                                                            <p className="text-sm text-slate-600 dark:text-slate-300">
-                                                                Click to select
-                                                                or attach
-                                                                documents
-                                                            </p>
-                                                            <p className="text-xs text-slate-600 dark:text-slate-300">
-                                                                (PDF, DOCX,
-                                                                XLSX, or Text
-                                                                files only)
-                                                            </p>
-                                                        </div>
-                                                    </label>
-                                                )}
-                                                {dragActive && (
-                                                    <div
-                                                        className="absolute inset-0 z-50"
-                                                        onDragEnter={handleDrag}
-                                                        onDragLeave={handleDrag}
-                                                        onDragOver={handleDrag}
-                                                        onDrop={handleDrop}
-                                                    ></div>
-                                                )}
-                                            </div>
-                                            {errors.documents && (
-                                                <small className="mt-2 text-sm text-danger">
-                                                    {errors.documents}
-                                                </small>
-                                            )}
-                                        </div>
-                                    </div>
-                                </div>
-                            </ModalBody>
-                            <ModalFooter>
-                                <Button
-                                    color="danger"
-                                    variant="light"
-                                    onPress={onClose}
-                                >
-                                    Close
-                                </Button>
-                                <Button
-                                    color="danger"
-                                    onClick={() => {
-                                        post(route("upload-document"), {
-                                            data,
-                                            preserveState: true,
-                                            preserveScroll: true,
-                                            onSuccess: () => {
-                                                fileUploadDisclosure.onClose();
-                                                // setOpenDrawer(false);
-                                                setData((prev) => ({
-                                                    ...prev,
-                                                    documents: null,
-                                                }));
-                                                // router.reload({ only: [""] });
-                                            },
-                                            onError: (error) => {
-                                                // setError(error);
-                                                // setData(
-                                                //     "file_id",
-                                                //     error.file_id
-                                                // );
-                                                // if (
-                                                //     error?.type ===
-                                                //     "duplicate"
-                                                // ) {
-                                                //     setFileName(
-                                                //         error.file_name
-                                                //     );
-                                                //     fileUploadDisclosure.onOpen();
-                                                // }
-                                            },
-                                        });
-                                    }}
-                                >
-                                    Upload Documents
-                                </Button>
-                            </ModalFooter>
-                        </>
-                    )}
-                </ModalContent>
-            </Modal> */}
+                        {data.documents && data.documents.length > 0 ? (
+                          <div className="flex flex-col">
+                            {data.documents.map((file, index) => (
+                              <label
+                                key={index}
+                                htmlFor="file-upload"
+                                className="flex items-center cursor-pointer mb-2"
+                              >
+                                <p className="flex items-center text-base font-semibold text-slate-600 dark:text-slate-200">
+                                  <span className="mr-2">
+                                    {getFileIcon(file.type)}
+                                  </span>
+                                  {file.name}
+                                </p>
+                              </label>
+                            ))}
+                          </div>
+                        ) : (
+                          <label
+                            htmlFor="file-upload"
+                            className="flex items-center justify-center h-full py-0 text-center cursor-pointer gap-x-2"
+                          >
+                            <svg
+                              className="w-8 h-8 text-primary"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                              ></path>
+                            </svg>
+                            <div className="text-left">
+                              <p className="text-sm text-slate-600 dark:text-slate-300">
+                                Click to select or attach documents
+                              </p>
+                              <p className="text-xs text-slate-600 dark:text-slate-300">
+                                (PDF, DOCX, XLSX, or Text files only)
+                              </p>
+                            </div>
+                          </label>
+                        )}
+                        {dragActive && (
+                          <div
+                            className="absolute inset-0 z-50"
+                            onDragEnter={handleDrag}
+                            onDragLeave={handleDrag}
+                            onDragOver={handleDrag}
+                            onDrop={handleDrop}
+                          ></div>
+                        )}
+                      </div>
+                      {errors.documents && (
+                        <small className="mt-2 text-sm text-danger">
+                          {errors.documents}
+                        </small>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </ModalBody>
+              <ModalFooter>
+                <Button color="danger" variant="light" onPress={onClose}>
+                  Close
+                </Button>
+                <Button
+                  color="danger"
+                  onClick={() => {
+                    console.log("file upload endpoint");
+
+                    // post(route("upload-document"), {
+                    //     data,
+
+                    // });
+                  }}
+                >
+                  Upload Documents
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
+
+      <ConfirmModal
+        disclosure={changeStatusDisclosure}
+        title="Change Request Status"
+        onButtonClick={async () => {
+          const resss = await axios.posst(`/document-requests/${data}/status`, {
+            status:
+              data?.status == "submitted"
+                ? "received"
+                : data?.status == "received"
+                ? "processing"
+                : "completed",
+          });
+
+          console.log(resss);
+        }}
+      >
+        <p className="font-quicksand">
+          Are you sure to change status to{" "}
+          <span className="font-semibold">
+            {data?.status == "submitted"
+              ? "Received"
+              : data?.status == "received"
+              ? "Processing"
+              : "Complete Request"}
+          </span>
+          {/* {data?.status} */}?
+        </p>
+      </ConfirmModal>
     </AuthLayout>
   );
 }

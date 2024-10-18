@@ -12,7 +12,6 @@ import { AnalysisIcon } from "./icons/analysis";
 import SupportIcon from "./icons/support";
 import { FaUsers } from "react-icons/fa";
 import { MdAttachEmail } from "react-icons/md";
-//
 
 export const navLinks = [
   {
@@ -37,10 +36,10 @@ export const navLinks = [
         label: "Validation Requests",
         path: "/requests/validation-requests",
       },
-      {
-        label: "Verification Requests",
-        path: "/requests/verification-requests",
-      },
+      // {
+      //   label: "Verification Requests",
+      //   path: "/requests/verification-requests",
+      // },
     ],
   },
   {
@@ -116,46 +115,8 @@ export const navLinks = [
       //     path: "/supports/disputes",
       //     acl: ["view disputes"],
       // },
-      // {
-      //     label: "Feedback",
-      //     path: "/supports/feedback/general",
-      //     acl: ["view general feedback"],
-      // },
     ],
   },
-  // {
-  //   label: "Messages",
-  //   path: "/messages",
-  //   icon: <ChatIcon />,
-  //   acl: [
-  //     "view messages",
-  //     "view chat",
-  //     "view compose email",
-  //     "view scheduled emails",
-  //   ],
-  //   children: [
-  //     {
-  //       label: "Email Templates",
-  //       path: "/messages/email-templates",
-  //       acl: ["view email templates"],
-  //     },
-  //     // {
-  //     //     label: "Chat",
-  //     //     path: "/messages/chat",
-  //     //     acl: ["view chat"],
-  //     // },
-  //     // {
-  //     //     label: "Compose Email",
-  //     //     path: "/messages/compose-email",
-  //     //     acl: ["view compose email"],
-  //     // },
-  //     // {
-  //     //     label: "Scheduled Emails",
-  //     //     path: "/messages/scheduled-emails",
-  //     //     acl: ["view scheduled emails"],
-  //     // },
-  //   ],
-  // },
   // {
   //   label: "Security",
   //   path: "/security",
@@ -189,7 +150,6 @@ export const navLinks = [
   //       label: "Access Logs",
   //       path: "/security/access-logs",
   //       acl: ["view system logs"],
-
   //       //                 Purpose: Track access-related events, usually focused on authentication and authorization.
   //       // What It Logs:
   //       // User login attempts (successful or failed).
@@ -212,21 +172,6 @@ export const navLinks = [
   //       // User X changed the role of User Y from "Viewer" to "Admin" on October 10, 2024.
   //       // User Z updated the payment details for order #12345.
   //     },
-  //     // {
-  //     //     label: "Security Alerts",
-  //     //     path: "/security/suspicious-accounts",
-  //     //     acl: ["view suspicious accounts"],
-  //     // },
-  //     // {
-  //     //     label: "IP Blacklist",
-  //     //     path: "/security/ip-blacklist",
-  //     //     acl: ["view ip blacklist"],
-  //     // },
-  //     // {
-  //     //     label: "Security Logs",
-  //     //     path: "/security/security-logs",
-  //     //     acl: ["view security logs"],
-  //     // },
   //   ],
   // },
   // {
@@ -248,20 +193,6 @@ export const navLinks = [
   //       path: "/settings/general",
   //       acl: ["view settings"],
   //     },
-  //     {
-  //       label: "Temporary Insitutions",
-  //       path: "/settings/temporary-institutions",
-  //       acl: ["view temporary institutions"],
-  //     },
-  //     {
-  //       label: "Document Types",
-  //       path: "/settings/document-types",
-  //       acl: ["view document types"],
-  //     },
-  //     // {
-  //     //     label: "Finance",
-  //     //     path: "/settings/finance",
-  //     // },
   //     {
   //       label: "User Management",
   //       path: "/settings/user-management",
