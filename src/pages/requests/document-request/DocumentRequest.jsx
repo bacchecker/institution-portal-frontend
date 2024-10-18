@@ -23,6 +23,7 @@ import StatusChip from "@components/status-chip";
 import Drawer from "@components/Drawer";
 import CustomUser from "@components/custom-user";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import ClipIcon from "@assets/icons/clip";
 
 const ItemCard = ({ title, value }) => (
   <div className="grid grid-cols-5 w-full items-center">
@@ -46,9 +47,9 @@ export default function DocumentRequest() {
     (url) => axios.get(url).then((res) => res.data)
   );
 
-  console.log(resData?.documentRequests);
+  console.log(resData);
 
-  //         resData?.documentRequests,
+  //         resData,
   //     documentTypes,
   //     filters,
   const [dateRange, setDateRange] = useState({
@@ -193,6 +194,7 @@ export default function DocumentRequest() {
             "ID",
             "Institution",
             "Requested By",
+            "Delivery Address",
             "Date",
             "Documents",
             "Status",
@@ -200,8 +202,8 @@ export default function DocumentRequest() {
             "Payment Status",
             "",
           ]}
-          // loadingState={false}
-          page={resData?.documentRequests?.current_page}
+          loadingState={resData ? false : true}
+          page={resData?.current_page}
           setPage={(page) =>
             navigate(
               `?region=${filters.region || ""}&search_query=${
@@ -209,19 +211,17 @@ export default function DocumentRequest() {
               }&status=${filters.status || ""}&page=${page}`
             )
           }
-          totalPages={Math.ceil(
-            resData?.documentRequests?.total /
-              resData?.documentRequests?.per_page
-          )}
+          totalPages={Math.ceil(resData?.total / resData?.per_page)}
         >
-          {resData?.documentRequests?.data?.map((item) => (
+          {resData?.data?.map((item) => (
             <TableRow key={item?.id}>
               <TableCell className="font-semibold">
                 {item?.unique_code}
               </TableCell>
               <TableCell>
                 <div className="flex items-center gap-2 flex-wrap">
-                  <p>{item?.institution?.name}</p>
+                  {item?.institution?.name}
+                  <p></p>
                   {!item?.institution?.user_id && (
                     <Chip size="sm" variant="faded" color="warning">
                       Temporary
@@ -236,6 +236,7 @@ export default function DocumentRequest() {
                   email={`${item?.user?.email}`}
                 />
               </TableCell>
+              <TableCell>{item?.delivery_address}</TableCell>
               <TableCell>
                 {moment(item?.created_at).format("Do MMMM, YYYY")}
               </TableCell>
@@ -361,22 +362,22 @@ export default function DocumentRequest() {
             <div>
               <section className="mb-3 flex items-center justify-between">
                 <div className="flex gap-2 items-center">
-                  <p className="font-semibold ">Documents</p>
+                  <p className="font-semibold ">Requested Documents</p>
                 </div>
               </section>
 
-              <section className="grid grid-cols-2 gap-3">
+              <section className="grid grid-cols-3 gap-3">
                 {data?.records?.map((item) => (
                   <div
                     key={item?.id}
-                    className="gap-3 p-2 rounded-lg border dark:border-white/10"
+                    className="flex items-center gap-3 p-2 rounded-lg border dark:border-white/10"
                   >
-                    <div className="w-full flex flex-col ">
+                    <div className="w-full">
                       <p className="font-semibold">
                         {item?.document_type?.name}
                       </p>
 
-                      <div className="flex justify-between">
+                      <div className="flex justify-between items-center">
                         <p>
                           GH¢{" "}
                           {Math.floor(
@@ -385,123 +386,93 @@ export default function DocumentRequest() {
                                 item?.document_type?.printing_fee
                           ).toFixed(2)}
                         </p>
-
-                        <div className="flex gap-2 items-center">
-                          <Chip size="sm">{item?.file?.extension}</Chip>
-                          <p>{filesize(item?.file?.size ?? 1000)}</p>
-                        </div>
+                        <p className="text-xs">{item?.document_format}</p>
                       </div>
-
-                      <Button
-                        color="primary"
-                        size="sm"
-                        className="cursor-pointer ml-auto mt-2"
-                        onClick={() => {
-                          window.location.href =
-                            route("download-document") +
-                            "?path=" +
-                            encodeURIComponent(item?.file?.path);
-                        }}
-                      >
-                        Download
-                      </Button>
                     </div>
                   </div>
                 ))}
               </section>
             </div>
 
-            {/* <div>
-                            <section className="mb-3 flex items-center justify-between">
-                                <div className="flex gap-2 items-center">
-                                    <ClipIcon />
-                                    <p className="font-semibold ">Attachmets</p>
-                                </div>
+            <div>
+              <section className="mb-3 flex items-center justify-between">
+                <div className="flex gap-2 items-center">
+                  <ClipIcon />
+                  <p className="font-semibold ">Attachmets</p>
+                </div>
+                {/* 
+                {data?.files.length >= 1 && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    color="primary"
+                    isLoading={bulkDownloadLoading}
+                    isDisabled={bulkDownloadLoading}
+                    onClick={() => {
+                      setBulkDownloadLoading(true);
+                      handleBulkDownload(data.files.map((f) => f.path));
+                    }}
+                    startContent={<DownloadIcon />}
+                  >
+                    Download all
+                  </Button>
+                )} */}
+              </section>
 
-                                {data?.files?.length >= 1 && (
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        color="primary"
-                                        isLoading={bulkDownloadLoading}
-                                        isDisabled={bulkDownloadLoading}
-                                        onClick={() => {
-                                            setBulkDownloadLoading(true);
-                                            handleBulkDownload(
-                                                data.files.map(
-                                                    (f) => f.path
-                                                )
-                                            );
-                                        }}
-                                        startContent={<DownloadIcon />}
-                                    >
-                                        Download all
-                                    </Button>
-                                )}
-                            </section>
+              <section className="grid grid-cols-2 gap-3">
+                {data?.files.length >= 1 ? (
+                  data?.files?.map((item) => (
+                    <div
+                      key={item?.id}
+                      className="flex items-center gap-3 p-2 rounded-lg border dark:border-white/10"
+                    >
+                      {item?.extension === "pdf" ? (
+                        <PdfIcon className="size-11" color="red" />
+                      ) : (
+                        <WordIcon className="size-11" color="blue" />
+                      )}
+                      <div className="w-full">
+                        <p className="font-semibold line-clamp-2">
+                          {item?.name}
+                        </p>
 
-                            <section className="grid grid-cols-2 gap-3">
-                                {data?.files?.length >= 1 ? (
-                                    data?.files?.map((item) => (
-                                        <div
-                                            key={item?.id}
-                                            className="flex items-center gap-3 p-2 rounded-lg border dark:border-white/10"
-                                        >
-                                            {item?.extension === "pdf" ? (
-                                                <PdfIcon
-                                                    className="size-11"
-                                                    color="red"
-                                                />
-                                            ) : (
-                                                <WordIcon
-                                                    className="size-11"
-                                                    color="blue"
-                                                />
-                                            )}
-                                            <div className="w-full">
-                                                <p className="font-semibold line-clamp-2">
-                                                    {item?.name}
-                                                </p>
+                        <div className="flex justify-between">
+                          <p>{filesize(item.size)}</p>
+                          <p
+                            className="cursor-pointer"
+                            onClick={() => {
+                              window.location.href =
+                                route("download-document") +
+                                "?path=" +
+                                encodeURIComponent(item.path);
+                            }}
+                          >
+                            Download
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <p>Nothing here</p>
+                )}
 
-                                                <div className="flex justify-between">
-                                                    <p>{filesize(item.size)}</p>
-                                                    <p
-                                                        className="cursor-pointer"
-                                                        onClick={() => {
-                                                            window.location.href =
-                                                                route(
-                                                                    "download-document"
-                                                                ) +
-                                                                "?path=" +
-                                                                encodeURIComponent(
-                                                                    item.path
-                                                                );
-                                                        }}
-                                                    >
-                                                        Download
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    ))
-                                ) : (
-                                    <p>Nothing here</p>
-                                )}
-
-                                <div className="flex items-center">
-                                    <Button
-                                        size="sm"
-                                        color="danger"
-                                        onClick={() => {
-                                            fileUploadDisclosure.onOpen();
-                                        }}
-                                    >
-                                        <PlusIcon />
-                                        Upload Document
-                                    </Button>
-                                </div>
-                            </section>
-                        </div> */}
+                {/* {data?.status == "processing" && (
+                  <div className="flex items-center">
+                    <Button
+                      size="sm"
+                      color="danger"
+                      onClick={() => {
+                        fileUploadDisclosure.onOpen();
+                      }}
+                    >
+                      <PlusIcon />
+                      Upload Document
+                    </Button>
+                  </div>
+                )} */}
+              </section>
+            </div>
           </div>
 
           <div className="flex items-center gap-3 justify-end">
@@ -511,21 +482,32 @@ export default function DocumentRequest() {
               color="default"
               onClick={() => {
                 setOpenDrawer(false);
-                // reset();
+                reset();
               }}
             >
               Close
             </Button>
 
-            <Button
-              color="danger"
-              className="font-montserrat font-semibold w-1/2"
-              //       isLoading={processing}
-              type="submit"
-              size="sm"
-            >
-              Turn In Document
-            </Button>
+            {data?.status !== "created" && data?.status !== "received" && (
+              <Button
+                color="secondary"
+                className="font-montserrat font-semibold w-1/2"
+                // isLoading={processing}
+                type="submit"
+                size="sm"
+                onClick={() => {
+                  console.log("submit");
+                }}
+              >
+                {data?.status === "submitted"
+                  ? "Acknowledge Request"
+                  : data?.status === "received"
+                  ? "Process Request"
+                  : data?.status == "processing"
+                  ? "Complete Request"
+                  : "Acknowledge Request"}
+              </Button>
+            )}
           </div>
         </div>
       </Drawer>
@@ -566,9 +548,9 @@ export default function DocumentRequest() {
                                                 />
 
                                                 {data.documents &&
-                                                data?.documents?.length > 0 ? (
+                                                data.documents.length > 0 ? (
                                                     <div className="flex flex-col">
-                                                        {data?.documents?.map(
+                                                        {data.documents.map(
                                                             (
                                                                 file,
                                                                 index: number

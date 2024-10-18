@@ -1,4 +1,5 @@
-const { nextui } = require("@nextui-org/react");
+import defaultTheme from "tailwindcss/defaultTheme";
+import { nextui } from "@nextui-org/react";
 
 /** @type {import('tailwindcss').Config} */
 
@@ -12,8 +13,7 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        lato: ["Lato", "sans-serif"],
-        figtree: ["Figtree", "sans-serif"],
+        sans: ["Figtree", ...defaultTheme.fontFamily.sans],
       },
 
       colors: {
