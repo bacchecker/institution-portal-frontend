@@ -33,7 +33,7 @@ class DocumentRequest extends Component {
       }, 0);
     } else if (profileComplete == "no") {
       setTimeout(() => {
-        this.props.navigate("/complete-profile");
+        this.props.navigate("/account-setup/profile");
         return;
       }, 0);
     } else {

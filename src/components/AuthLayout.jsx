@@ -26,10 +26,6 @@ export default function AuthLayout({ children, title = "Page Title" }) {
   const [accessibleRoutes, setAccessibleRoutes] = useState([]);
   const { isAuthenticated, user, institution } = useAuthStore();
 
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
-  }
-
   useEffect(() => {
     setIsDesktopExpanded(
       localStorage.getItem("isDesktopExpanded") === "true"
@@ -105,19 +101,9 @@ export default function AuthLayout({ children, title = "Page Title" }) {
     setAccessibleRoutes(filteredRoutes);
   }, [institution]);
 
-  // const fetchUserData = async () => {
-  //   try {
-  //     const response = await axios.get("/institution/user-data");
-  //     const userData = response.data.userData;
-  //     // console.log({ userData });
-
-  //     if (userData) {
-  //       // setUser(institutionData);
-  //     }
-  //   } catch (error) {
-  //     //   toast.error(error.response.data.message);
-  //   }
-  // };
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
 
   return (
     <AnimatePresence>
