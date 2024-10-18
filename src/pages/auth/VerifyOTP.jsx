@@ -1,14 +1,14 @@
 import React, { Component, useRef, useState } from "react";
-import axios from "../../axiosConfig";
 import { toast } from "react-hot-toast";
 import { Navigate, useNavigate } from "react-router-dom";
+import axios from "@utils/axiosConfig";
 import {
   InputOTP,
   InputOTPGroup,
   InputOTPSeparator,
   InputOTPSlot,
-} from "../../components/input-otp";
-import useAuthStore from "../../store/authStore";
+} from "@components/input-otp";
+import useAuthStore from "@store/authStore";
 
 const VerifyOTP = () => {
   const [otp, setOtp] = useState();

@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
-import withRouter from "../components/withRouter";
-import CustomTable from "../components/CustomTable";
-import Drawer from "../components/Drawer";
+import CustomTable from "@components/CustomTable";
+import Drawer from "@components/Drawer";
 import {
   Button,
   Card,
@@ -19,12 +18,12 @@ import {
   useDisclosure,
 } from "@nextui-org/react";
 import { IoSearch } from "react-icons/io5";
-import axios from "../axiosConfig";
-import Elipsis from "../assets/icons/elipsis";
-import DeleteModal from "../components/DeleteModal";
+import axios from "@utils/axiosConfig";
+import Elipsis from "@assets/icons/elipsis";
+import DeleteModal from "@components/DeleteModal";
 import toast from "react-hot-toast";
-import AuthLayout from "../components/AuthLayout";
-import useAuthStore from "../store/authStore";
+import AuthLayout from "@components/AuthLayout";
+import useAuthStore from "@store/authStore";
 import useSWR from "swr";
 
 const PaymentRevenueSetup = () => {

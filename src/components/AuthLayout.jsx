@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import axios from "../axiosConfig";
+import axios from "@utils/axiosConfig";
 //     import { toast, Toaster } from "sonner";
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -13,11 +13,11 @@ import {
   PopoverTrigger,
   User,
 } from "@nextui-org/react";
-import BellIcon from "../assets/icons/bell";
+import BellIcon from "@assets/icons/bell";
 import ThemeSwitcher from "./ThemeSwitcher";
-import { navLinks } from "../assets/constants";
+import { navLinks } from "@assets/constants";
 import { Link, Navigate, useLocation } from "react-router-dom";
-import useAuthStore from "../store/authStore";
+import useAuthStore from "@store/authStore";
 
 export default function AuthLayout({ children, title = "Page Title" }) {
   const [isDesktopExpanded, setIsDesktopExpanded] = useState(true);

@@ -4,7 +4,7 @@ import React, {
   useImperativeHandle,
   forwardRef,
 } from "react";
-import axios from "../../axiosConfig";
+import axios from "@utils/axiosConfig";
 import { IoIosMail } from "react-icons/io";
 import { BsSendCheck } from "react-icons/bs";
 import { FaPhoneVolume } from "react-icons/fa";

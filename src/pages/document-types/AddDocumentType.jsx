@@ -1,12 +1,12 @@
 import React, { Component } from "react";
-import axios from "../../axiosConfig";
+import axios from "@utils/axiosConfig";
 import { toast } from "react-hot-toast";
 import { RiInformation2Fill } from "react-icons/ri";
 import { IoMdAdd, IoMdClose } from "react-icons/io";
-import Spinner from "../../components/Spinner";
+import Spinner from "@components/Spinner";
 import { MdClose } from "react-icons/md";
-import Textarea from "../../components/Textarea";
-import Textbox from "../../components/Textbox";
+import Textarea from "@components/Textarea";
+import Textbox from "@components/Textbox";
 
 class AddDocumentType extends Component {
   constructor(props) {
@@ -21,12 +21,12 @@ class AddDocumentType extends Component {
       isSaving: false,
       isDeleting: false,
       addNewModal: false,
-      name: '',
-      description: '',
-      base_fee: '',
-      printing_fee: '',
-      validation_fee: '',
-      verification_fee: '',
+      name: "",
+      description: "",
+      base_fee: "",
+      printing_fee: "",
+      validation_fee: "",
+      verification_fee: "",
     };
 
     // Binding methods
@@ -78,23 +78,23 @@ class AddDocumentType extends Component {
     }
   } */
 
-    fetchDocumentTypes = () => {
+  fetchDocumentTypes = () => {
     const { search } = this.state;
-    this.setState({ isLoading: true })
-    axios.get(`/institution/available-document-types`, {
-    })
-    .then( response => {
+    this.setState({ isLoading: true });
+    axios
+      .get(`/institution/available-document-types`, {})
+      .then((response) => {
         this.setState({
-            availableDocumentTypes: response.data.data.available_types,
-            institutionDocumentTypes: response.data.data.institution_doc_types,
+          availableDocumentTypes: response.data.data.available_types,
+          institutionDocumentTypes: response.data.data.institution_doc_types,
         });
-        
-        this.setState({ isLoading: false })
-    })
-    .catch((error) => {
+
+        this.setState({ isLoading: false });
+      })
+      .catch((error) => {
         console.error(error);
-        this.setState({ isLoading: false })
-    });
+        this.setState({ isLoading: false });
+      });
   };
 
   handleSearchAvailableNameChange(event) {
@@ -107,16 +107,16 @@ class AddDocumentType extends Component {
 
   toggleAddNewModal = () => {
     this.setState({ addNewModal: !this.state.addNewModal });
-  }
+  };
 
   handleInputChange = (event) => {
     const { name, value } = event.target;
 
-    this.setState(prevState => ({
-        ...prevState,
+    this.setState((prevState) => ({
+      ...prevState,
       [name]: value,
     }));
-}
+  };
 
   handleCheckboxChange(id) {
     this.setState((prevState) => {
@@ -185,38 +185,45 @@ class AddDocumentType extends Component {
     }
   }
 
-  handleClear = () =>{
-    this.state.name = ''
-    this.state.description = ''
+  handleClear = () => {
+    this.state.name = "";
+    this.state.description = "";
   };
 
   handleAddNew = async (event) => {
     event.preventDefault();
-    this.setState({isSaving: true})
-    const { name, description, base_fee, printing_fee, validation_fee, verification_fee } = this.state;
-  
+    this.setState({ isSaving: true });
+    const {
+      name,
+      description,
+      base_fee,
+      printing_fee,
+      validation_fee,
+      verification_fee,
+    } = this.state;
+
     try {
-      const response = await axios.post('/institution/add-document-type', {
-        name,                   
-        description,            
-        base_fee,            
-        printing_fee,            
-        validation_fee,            
-        verification_fee,            
+      const response = await axios.post("/institution/add-document-type", {
+        name,
+        description,
+        base_fee,
+        printing_fee,
+        validation_fee,
+        verification_fee,
       });
-  
+
       if (response.status === 201) {
         toast.success(response.data.message);
       }
-      this.setState({isSaving: false})
+      this.setState({ isSaving: false });
       this.fetchDocumentTypes();
-      this.handleClear(); 
+      this.handleClear();
       this.toggleAddNewModal();
     } catch (error) {
       toast.error(error.response.data.message);
-      this.setState({isSaving: false})
+      this.setState({ isSaving: false });
     }
-};
+  };
 
   render() {
     const {
@@ -509,94 +516,98 @@ class AddDocumentType extends Component {
         </div>
         {addNewModal && (
           <div className="fixed z-50 inset-0 bg-black bg-opacity-60 flex justify-end">
-              <form onSubmit={this.handleAddNew} className="w-1/2 lg:w-1/3 xl:w-[28%] h-full bg-white shadow-lg transition-transform duration-700 ease-in-out transform"
-                  style={{ right: 0, position: 'absolute', transform: addNewModal ? 'translateX(0)' : 'translateX(100%)' }}
-              >
-                  <div className="flex justify-between items-center font-medium border-b-2 p-4">
-                      <h2 className="text-lg">Add New Document Type</h2>
-                      <button
-                          onClick={this.toggleAddNewModal}
-                          className="flex items-center justify-center h-8 w-8 bg-red-200 rounded-md"
-                      >
-                          <MdClose size={20} className="text-red-600" />
-                      </button>
-                  </div>
-          
-                  <div className="relative flex flex-col space-y-7 px-4 py-6 overflow-y-auto h-[calc(100%-4rem)]">
-                      <Textbox
-                        label="Name"
-                        name="name"
-                        value={this.state.name}
-                        onChange={this.handleInputChange}
-                      />
-                      <Textarea
-                          label="Description"
-                          name="description"
-                          value={this.state.description}
-                          onChange={this.handleInputChange}
-                      />
-                      <Textbox
-                          label="Document Validation Fee"
-                          name="validation_fee"
-                          type="number"
-                          value={this.state.validation_fee}
-                          onChange={this.handleInputChange}
-                      />
-                      <Textbox
-                          label="Document Verification Fee"
-                          name="verification_fee"
-                          type="number"
-                          value={this.state.verification_fee}
-                          onChange={this.handleInputChange}
-                      />
-                      <Textbox
-                          label="Document Requisition Fee"
-                          name="base_fee"
-                          type="number"
-                          value={this.state.base_fee}
-                          onChange={this.handleInputChange}
-                      />
-                      <Textbox
-                          label="Printing Fee"
-                          name="printing_fee"
-                          type="number"
-                          value={this.state.printing_fee}
-                          onChange={this.handleInputChange}
-                      />
-                      
+            <form
+              onSubmit={this.handleAddNew}
+              className="w-1/2 lg:w-1/3 xl:w-[28%] h-full bg-white shadow-lg transition-transform duration-700 ease-in-out transform"
+              style={{
+                right: 0,
+                position: "absolute",
+                transform: addNewModal ? "translateX(0)" : "translateX(100%)",
+              }}
+            >
+              <div className="flex justify-between items-center font-medium border-b-2 p-4">
+                <h2 className="text-lg">Add New Document Type</h2>
+                <button
+                  onClick={this.toggleAddNewModal}
+                  className="flex items-center justify-center h-8 w-8 bg-red-200 rounded-md"
+                >
+                  <MdClose size={20} className="text-red-600" />
+                </button>
+              </div>
 
-                      <div className="w-full absolute bottom-4 right-0 flex space-x-4 px-4">
-                          <button
-                              onClick={this.toggleAddNewModal}
-                              type="button"
-                              className="text-xs w-1/2 text-gray-600 border px-4 py-1.5 rounded-full"
-                          >
-                              Close
-                          </button>
-                          <button
-                              type="submit"
-                              disabled={isSaving}
-                              className={`w-1/2 flex items-center justify-center rounded-full ${
-                                  isSaving ? 'bg-gray-400 text-gray-700' : 'bg-buttonLog text-white'
-                              } py-1.5 text-xs ${isSaving ? 'cursor-not-allowed' : ''}`}
-                          >
-                              {isSaving ? (
-                                  <>
-                                      <Spinner size="w-4 h-4 mr-2"/>
-                                      Saving...
-                                  </>
-                              ) : (
-                                  'Save'
-                              )}
-                          </button>
-                      </div>   
-                  </div>
-          
-                  
-              </form>
+              <div className="relative flex flex-col space-y-7 px-4 py-6 overflow-y-auto h-[calc(100%-4rem)]">
+                <Textbox
+                  label="Name"
+                  name="name"
+                  value={this.state.name}
+                  onChange={this.handleInputChange}
+                />
+                <Textarea
+                  label="Description"
+                  name="description"
+                  value={this.state.description}
+                  onChange={this.handleInputChange}
+                />
+                <Textbox
+                  label="Document Validation Fee"
+                  name="validation_fee"
+                  type="number"
+                  value={this.state.validation_fee}
+                  onChange={this.handleInputChange}
+                />
+                <Textbox
+                  label="Document Verification Fee"
+                  name="verification_fee"
+                  type="number"
+                  value={this.state.verification_fee}
+                  onChange={this.handleInputChange}
+                />
+                <Textbox
+                  label="Document Requisition Fee"
+                  name="base_fee"
+                  type="number"
+                  value={this.state.base_fee}
+                  onChange={this.handleInputChange}
+                />
+                <Textbox
+                  label="Printing Fee"
+                  name="printing_fee"
+                  type="number"
+                  value={this.state.printing_fee}
+                  onChange={this.handleInputChange}
+                />
+
+                <div className="w-full absolute bottom-4 right-0 flex space-x-4 px-4">
+                  <button
+                    onClick={this.toggleAddNewModal}
+                    type="button"
+                    className="text-xs w-1/2 text-gray-600 border px-4 py-1.5 rounded-full"
+                  >
+                    Close
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isSaving}
+                    className={`w-1/2 flex items-center justify-center rounded-full ${
+                      isSaving
+                        ? "bg-gray-400 text-gray-700"
+                        : "bg-buttonLog text-white"
+                    } py-1.5 text-xs ${isSaving ? "cursor-not-allowed" : ""}`}
+                  >
+                    {isSaving ? (
+                      <>
+                        <Spinner size="w-4 h-4 mr-2" />
+                        Saving...
+                      </>
+                    ) : (
+                      "Save"
+                    )}
+                  </button>
+                </div>
+              </div>
+            </form>
           </div>
-      
-      )}
+        )}
       </>
     );
   }

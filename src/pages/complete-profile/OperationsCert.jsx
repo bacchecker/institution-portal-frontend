@@ -1,10 +1,10 @@
 import React, { Component } from "react";
 import toast from "react-hot-toast";
-import Textbox from "../../components/Textbox";
-import Spinner from "../../components/Spinner";
+import Textbox from "@components/Textbox";
+import Spinner from "@components/Spinner";
 import { FaAnglesRight } from "react-icons/fa6";
-import axios from "../../axiosConfig";
-import AuthLayout from "../../components/AuthLayout";
+import axios from "@utils/axiosConfig";
+import AuthLayout from "@components/AuthLayout";
 
 class OperationsCert extends Component {
   constructor(props) {

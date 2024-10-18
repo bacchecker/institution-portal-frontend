@@ -1,6 +1,6 @@
 import React, { Component } from "react";
-import Stepper from "../components/Stepper";
-import AuthLayout from "../components/AuthLayout";
+import Stepper from "@components/Stepper";
+import AuthLayout from "@components/AuthLayout";
 import { Card, CardBody } from "@nextui-org/react";
 
 class CompleteProfile extends Component {

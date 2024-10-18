@@ -2,13 +2,13 @@ import React, { Component, createRef } from "react";
 import SunEditor from "suneditor-react";
 import "suneditor/dist/css/suneditor.min.css";
 import Handlebars from "handlebars";
-import axios from "../../axiosConfig";
+import axios from "@utils/axiosConfig";
 import toast from "react-hot-toast";
 import { IoIosMail } from "react-icons/io";
 import { BsSendCheck } from "react-icons/bs";
 import { FaPhoneVolume } from "react-icons/fa6";
-import Spinner from "../../components/Spinner";
-import AuthLayout from "../../components/AuthLayout";
+import Spinner from "@components/Spinner";
+import AuthLayout from "@components/AuthLayout";
 
 class InstitutionLetter extends Component {
   constructor(props) {

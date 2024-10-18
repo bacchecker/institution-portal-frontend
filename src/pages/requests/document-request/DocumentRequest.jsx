@@ -1,12 +1,12 @@
 import React, { Component } from "react";
-import axios from "../../axiosConfig";
+import axios from "@utils/axiosConfig";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { LuMoreVertical } from "react-icons/lu";
 import { toast } from "react-hot-toast";
-import withRouter from "../../components/withRouter";
+import withRouter from "@components/withRouter";
 import { FaRegFolderOpen } from "react-icons/fa6";
 import { NavLink } from "react-router-dom";
-import AuthLayout from "../../components/AuthLayout";
+import AuthLayout from "@components/AuthLayout";
 class DocumentRequest extends Component {
   constructor(props) {
     super(props);
