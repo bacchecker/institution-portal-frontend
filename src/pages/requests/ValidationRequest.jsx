@@ -22,6 +22,7 @@ import axios from "@utils/axiosConfig";
 import StatusChip from "@components/status-chip";
 import Drawer from "@components/Drawer";
 import CustomUser from "@components/custom-user";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 const ItemCard = ({ title, value }) => (
   <div className="grid grid-cols-5 w-full items-center">
@@ -38,9 +39,12 @@ export default function ValidationRequest() {
   });
   const [openDrawer, setOpenDrawer] = useState(false);
   const [data, setData] = useState(null);
+  const navigate = useNavigate();
+
+  // .get(`/institution/requests/document-requests`, {
 
   const { data: documentRequests, error } = useSWR(
-    "/institution/document-requests",
+    "/institution/requests/validation-requests",
     (url) => axios.get(url).then((res) => res.data)
   );
 
@@ -198,14 +202,12 @@ export default function ValidationRequest() {
           ]}
           // loadingState={false}
           page={documentRequests?.current_page}
-          setPage={
-            (page) => console.log("sss")
-
-            //     router.get(
-            //       `?region=${filters.region || ""}&search_query=${
-            //         filters.search_query || ""
-            //       }&status=${filters.status || ""}&page=${page}`
-            //     )
+          setPage={(page) =>
+            navigate(
+              `?region=${filters.region || ""}&search_query=${
+                filters.search_query || ""
+              }&status=${filters.status || ""}&page=${page}`
+            )
           }
           totalPages={Math.ceil(
             documentRequests?.total / documentRequests?.per_page
