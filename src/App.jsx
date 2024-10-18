@@ -22,6 +22,7 @@ import { Button } from "@nextui-org/react";
 import ValidationRequest from "./pages/requests/ValidationRequest";
 import DocumentRequest from "./pages/requests/document-request/DocumentRequest";
 import DocumentDetails from "./pages/requests/document-request/DocumentDetails";
+import TermsConditions from "./pages/complete-profile/TermsConditions";
 
 const App = () => {
   const navigate = useNavigate();
@@ -48,6 +49,7 @@ const App = () => {
         <Route path="/account-setup" element={<Outlet />}>
           <Route path="profile" element={<InstitutionData />} />
           <Route path="institution-teams" element={<InstitutionTeams />} />
+          <Route path="terms-conditions" element={<TermsConditions />} />
           <Route path="operations-certificate" element={<OperationsCert />} />
           <Route path="letter-templates" element={<InstitutionLetter />} />
 

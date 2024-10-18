@@ -14,6 +14,7 @@ import {
   SelectItem,
   TableCell,
   TableRow,
+  Textarea,
 } from "@nextui-org/react";
 import CustomTable from "@components/CustomTable";
 import useSWR from "swr";
@@ -24,6 +25,9 @@ import Drawer from "@components/Drawer";
 import CustomUser from "@components/custom-user";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import ClipIcon from "@assets/icons/clip";
+import { IoDocumentText } from "react-icons/io5";
+import { FaRegNoteSticky } from "react-icons/fa6";
+import { FaUser } from "react-icons/fa";
 
 const ItemCard = ({ title, value }) => (
   <div className="grid grid-cols-5 w-full items-center">
@@ -302,8 +306,114 @@ export default function DocumentRequest() {
         classNames="w-[100vw] md:w-[50vw]"
       >
         <div className="h-full flex flex-col justify-between">
-          <div className="flex flex-col gap-11 mb-6">
-            <div className="grid grid-cols-2 gap-2 gap-y-4">
+          <div className="flex flex-col gap-2 mb-6">
+            <div className="">
+              <div className="flex space-x-2 items-center">
+                <p className="font-semibold">
+                  Unique Code:{" "}
+                  <span className="uppercase">
+                    {data?.unique_code}
+                  </span>
+                </p>
+                <div
+                  className={`flex items-center border px-4 py-1 rounded-full text-xs uppercase ${
+                    data?.payment_status == "paid"
+                      ? "bg-green-200 border-green-600 text-green-600"
+                      : "bg-gray-200 border-gray-600 text-gray-600"
+                  }`}
+                >
+                  {data?.payment_status}
+                </div>
+              </div>
+              <p className="text-sm">
+                {moment(data?.created_at).format("Do MMMM, YYYY")}
+              </p>
+            </div>
+            <div className="mb-2">
+              <div className="border rounded-lg p-4 text-sm flex space-x-4">
+                <div className="flex items-center justify-center w-12 h-12 bg-gray-100  text-gray-700 shadow-md shadow-gray-400 rounded-full">
+                    <FaUser size={20} />
+                </div>
+                <div className="">
+                  <p className="font-bold mb-2 text-base">Applicant Info:</p>
+                  <div className="grid grid-cols-5 gap-1">
+                    <p className="font-semibold">Name:</p>
+                    <p className="col-span-4">
+                      {data?.user.first_name}{" "}
+                      {data?.user.last_name}
+                    </p>
+                  </div>
+                  <div className="grid grid-cols-5 gap-1 my-1">
+                    <p className="font-semibold">Email:</p>
+                    <p className="col-span-4">{data?.user.email}</p>
+                  </div>
+                  <div className="grid grid-cols-5 gap-1">
+                    <p className="font-semibold">Phone:</p>
+                    <p className="col-span-4">{data?.user.phone}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="border rounded-lg p-4 mb-2">
+              <p className="font-bold mb-1">Document Request Summary:</p>
+              <ItemCard
+                title="Status"
+                value={<StatusChip status={data?.status} />}
+              />
+              <div className="w-full flex px-2">
+                  
+                  
+                  {data?.records?.map((item, index) => (
+                    <div key={index} className="w-full grid grid-cols-2 xl:grid-cols-3 gap-2">
+                      {/* Document type and description */}
+                      <div className="col-span-2 flex items-center space-x-4 w-full">
+                        <div className="flex items-center justify-center text-gray-700 bg-gray-100 rounded-full w-12 h-12 shadow-md shadow-gray-400">
+                          <IoDocumentText size={30} />
+                        </div>
+                        <div>
+                          <p className="font-medium text-gray-700">
+                            {item?.document_type.name}
+                          </p>
+                          <p className="text-sm text-gray-500">
+                            {item?.document_type.description}
+                          </p>
+                        </div>
+                      </div>
+                      
+                      {/* Copies, Format, and Total Amount */}
+                      <div className="text-sm font-semibold text-gray-700">
+                        <div className="grid grid-cols-2 gap-2">
+                          <p className="">Copies:</p>
+                          <p className="">{item?.number_of_copies}</p>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2">
+                          <p className="">Format:</p>
+                          <p className="">
+                            {item?.document_type.document_format === "soft_copy"
+                              ? "Soft Copy"
+                              : "Hard Copy"}
+                          </p>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2">
+                          <p className="">Total Amt:</p>
+                          <p>
+                            GH¢{" "}
+                            {Math.floor(
+                              item?.document_type?.base_fee +
+                                item?.number_of_copies *
+                                  item?.document_type?.printing_fee
+                            ).toFixed(2)}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+
+            </div>
+
+            
+            {/* <div className="grid grid-cols-2 gap-2 gap-y-4">
               <ItemCard title="Request ID" value={data?.unique_code} />
               <ItemCard
                 title="Status"
@@ -347,9 +457,9 @@ export default function DocumentRequest() {
               />
 
               <ItemCard title="Total Cost (GH¢)" value={data?.total_amount} />
-            </div>
+            </div> */}
 
-            <div>
+            {/* <div>
               <section className="mb-3 flex items-center justify-between">
                 <div className="flex gap-2 items-center">
                   <p className="font-semibold ">Requested Documents</p>
@@ -382,7 +492,7 @@ export default function DocumentRequest() {
                   </div>
                 ))}
               </section>
-            </div>
+            </div> */}
 
             <div>
               <section className="mb-3 flex items-center justify-between">
