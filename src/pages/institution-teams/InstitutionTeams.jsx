@@ -1,17 +1,17 @@
 import React, { Component } from "react";
 import { FaChevronLeft, FaChevronRight, FaPlus } from "react-icons/fa";
-import axios from "../../axiosConfig";
+import axios from "@utils/axiosConfig";
 import { toast } from "react-hot-toast";
 import { GrDocumentConfig } from "react-icons/gr";
 import { IoArrowForwardCircle } from "react-icons/io5";
 import { NavLink } from "react-router-dom";
-import withRouter from "../../components/withRouter";
-import Textarea from "../../components/Textarea";
-import Textbox from "../../components/Textbox";
+import withRouter from "@components/withRouter";
+import Textarea from "@components/Textarea";
+import Textbox from "@components/Textbox";
 import { MdClose } from "react-icons/md";
-import Spinner from "../../components/Spinner";
+import Spinner from "@components/Spinner";
 import { FaUsers } from "react-icons/fa6";
-import AuthLayout from "../../components/AuthLayout";
+import AuthLayout from "@components/AuthLayout";
 
 class InstitutionTeams extends Component {
   constructor(props) {

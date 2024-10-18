@@ -1,13 +1,13 @@
 import React, { Component } from "react";
 import { FaChevronLeft, FaChevronRight, FaPlus } from "react-icons/fa";
-import axios from "../../axiosConfig";
+import axios from "@utils/axiosConfig";
 import { toast } from "react-hot-toast";
 import { GrDocumentConfig } from "react-icons/gr";
 import { IoArrowForwardCircle } from "react-icons/io5";
 import { NavLink } from "react-router-dom";
 import { MdAdd } from "react-icons/md";
-import withRouter from "../../components/withRouter";
-import AuthLayout from "../../components/AuthLayout";
+import withRouter from "@components/withRouter";
+import AuthLayout from "@components/AuthLayout";
 
 class DocumentTypes extends Component {
   constructor(props) {

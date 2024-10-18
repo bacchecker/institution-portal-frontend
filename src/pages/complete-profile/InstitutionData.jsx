@@ -1,14 +1,14 @@
 import React, { Component } from "react";
-import withRouter from "../../components/withRouter";
-import Textbox from "../../components/Textbox";
-import Select from "../../components/Select";
+import withRouter from "@components/withRouter";
+import Textbox from "@components/Textbox";
+import Select from "@components/Select";
 import { IoMdClose } from "react-icons/io";
-import axios from "../../axiosConfig";
+import axios from "@utils/axiosConfig";
 import toast from "react-hot-toast";
 import { FaAnglesRight } from "react-icons/fa6";
-import Spinner from "../../components/Spinner";
+import Spinner from "@components/Spinner";
 import { Input, Textarea } from "@nextui-org/react";
-import AuthLayout from "../../components/AuthLayout";
+import AuthLayout from "@components/AuthLayout";
 
 class InstitutionData extends Component {
   constructor(props) {

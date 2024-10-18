@@ -4,7 +4,7 @@ import React, {
   useImperativeHandle,
   forwardRef,
 } from "react";
-import axios from "../../axiosConfig";
+import axios from "@utils/axiosConfig";
 import { toast } from "react-hot-toast";
 import { RiInformation2Fill } from "react-icons/ri";
 import { IoMdAdd, IoMdClose } from "react-icons/io";

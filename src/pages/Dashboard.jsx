@@ -5,10 +5,10 @@ import { IoIosMail, IoIosNotificationsOutline } from "react-icons/io";
 import { IoDocumentAttach, IoDocuments } from "react-icons/io5";
 import { LuClipboardEdit } from "react-icons/lu";
 import { MdManageHistory, MdOutlineVerifiedUser } from "react-icons/md";
-import withRouter from "../components/withRouter";
-import axios from "../axiosConfig";
+import withRouter from "@components/withRouter";
+import axios from "@utils/axiosConfig";
 import { toast } from "react-hot-toast";
-import AuthLayout from "../components/AuthLayout";
+import AuthLayout from "@components/AuthLayout";
 
 class Dashboard extends Component {
   constructor(props) {
