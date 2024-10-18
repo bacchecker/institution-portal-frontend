@@ -27,7 +27,6 @@ import useAuthStore from "@store/authStore";
 import useSWR from "swr";
 
 const PaymentRevenueSetup = () => {
-  const [paymentAccounts, setPaymentAccounts] = useState([]);
   const [selectedData, setSelectedData] = useState({});
   const [processing, setProcessing] = useState(false);
   const [loadingData, setLoadingData] = useState(false);
