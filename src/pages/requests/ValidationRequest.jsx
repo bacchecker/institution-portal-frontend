@@ -43,14 +43,13 @@ export default function ValidationRequest() {
 
   // .get(`/institution/requests/document-requests`, {
 
-  const { data: documentRequests, error } = useSWR(
+  const { data: resData, error } = useSWR(
     "/institution/requests/validation-requests",
     (url) => axios.get(url).then((res) => res.data)
   );
 
-  //         documentRequests,
-  //     documentTypes,
-  //     filters,
+  console.log(resData);
+
   const [dateRange, setDateRange] = useState({
     // start:
     //     !filters?.start_date || filters?.start_date === "null"
@@ -201,7 +200,7 @@ export default function ValidationRequest() {
             "",
           ]}
           // loadingState={false}
-          page={documentRequests?.current_page}
+          page={resData?.current_page}
           setPage={(page) =>
             navigate(
               `?region=${filters.region || ""}&search_query=${
@@ -209,11 +208,9 @@ export default function ValidationRequest() {
               }&status=${filters.status || ""}&page=${page}`
             )
           }
-          totalPages={Math.ceil(
-            documentRequests?.total / documentRequests?.per_page
-          )}
+          totalPages={Math.ceil(resData?.total / resData?.per_page)}
         >
-          {documentRequests?.data?.map((item) => (
+          {resData?.data?.map((item) => (
             <TableRow key={item?.id}>
               <TableCell className="font-semibold">
                 {item?.unique_code}
