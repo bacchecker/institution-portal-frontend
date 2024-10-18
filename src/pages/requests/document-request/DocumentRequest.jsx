@@ -1,299 +1,699 @@
-import React, { Component } from "react";
-import axios from "@utils/axiosConfig";
-import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
-import { LuMoreVertical } from "react-icons/lu";
-import { toast } from "react-hot-toast";
-import withRouter from "@components/withRouter";
-import { FaRegFolderOpen } from "react-icons/fa6";
-import { NavLink } from "react-router-dom";
+import React, { useState } from "react";
 import AuthLayout from "@components/AuthLayout";
-class DocumentRequest extends Component {
-  constructor(props) {
-    super(props);
-  }
+import {
+  Button,
+  Card,
+  CardBody,
+  Chip,
+  DateRangePicker,
+  Input,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+  Select,
+  SelectItem,
+  TableCell,
+  TableRow,
+} from "@nextui-org/react";
+import CustomTable from "@components/CustomTable";
+import useSWR from "swr";
+import moment from "moment";
+import axios from "@utils/axiosConfig";
+import StatusChip from "@components/status-chip";
+import Drawer from "@components/Drawer";
+import CustomUser from "@components/custom-user";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
-  state = {
-    documentRequests: [],
-    search: "",
-    currentPage: 1,
-    lastPage: 1,
-    total: 0,
-    rowMenuOpen: null,
-    institutionStatus: this.props.institutionStatus,
-    profileComplete: this.props.profileComplete,
-  };
+const ItemCard = ({ title, value }) => (
+  <div className="grid grid-cols-5 w-full items-center">
+    <p className="col-span-2 dark:text-white/80 text-black/55">{title}</p>
+    <div className="col-span-3">{value}</div>
+  </div>
+);
 
-  componentDidMount() {
-    const { profileComplete, institutionStatus } = this.state;
+export default function DocumentRequest() {
+  const [filters, setFilters] = useState({
+    search_query: "",
+    status: "",
+    payment_status: "",
+  });
+  const [openDrawer, setOpenDrawer] = useState(false);
+  const [data, setData] = useState(null);
+  const navigate = useNavigate();
 
-    if (institutionStatus == "inactive") {
-      setTimeout(() => {
-        this.props.navigate("/account-inactive");
-        return;
-      }, 0);
-    } else if (profileComplete == "no") {
-      setTimeout(() => {
-        this.props.navigate("/account-setup/profile");
-        return;
-      }, 0);
-    } else {
-      this.fetchDocumentRequests();
-    }
-  }
+  const { data: resData, error } = useSWR(
+    "/institution/requests/document-requests",
+    (url) => axios.get(url).then((res) => res.data)
+  );
 
-  fetchDocumentRequests = (page = 1) => {
-    const { search } = this.state;
-    axios
-      .get(`/institution/requests/document-requests`, {
-        params: {
-          page,
-          search,
-        },
-      })
-      .then((response) => {
-        if (response.data.status === 200) {
-          this.setState({
-            documentRequests: response.data.documentRequests.data,
-            currentPage: response.data.documentRequests.current_page,
-            lastPage: response.data.documentRequests.last_page,
-            total: response.data.documentRequests.total, // Capture total number of records
-          });
-        } else {
-          toast.error(error.response.data.message);
-        }
-      })
-      .catch((error) => {
-        toast.error(error.response.data.message);
-      });
-  };
+  console.log(resData?.documentRequests);
 
-  handleFilterChange = (e) => {
-    this.setState({ [e.target.name]: e.target.value }, () =>
-      this.fetchDocumentRequests()
-    );
-  };
+  //         resData?.documentRequests,
+  //     documentTypes,
+  //     filters,
+  const [dateRange, setDateRange] = useState({
+    // start:
+    //     !filters?.start_date || filters?.start_date === "null"
+    //         ? ""
+    //         : filters?.start_date,
+    // end:
+    //     !filters?.end_date || filters?.end_date === "null"
+    //         ? ""
+    //         : filters?.end_date,
+  });
 
-  handlePageChange = (page) => {
-    this.fetchDocumentRequests(page);
-  };
+  return (
+    <AuthLayout title="Document Request">
+      <section className="md:px-3">
+        <Card className="my-3 md:w-full w-[98vw] mx-auto dark:bg-slate-900">
+          <CardBody className="w-full">
+            <form method="get" className="flex flex-row gap-3 items-center">
+              <input type="hidden" name="start_date" value={dateRange.start} />
+              <input type="hidden" name="end_date" value={dateRange.end} />
 
-  renderPageNumbers = () => {
-    const { currentPage, lastPage } = this.state;
-    const pageNumbers = [];
-
-    for (let i = 1; i <= lastPage; i++) {
-      pageNumbers.push(
-        <button
-          key={i}
-          onClick={() => this.handlePageChange(i)}
-          className={`px-2.5 py-1 border rounded-lg text-sm ${
-            i === currentPage
-              ? "bg-buttonLog text-white border-0"
-              : "bg-white text-gray-800"
-          }`}
-        >
-          {i}
-        </button>
-      );
-    }
-
-    return pageNumbers;
-  };
-
-  capitalizeFirstLetter = (status) => {
-    return status.charAt(0).toUpperCase() + status.slice(1);
-  };
-
-  getStatusClass = (status) => {
-    switch (status) {
-      case "created":
-        return "bg-blue-100 text-blue-700";
-      case "submitted":
-        return "bg-yellow-100 text-yellow-700";
-      case "received":
-        return "bg-purple-100 text-purple-700";
-      case "processing":
-        return "bg-orange-100 text-orange-700";
-      case "completed":
-        return "bg-green-100 text-green-700";
-      case "rejected":
-        return "bg-red-100 text-red-700";
-      default:
-        return "bg-gray-100 text-gray-700";
-    }
-  };
-
-  render() {
-    const {
-      documentRequests,
-      search,
-      currentPage,
-      lastPage,
-      total,
-      rowMenuOpen,
-    } = this.state;
-    return (
-      <AuthLayout title="Document Requests">
-        <div className="container mx-auto md:px-3">
-          <h1 className="text-xl font-bold mb-4">Document Requests</h1>
-
-          {/* Filter Section */}
-          <div className="mb-4 flex space-x-4">
-            <div className="relative w-full lg:w-2/3">
-              <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-                <svg
-                  className="w-4 h-4 text-gray-500 "
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
-                  />
-                </svg>
-              </div>
-              <input
-                type="search"
-                onChange={this.handleFilterChange}
-                name="search"
-                id="default-search"
-                className="block w-full focus:outline-0 px-4 py-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-2xl bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Search by Document Type, User Name or Unique Code"
-                required
+              <Input
+                name="search_query"
+                placeholder="Search unique code, user name, user phone number"
+                defaultValue={filters.search_query}
+                // startContent={<SearchIconDuotone />}
+                size="sm"
+                className="max-w-xs min-w-[200px]"
               />
+              {/* 
+              <Select
+                size="sm"
+                placeholder="Document Type"
+                className="max-w-xs"
+                name="document_type"
+                defaultSelectedKeys={[filters?.document_type]}
+              >
+                {documentTypes.map((item) => (
+                  <SelectItem key={item.key}>{item.label}</SelectItem>
+                ))}
+              </Select> */}
+
+              <Select
+                size="sm"
+                placeholder="Status"
+                className="max-w-[130px] min-w-[130px]"
+                name="status"
+                defaultSelectedKeys={[filters?.status]}
+              >
+                {[
+                  {
+                    key: "active",
+                    label: "Active",
+                  },
+                  {
+                    key: "inactive",
+                    label: "Inactive",
+                  },
+                ].map((item) => (
+                  <SelectItem key={item.key}>{item.label}</SelectItem>
+                ))}
+              </Select>
+
+              <Select
+                size="sm"
+                placeholder="Payment Status"
+                className="max-w-[130px] min-w-[130px]"
+                name="payment_status"
+                defaultSelectedKeys={[filters?.payment_status]}
+              >
+                {[
+                  {
+                    key: "pending",
+                    label: "Pending",
+                  },
+                  {
+                    key: "failed",
+                    label: "Failed",
+                  },
+                  {
+                    key: "paid",
+                    label: "Paid",
+                  },
+                ].map((item) => (
+                  <SelectItem key={item.key}>{item.label}</SelectItem>
+                ))}
+              </Select>
+
+              <DateRangePicker
+                visibleMonths={2}
+                className="w-[30%]"
+                // value={{
+                //     start: dateRange.start
+                //         ? parseDate(dateRange.start)
+                //         : null,
+                //     end: dateRange.end
+                //         ? parseDate(dateRange.end)
+                //         : null,
+                // }}
+                onChange={(date) => {
+                  let newStartDate;
+                  if (date) {
+                    newStartDate = new Date(
+                      date.start.year,
+                      date.start.month - 1, // month is 0-based
+                      date.start.day
+                    ).toDateString();
+                  }
+
+                  let newEndDate;
+                  if (date) {
+                    newEndDate = new Date(
+                      date.end.year,
+                      date.end.month - 1, // month is 0-based
+                      date.end.day
+                    ).toDateString();
+                  }
+
+                  setDateRange({
+                    start: moment(newStartDate, "ddd MMM DD YYYY")
+                      .format("YYYY-MM-DD")
+                      .toString(),
+                    end: moment(newEndDate, "ddd MMM DD YYYY")
+                      .format("YYYY-MM-DD")
+                      .toString(),
+                  });
+                }}
+              />
+
+              <Button size="sm" type="submit" color="danger">
+                Filter
+              </Button>
+            </form>
+          </CardBody>
+        </Card>
+      </section>
+
+      <section className="md:px-3 md:w-full w-[98vw] mx-auto">
+        <CustomTable
+          columns={[
+            "ID",
+            "Institution",
+            "Requested By",
+            "Date",
+            "Documents",
+            "Status",
+            "Total Amount",
+            "Payment Status",
+            "",
+          ]}
+          // loadingState={false}
+          page={resData?.documentRequests?.current_page}
+          setPage={(page) =>
+            navigate(
+              `?region=${filters.region || ""}&search_query=${
+                filters.search_query || ""
+              }&status=${filters.status || ""}&page=${page}`
+            )
+          }
+          totalPages={Math.ceil(
+            resData?.documentRequests?.total /
+              resData?.documentRequests?.per_page
+          )}
+        >
+          {resData?.documentRequests?.data?.map((item) => (
+            <TableRow key={item?.id}>
+              <TableCell className="font-semibold">
+                {item?.unique_code}
+              </TableCell>
+              <TableCell>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <p>{item?.institution?.name}</p>
+                  {!item?.institution?.user_id && (
+                    <Chip size="sm" variant="faded" color="warning">
+                      Temporary
+                    </Chip>
+                  )}
+                </div>
+              </TableCell>
+              <TableCell className="font-semibold">
+                <CustomUser
+                  avatarSrc={item?.user?.profile_photo_url}
+                  name={`${item?.user?.first_name} ${item?.user?.last_name}`}
+                  email={`${item?.user?.email}`}
+                />
+              </TableCell>
+              <TableCell>
+                {moment(item?.created_at).format("Do MMMM, YYYY")}
+              </TableCell>
+              <TableCell>
+                {item?.records?.length > 1 ? (
+                  <Popover placement="right">
+                    <PopoverTrigger>
+                      <Button size="sm" color="danger">
+                        {item?.records?.length} Docs
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent>
+                      <div className="px-1 py-2 flex flex-col gap-1">
+                        {item?.records?.map((doc) => (
+                          <div
+                            key={doc.id}
+                            className="flex items-center gap-2 justify-between bg-slate-100 dark:text-white dark:bg-gray-800 p-2 rounded-lg"
+                          >
+                            <div className="text-tiny">
+                              {doc.document_type?.name}
+                            </div>
+                            <div className="text-tiny ml-5">
+                              GH¢{" "}
+                              {Math.floor(
+                                doc?.document_type?.base_fee +
+                                  doc?.number_of_copies *
+                                    doc?.document_type?.printing_fee
+                              ).toFixed(2)}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+                ) : (
+                  item?.records[0]?.document_type?.name
+                )}
+              </TableCell>
+              <TableCell>
+                <StatusChip status={item?.status} />
+              </TableCell>
+              <TableCell> GH¢ {item?.total_amount}</TableCell>
+              <TableCell>
+                <StatusChip status={item?.payment_status} />
+              </TableCell>
+              <TableCell className="flex items-center h-16 gap-3">
+                <Button
+                  size="sm"
+                  color="success"
+                  onClick={() => {
+                    setOpenDrawer(true);
+                    setData(item);
+                    // router.visit(
+                    //     route(
+                    //         "requests.document-requests.show",
+                    //         item.id
+                    //     )
+                    // );
+                  }}
+                >
+                  View
+                </Button>
+              </TableCell>
+            </TableRow>
+          ))}
+        </CustomTable>
+      </section>
+
+      <Drawer
+        title="Request Details"
+        isOpen={openDrawer}
+        setIsOpen={setOpenDrawer}
+        classNames="w-[100vw] md:w-[50vw]"
+      >
+        <div className="h-full flex flex-col justify-between">
+          <div className="flex flex-col gap-11 mb-6">
+            <div className="grid grid-cols-2 gap-2 gap-y-4">
+              <ItemCard title="Request ID" value={data?.unique_code} />
+              <ItemCard
+                title="Status"
+                value={<StatusChip status={data?.status} />}
+              />
+              <ItemCard
+                title="Payment Status"
+                value={<StatusChip status={data?.payment_status} />}
+              />
+              <ItemCard
+                title="Requested On"
+                value={moment(data?.created_at).format("Do MMMM, YYYY")}
+              />
+              <ItemCard
+                title="Requested By"
+                value={
+                  <CustomUser
+                    avatarSrc={data?.user?.profile_photo_url}
+                    name={`${data?.user?.first_name} ${data?.user?.last_name}`}
+                    email={`${data?.user?.email}`}
+                  />
+                }
+              />
+              <ItemCard
+                title="Institution"
+                // value={data?.institution?.name}
+                value={
+                  <div className="flex gap-2 items-center">
+                    <p>{data?.institution?.name}</p>
+                    {!data?.institution?.user_id && (
+                      <Chip size="sm" variant="faded" color="warning">
+                        Temporary
+                      </Chip>
+                    )}
+                  </div>
+                }
+              />
+              <ItemCard
+                title="Delivery Address"
+                value={data?.delivery_address}
+              />
+
+              <ItemCard title="Total Cost (GH¢)" value={data?.total_amount} />
             </div>
+
+            <div>
+              <section className="mb-3 flex items-center justify-between">
+                <div className="flex gap-2 items-center">
+                  <p className="font-semibold ">Documents</p>
+                </div>
+              </section>
+
+              <section className="grid grid-cols-2 gap-3">
+                {data?.records?.map((item) => (
+                  <div
+                    key={item?.id}
+                    className="gap-3 p-2 rounded-lg border dark:border-white/10"
+                  >
+                    <div className="w-full flex flex-col ">
+                      <p className="font-semibold">
+                        {item?.document_type?.name}
+                      </p>
+
+                      <div className="flex justify-between">
+                        <p>
+                          GH¢{" "}
+                          {Math.floor(
+                            item?.document_type?.base_fee +
+                              item?.number_of_copies *
+                                item?.document_type?.printing_fee
+                          ).toFixed(2)}
+                        </p>
+
+                        <div className="flex gap-2 items-center">
+                          <Chip size="sm">{item?.file?.extension}</Chip>
+                          <p>{filesize(item?.file?.size ?? 1000)}</p>
+                        </div>
+                      </div>
+
+                      <Button
+                        color="primary"
+                        size="sm"
+                        className="cursor-pointer ml-auto mt-2"
+                        onClick={() => {
+                          window.location.href =
+                            route("download-document") +
+                            "?path=" +
+                            encodeURIComponent(item?.file?.path);
+                        }}
+                      >
+                        Download
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </section>
+            </div>
+
+            {/* <div>
+                            <section className="mb-3 flex items-center justify-between">
+                                <div className="flex gap-2 items-center">
+                                    <ClipIcon />
+                                    <p className="font-semibold ">Attachmets</p>
+                                </div>
+
+                                {data?.files?.length >= 1 && (
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        color="primary"
+                                        isLoading={bulkDownloadLoading}
+                                        isDisabled={bulkDownloadLoading}
+                                        onClick={() => {
+                                            setBulkDownloadLoading(true);
+                                            handleBulkDownload(
+                                                data.files.map(
+                                                    (f) => f.path
+                                                )
+                                            );
+                                        }}
+                                        startContent={<DownloadIcon />}
+                                    >
+                                        Download all
+                                    </Button>
+                                )}
+                            </section>
+
+                            <section className="grid grid-cols-2 gap-3">
+                                {data?.files?.length >= 1 ? (
+                                    data?.files?.map((item) => (
+                                        <div
+                                            key={item?.id}
+                                            className="flex items-center gap-3 p-2 rounded-lg border dark:border-white/10"
+                                        >
+                                            {item?.extension === "pdf" ? (
+                                                <PdfIcon
+                                                    className="size-11"
+                                                    color="red"
+                                                />
+                                            ) : (
+                                                <WordIcon
+                                                    className="size-11"
+                                                    color="blue"
+                                                />
+                                            )}
+                                            <div className="w-full">
+                                                <p className="font-semibold line-clamp-2">
+                                                    {item?.name}
+                                                </p>
+
+                                                <div className="flex justify-between">
+                                                    <p>{filesize(item.size)}</p>
+                                                    <p
+                                                        className="cursor-pointer"
+                                                        onClick={() => {
+                                                            window.location.href =
+                                                                route(
+                                                                    "download-document"
+                                                                ) +
+                                                                "?path=" +
+                                                                encodeURIComponent(
+                                                                    item.path
+                                                                );
+                                                        }}
+                                                    >
+                                                        Download
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <p>Nothing here</p>
+                                )}
+
+                                <div className="flex items-center">
+                                    <Button
+                                        size="sm"
+                                        color="danger"
+                                        onClick={() => {
+                                            fileUploadDisclosure.onOpen();
+                                        }}
+                                    >
+                                        <PlusIcon />
+                                        Upload Document
+                                    </Button>
+                                </div>
+                            </section>
+                        </div> */}
           </div>
 
-          {/* Table Section */}
-          <div className="bg-white rounded-lg p-4">
-            <div className="overflow-x-auto">
-              {" "}
-              {/* Makes table scrollable on small screens */}
-              <table className="min-w-full table-fixed bg-white text-black text-sm">
-                <thead className="bg-gray-100 rounded-lg sticky top-0 z-10">
-                  {" "}
-                  {/* Sticky for fixed header */}
-                  <tr className="rounded-lg text-xs">
-                    <th className="text-left px-4 py-3 table-cell rounded-l-lg">
-                      {" "}
-                      {/* Rounded left for first column */}
-                      User Name
-                    </th>
-                    <th className="text-left p-2 table-cell">Document Type</th>
-                    <th className="text-left p-2 table-cell">Unique Code</th>
-                    <th className="p-2 table-cell text-center">Status</th>
-                    <th className="text-left p-2 table-cell">Format</th>
-                    <th className="text-center p-2 table-cell">Copies</th>
-                    <th className="text-left p-2 table-cell rounded-r-lg">
-                      Action
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="mt-2">
-                  {documentRequests.length > 0 ? (
-                    documentRequests.map((request) => (
-                      <tr key={request.id} className="bg-white">
-                        <td className="pl-4 p-2 table-cell">
-                          <p className="font-semibold text-gray-800 text-base">
-                            {request.user.first_name} {request.user.last_name}
-                          </p>
-                          <p className="text-gray-600 font-medium">
-                            {request.user.phone}
-                          </p>
-                        </td>
-                        <td className="p-2 table-cell">
-                          {request.document_type.name}
-                        </td>
-                        <td className="p-2 table-cell">
-                          {request.unique_code}
-                        </td>
-                        <td className="p-2 table-cell text-center">
-                          <span
-                            className={`inline-block text-xs ${this.getStatusClass(
-                              request.status
-                            )} px-4 py-1.5 rounded-full`}
-                          >
-                            {this.capitalizeFirstLetter(request.status)}
-                          </span>
-                        </td>
+          <div className="flex items-center gap-3 justify-end">
+            <Button
+              // className="w-1/2"
+              size="sm"
+              color="default"
+              onClick={() => {
+                setOpenDrawer(false);
+                // reset();
+              }}
+            >
+              Close
+            </Button>
 
-                        <td className="p-2 table-cell">
-                          {request.document_format === "soft_copy"
-                            ? "Soft copy"
-                            : "Hard copy"}
-                        </td>
-                        <td className="p-2 table-cell text-center">
-                          {request.number_of_copies}
-                        </td>
-                        <td className="p-2">
-                          <div className="relative">
-                            <NavLink
-                              to={`/document-requests/${request.id}`}
-                              className="flex items-center justify-center cursor-pointer hover:border-blue-400 border text-blue-600 rounded-md w-8 h-8"
-                            >
-                              <FaRegFolderOpen />
-                            </NavLink>
-                          </div>
-                        </td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan="6" className="p-6 text-center">
-                        <div className="flex flex-col justify-center items-center">
-                          <img
-                            src="/images/nodata.png"
-                            alt="No data available"
-                            className="w-1/4 h-auto object-contain"
-                          />
-                          <p className="text-gray-500 text-sm font-medium -mt-5 xl:-mt-12">
-                            No document request found
-                          </p>
-                        </div>
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-
-            {/* Pagination */}
-            <div className="flex justify-between items-center mt-4">
-              <div>
-                <span className="text-gray-600 font-medium text-sm">
-                  Page {currentPage} of {lastPage}
-                </span>
-              </div>
-              <div className="flex space-x-2">
-                <button
-                  disabled={currentPage === 1}
-                  onClick={() => this.handlePageChange(currentPage - 1)}
-                  className="p-2 bg-white text-gray-800 border rounded-lg disabled:bg-gray-300 disabled:text-white"
-                >
-                  <FaChevronLeft size={12} />
-                </button>
-
-                {this.renderPageNumbers()}
-
-                <button
-                  disabled={currentPage === lastPage}
-                  onClick={() => this.handlePageChange(currentPage + 1)}
-                  className="p-2 bg-white text-gray-800 border rounded-lg disabled:bg-gray-300 disabled:text-white disabled:border-0"
-                >
-                  <FaChevronRight size={12} />
-                </button>
-              </div>
-            </div>
+            <Button
+              color="danger"
+              className="font-montserrat font-semibold w-1/2"
+              //       isLoading={processing}
+              type="submit"
+              size="sm"
+            >
+              Turn In Document
+            </Button>
           </div>
         </div>
-      </AuthLayout>
-    );
-  }
-}
+      </Drawer>
 
-export default withRouter(DocumentRequest);
+      {/* <Modal
+                isOpen={fileUploadDisclosure.isOpen}
+                onOpenChange={fileUploadDisclosure.onOpenChange}
+                isDismissable={false}
+                isKeyboardDismissDisabled={true}
+                className="z-[99]"
+                backdrop="blur"
+            >
+                <ModalContent>
+                    {(onClose) => (
+                        <>
+                            <ModalHeader className="flex flex-col gap-1">
+                                Upload Documents
+                            </ModalHeader>
+                            <ModalBody>
+                                <div>
+                                    <div className="sticky top-0 z-50 bg-white dark:bg-slate-900 pb-5">
+                                        <div className="border-2 border-primary shadow-sm rounded-xl p-4 bg-gray-50 dark:bg-slate-900">
+                                            <div
+                                                className={`p-3 border-2 border-dashed rounded-lg ${
+                                                    dragActive
+                                                        ? "border-blue-400 bg-blue-50"
+                                                        : "border-gray-300"
+                                                }`}
+                                            >
+                                                <input
+                                                    type="file"
+                                                    multiple
+                                                    id="file-upload"
+                                                    name="document"
+                                                    className="hidden"
+                                                    onChange={handleChange}
+                                                    accept=".pdf,.docx,.doc,.txt,.xlsx,.xls"
+                                                />
+
+                                                {data.documents &&
+                                                data?.documents?.length > 0 ? (
+                                                    <div className="flex flex-col">
+                                                        {data?.documents?.map(
+                                                            (
+                                                                file,
+                                                                index: number
+                                                            ) => (
+                                                                <label
+                                                                    key={index}
+                                                                    htmlFor="file-upload"
+                                                                    className="flex items-center cursor-pointer mb-2"
+                                                                >
+                                                                    <p className="flex items-center text-base font-semibold text-slate-600 dark:text-slate-200">
+                                                                        <span className="mr-2">
+                                                                            {getFileIcon(
+                                                                                file.type
+                                                                            )}
+                                                                        </span>
+                                                                        {
+                                                                            file.name
+                                                                        }
+                                                                    </p>
+                                                                </label>
+                                                            )
+                                                        )}
+                                                    </div>
+                                                ) : (
+                                                    <label
+                                                        htmlFor="file-upload"
+                                                        className="flex items-center justify-center h-full py-0 text-center cursor-pointer gap-x-2"
+                                                    >
+                                                        <svg
+                                                            className="w-8 h-8 text-primary"
+                                                            fill="none"
+                                                            stroke="currentColor"
+                                                            viewBox="0 0 24 24"
+                                                            xmlns="http://www.w3.org/2000/svg"
+                                                        >
+                                                            <path
+                                                                strokeLinecap="round"
+                                                                strokeLinejoin="round"
+                                                                strokeWidth="2"
+                                                                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                                                            ></path>
+                                                        </svg>
+                                                        <div className="text-left">
+                                                            <p className="text-sm text-slate-600 dark:text-slate-300">
+                                                                Click to select
+                                                                or attach
+                                                                documents
+                                                            </p>
+                                                            <p className="text-xs text-slate-600 dark:text-slate-300">
+                                                                (PDF, DOCX,
+                                                                XLSX, or Text
+                                                                files only)
+                                                            </p>
+                                                        </div>
+                                                    </label>
+                                                )}
+                                                {dragActive && (
+                                                    <div
+                                                        className="absolute inset-0 z-50"
+                                                        onDragEnter={handleDrag}
+                                                        onDragLeave={handleDrag}
+                                                        onDragOver={handleDrag}
+                                                        onDrop={handleDrop}
+                                                    ></div>
+                                                )}
+                                            </div>
+                                            {errors.documents && (
+                                                <small className="mt-2 text-sm text-danger">
+                                                    {errors.documents}
+                                                </small>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            </ModalBody>
+                            <ModalFooter>
+                                <Button
+                                    color="danger"
+                                    variant="light"
+                                    onPress={onClose}
+                                >
+                                    Close
+                                </Button>
+                                <Button
+                                    color="danger"
+                                    onClick={() => {
+                                        post(route("upload-document"), {
+                                            data,
+                                            preserveState: true,
+                                            preserveScroll: true,
+                                            onSuccess: () => {
+                                                fileUploadDisclosure.onClose();
+                                                // setOpenDrawer(false);
+                                                setData((prev) => ({
+                                                    ...prev,
+                                                    documents: null,
+                                                }));
+                                                // router.reload({ only: [""] });
+                                            },
+                                            onError: (error) => {
+                                                // setError(error);
+                                                // setData(
+                                                //     "file_id",
+                                                //     error.file_id
+                                                // );
+                                                // if (
+                                                //     error?.type ===
+                                                //     "duplicate"
+                                                // ) {
+                                                //     setFileName(
+                                                //         error.file_name
+                                                //     );
+                                                //     fileUploadDisclosure.onOpen();
+                                                // }
+                                            },
+                                        });
+                                    }}
+                                >
+                                    Upload Documents
+                                </Button>
+                            </ModalFooter>
+                        </>
+                    )}
+                </ModalContent>
+            </Modal> */}
+    </AuthLayout>
+  );
+}
