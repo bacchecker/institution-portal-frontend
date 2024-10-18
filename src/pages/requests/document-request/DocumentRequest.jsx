@@ -401,14 +401,8 @@ export default function DocumentRequest() {
                   size="sm"
                   color="success"
                   onClick={() => {
-                    setOpenDrawer(true);
                     setData(item);
-                    // router.visit(
-                    //     route(
-                    //         "requests.document-requests.show",
-                    //         item.id
-                    //     )
-                    // );
+                    setOpenDrawer(true);
                   }}
                 >
                   View
@@ -707,7 +701,6 @@ export default function DocumentRequest() {
               <Button
                 color="secondary"
                 className="font-montserrat font-semibold w-1/2"
-                // isLoading={processing}
                 size="sm"
                 onClick={() => {
                   changeStatusDisclosure.onOpen();
@@ -862,14 +855,19 @@ export default function DocumentRequest() {
         disclosure={changeStatusDisclosure}
         title="Change Request Status"
         onButtonClick={async () => {
-          const resss = await axios.posst(`/document-requests/${data}/status`, {
-            status:
-              data?.status == "submitted"
-                ? "received"
-                : data?.status == "received"
-                ? "processing"
-                : "completed",
-          });
+          console.log(data);
+
+          const resss = await axios.post(
+            `/institution/document-requests/${data?.unique_code}/status`,
+            {
+              status:
+                data?.status == "submitted"
+                  ? "received"
+                  : data?.status == "received"
+                  ? "processing"
+                  : "completed",
+            }
+          );
 
           console.log(resss);
         }}
