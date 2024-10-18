@@ -150,9 +150,17 @@ export default function DocumentRequest() {
     );
 
     if (validFiles.length > 0) {
-      setData("documents", validFiles); // Update state with all valid files
+      // setData("documents", validFiles); // Update state with all valid files
+      setData((prev) => ({
+        ...prev,
+        documents: validFiles,
+      }));
     } else {
-      setData("documents", []);
+      // setData("documents", []);
+      setData((prev) => ({
+        ...prev,
+        documents: [],
+      }));
     }
   };
 
@@ -451,7 +459,7 @@ export default function DocumentRequest() {
                   <div className="grid grid-cols-5 gap-1">
                     <p className="font-semibold">Name:</p>
                     <p className="col-span-4">
-                      {data?.user.first_name} {data?.user.last_name}
+                      {data?.user?.first_name} {data?.user.last_name}
                     </p>
                   </div>
                   <div className="grid grid-cols-5 gap-1 my-1">
@@ -819,11 +827,11 @@ export default function DocumentRequest() {
                           ></div>
                         )}
                       </div>
-                      {errors.documents && (
+                      {/* {errors?.documents && (
                         <small className="mt-2 text-sm text-danger">
                           {errors.documents}
                         </small>
-                      )}
+                      )} */}
                     </div>
                   </div>
                 </div>
