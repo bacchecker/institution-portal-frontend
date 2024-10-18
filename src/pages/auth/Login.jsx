@@ -45,7 +45,7 @@ const Login = () => {
     }
 
     try {
-      const response = await axios.post("/auth/institutionLogin", {
+      const response = await axios.post("/auth/login", {
         email: formData.email,
         password: formData.password,
         recaptcha_token: recaptchaToken,
