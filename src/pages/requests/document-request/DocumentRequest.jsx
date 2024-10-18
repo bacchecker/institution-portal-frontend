@@ -192,7 +192,6 @@ export default function DocumentRequest() {
         <CustomTable
           columns={[
             "ID",
-            "Institution",
             "Requested By",
             "Delivery Address",
             "Date",
@@ -218,20 +217,11 @@ export default function DocumentRequest() {
               <TableCell className="font-semibold">
                 {item?.unique_code}
               </TableCell>
-              <TableCell>
-                <div className="flex items-center gap-2 flex-wrap">
-                  {item?.institution?.name}
-                  <p></p>
-                  {!item?.institution?.user_id && (
-                    <Chip size="sm" variant="faded" color="warning">
-                      Temporary
-                    </Chip>
-                  )}
-                </div>
-              </TableCell>
               <TableCell className="font-semibold">
                 <CustomUser
-                  avatarSrc={item?.user?.profile_photo_url}
+                  avatarSrc={`${
+                    import.meta.env.VITE_BASE_URL
+                  }/storage/app/public/${item?.user?.photo}`}
                   name={`${item?.user?.first_name} ${item?.user?.last_name}`}
                   email={`${item?.user?.email}`}
                 />

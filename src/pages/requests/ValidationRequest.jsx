@@ -230,7 +230,7 @@ export default function ValidationRequest() {
               </TableCell>
               <TableCell className="font-semibold">
                 <CustomUser
-                  avatarSrc={item?.user?.profile_photo_url}
+                  avatarSrc={item?.user?.photo}
                   name={`${item?.user?.first_name} ${item?.user?.last_name}`}
                   email={`${item?.user?.email}`}
                 />
