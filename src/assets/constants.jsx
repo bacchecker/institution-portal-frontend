@@ -88,7 +88,7 @@ export const navLinks = [
     showOn: ["active"],
     children: [
       {
-        label: "Revenue Overview ",
+        label: "Report Overview ",
         path: "/reports/revenue-overview",
       },
     ],
