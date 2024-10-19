@@ -416,8 +416,8 @@ export default function DocumentRequest() {
       >
         <div className="h-full flex flex-col justify-between">
           <div className="flex flex-col gap-2 mb-6">
-            <div className="">
-              <div className="flex space-x-2 items-center">
+            <div className="flex flex-col gap-1">
+              {/* <div className="flex space-x-2 items-center">
                 <p className="font-semibold">
                   Unique Code:{" "}
                   <span className="uppercase">{data?.unique_code}</span>
@@ -430,11 +430,23 @@ export default function DocumentRequest() {
                   }`}
                 >
                   {data?.payment_status}
-                </div>
-              </div>
-              <p className="text-sm">
-                {moment(data?.created_at).format("Do MMMM, YYYY")}
-              </p>
+                  </div>
+                  </div> */}
+              <ItemCard title="Request ID" value={data?.unique_code} />
+              <ItemCard
+                title="Requested On"
+                value={moment(data?.created_at).format("Do MMMM, YYYY")}
+              />
+
+              <ItemCard
+                title="Delivery Address"
+                value={data?.delivery_address}
+              />
+              <ItemCard title="Total Cost (GH¢)" value={data?.total_amount} />
+              <ItemCard
+                title="Payment Status"
+                value={<StatusChip status={data?.payment_status} />}
+              />
             </div>
 
             <Card className="dark:bg-slate-950">
@@ -516,26 +528,7 @@ export default function DocumentRequest() {
               </CardBody>
             </Card>
 
-            {/* <div className="grid grid-cols-2 gap-2 gap-y-4">
-            <ItemCard title="Request ID" value={data?.unique_code} />
-            
-              <ItemCard
-                title="Payment Status"
-                value={<StatusChip status={data?.payment_status} />}
-              />
-              <ItemCard
-                title="Requested On"
-                value={moment(data?.created_at).format("Do MMMM, YYYY")}
-              />
-              <ItemCard
-                title="Delivery Address"
-                value={data?.delivery_address}
-              />
-
-              <ItemCard title="Total Cost (GH¢)" value={data?.total_amount} />
-            </div> */}
-
-            <div>
+            <div className="mt-11">
               <section className="mb-3 flex items-center justify-between">
                 <div className="flex gap-2 items-center">
                   <ClipIcon />
@@ -572,12 +565,12 @@ export default function DocumentRequest() {
                       ) : (
                         <WordIcon className="size-11" color="blue" />
                       )}
-                      <div className="w-full">
+                      <div className="w-full flex flex-col h-full">
                         <p className="font-semibold line-clamp-2">
                           {item?.name}
                         </p>
 
-                        <div className="flex justify-between">
+                        <div className="flex justify-between items-center mt-auto">
                           <p>{filesize(item.size)}</p>
                           <p
                             className="cursor-pointer p-1 rounded-lg bg-primary text-white text-xs"
