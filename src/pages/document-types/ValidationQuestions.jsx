@@ -11,7 +11,6 @@ import Select from "@components/Select";
 import Spinner from "@components/Spinner";
 import AuthLayout from "@components/AuthLayout";
 import { FaMoneyBill1Wave } from "react-icons/fa6";
-import AuthLayout from "../../components/AuthLayout";
 
 class ValidationQuestions extends Component {
   constructor(props) {
@@ -176,344 +175,350 @@ class ValidationQuestions extends Component {
     } = this.state;
     return (
       <>
-      <AuthLayout title='Document Type Details'>
-        <div className="bg-white  py-2 min-h-screen">
-          <div className="w-full flex flex-col justify-center items-center pb-2">
-            <h1 className="font-bold text-deepBlue uppercase text-xl mb-1">
-              {document_type_details.name}
-            </h1>
-          </div>
-          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 lg:gap-2 pl-3">
-            <div className="min-h-screen shadow-lg">
-              <h2 className="bg-blue-700 text-white pl-6 pr-4 py-2">
-                Document Billings
-              </h2>
-              <div className="my-4">
-                <div className="flex flex-col space-y-4 px-3">
-                  <div className="grid grid-cols-3 text-sm items-center">
-                    <p className="font-semibold col-span-2">Validation Fee</p>
-                    <p>GH₵{document_type_details.validation_fee ?? "0.00"}</p>
+        <AuthLayout title="Document Type Details">
+          <div className="bg-white  py-2 min-h-screen">
+            <div className="w-full flex flex-col justify-center items-center pb-2">
+              <h1 className="font-bold text-deepBlue uppercase text-xl mb-1">
+                {document_type_details.name}
+              </h1>
+            </div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 lg:gap-2 pl-3">
+              <div className="min-h-screen shadow-lg">
+                <h2 className="bg-blue-700 text-white pl-6 pr-4 py-2">
+                  Document Billings
+                </h2>
+                <div className="my-4">
+                  <div className="flex flex-col space-y-4 px-3">
+                    <div className="grid grid-cols-3 text-sm items-center">
+                      <p className="font-semibold col-span-2">Validation Fee</p>
+                      <p>GH₵{document_type_details.validation_fee ?? "0.00"}</p>
+                    </div>
+                    <div className="grid grid-cols-3 text-sm items-center">
+                      <p className="font-semibold col-span-2">
+                        Verification Fee
+                      </p>
+                      <p>
+                        GH₵{document_type_details.verification_fee ?? "0.00"}
+                      </p>
+                    </div>
+                    <div className="grid grid-cols-3 text-sm items-center">
+                      <p className="font-semibold col-span-2">
+                        Requisition Fee
+                      </p>
+                      <p>GH₵{document_type_details.base_fee ?? "0.00"}</p>
+                    </div>
+                    <div className="grid grid-cols-3 text-sm items-center">
+                      <p className="font-semibold col-span-2">Printing Fee</p>
+                      <p>GH₵{document_type_details.printing_fee ?? "0.00"}</p>
+                    </div>
+                    <div
+                      className="w-1/2 self-end flex space-x-2 text-sm items-center justify-center mt-8 border border-blue-700 text-blue-700 hover:bg-blue-600 hover:text-white rounded-md px-3 h-8 cursor-pointer"
+                      onClick={this.toggleBaseFeeModal}
+                    >
+                      <p>Edit Fees</p> <MdEdit />
+                    </div>
                   </div>
-                  <div className="grid grid-cols-3 text-sm items-center">
-                    <p className="font-semibold col-span-2">Verification Fee</p>
-                    <p>GH₵{document_type_details.verification_fee ?? "0.00"}</p>
-                  </div>
-                  <div className="grid grid-cols-3 text-sm items-center">
-                    <p className="font-semibold col-span-2">Requisition Fee</p>
-                    <p>GH₵{document_type_details.base_fee ?? "0.00"}</p>
-                  </div>
-                  <div className="grid grid-cols-3 text-sm items-center">
-                    <p className="font-semibold col-span-2">Printing Fee</p>
-                    <p>GH₵{document_type_details.printing_fee ?? "0.00"}</p>
-                  </div>
-                  <div
-                    className="w-1/2 self-end flex space-x-2 text-sm items-center justify-center mt-8 border border-blue-700 text-blue-700 hover:bg-blue-600 hover:text-white rounded-md px-3 h-8 cursor-pointer"
-                    onClick={this.toggleBaseFeeModal}
+
+                  <h2 className="bg-blue-700 text-white pl-6 pr-4 py-2 mt-4">
+                    Document Formats
+                  </h2>
+                  <form
+                    onSubmit={this.handleDocumentFormatSubmit}
+                    className="border-b pb-4"
                   >
-                    <p>Edit Fees</p> <MdEdit />
+                    <div className="flex space-x-5 mt-6 px-4">
+                      <div className="flex items-center mb-4">
+                        <input
+                          name="soft_copy"
+                          type="checkbox"
+                          checked={soft_copy}
+                          onChange={this.handleCheckboxChange}
+                          className="w-5 h-5 text-blue-700 bg-gray-100 border-gray-300 cursor-pointer rounded-lg"
+                        />
+                        <label className="ms-2 text-sm font-medium text-gray-900">
+                          Soft Copy
+                        </label>
+                      </div>
+                      <div className="flex items-center mb-4">
+                        <input
+                          name="hard_copy"
+                          type="checkbox"
+                          checked={hard_copy}
+                          onChange={this.handleCheckboxChange}
+                          className="w-5 h-5 text-blue-700 bg-gray-100 border-gray-300 cursor-pointer rounded-lg"
+                        />
+                        <label className="ms-2 text-sm font-medium text-gray-900">
+                          Hard Copy
+                        </label>
+                      </div>
+                    </div>
+                    <div className="flex justify-end pr-4">
+                      <button
+                        type="submit"
+                        disabled={isSaving}
+                        className="w-1/2 flex space-x-2 text-sm items-center justify-center mt-8 border border-blue-700 text-blue-700 hover:bg-blue-600 hover:text-white rounded-md px-3 h-8 cursor-pointer"
+                      >
+                        {isSaving ? (
+                          <>
+                            <Spinner size="w-4 h-4 mr-2" />
+                            Updating...
+                          </>
+                        ) : (
+                          <div className="flex items-center space-x-2">
+                            <p>Update</p> <MdSave />
+                          </div>
+                        )}
+                      </button>
+                    </div>
+                  </form>
+
+                  <div className="mt-6 px-4">
+                    <div className="my-2">
+                      <p className="text-sm font-medium text-gray-800 underline">
+                        Validation Fee
+                      </p>
+                      <p className="italic text-xs text-gray-700 ml-1">
+                        Fees applicant pay when they request for a document to
+                        be validated
+                      </p>
+                    </div>
+                    <div className="my-2">
+                      <p className="text-sm font-medium text-gray-800 underline">
+                        Verification Fee
+                      </p>
+                      <p className="italic text-xs text-gray-700 ml-1">
+                        Fees institutions pay when they request for a document
+                        to be verified for authenticity
+                      </p>
+                    </div>
+                    <div className="my-2">
+                      <p className="text-sm font-medium text-gray-800 underline">
+                        Requisition Fee
+                      </p>
+                      <p className="italic text-xs text-gray-700 ml-1">
+                        Fees applicant pay when they request for a document
+                      </p>
+                    </div>
+                    <div className="my-2">
+                      <p className="text-sm font-medium text-gray-800 underline">
+                        Printing Fee
+                      </p>
+                      <p className="italic text-xs text-gray-700 ml-1">
+                        In instances of hard copy format the fee for printing
+                        the document
+                      </p>
+                    </div>
                   </div>
                 </div>
+              </div>
+              <div className="col-span-3">
+                {this.state.isVisible && (
+                  <div className="px-2">
+                    <div className="w-full bg-red-100 px-4 py-3 mx-auto rounded-lg">
+                      <div className="flex justify-between border-b border-white pb-2 items-center">
+                        <div className="flex space-x-2">
+                          <IoWarning size={24} className="text-yellow-500" />
+                          <p className="font-semibold">
+                            Setup Document Verification Process
+                          </p>
+                        </div>
+                        {/* <div className="flex items-center justify-center w-8 h-8 rounded bg-red-200 text-red-600 cursor-pointer hover:bg-red-300" onClick={this.handleCloseDiv}>
+                                                <MdClose/>
+                                            </div> */}
+                      </div>
 
-                <h2 className="bg-blue-700 text-white pl-6 pr-4 py-2 mt-4">
-                  Document Formats
-                </h2>
-                <form
-                  onSubmit={this.handleDocumentFormatSubmit}
-                  className="border-b pb-4"
-                >
-                  <div className="flex space-x-5 mt-6 px-4">
-                    <div className="flex items-center mb-4">
-                      <input
-                        name="soft_copy"
-                        type="checkbox"
-                        checked={soft_copy}
-                        onChange={this.handleCheckboxChange}
-                        className="w-5 h-5 text-blue-700 bg-gray-100 border-gray-300 cursor-pointer rounded-lg"
-                      />
-                      <label className="ms-2 text-sm font-medium text-gray-900">
-                        Soft Copy
-                      </label>
-                    </div>
-                    <div className="flex items-center mb-4">
-                      <input
-                        name="hard_copy"
-                        type="checkbox"
-                        checked={hard_copy}
-                        onChange={this.handleCheckboxChange}
-                        className="w-5 h-5 text-blue-700 bg-gray-100 border-gray-300 cursor-pointer rounded-lg"
-                      />
-                      <label className="ms-2 text-sm font-medium text-gray-900">
-                        Hard Copy
-                      </label>
+                      <div className="text-sm mt-1">
+                        <p>
+                          To ensure efficient document review and validation,
+                          please define the necessary steps or questions for the
+                          process.
+                        </p>
+                        <ul className="px-4 mt-1">
+                          <li className="list-disc">
+                            Each question represents a step in the validation
+                            process.
+                          </li>
+                          <li className="list-disc">
+                            Ensure that all required steps are covered to
+                            maintain the integrity of the document review.
+                          </li>
+                          <li className="list-disc">
+                            You can add as many validation questions as needed
+                            to complete the process.
+                          </li>
+                        </ul>
+                      </div>
                     </div>
                   </div>
-                  <div className="flex justify-end pr-4">
+                )}
+                <div className="mt-6 px-4">
+                  {validation_questions.length > 0 ? (
+                    <div className="">
+                      {validation_questions.map((request) => (
+                        <div
+                          key={request.id}
+                          className="flex space-x-4 group bg-gray-100 items-center p-2 rounded-md mb-2 cursor-pointer"
+                        >
+                          <div
+                            className={`flex items-center justify-center ${
+                              request.status == "active"
+                                ? "bg-green-600"
+                                : "bg-gray-400"
+                            }  text-white w-6 h-6 rounded-full font-bold`}
+                          >
+                            {request.index}
+                          </div>
+                          <div
+                            className={`flex-1 ${
+                              request.status == "active"
+                                ? "text-gray-900"
+                                : "text-gray-400"
+                            }`}
+                          >
+                            {request.question}
+                          </div>
+                          <div className="flex ">
+                            <MdEdit
+                              size={28}
+                              className="text-green-700 bg-green-100 rounded-md p-1 border mr-2"
+                              onClick={() => this.handleEditClick(request)}
+                            />
+                            <MdDelete
+                              size={28}
+                              className="text-red-700 bg-red-100 rounded-md p-1 border"
+                              onClick={() => this.handleDeleteClick(request)}
+                            />
+
+                            {editingValidationQuestion === request.id && (
+                              <EditValidationQuestion
+                                fetchValidationQuestions={
+                                  this.fetchValidationQuestions
+                                }
+                                validationQuestion={questionToEdit}
+                                onClose={() =>
+                                  this.setState({
+                                    editingValidationQuestion: null,
+                                    questionToEdit: null,
+                                  })
+                                }
+                              />
+                            )}
+                            {deleteValidationQuestion === request.id && (
+                              <DeleteValidationQuestion
+                                fetchValidationQuestions={
+                                  this.fetchValidationQuestions
+                                }
+                                validationQuestion={questionToDelete}
+                                onClose={() =>
+                                  this.setState({
+                                    deleteValidationQuestion: null,
+                                    questionToDelete: null,
+                                  })
+                                }
+                              />
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="flex flex-col justify-center items-center h-full">
+                      <img
+                        src="/images/nodata.png"
+                        alt="No data available"
+                        className="w-1/4 h-auto"
+                      />
+                      <p className="text-gray-500 text-sm -mt-10 font-medium">
+                        No validation questions
+                      </p>
+                    </div>
+                  )}
+                </div>
+                <button
+                  className="absolute right-6 xl:right-12 bottom-10 flex space-x-2 bg-deepBlue text-white px-4 rounded-full py-1.5 text-sm font-light shadow-md shadow-gray-500"
+                  onClick={this.toggleCreateModal}
+                >
+                  <FaPlus className="self-center" />
+                  <p>New Question</p>
+                </button>
+              </div>
+            </div>
+          </div>
+          {createModal && (
+            <div className="fixed z-50 inset-0 bg-black bg-opacity-60 flex justify-end">
+              <form
+                onSubmit={this.handleSubmit}
+                className="w-1/2 lg:w-1/3 xl:w-[28%] h-full bg-white shadow-lg transition-transform duration-700 ease-in-out transform"
+                style={{
+                  right: 0,
+                  position: "absolute",
+                  transform: createModal ? "translateX(0)" : "translateX(100%)",
+                }}
+              >
+                <div className="flex justify-between items-center font-medium border-b-2 p-4">
+                  <h2 className="text-lg">Add New Question</h2>
+                  <button
+                    onClick={this.toggleCreateModal}
+                    className="flex items-center justify-center h-8 w-8 bg-red-200 rounded-md"
+                  >
+                    <MdClose size={20} className="text-red-600" />
+                  </button>
+                </div>
+
+                <div className="relative flex flex-col space-y-7 px-4 py-6 overflow-y-auto h-[calc(100%-4rem)]">
+                  <Textarea
+                    label="Question"
+                    name="question"
+                    value={this.state.question}
+                    onChange={this.handleInputChange}
+                  />
+                  <Textbox
+                    label="Index"
+                    name="index"
+                    type="number"
+                    caption="This number decides the order of your verification questions"
+                    value={this.state.index}
+                    onChange={this.handleInputChange}
+                  />
+
+                  <div className="w-full absolute bottom-4 right-0 flex space-x-4 px-4">
+                    <button
+                      onClick={this.toggleCreateModal}
+                      type="button"
+                      className="text-xs w-1/2 text-gray-600 border px-4 py-1.5 rounded-full"
+                    >
+                      Close
+                    </button>
                     <button
                       type="submit"
                       disabled={isSaving}
-                      className="w-1/2 flex space-x-2 text-sm items-center justify-center mt-8 border border-blue-700 text-blue-700 hover:bg-blue-600 hover:text-white rounded-md px-3 h-8 cursor-pointer"
+                      className={`w-1/2 flex items-center justify-center rounded-full ${
+                        isSaving
+                          ? "bg-gray-400 text-gray-700"
+                          : "bg-buttonLog text-white"
+                      } py-1.5 text-xs ${isSaving ? "cursor-not-allowed" : ""}`}
                     >
                       {isSaving ? (
                         <>
                           <Spinner size="w-4 h-4 mr-2" />
-                          Updating...
+                          Saving...
                         </>
                       ) : (
-                        <div className="flex items-center space-x-2">
-                          <p>Update</p> <MdSave />
-                        </div>
+                        "Save"
                       )}
                     </button>
                   </div>
-                </form>
-
-                <div className="mt-6 px-4">
-                  <div className="my-2">
-                    <p className="text-sm font-medium text-gray-800 underline">
-                      Validation Fee
-                    </p>
-                    <p className="italic text-xs text-gray-700 ml-1">
-                      Fees applicant pay when they request for a document to be
-                      validated
-                    </p>
-                  </div>
-                  <div className="my-2">
-                    <p className="text-sm font-medium text-gray-800 underline">
-                      Verification Fee
-                    </p>
-                    <p className="italic text-xs text-gray-700 ml-1">
-                      Fees institutions pay when they request for a document to
-                      be verified for authenticity
-                    </p>
-                  </div>
-                  <div className="my-2">
-                    <p className="text-sm font-medium text-gray-800 underline">
-                      Requisition Fee
-                    </p>
-                    <p className="italic text-xs text-gray-700 ml-1">
-                      Fees applicant pay when they request for a document
-                    </p>
-                  </div>
-                  <div className="my-2">
-                    <p className="text-sm font-medium text-gray-800 underline">
-                      Printing Fee
-                    </p>
-                    <p className="italic text-xs text-gray-700 ml-1">
-                      In instances of hard copy format the fee for printing the
-                      document
-                    </p>
-                  </div>
                 </div>
-              </div>
+              </form>
             </div>
-            <div className="col-span-3">
-              {this.state.isVisible && (
-                <div className="px-2">
-                  <div className="w-full bg-red-100 px-4 py-3 mx-auto rounded-lg">
-                    <div className="flex justify-between border-b border-white pb-2 items-center">
-                      <div className="flex space-x-2">
-                        <IoWarning size={24} className="text-yellow-500" />
-                        <p className="font-semibold">
-                          Setup Document Verification Process
-                        </p>
-                      </div>
-                      {/* <div className="flex items-center justify-center w-8 h-8 rounded bg-red-200 text-red-600 cursor-pointer hover:bg-red-300" onClick={this.handleCloseDiv}>
-                                                <MdClose/>
-                                            </div> */}
-                    </div>
-
-                    <div className="text-sm mt-1">
-                      <p>
-                        To ensure efficient document review and validation,
-                        please define the necessary steps or questions for the
-                        process.
-                      </p>
-                      <ul className="px-4 mt-1">
-                        <li className="list-disc">
-                          Each question represents a step in the validation
-                          process.
-                        </li>
-                        <li className="list-disc">
-                          Ensure that all required steps are covered to maintain
-                          the integrity of the document review.
-                        </li>
-                        <li className="list-disc">
-                          You can add as many validation questions as needed to
-                          complete the process.
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-              )}
-              <div className="mt-6 px-4">
-                {validation_questions.length > 0 ? (
-                  <div className="">
-                    {validation_questions.map((request) => (
-                      <div
-                        key={request.id}
-                        className="flex space-x-4 group bg-gray-100 items-center p-2 rounded-md mb-2 cursor-pointer"
-                      >
-                        <div
-                          className={`flex items-center justify-center ${
-                            request.status == "active"
-                              ? "bg-green-600"
-                              : "bg-gray-400"
-                          }  text-white w-6 h-6 rounded-full font-bold`}
-                        >
-                          {request.index}
-                        </div>
-                        <div
-                          className={`flex-1 ${
-                            request.status == "active"
-                              ? "text-gray-900"
-                              : "text-gray-400"
-                          }`}
-                        >
-                          {request.question}
-                        </div>
-                        <div className="flex ">
-                          <MdEdit
-                            size={28}
-                            className="text-green-700 bg-green-100 rounded-md p-1 border mr-2"
-                            onClick={() => this.handleEditClick(request)}
-                          />
-                          <MdDelete
-                            size={28}
-                            className="text-red-700 bg-red-100 rounded-md p-1 border"
-                            onClick={() => this.handleDeleteClick(request)}
-                          />
-
-                          {editingValidationQuestion === request.id && (
-                            <EditValidationQuestion
-                              fetchValidationQuestions={
-                                this.fetchValidationQuestions
-                              }
-                              validationQuestion={questionToEdit}
-                              onClose={() =>
-                                this.setState({
-                                  editingValidationQuestion: null,
-                                  questionToEdit: null,
-                                })
-                              }
-                            />
-                          )}
-                          {deleteValidationQuestion === request.id && (
-                            <DeleteValidationQuestion
-                              fetchValidationQuestions={
-                                this.fetchValidationQuestions
-                              }
-                              validationQuestion={questionToDelete}
-                              onClose={() =>
-                                this.setState({
-                                  deleteValidationQuestion: null,
-                                  questionToDelete: null,
-                                })
-                              }
-                            />
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="flex flex-col justify-center items-center h-full">
-                    <img
-                      src="/images/nodata.png"
-                      alt="No data available"
-                      className="w-1/4 h-auto"
-                    />
-                    <p className="text-gray-500 text-sm -mt-10 font-medium">
-                      No validation questions
-                    </p>
-                  </div>
-                )}
-              </div>
-              <button
-                className="absolute right-6 xl:right-12 bottom-10 flex space-x-2 bg-deepBlue text-white px-4 rounded-full py-1.5 text-sm font-light shadow-md shadow-gray-500"
-                onClick={this.toggleCreateModal}
-              >
-                <FaPlus className="self-center" />
-                <p>New Question</p>
-              </button>
-            </div>
-          </div>
-        </div>
-        {createModal && (
-          <div className="fixed z-50 inset-0 bg-black bg-opacity-60 flex justify-end">
-            <form
-              onSubmit={this.handleSubmit}
-              className="w-1/2 lg:w-1/3 xl:w-[28%] h-full bg-white shadow-lg transition-transform duration-700 ease-in-out transform"
-              style={{
-                right: 0,
-                position: "absolute",
-                transform: createModal ? "translateX(0)" : "translateX(100%)",
-              }}
-            >
-              <div className="flex justify-between items-center font-medium border-b-2 p-4">
-                <h2 className="text-lg">Add New Question</h2>
-                <button
-                  onClick={this.toggleCreateModal}
-                  className="flex items-center justify-center h-8 w-8 bg-red-200 rounded-md"
-                >
-                  <MdClose size={20} className="text-red-600" />
-                </button>
-              </div>
-
-              <div className="relative flex flex-col space-y-7 px-4 py-6 overflow-y-auto h-[calc(100%-4rem)]">
-                <Textarea
-                  label="Question"
-                  name="question"
-                  value={this.state.question}
-                  onChange={this.handleInputChange}
-                />
-                <Textbox
-                  label="Index"
-                  name="index"
-                  type="number"
-                  caption="This number decides the order of your verification questions"
-                  value={this.state.index}
-                  onChange={this.handleInputChange}
-                />
-
-                <div className="w-full absolute bottom-4 right-0 flex space-x-4 px-4">
-                  <button
-                    onClick={this.toggleCreateModal}
-                    type="button"
-                    className="text-xs w-1/2 text-gray-600 border px-4 py-1.5 rounded-full"
-                  >
-                    Close
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={isSaving}
-                    className={`w-1/2 flex items-center justify-center rounded-full ${
-                      isSaving
-                        ? "bg-gray-400 text-gray-700"
-                        : "bg-buttonLog text-white"
-                    } py-1.5 text-xs ${isSaving ? "cursor-not-allowed" : ""}`}
-                  >
-                    {isSaving ? (
-                      <>
-                        <Spinner size="w-4 h-4 mr-2" />
-                        Saving...
-                      </>
-                    ) : (
-                      "Save"
-                    )}
-                  </button>
-                </div>
-              </div>
-            </form>
-          </div>
-        )}
-        {baseFeeModal && (
-          <UpdateDocumentFee
-            documentType={document_type_details}
-            onClose={this.toggleBaseFeeModal}
-            fetchValidationQuestions={this.fetchValidationQuestions}
-          />
-        )}
+          )}
+          {baseFeeModal && (
+            <UpdateDocumentFee
+              documentType={document_type_details}
+              onClose={this.toggleBaseFeeModal}
+              fetchValidationQuestions={this.fetchValidationQuestions}
+            />
+          )}
         </AuthLayout>
       </>
     );
@@ -947,7 +952,7 @@ class UpdateDocumentFee extends Component {
               </div>
             </div>
           </div>
-        )}        
+        )}
       </>
     );
   }
