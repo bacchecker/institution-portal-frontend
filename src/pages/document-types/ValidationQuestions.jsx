@@ -10,6 +10,7 @@ import Textarea from "@components/Textarea";
 import Select from "@components/Select";
 import Spinner from "@components/Spinner";
 import { FaMoneyBill1Wave } from "react-icons/fa6";
+import AuthLayout from "../../components/AuthLayout";
 
 class ValidationQuestions extends Component {
   constructor(props) {
@@ -173,7 +174,7 @@ class ValidationQuestions extends Component {
       hard_copy,
     } = this.state;
     return (
-      <>
+      <AuthLayout title="Document Type Details">
         <div className="bg-white py-4 rounded-md min-h-screen">
           <div className="w-full flex flex-col justify-center border-b items-center pb-2">
             <h1 className="font-bold text-deepBlue uppercase text-xl mb-1">
@@ -511,7 +512,7 @@ class ValidationQuestions extends Component {
             fetchValidationQuestions={this.fetchValidationQuestions}
           />
         )}
-      </>
+      </AuthLayout>
     );
   }
 }

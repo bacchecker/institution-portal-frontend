@@ -1,5 +1,4 @@
 import Dashboard from "./pages/Dashboard";
-import { toast } from "react-hot-toast";
 import { Routes, Route, Outlet, useNavigate } from "react-router-dom";
 import Login from "./pages/auth/Login";
 import withRouter from "./components/withRouter";

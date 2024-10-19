@@ -58,9 +58,7 @@ class DocumentTypes extends Component {
     const { documentTypes, isLoading } = this.state;
     return (
       <AuthLayout title="Document Types">
-        <div className="container mx-auto md:px-3">
-          <h1 className="text-xl font-bold mb-4">Document Types</h1>
-
+        <div className="container mx-auto md:p-3 ">
           {/* Filter Section */}
           <div className="mb-4 flex justify-between">
             <div className="relative w-full lg:w-2/3">
@@ -92,7 +90,7 @@ class DocumentTypes extends Component {
               />
             </div>
             <NavLink
-              to={`/document-types/add-remove`}
+              to={`/account-setup/document-types/add-remove`}
               className={`flex items-center bg-purple-800 text-white px-4 rounded-full`}
             >
               <MdAdd size={24} /> Add / Remove
@@ -142,7 +140,7 @@ class DocumentTypes extends Component {
                 <div className="grid grid-cols-1 xl:grid-cols-2 gap-5 mt-2">
                   {documentTypes.map((request) => (
                     <NavLink
-                      to={`/document-types/${request.id}`}
+                      to={`/account-setup/document-types/${request.id}`}
                       key={request.id}
                       className="relative bg-white shadow-md shadow-gray-300 hover:cursor-pointer hover:shadow-gray-500 group"
                     >

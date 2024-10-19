@@ -14,13 +14,19 @@ const useAuthStore = create(
       login: (user, institution, token) =>
         set({
           user,
-          institution,
           token,
+          institution,
           isAuthenticated: true,
         }),
 
       // Action to log out the user
-      logout: () => set({ user: null, isAuthenticated: false }),
+      logout: () =>
+        set({
+          user: null,
+          token: null,
+          institution: null,
+          isAuthenticated: false,
+        }),
     }),
     {
       name: "auth-storage", // Name of the localStorage key

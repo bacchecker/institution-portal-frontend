@@ -188,7 +188,7 @@ class InstitutionData extends Component {
     try {
       const response = await axios.post("/institution/account-setup", form);
       toast.success(response.data.message);
-      this.props.navigate("/document-types");
+      this.props.navigate("/account-setup/document-types");
     } catch (error) {
       toast.error(error.response?.data?.message || "An error occurred");
     } finally {

@@ -24,7 +24,7 @@ export default function AuthLayout({ children, title = "Page Title" }) {
   const [isMobileExpanded, setIsMobileExpanded] = useState(false);
   const url = useLocation().pathname;
   const [accessibleRoutes, setAccessibleRoutes] = useState([]);
-  const { isAuthenticated, user, institution } = useAuthStore();
+  const { isAuthenticated, user, institution, logout } = useAuthStore();
 
   useEffect(() => {
     setIsDesktopExpanded(
@@ -436,7 +436,7 @@ export default function AuthLayout({ children, title = "Page Title" }) {
                     key="logout"
                     color="danger"
                     onClick={() => {
-                      post(route("admin.logout"));
+                      logout();
                     }}
                   >
                     Log Out
