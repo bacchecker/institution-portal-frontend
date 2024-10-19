@@ -30,8 +30,6 @@ import Drawer from "@components/Drawer";
 import CustomUser from "@components/custom-user";
 import { useNavigate } from "react-router-dom";
 import ClipIcon from "@assets/icons/clip";
-import { IoDocumentText } from "react-icons/io5";
-import { FaUser } from "react-icons/fa";
 import DownloadIcon from "@assets/icons/download";
 import PdfIcon from "../../../assets/icons/pdf";
 import WordIcon from "../../../assets/icons/word";
@@ -261,14 +259,6 @@ export default function DocumentRequest() {
               <DateRangePicker
                 visibleMonths={2}
                 className="w-[30%]"
-                // value={{
-                //     start: dateRange.start
-                //         ? parseDate(dateRange.start)
-                //         : null,
-                //     end: dateRange.end
-                //         ? parseDate(dateRange.end)
-                //         : null,
-                // }}
                 onChange={(date) => {
                   let newStartDate;
                   if (date) {
@@ -821,7 +811,6 @@ export default function DocumentRequest() {
               ? "Processing"
               : "Complete Request"}
           </span>
-          {/* {data?.status} */}?
         </p>
       </ConfirmModal>
     </AuthLayout>

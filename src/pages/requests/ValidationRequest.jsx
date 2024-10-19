@@ -23,6 +23,7 @@ import StatusChip from "@components/status-chip";
 import Drawer from "@components/Drawer";
 import CustomUser from "@components/custom-user";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { filesize } from "filesize";
 
 const ItemCard = ({ title, value }) => (
   <div className="grid grid-cols-5 w-full items-center">
@@ -41,8 +42,6 @@ export default function ValidationRequest() {
   const [data, setData] = useState(null);
   const navigate = useNavigate();
 
-  // .get(`/institution/requests/document-requests`, {
-
   const { data: resData, error } = useSWR(
     "/institution/requests/validation-requests",
     (url) => axios.get(url).then((res) => res.data)
@@ -50,16 +49,7 @@ export default function ValidationRequest() {
 
   console.log(resData);
 
-  const [dateRange, setDateRange] = useState({
-    // start:
-    //     !filters?.start_date || filters?.start_date === "null"
-    //         ? ""
-    //         : filters?.start_date,
-    // end:
-    //     !filters?.end_date || filters?.end_date === "null"
-    //         ? ""
-    //         : filters?.end_date,
-  });
+  const [dateRange, setDateRange] = useState({});
 
   return (
     <AuthLayout title="Validation Request">
@@ -190,7 +180,6 @@ export default function ValidationRequest() {
         <CustomTable
           columns={[
             "ID",
-            "Institution",
             "Requested By",
             "Date",
             "Documents",
@@ -199,7 +188,7 @@ export default function ValidationRequest() {
             "Payment Status",
             "",
           ]}
-          // loadingState={false}
+          loadingState={resData ? false : true}
           page={resData?.current_page}
           setPage={(page) =>
             navigate(
@@ -214,16 +203,6 @@ export default function ValidationRequest() {
             <TableRow key={item?.id}>
               <TableCell className="font-semibold">
                 {item?.unique_code}
-              </TableCell>
-              <TableCell>
-                <div className="flex items-center gap-2 flex-wrap">
-                  <p>{item?.institution?.name}</p>
-                  {!item?.institution?.user_id && (
-                    <Chip size="sm" variant="faded" color="warning">
-                      Temporary
-                    </Chip>
-                  )}
-                </div>
               </TableCell>
               <TableCell className="font-semibold">
                 <CustomUser
@@ -304,7 +283,7 @@ export default function ValidationRequest() {
         title="Request Details"
         isOpen={openDrawer}
         setIsOpen={setOpenDrawer}
-        classNames="w-[100vw] md:w-[50vw]"
+        classNames="w-[100vw] md:w-[40vw]"
       >
         <div className="h-full flex flex-col justify-between">
           <div className="flex flex-col gap-11 mb-6">
@@ -507,7 +486,7 @@ export default function ValidationRequest() {
               color="default"
               onClick={() => {
                 setOpenDrawer(false);
-                // reset();
+                setData(null);
               }}
             >
               Close
@@ -526,170 +505,47 @@ export default function ValidationRequest() {
         </div>
       </Drawer>
 
-      {/* <Modal
-                isOpen={fileUploadDisclosure.isOpen}
-                onOpenChange={fileUploadDisclosure.onOpenChange}
-                isDismissable={false}
-                isKeyboardDismissDisabled={true}
-                className="z-[99]"
-                backdrop="blur"
-            >
-                <ModalContent>
-                    {(onClose) => (
-                        <>
-                            <ModalHeader className="flex flex-col gap-1">
-                                Upload Documents
-                            </ModalHeader>
-                            <ModalBody>
-                                <div>
-                                    <div className="sticky top-0 z-50 bg-white dark:bg-slate-900 pb-5">
-                                        <div className="border-2 border-primary shadow-sm rounded-xl p-4 bg-gray-50 dark:bg-slate-900">
-                                            <div
-                                                className={`p-3 border-2 border-dashed rounded-lg ${
-                                                    dragActive
-                                                        ? "border-blue-400 bg-blue-50"
-                                                        : "border-gray-300"
-                                                }`}
-                                            >
-                                                <input
-                                                    type="file"
-                                                    multiple
-                                                    id="file-upload"
-                                                    name="document"
-                                                    className="hidden"
-                                                    onChange={handleChange}
-                                                    accept=".pdf,.docx,.doc,.txt,.xlsx,.xls"
-                                                />
+      {/* <ConfirmModal
+        processing={processing}
+        disclosure={changeStatusDisclosure}
+        title="Change Request Status"
+        onButtonClick={async () => {
+          setProcessing(true);
+          const resss = await axios.post(
+            `/institution/document-requests/${data?.unique_code}/status`,
+            {
+              status:
+                data?.status == "submitted"
+                  ? "received"
+                  : data?.status == "received"
+                  ? "processing"
+                  : "completed",
+            }
+          );
 
-                                                {data.documents &&
-                                                data?.documents?.length > 0 ? (
-                                                    <div className="flex flex-col">
-                                                        {data?.documents?.map(
-                                                            (
-                                                                file,
-                                                                index: number
-                                                            ) => (
-                                                                <label
-                                                                    key={index}
-                                                                    htmlFor="file-upload"
-                                                                    className="flex items-center cursor-pointer mb-2"
-                                                                >
-                                                                    <p className="flex items-center text-base font-semibold text-slate-600 dark:text-slate-200">
-                                                                        <span className="mr-2">
-                                                                            {getFileIcon(
-                                                                                file.type
-                                                                            )}
-                                                                        </span>
-                                                                        {
-                                                                            file.name
-                                                                        }
-                                                                    </p>
-                                                                </label>
-                                                            )
-                                                        )}
-                                                    </div>
-                                                ) : (
-                                                    <label
-                                                        htmlFor="file-upload"
-                                                        className="flex items-center justify-center h-full py-0 text-center cursor-pointer gap-x-2"
-                                                    >
-                                                        <svg
-                                                            className="w-8 h-8 text-primary"
-                                                            fill="none"
-                                                            stroke="currentColor"
-                                                            viewBox="0 0 24 24"
-                                                            xmlns="http://www.w3.org/2000/svg"
-                                                        >
-                                                            <path
-                                                                strokeLinecap="round"
-                                                                strokeLinejoin="round"
-                                                                strokeWidth="2"
-                                                                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-                                                            ></path>
-                                                        </svg>
-                                                        <div className="text-left">
-                                                            <p className="text-sm text-slate-600 dark:text-slate-300">
-                                                                Click to select
-                                                                or attach
-                                                                documents
-                                                            </p>
-                                                            <p className="text-xs text-slate-600 dark:text-slate-300">
-                                                                (PDF, DOCX,
-                                                                XLSX, or Text
-                                                                files only)
-                                                            </p>
-                                                        </div>
-                                                    </label>
-                                                )}
-                                                {dragActive && (
-                                                    <div
-                                                        className="absolute inset-0 z-50"
-                                                        onDragEnter={handleDrag}
-                                                        onDragLeave={handleDrag}
-                                                        onDragOver={handleDrag}
-                                                        onDrop={handleDrop}
-                                                    ></div>
-                                                )}
-                                            </div>
-                                            {errors.documents && (
-                                                <small className="mt-2 text-sm text-danger">
-                                                    {errors.documents}
-                                                </small>
-                                            )}
-                                        </div>
-                                    </div>
-                                </div>
-                            </ModalBody>
-                            <ModalFooter>
-                                <Button
-                                    color="danger"
-                                    variant="light"
-                                    onPress={onClose}
-                                >
-                                    Close
-                                </Button>
-                                <Button
-                                    color="danger"
-                                    onClick={() => {
-                                        post(route("upload-document"), {
-                                            data,
-                                            preserveState: true,
-                                            preserveScroll: true,
-                                            onSuccess: () => {
-                                                fileUploadDisclosure.onClose();
-                                                // setOpenDrawer(false);
-                                                setData((prev) => ({
-                                                    ...prev,
-                                                    documents: null,
-                                                }));
-                                                // router.reload({ only: [""] });
-                                            },
-                                            onError: (error) => {
-                                                // setError(error);
-                                                // setData(
-                                                //     "file_id",
-                                                //     error.file_id
-                                                // );
-                                                // if (
-                                                //     error?.type ===
-                                                //     "duplicate"
-                                                // ) {
-                                                //     setFileName(
-                                                //         error.file_name
-                                                //     );
-                                                //     fileUploadDisclosure.onOpen();
-                                                // }
-                                            },
-                                        });
-                                    }}
-                                >
-                                    Upload Documents
-                                </Button>
-                            </ModalFooter>
-                        </>
-                    )}
-                </ModalContent>
-            </Modal> */}
+          if (resss.status !== 200) {
+            toast.error("Failed to update request status");
+            return;
+          }
+          console.log(resss?.data);
+          setData(resss?.data[0]);
+          setProcessing(false);
+          toast.success("Request status updated successfully");
+          mutate("/institution/requests/document-requests");
+          changeStatusDisclosure.onClose();
+        }}
+      >
+        <p className="font-quicksand">
+          Are you sure to change status to{" "}
+          <span className="font-semibold">
+            {data?.status == "submitted"
+              ? "Received"
+              : data?.status == "received"
+              ? "Processing"
+              : "Complete Request"}
+          </span>
+        </p>
+      </ConfirmModal> */}
     </AuthLayout>
   );
 }
