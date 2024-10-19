@@ -4,6 +4,7 @@ import {
   Button,
   Card,
   CardBody,
+  CardHeader,
   Chip,
   DateRangePicker,
   Input,
@@ -14,33 +15,42 @@ import {
   SelectItem,
   TableCell,
   TableRow,
+  useDisclosure,
 } from "@nextui-org/react";
 import CustomTable from "@components/CustomTable";
-import useSWR from "swr";
+import useSWR, { useSWRConfig } from "swr";
 import moment from "moment";
 import axios from "@utils/axiosConfig";
 import StatusChip from "@components/status-chip";
 import Drawer from "@components/Drawer";
 import CustomUser from "@components/custom-user";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { filesize } from "filesize";
+import ClipIcon from "@assets/icons/clip";
+import DownloadIcon from "@assets/icons/download";
+import ConfirmModal from "../../components/confirm-modal";
+import toast from "react-hot-toast";
 
 const ItemCard = ({ title, value }) => (
-  <div className="grid grid-cols-5 w-full items-center">
-    <p className="col-span-2 dark:text-white/80 text-black/55">{title}</p>
-    <div className="col-span-3">{value}</div>
+  <div className="flex gap-4 items-center">
+    <p className="dark:text-white/80 text-black/55">{title}</p>
+    <div className="">{value}</div>
   </div>
 );
 
 export default function ValidationRequest() {
+  const [openDrawer, setOpenDrawer] = useState(false);
+  const [data, setData] = useState(null);
+  const navigate = useNavigate();
+  const [processing, setProcessing] = useState(false);
+  const { mutate } = useSWRConfig();
+  const [dateRange, setDateRange] = useState({});
+  const [bulkDownloadLoading, setBulkDownloadLoading] = useState(false);
   const [filters, setFilters] = useState({
     search_query: "",
     status: "",
     payment_status: "",
   });
-  const [openDrawer, setOpenDrawer] = useState(false);
-  const [data, setData] = useState(null);
-  const navigate = useNavigate();
 
   const { data: resData, error } = useSWR(
     "/institution/requests/validation-requests",
@@ -49,7 +59,49 @@ export default function ValidationRequest() {
 
   console.log(resData);
 
-  const [dateRange, setDateRange] = useState({});
+  const handleBulkDownload = async (filePaths) => {
+    try {
+      const csrfTokenMeta = document?.querySelector('meta[name="csrf-token"]');
+      const csrfToken = csrfTokenMeta?.getAttribute("content");
+
+      const headers = {
+        "Content-Type": "application/json",
+      };
+
+      // Only add X-CSRF-TOKEN if the token exists
+      if (csrfToken) {
+        headers["X-CSRF-TOKEN"] = csrfToken;
+      }
+
+      const response = await fetch(
+        "https://backend.baccheck.online/api/document/bulk-download",
+        {
+          method: "POST",
+          headers: headers,
+          body: JSON.stringify({ files: filePaths }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "bulk_download.zip"; // You can set a dynamic name if needed
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+      setBulkDownloadLoading(false);
+    } catch (error) {
+      console.error("Error downloading files:", error);
+    }
+  };
+
+  const changeStatusDisclosure = useDisclosure();
 
   return (
     <AuthLayout title="Validation Request">
@@ -263,12 +315,6 @@ export default function ValidationRequest() {
                   onClick={() => {
                     setOpenDrawer(true);
                     setData(item);
-                    // router.visit(
-                    //     route(
-                    //         "requests.document-requests.show",
-                    //         item.id
-                    //     )
-                    // );
                   }}
                 >
                   View
@@ -286,58 +332,65 @@ export default function ValidationRequest() {
         classNames="w-[100vw] md:w-[40vw]"
       >
         <div className="h-full flex flex-col justify-between">
-          <div className="flex flex-col gap-11 mb-6">
-            <div className="grid grid-cols-2 gap-2 gap-y-4">
+          <div className="flex flex-col gap-2 mb-6">
+            <div className="flex flex-col gap-1">
               <ItemCard title="Request ID" value={data?.unique_code} />
               <ItemCard
-                title="Status"
-                value={<StatusChip status={data?.status} />}
+                title="Requested On"
+                value={moment(data?.created_at).format("Do MMMM, YYYY")}
               />
+              <ItemCard title="Total Cost (GH¢)" value={data?.total_amount} />
               <ItemCard
                 title="Payment Status"
                 value={<StatusChip status={data?.payment_status} />}
               />
               <ItemCard
-                title="Requested On"
-                value={moment(data?.created_at).format("Do MMMM, YYYY")}
+                title="Request Status"
+                value={<StatusChip status={data?.status} />}
               />
-              <ItemCard
-                title="Requested By"
-                value={
+            </div>
+
+            <Card className="dark:bg-slate-950">
+              <CardHeader>
+                <p className="font-bold">Applicant Info</p>
+              </CardHeader>
+              <CardBody>
+                <div className="flex gap-3">
                   <CustomUser
                     avatarSrc={data?.user?.profile_photo_url}
                     name={`${data?.user?.first_name} ${data?.user?.last_name}`}
                     email={`${data?.user?.email}`}
                   />
-                }
-              />
-              <ItemCard
-                title="Institution"
-                // value={data?.institution?.name}
-                value={
-                  <div className="flex gap-2 items-center">
-                    <p>{data?.institution?.name}</p>
-                    {!data?.institution?.user_id && (
-                      <Chip size="sm" variant="faded" color="warning">
-                        Temporary
-                      </Chip>
-                    )}
+
+                  <div className="grid grid-cols-5 gap-1">
+                    <p className="font-semibold">Phone:</p>
+                    <p className="col-span-4">{data?.user?.phone}</p>
                   </div>
-                }
-              />
-              <ItemCard
-                title="Delivery Address"
-                value={data?.delivery_address}
-              />
+                </div>
+              </CardBody>
+            </Card>
 
-              <ItemCard title="Total Cost (GH¢)" value={data?.total_amount} />
-            </div>
-
-            <div>
+            <div className="mt-11">
               <section className="mb-3 flex items-center justify-between">
                 <div className="flex gap-2 items-center">
-                  <p className="font-semibold ">Documents</p>
+                  <ClipIcon />
+                  <p className="font-semibold ">Attachmets</p>
                 </div>
+
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  color="primary"
+                  isLoading={bulkDownloadLoading}
+                  isDisabled={bulkDownloadLoading}
+                  onClick={() => {
+                    setBulkDownloadLoading(true);
+                    handleBulkDownload(data.files.map((f) => f.path));
+                  }}
+                  startContent={<DownloadIcon />}
+                >
+                  Download all
+                </Button>
               </section>
 
               <section className="grid grid-cols-2 gap-3">
@@ -346,142 +399,45 @@ export default function ValidationRequest() {
                     key={item?.id}
                     className="gap-3 p-2 rounded-lg border dark:border-white/10"
                   >
-                    <div className="w-full flex flex-col ">
+                    <div className="w-full flex flex-col gap-1">
                       <p className="font-semibold">
                         {item?.document_type?.name}
                       </p>
+                      <p>
+                        GH¢{" "}
+                        {Math.floor(
+                          item?.document_type?.base_fee +
+                            item?.number_of_copies *
+                              item?.document_type?.printing_fee
+                        ).toFixed(2)}
+                      </p>
 
                       <div className="flex justify-between">
-                        <p>
-                          GH¢{" "}
-                          {Math.floor(
-                            item?.document_type?.base_fee +
-                              item?.number_of_copies *
-                                item?.document_type?.printing_fee
-                          ).toFixed(2)}
-                        </p>
-
                         <div className="flex gap-2 items-center">
                           <Chip size="sm">{item?.file?.extension}</Chip>
                           <p>{filesize(item?.file?.size ?? 1000)}</p>
                         </div>
+                        <p
+                          className="cursor-pointer p-1 rounded-lg bg-primary text-white text-xs"
+                          onClick={() => {
+                            window.location.href =
+                              "https://backend.baccheck.online/api/document/download" +
+                              "?path=" +
+                              encodeURIComponent(item?.file?.path);
+                          }}
+                        >
+                          Download
+                        </p>
                       </div>
-
-                      <Button
-                        color="primary"
-                        size="sm"
-                        className="cursor-pointer ml-auto mt-2"
-                        onClick={() => {
-                          window.location.href =
-                            route("download-document") +
-                            "?path=" +
-                            encodeURIComponent(item?.file?.path);
-                        }}
-                      >
-                        Download
-                      </Button>
                     </div>
                   </div>
                 ))}
               </section>
             </div>
-
-            {/* <div>
-                            <section className="mb-3 flex items-center justify-between">
-                                <div className="flex gap-2 items-center">
-                                    <ClipIcon />
-                                    <p className="font-semibold ">Attachmets</p>
-                                </div>
-
-                                {data?.files?.length >= 1 && (
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        color="primary"
-                                        isLoading={bulkDownloadLoading}
-                                        isDisabled={bulkDownloadLoading}
-                                        onClick={() => {
-                                            setBulkDownloadLoading(true);
-                                            handleBulkDownload(
-                                                data.files.map(
-                                                    (f) => f.path
-                                                )
-                                            );
-                                        }}
-                                        startContent={<DownloadIcon />}
-                                    >
-                                        Download all
-                                    </Button>
-                                )}
-                            </section>
-
-                            <section className="grid grid-cols-2 gap-3">
-                                {data?.files?.length >= 1 ? (
-                                    data?.files?.map((item) => (
-                                        <div
-                                            key={item?.id}
-                                            className="flex items-center gap-3 p-2 rounded-lg border dark:border-white/10"
-                                        >
-                                            {item?.extension === "pdf" ? (
-                                                <PdfIcon
-                                                    className="size-11"
-                                                    color="red"
-                                                />
-                                            ) : (
-                                                <WordIcon
-                                                    className="size-11"
-                                                    color="blue"
-                                                />
-                                            )}
-                                            <div className="w-full">
-                                                <p className="font-semibold line-clamp-2">
-                                                    {item?.name}
-                                                </p>
-
-                                                <div className="flex justify-between">
-                                                    <p>{filesize(item.size)}</p>
-                                                    <p
-                                                        className="cursor-pointer"
-                                                        onClick={() => {
-                                                            window.location.href =
-                                                                route(
-                                                                    "download-document"
-                                                                ) +
-                                                                "?path=" +
-                                                                encodeURIComponent(
-                                                                    item.path
-                                                                );
-                                                        }}
-                                                    >
-                                                        Download
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    ))
-                                ) : (
-                                    <p>Nothing here</p>
-                                )}
-
-                                <div className="flex items-center">
-                                    <Button
-                                        size="sm"
-                                        color="danger"
-                                        onClick={() => {
-                                            fileUploadDisclosure.onOpen();
-                                        }}
-                                    >
-                                        <PlusIcon />
-                                        Upload Document
-                                    </Button>
-                                </div>
-                            </section>
-                        </div> */}
           </div>
 
           <div className="flex items-center gap-3 justify-end">
             <Button
-              // className="w-1/2"
               size="sm"
               color="default"
               onClick={() => {
@@ -492,27 +448,34 @@ export default function ValidationRequest() {
               Close
             </Button>
 
-            <Button
-              color="danger"
-              className="font-montserrat font-semibold w-1/2"
-              //       isLoading={processing}
-              type="submit"
-              size="sm"
-            >
-              Turn In Document
-            </Button>
+            {data?.status !== "created" && data?.status !== "completed" && (
+              <Button
+                color="secondary"
+                className="font-montserrat font-semibold w-1/2"
+                size="sm"
+                onClick={() => changeStatusDisclosure.onOpen()}
+              >
+                {data?.status === "submitted"
+                  ? "Acknowledge Request"
+                  : data?.status === "received"
+                  ? "Process Request"
+                  : data?.status == "processing"
+                  ? "Complete Request"
+                  : "Acknowledge Request"}
+              </Button>
+            )}
           </div>
         </div>
       </Drawer>
 
-      {/* <ConfirmModal
+      <ConfirmModal
         processing={processing}
         disclosure={changeStatusDisclosure}
         title="Change Request Status"
         onButtonClick={async () => {
           setProcessing(true);
           const resss = await axios.post(
-            `/institution/document-requests/${data?.unique_code}/status`,
+            `/institution/requests/validation-requests/${data?.unique_code}/status`,
             {
               status:
                 data?.status == "submitted"
@@ -531,7 +494,7 @@ export default function ValidationRequest() {
           setData(resss?.data[0]);
           setProcessing(false);
           toast.success("Request status updated successfully");
-          mutate("/institution/requests/document-requests");
+          mutate("/institution/requests/validation-requests");
           changeStatusDisclosure.onClose();
         }}
       >
@@ -545,7 +508,7 @@ export default function ValidationRequest() {
               : "Complete Request"}
           </span>
         </p>
-      </ConfirmModal> */}
+      </ConfirmModal>
     </AuthLayout>
   );
 }

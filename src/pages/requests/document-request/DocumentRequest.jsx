@@ -56,6 +56,7 @@ export default function DocumentRequest() {
   const [openDrawer, setOpenDrawer] = useState(false);
   const [bulkDownloadLoading, setBulkDownloadLoading] = useState(false);
   const [processing, setProcessing] = useState(false);
+  const [dragActive, setDragActive] = useState(false);
   const [filters, setFilters] = useState({
     search_query: "",
     status: "",
@@ -109,8 +110,6 @@ export default function DocumentRequest() {
       console.error("Error downloading files:", error);
     }
   };
-
-  const [dragActive, setDragActive] = useState(false);
 
   const handleDrag = useCallback((e) => {
     e.preventDefault();
@@ -779,7 +778,7 @@ export default function DocumentRequest() {
         onButtonClick={async () => {
           setProcessing(true);
           const resss = await axios.post(
-            `/institution/document-requests/${data?.unique_code}/status`,
+            `/institution/requests/document-requests/${data?.unique_code}/status`,
             {
               status:
                 data?.status == "submitted"
