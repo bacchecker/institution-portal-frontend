@@ -24,12 +24,17 @@ import axios from "@utils/axiosConfig";
 import StatusChip from "@components/status-chip";
 import Drawer from "@components/Drawer";
 import CustomUser from "@components/custom-user";
-import { useNavigate } from "react-router-dom";
+import {
+  createSearchParams,
+  useNavigate,
+  useSearchParams,
+} from "react-router-dom";
 import { filesize } from "filesize";
 import ClipIcon from "@assets/icons/clip";
 import DownloadIcon from "@assets/icons/download";
 import ConfirmModal from "../../components/confirm-modal";
 import toast from "react-hot-toast";
+import { parseDate } from "@internationalized/date";
 
 const ItemCard = ({ title, value }) => (
   <div className="flex gap-4 items-center">
@@ -39,25 +44,31 @@ const ItemCard = ({ title, value }) => (
 );
 
 export default function ValidationRequest() {
-  const [openDrawer, setOpenDrawer] = useState(false);
-  const [data, setData] = useState(null);
   const navigate = useNavigate();
-  const [processing, setProcessing] = useState(false);
   const { mutate } = useSWRConfig();
-  const [dateRange, setDateRange] = useState({});
+
+  const changeStatusDisclosure = useDisclosure();
+
   const [bulkDownloadLoading, setBulkDownloadLoading] = useState(false);
+  const [openDrawer, setOpenDrawer] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [processing, setProcessing] = useState(false);
+  const [data, setData] = useState(null);
+
+  const [dateRange, setDateRange] = useState({});
   const [filters, setFilters] = useState({
-    search_query: "",
-    status: "",
-    payment_status: "",
+    search_query: searchParams.get("search_query") || "",
+    status: searchParams.get("status") || "",
+    start_date: searchParams.get("start_date") || "",
+    end_date: searchParams.get("end_date") || "",
   });
 
   const { data: resData, error } = useSWR(
-    "/institution/requests/validation-requests",
+    `/institution/requests/validation-requests?${createSearchParams(filters)}`,
     (url) => axios.get(url).then((res) => res.data)
   );
 
-  console.log(resData);
+  console.log(searchParams.get("search_query"));
 
   const handleBulkDownload = async (filePaths) => {
     try {
@@ -101,17 +112,22 @@ export default function ValidationRequest() {
     }
   };
 
-  const changeStatusDisclosure = useDisclosure();
-
   return (
     <AuthLayout title="Validation Request">
       <section className="md:px-3">
         <Card className="my-3 md:w-full w-[98vw] mx-auto dark:bg-slate-900">
           <CardBody className="w-full">
-            <form method="get" className="flex flex-row gap-3 items-center">
-              <input type="hidden" name="start_date" value={dateRange.start} />
-              <input type="hidden" name="end_date" value={dateRange.end} />
-
+            <form
+              method="get"
+              className="flex flex-row gap-3 items-center"
+              onSubmit={(e) => {
+                e.preventDefault();
+                navigate({
+                  // pathname: "listing",
+                  search: createSearchParams(filters).toString(),
+                });
+              }}
+            >
               <Input
                 name="search_query"
                 placeholder="Search unique code, user name, user phone number"
@@ -119,6 +135,9 @@ export default function ValidationRequest() {
                 // startContent={<SearchIconDuotone />}
                 size="sm"
                 className="max-w-xs min-w-[200px]"
+                onChange={(e) =>
+                  setFilters({ ...filters, search_query: e.target.value })
+                }
               />
               {/* 
               <Select
@@ -139,40 +158,30 @@ export default function ValidationRequest() {
                 className="max-w-[130px] min-w-[130px]"
                 name="status"
                 defaultSelectedKeys={[filters?.status]}
+                onChange={(e) =>
+                  setFilters({ ...filters, status: e.target.value })
+                }
               >
                 {[
                   {
-                    key: "active",
-                    label: "Active",
+                    key: "submitted",
+                    label: "submitted",
                   },
                   {
-                    key: "inactive",
-                    label: "Inactive",
-                  },
-                ].map((item) => (
-                  <SelectItem key={item.key}>{item.label}</SelectItem>
-                ))}
-              </Select>
-
-              <Select
-                size="sm"
-                placeholder="Payment Status"
-                className="max-w-[130px] min-w-[130px]"
-                name="payment_status"
-                defaultSelectedKeys={[filters?.payment_status]}
-              >
-                {[
-                  {
-                    key: "pending",
-                    label: "Pending",
+                    key: "received",
+                    label: "received",
                   },
                   {
-                    key: "failed",
-                    label: "Failed",
+                    key: "processing",
+                    label: "processing",
                   },
                   {
-                    key: "paid",
-                    label: "Paid",
+                    key: "completed",
+                    label: "completed",
+                  },
+                  {
+                    key: "cancelled",
+                    label: "cancelled",
                   },
                 ].map((item) => (
                   <SelectItem key={item.key}>{item.label}</SelectItem>
@@ -182,14 +191,12 @@ export default function ValidationRequest() {
               <DateRangePicker
                 visibleMonths={2}
                 className="w-[30%]"
-                // value={{
-                //     start: dateRange.start
-                //         ? parseDate(dateRange.start)
-                //         : null,
-                //     end: dateRange.end
-                //         ? parseDate(dateRange.end)
-                //         : null,
-                // }}
+                value={{
+                  start: filters.start_date
+                    ? parseDate(filters.start_date)
+                    : null,
+                  end: filters.end_date ? parseDate(filters.end_date) : null,
+                }}
                 onChange={(date) => {
                   let newStartDate;
                   if (date) {
@@ -209,11 +216,12 @@ export default function ValidationRequest() {
                     ).toDateString();
                   }
 
-                  setDateRange({
-                    start: moment(newStartDate, "ddd MMM DD YYYY")
+                  setFilters({
+                    ...filters,
+                    start_date: moment(newStartDate, "ddd MMM DD YYYY")
                       .format("YYYY-MM-DD")
                       .toString(),
-                    end: moment(newEndDate, "ddd MMM DD YYYY")
+                    end_date: moment(newEndDate, "ddd MMM DD YYYY")
                       .format("YYYY-MM-DD")
                       .toString(),
                   });
@@ -243,11 +251,10 @@ export default function ValidationRequest() {
           loadingState={resData ? false : true}
           page={resData?.current_page}
           setPage={(page) =>
-            navigate(
-              `?region=${filters.region || ""}&search_query=${
-                filters.search_query || ""
-              }&status=${filters.status || ""}&page=${page}`
-            )
+            navigate({
+              // pathname: "listing",
+              search: createSearchParams({ ...filters, page }).toString(),
+            })
           }
           totalPages={Math.ceil(resData?.total / resData?.per_page)}
         >
@@ -494,11 +501,11 @@ export default function ValidationRequest() {
             return;
           }
           console.log(resss?.data);
-          setData(resss?.data[0]);
+          // setData(resss?.data[0]);
           setProcessing(false);
-          toast.success("Request status updated successfully");
-          mutate("/institution/requests/validation-requests");
-          changeStatusDisclosure.onClose();
+          // toast.success("Request status updated successfully");
+          // mutate("/institution/requests/validation-requests");
+          // changeStatusDisclosure.onClose();
         }}
       >
         <p className="font-quicksand">
