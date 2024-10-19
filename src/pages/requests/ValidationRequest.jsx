@@ -500,12 +500,12 @@ export default function ValidationRequest() {
             toast.error("Failed to update request status");
             return;
           }
-          console.log(resss?.data);
-          // setData(resss?.data[0]);
+          console.log(resss);
+          setData(resss?.data[0]);
           setProcessing(false);
-          // toast.success("Request status updated successfully");
-          // mutate("/institution/requests/validation-requests");
-          // changeStatusDisclosure.onClose();
+          toast.success("Request status updated successfully");
+          mutate("/institution/requests/validation-requests");
+          changeStatusDisclosure.onClose();
         }}
       >
         <p className="font-quicksand">
