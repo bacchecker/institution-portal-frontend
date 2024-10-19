@@ -477,6 +477,9 @@ export default function ValidationRequest() {
           const resss = await axios.post(
             `/institution/requests/validation-requests/${data?.unique_code}/status`,
             {
+              institution_id: data?.institution_id,
+              user_id: data?.user_id,
+              unique_code: data?.unique_code,
               status:
                 data?.status == "submitted"
                   ? "received"
