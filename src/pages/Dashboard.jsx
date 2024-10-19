@@ -50,7 +50,7 @@ class Dashboard extends Component {
 
   render() {
     return (
-      <AuthLayout>
+      <AuthLayout title='Dashboard'>
         <div className="w-full md:px-3">
           <div className="grid grid-cols-2 xl:grid-cols-4 gap-8">
             <div className="col-span-3 flex items-center xl:space-x-8 space-x-4">

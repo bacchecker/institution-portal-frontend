@@ -8,6 +8,7 @@ import Select from "@components/Select";
 import { toast } from "react-hot-toast";
 import Spinner from "@components/Spinner";
 import withRouter from "@components/withRouter";
+import AuthLayout from "@components/AuthLayout";
 
 class InstitutionUsers extends Component {
   constructor(props) {
@@ -233,6 +234,7 @@ class InstitutionUsers extends Component {
     } = this.state;
     return (
       <>
+      <AuthLayout title='Institution Staff'>
         <div className="container mx-auto p-2">
           <h1 className="text-xl font-bold mb-2">{team_name}</h1>
 
@@ -563,6 +565,8 @@ class InstitutionUsers extends Component {
             </div>
           )}
         </div>
+      </AuthLayout>
+        
       </>
     );
   }

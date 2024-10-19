@@ -190,7 +190,7 @@ class InstitutionTeams extends Component {
                 <div className="grid grid-cols-1 xl:grid-cols-2 gap-5 mt-2">
                   {institutionTeams.map((request) => (
                     <NavLink
-                      to={`/institution-teams/${request.id}`}
+                      to={`/account-setup/institution-teams/${request.id}`}
                       key={request.id}
                       className="relative bg-white shadow-md shadow-gray-300 hover:cursor-pointer hover:shadow-gray-500 group"
                     >

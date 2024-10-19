@@ -9,6 +9,7 @@ import Textbox from "@components/Textbox";
 import Textarea from "@components/Textarea";
 import Select from "@components/Select";
 import Spinner from "@components/Spinner";
+import AuthLayout from "@components/AuthLayout";
 import { FaMoneyBill1Wave } from "react-icons/fa6";
 import AuthLayout from "../../components/AuthLayout";
 
@@ -174,15 +175,16 @@ class ValidationQuestions extends Component {
       hard_copy,
     } = this.state;
     return (
-      <AuthLayout title="Document Type Details">
-        <div className="bg-white py-4 rounded-md min-h-screen">
-          <div className="w-full flex flex-col justify-center border-b items-center pb-2">
+      <>
+      <AuthLayout title='Document Type Details'>
+        <div className="bg-white  py-2 min-h-screen">
+          <div className="w-full flex flex-col justify-center items-center pb-2">
             <h1 className="font-bold text-deepBlue uppercase text-xl mb-1">
               {document_type_details.name}
             </h1>
           </div>
-          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 lg:gap-2">
-            <div className="min-h-screen border-r">
+          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 lg:gap-2 pl-3">
+            <div className="min-h-screen shadow-lg">
               <h2 className="bg-blue-700 text-white pl-6 pr-4 py-2">
                 Document Billings
               </h2>
@@ -512,7 +514,8 @@ class ValidationQuestions extends Component {
             fetchValidationQuestions={this.fetchValidationQuestions}
           />
         )}
-      </AuthLayout>
+        </AuthLayout>
+      </>
     );
   }
 }
@@ -944,7 +947,7 @@ class UpdateDocumentFee extends Component {
               </div>
             </div>
           </div>
-        )}
+        )}        
       </>
     );
   }

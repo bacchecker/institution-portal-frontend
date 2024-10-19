@@ -1,5 +1,4 @@
-import { PiCertificateLight } from "react-icons/pi";
-import { ChatIcon } from "./icons/chat";
+
 import MoneyIcon from "./icons/money";
 import {
   CogBagdedIcon,
@@ -7,11 +6,8 @@ import {
   PersonCircleIcon,
   TasksListIcon,
 } from "./icons/nav";
-import { SecurityIcon } from "./icons/security";
 import { AnalysisIcon } from "./icons/analysis";
 import SupportIcon from "./icons/support";
-import { FaUsers } from "react-icons/fa";
-import { MdAttachEmail } from "react-icons/md";
 
 export const navLinks = [
   {
@@ -69,6 +65,10 @@ export const navLinks = [
       {
         label: "Setup Team",
         path: "/account-setup/institution-teams",
+      },
+      {
+        label: "Terms & Conditions",
+        path: "/account-setup/terms-conditions",
       },
     ],
   },
