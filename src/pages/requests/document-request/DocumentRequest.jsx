@@ -4,7 +4,7 @@ import {
   Button,
   Card,
   CardBody,
-  Chip,
+  CardHeader,
   DateRangePicker,
   Input,
   Modal,
@@ -19,20 +19,18 @@ import {
   SelectItem,
   TableCell,
   TableRow,
-  Textarea,
   useDisclosure,
 } from "@nextui-org/react";
 import CustomTable from "@components/CustomTable";
-import useSWR from "swr";
+import useSWR, { useSWRConfig } from "swr";
 import moment from "moment";
 import axios from "@utils/axiosConfig";
 import StatusChip from "@components/status-chip";
 import Drawer from "@components/Drawer";
 import CustomUser from "@components/custom-user";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import ClipIcon from "@assets/icons/clip";
 import { IoDocumentText } from "react-icons/io5";
-import { FaRegNoteSticky } from "react-icons/fa6";
 import { FaUser } from "react-icons/fa";
 import DownloadIcon from "@assets/icons/download";
 import PdfIcon from "../../../assets/icons/pdf";
@@ -42,27 +40,30 @@ import { PlusIcon } from "../../../assets/icons/plus";
 import ExcelIcon from "../../../assets/icons/excel";
 import Elipsis from "../../../assets/icons/elipsis";
 import ConfirmModal from "../../../components/confirm-modal";
+import toast from "react-hot-toast";
 
 const ItemCard = ({ title, value }) => (
-  <div className="grid grid-cols-5 w-full items-center">
-    <p className="col-span-2 dark:text-white/80 text-black/55">{title}</p>
-    <div className="col-span-3">{value}</div>
+  <div className="flex gap-4 items-center">
+    <p className="dark:text-white/80 text-black/55">{title}</p>
+    <div className="">{value}</div>
   </div>
 );
 
 export default function DocumentRequest() {
+  const navigate = useNavigate();
+  const [data, setData] = useState(null);
+  const fileUploadDisclosure = useDisclosure();
+  const changeStatusDisclosure = useDisclosure();
+  const [dateRange, setDateRange] = useState({});
+  const [openDrawer, setOpenDrawer] = useState(false);
+  const [bulkDownloadLoading, setBulkDownloadLoading] = useState(false);
+  const [processing, setProcessing] = useState(false);
   const [filters, setFilters] = useState({
     search_query: "",
     status: "",
     payment_status: "",
   });
-  const [openDrawer, setOpenDrawer] = useState(false);
-  const [data, setData] = useState(null);
-  const navigate = useNavigate();
-  const [bulkDownloadLoading, setBulkDownloadLoading] = useState(false);
-
-  const fileUploadDisclosure = useDisclosure();
-  const changeStatusDisclosure = useDisclosure();
+  const { mutate } = useSWRConfig();
 
   const { data: resData, error } = useSWR(
     "/institution/requests/document-requests",
@@ -83,11 +84,14 @@ export default function DocumentRequest() {
         headers["X-CSRF-TOKEN"] = csrfToken;
       }
 
-      const response = await fetch("https://bulk-download-api-endpoint", {
-        method: "POST",
-        headers: headers,
-        body: JSON.stringify({ files: filePaths }),
-      });
+      const response = await fetch(
+        "https://backend.baccheck.online/api/document/bulk-download",
+        {
+          method: "POST",
+          headers: headers,
+          body: JSON.stringify({ files: filePaths }),
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Network response was not ok");
@@ -150,13 +154,11 @@ export default function DocumentRequest() {
     );
 
     if (validFiles.length > 0) {
-      // setData("documents", validFiles); // Update state with all valid files
       setData((prev) => ({
         ...prev,
         documents: validFiles,
       }));
     } else {
-      // setData("documents", []);
       setData((prev) => ({
         ...prev,
         documents: [],
@@ -179,21 +181,6 @@ export default function DocumentRequest() {
         return <Elipsis />;
     }
   };
-  console.log(resData);
-
-  //         resData,
-  //     documentTypes,
-  //     filters,
-  const [dateRange, setDateRange] = useState({
-    // start:
-    //     !filters?.start_date || filters?.start_date === "null"
-    //         ? ""
-    //         : filters?.start_date,
-    // end:
-    //     !filters?.end_date || filters?.end_date === "null"
-    //         ? ""
-    //         : filters?.end_date,
-  });
 
   return (
     <AuthLayout title="Document Request">
@@ -449,37 +436,38 @@ export default function DocumentRequest() {
                 {moment(data?.created_at).format("Do MMMM, YYYY")}
               </p>
             </div>
-            <div className="mb-2">
-              <div className="border rounded-lg p-4 text-sm flex space-x-4">
-                <div className="flex items-center justify-center w-12 h-12 bg-gray-100  text-gray-700 shadow-md shadow-gray-400 rounded-full">
-                  <FaUser size={20} />
-                </div>
-                <div className="">
-                  <p className="font-bold mb-2 text-base">Applicant Info:</p>
-                  <div className="grid grid-cols-5 gap-1">
-                    <p className="font-semibold">Name:</p>
-                    <p className="col-span-4">
-                      {data?.user?.first_name} {data?.user.last_name}
-                    </p>
-                  </div>
-                  <div className="grid grid-cols-5 gap-1 my-1">
-                    <p className="font-semibold">Email:</p>
-                    <p className="col-span-4">{data?.user.email}</p>
-                  </div>
+
+            <Card className="dark:bg-slate-950">
+              <CardHeader>
+                <p className="font-bold">Applicant Info</p>
+              </CardHeader>
+              <CardBody>
+                <div className="flex gap-3">
+                  <CustomUser
+                    avatarSrc={data?.user?.profile_photo_url}
+                    name={`${data?.user?.first_name} ${data?.user?.last_name}`}
+                    email={`${data?.user?.email}`}
+                  />
+
                   <div className="grid grid-cols-5 gap-1">
                     <p className="font-semibold">Phone:</p>
-                    <p className="col-span-4">{data?.user.phone}</p>
+                    <p className="col-span-4">{data?.user?.phone}</p>
                   </div>
                 </div>
-              </div>
-            </div>
-            <div className="border rounded-lg p-4 mb-2">
-              <p className="font-bold mb-1">Document Request Summary:</p>
-              <ItemCard
-                title="Status"
-                value={<StatusChip status={data?.status} />}
-              />
-              <div className="w-full flex px-2">
+              </CardBody>
+            </Card>
+
+            <Card className="dark:bg-slate-950">
+              <CardHeader className="flex justify-between">
+                <p className="font-bold">Document Request Summary</p>
+
+                <ItemCard
+                  title="Status"
+                  value={<StatusChip status={data?.status} />}
+                />
+              </CardHeader>
+
+              <CardBody className="flex flex-col gap-3 px-2">
                 {data?.records?.map((item, index) => (
                   <div
                     key={index}
@@ -487,15 +475,12 @@ export default function DocumentRequest() {
                   >
                     {/* Document type and description */}
                     <div className="col-span-2 flex items-center space-x-4 w-full">
-                      <div className="flex items-center justify-center text-gray-700 bg-gray-100 rounded-full w-12 h-12 shadow-md shadow-gray-400">
-                        <IoDocumentText size={30} />
-                      </div>
                       <div>
                         <p className="font-medium text-gray-700">
                           {item?.document_type.name}
                         </p>
                         <p className="text-sm text-gray-500">
-                          {item?.document_type.description}
+                          {item?.document_type?.description}
                         </p>
                       </div>
                     </div>
@@ -528,15 +513,12 @@ export default function DocumentRequest() {
                     </div>
                   </div>
                 ))}
-              </div>
-            </div>
+              </CardBody>
+            </Card>
 
             {/* <div className="grid grid-cols-2 gap-2 gap-y-4">
-              <ItemCard title="Request ID" value={data?.unique_code} />
-              <ItemCard
-                title="Status"
-                value={<StatusChip status={data?.status} />}
-              />
+            <ItemCard title="Request ID" value={data?.unique_code} />
+            
               <ItemCard
                 title="Payment Status"
                 value={<StatusChip status={data?.payment_status} />}
@@ -546,70 +528,11 @@ export default function DocumentRequest() {
                 value={moment(data?.created_at).format("Do MMMM, YYYY")}
               />
               <ItemCard
-                title="Requested By"
-                value={
-                  <CustomUser
-                    avatarSrc={data?.user?.profile_photo_url}
-                    name={`${data?.user?.first_name} ${data?.user?.last_name}`}
-                    email={`${data?.user?.email}`}
-                  />
-                }
-              />
-              <ItemCard
-                title="Institution"
-                // value={data?.institution?.name}
-                value={
-                  <div className="flex gap-2 items-center">
-                    <p>{data?.institution?.name}</p>
-                    {!data?.institution?.user_id && (
-                      <Chip size="sm" variant="faded" color="warning">
-                        Temporary
-                      </Chip>
-                    )}
-                  </div>
-                }
-              />
-              <ItemCard
                 title="Delivery Address"
                 value={data?.delivery_address}
               />
 
               <ItemCard title="Total Cost (GH¢)" value={data?.total_amount} />
-            </div> */}
-
-            {/* <div>
-              <section className="mb-3 flex items-center justify-between">
-                <div className="flex gap-2 items-center">
-                  <p className="font-semibold ">Requested Documents</p>
-                </div>
-              </section>
-
-              <section className="grid grid-cols-3 gap-3">
-                {data?.records?.map((item) => (
-                  <div
-                    key={item?.id}
-                    className="flex items-center gap-3 p-2 rounded-lg border dark:border-white/10"
-                  >
-                    <div className="w-full">
-                      <p className="font-semibold">
-                        {item?.document_type?.name}
-                      </p>
-
-                      <div className="flex justify-between items-center">
-                        <p>
-                          GH¢{" "}
-                          {Math.floor(
-                            item?.document_type?.base_fee +
-                              item?.number_of_copies *
-                                item?.document_type?.printing_fee
-                          ).toFixed(2)}
-                        </p>
-                        <p className="text-xs">{item?.document_format}</p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </section>
             </div> */}
 
             <div>
@@ -657,10 +580,10 @@ export default function DocumentRequest() {
                         <div className="flex justify-between">
                           <p>{filesize(item.size)}</p>
                           <p
-                            className="cursor-pointer"
+                            className="cursor-pointer p-1 rounded-lg bg-primary text-white text-xs"
                             onClick={() => {
                               window.location.href =
-                                "download-doc-api-endpoint" +
+                                "https://backend.baccheck.online/api/document/download" +
                                 "?path=" +
                                 encodeURIComponent(item.path);
                             }}
@@ -710,18 +633,7 @@ export default function DocumentRequest() {
                 color="secondary"
                 className="font-montserrat font-semibold w-1/2"
                 size="sm"
-                onClick={() => {
-                  changeStatusDisclosure.onOpen();
-                  // setData((prev) => ({
-                  //   ...prev,
-                  //   status:
-                  // data?.status == "submitted"
-                  //   ? "received"
-                  //   : data?.status == "received"
-                  //   ? "processing"
-                  //   : "completed",
-                  // }));
-                }}
+                onClick={() => changeStatusDisclosure.onOpen()}
               >
                 {data?.status === "submitted"
                   ? "Acknowledge Request"
@@ -841,14 +753,32 @@ export default function DocumentRequest() {
                   Close
                 </Button>
                 <Button
+                  isLoading={processing}
+                  isDisabled={data.documents?.length < 1 || processing}
                   color="danger"
-                  onClick={() => {
-                    console.log("file upload endpoint");
+                  onClick={async () => {
+                    setProcessing(true);
 
-                    // post(route("upload-document"), {
-                    //     data,
+                    const resss = await axios.post(
+                      `/institution/upload-document`,
+                      {
+                        documents: data.documents,
+                        unique_code: data.unique_code,
+                        institution_id: data.institution_id,
+                      }
+                    );
 
-                    // });
+                    if (resss.status !== 200) {
+                      toast.error("Failed to upload file(s)");
+                      return;
+                    }
+
+                    console.log(resss?.data);
+                    setData(resss?.data[0]);
+                    setProcessing(false);
+                    toast.success("Documents uploaded successfully");
+                    mutate("/institution/requests/document-requests");
+                    fileUploadDisclosure.onClose();
                   }}
                 >
                   Upload Documents
@@ -860,11 +790,11 @@ export default function DocumentRequest() {
       </Modal>
 
       <ConfirmModal
+        processing={processing}
         disclosure={changeStatusDisclosure}
         title="Change Request Status"
         onButtonClick={async () => {
-          console.log(data);
-
+          setProcessing(true);
           const resss = await axios.post(
             `/institution/document-requests/${data?.unique_code}/status`,
             {
@@ -877,7 +807,16 @@ export default function DocumentRequest() {
             }
           );
 
-          console.log(resss);
+          if (resss.status !== 200) {
+            toast.error("Failed to update request status");
+            return;
+          }
+          console.log(resss?.data);
+          setData(resss?.data[0]);
+          setProcessing(false);
+          toast.success("Request status updated successfully");
+          mutate("/institution/requests/document-requests");
+          changeStatusDisclosure.onClose();
         }}
       >
         <p className="font-quicksand">
