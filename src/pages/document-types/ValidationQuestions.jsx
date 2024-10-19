@@ -3,15 +3,13 @@ import withRouter from "@components/withRouter";
 import { toast } from "react-hot-toast";
 import axios from "@utils/axiosConfig";
 import { MdClose, MdDelete, MdEdit, MdSave } from "react-icons/md";
-import { IoDocumentText, IoWarning } from "react-icons/io5";
+import { IoWarning } from "react-icons/io5";
 import { FaPlus } from "react-icons/fa";
 import Textbox from "@components/Textbox";
 import Textarea from "@components/Textarea";
 import Select from "@components/Select";
 import Spinner from "@components/Spinner";
 import AuthLayout from "@components/AuthLayout";
-import { FaMoneyBill1Wave } from "react-icons/fa6";
-import AuthLayout from "../../components/AuthLayout";
 
 class ValidationQuestions extends Component {
   constructor(props) {
