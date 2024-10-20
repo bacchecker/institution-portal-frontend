@@ -19,11 +19,11 @@ class CompleteProfile extends Component {
   render() {
     const { isCollapsed } = this.state;
     return (
-      <AuthLayout title="Complete Profile">
+      <AuthLayout title="Account Setup">
         <section className="p-3">
           <Card className="dark:bg-slate-900">
             <CardBody className=" ">
-              <div className="flex justify-between px-10 py-5 ">
+              <div className="flex justify-between px-10 pt-4 pb-2 ">
                 <div className="">
                   <p className="font-bold text-2xl text-uewBlue mb-1">
                     Institution Account Setup
@@ -34,7 +34,7 @@ class CompleteProfile extends Component {
                   </p>
                 </div>
               </div>
-              <div className="mx-2 py-2 lg:mx-5 lg:py-5">
+              <div className="mx-2 py-2 lg:mx-5 ">
                 <Stepper />
               </div>
             </CardBody>
