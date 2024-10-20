@@ -498,6 +498,7 @@ export default function ValidationRequest() {
 
           if (resss.status !== 200) {
             toast.error("Failed to update request status");
+            setProcessing(false);
             return;
           }
           console.log(resss);
