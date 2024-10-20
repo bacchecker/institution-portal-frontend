@@ -24,7 +24,8 @@ export default function AuthLayout({ children, title = "Page Title" }) {
   const [isMobileExpanded, setIsMobileExpanded] = useState(false);
   const url = useLocation().pathname;
   const [accessibleRoutes, setAccessibleRoutes] = useState([]);
-  const { isAuthenticated, user, institution, logout } = useAuthStore();
+  const { isAuthenticated, user, institution, logout, updateInstitution } =
+    useAuthStore();
 
   useEffect(() => {
     setIsDesktopExpanded(
@@ -55,25 +56,25 @@ export default function AuthLayout({ children, title = "Page Title" }) {
     return routeAcl.some((permission) => userPermissions.includes(permission));
   };
 
-  const getAccessibleRoutes = (routes, userPermissions) => {
-    return routes
-      .filter((route) => hasPermission(userPermissions, route.acl)) // Filter parent routes
-      .map((route) => {
-        if (route.children) {
-          // Filter children recursively based on permissions
-          const accessibleChildren = getAccessibleRoutes(
-            route.children,
-            userPermissions
-          );
+  // const getAccessibleRoutes = (routes, userPermissions) => {
+  //   return routes
+  //     .filter((route) => hasPermission(userPermissions, route.acl)) // Filter parent routes
+  //     .map((route) => {
+  //       if (route.children) {
+  //         // Filter children recursively based on permissions
+  //         const accessibleChildren = getAccessibleRoutes(
+  //           route.children,
+  //           userPermissions
+  //         );
 
-          // Return parent route only if there are accessible children or no children
-          return accessibleChildren.length > 0
-            ? { ...route, children }
-            : { ...route, children };
-        }
-        return route;
-      });
-  };
+  //         // Return parent route only if there are accessible children or no children
+  //         return accessibleChildren.length > 0
+  //           ? { ...route, children }
+  //           : { ...route, children };
+  //       }
+  //       return route;
+  //     });
+  // };
 
   //   const accessibleRoutes = getAccessibleRoutes(adminNavLinks, permissions);
 
@@ -102,8 +103,21 @@ export default function AuthLayout({ children, title = "Page Title" }) {
   }, [institution]);
 
   if (!isAuthenticated) {
+    console.log("Not authenticated");
     return <Navigate to="/login" replace />;
   }
+
+  // if (institution?.status === "inactive") {
+  //   (async () => {
+  //     const response = await axios.get("/institution/institution-data");
+  //     const responseData = response.data.institutionData;
+  //     console.log(responseData);
+  //     if (responseData.status == "active") {
+  //       updateInstitution(responseData);
+  //       return <Navigate to="/dashboard" replace />;
+  //     }
+  //   })();
+  // }
 
   return (
     <AnimatePresence>

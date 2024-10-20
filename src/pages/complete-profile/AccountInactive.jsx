@@ -9,7 +9,7 @@ import Select from "@components/Select";
 import Spinner from "@components/Spinner";
 import { toast } from "react-hot-toast";
 import { FaUser } from "react-icons/fa6";
-import { NavLink } from "react-router-dom";
+import { Navigate, NavLink } from "react-router-dom";
 import { MdClose } from "react-icons/md";
 
 class AccountInactive extends Component {
@@ -49,6 +49,8 @@ class AccountInactive extends Component {
       const institutionData = response.data.institutionData;
 
       const { status } = institutionData;
+      console.log({ status });
+
       this.setState({
         institutionStatus: status !== "inactive", // Set to true if status is not 'inactive'
       });
@@ -110,6 +112,11 @@ class AccountInactive extends Component {
       institutionStatus,
       showModal,
     } = this.state;
+
+    if (this.state.institutionStatus == true) {
+      return <Navigate to="/dashboard" />;
+    }
+
     return (
       <>
         <div className="w-full relative flex flex-col items-center justify-center bg-white rounded-md min-h-dvh">

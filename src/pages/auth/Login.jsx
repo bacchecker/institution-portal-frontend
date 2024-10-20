@@ -26,10 +26,6 @@ const Login = () => {
 
   const { login, isAuthenticated } = useAuthStore();
 
-  const handleMouseDownPassword = (event) => {
-    event.preventDefault();
-  };
-
   const onRecaptchaChange = (token) => {
     setRecaptchaToken(token);
   };
@@ -65,12 +61,12 @@ const Login = () => {
 
       const type = localStorage.getItem("type");
 
+      login(responseData.user, responseData?.institution, responseData.token);
+
       if (responseData.institution.status === "inactive") {
         navigate("/account-inactive");
         return;
       }
-
-      login(responseData.user, responseData?.institution, responseData.token);
 
       if (type === "institution") {
         toast.success(response.data.message, {});
