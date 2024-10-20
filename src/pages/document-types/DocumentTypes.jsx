@@ -91,7 +91,7 @@ class DocumentTypes extends Component {
             </div>
             <NavLink
               to={`/account-setup/document-types/add-remove`}
-              className={`flex items-center bg-purple-800 text-white px-4 rounded-full`}
+              className={`flex items-center bg-danger text-white px-4 rounded-full`}
             >
               <MdAdd size={24} /> Add / Remove
             </NavLink>
@@ -144,16 +144,16 @@ class DocumentTypes extends Component {
                       key={request.id}
                       className="relative bg-white shadow-md shadow-gray-300 hover:cursor-pointer hover:shadow-gray-500 group"
                     >
-                      <div className="flex items-center space-x-4 absolute left-0 bg-gradient-to-tl from-purple-700 via-purple-800 to-purple-900 rounded-r-full text-white px-2 py-2 shadow-md shadow-gray-500">
+                      <div className="flex items-center space-x-4 absolute left-0 bg-gradient-to-tl from-red-400 via-red-500 to-red-700 rounded-r-full text-white px-2 py-2 shadow-md shadow-gray-500">
                         <p className="text-2xl font-semibold">
                           {request.index}
                         </p>
-                        <div className="flex items-center justify-center w-10 h-10 bg-white text-purple-800 rounded-full shadow-md shadow-gray-500">
+                        <div className="flex items-center justify-center w-10 h-10 bg-white text-danger rounded-full shadow-md shadow-gray-500">
                           <GrDocumentConfig size={20} />
                         </div>
                       </div>
                       <div className="ml-28 p-3">
-                        <p className="text-purple-800 font-semibold">
+                        <p className="text-danger font-semibold">
                           {request.document_type.name}
                         </p>
                         <p className="text-sm font-medium">
@@ -166,7 +166,7 @@ class DocumentTypes extends Component {
                           </p>
                           <IoArrowForwardCircle
                             size={26}
-                            className="self-end group-hover:text-purple-800"
+                            className="self-end group-hover:text-red-700"
                           />
                         </div>
                       </div>

@@ -454,10 +454,10 @@ export default function ValidationRequest() {
             >
               Close
             </Button>
-            
+
             {data?.status !== "created" && data?.status !== "completed" && (
               <Button
-                color="secondary"
+                color="danger"
                 className="font-montserrat font-semibold w-1/2"
                 size="sm"
                 onClick={() => changeStatusDisclosure.onOpen()}

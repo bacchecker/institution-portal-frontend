@@ -83,7 +83,7 @@ class DocumentDetails extends Component {
       case "submitted":
         return "bg-yellow-100 text-yellow-700";
       case "received":
-        return "bg-purple-100 text-purple-700";
+        return "bg-danger text-white";
       case "processing":
         return "bg-orange-100 text-orange-700";
       case "completed":

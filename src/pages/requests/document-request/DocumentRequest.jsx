@@ -178,6 +178,7 @@ export default function DocumentRequest() {
         return <Elipsis />;
     }
   };
+  console.log(data);
 
   return (
     <AuthLayout title="Document Request">
@@ -303,7 +304,8 @@ export default function DocumentRequest() {
             "Requested By",
             "Delivery Address",
             "Date",
-            "Documents",
+            "Document",
+            "Format",
             "Status",
             "Total Amount",
             "Payment Status",
@@ -334,44 +336,15 @@ export default function DocumentRequest() {
                   email={`${item?.user?.email}`}
                 />
               </TableCell>
-              <TableCell>{item?.delivery_address}</TableCell>
+              <TableCell>{item?.delivery_address ?? "N/A"}</TableCell>
               <TableCell>
                 {moment(item?.created_at).format("Do MMMM, YYYY")}
               </TableCell>
+              <TableCell>{item?.document_type?.name}</TableCell>
               <TableCell>
-                {item?.records?.length > 1 ? (
-                  <Popover placement="right">
-                    <PopoverTrigger>
-                      <Button size="sm" color="danger">
-                        {item?.records?.length} Docs
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent>
-                      <div className="px-1 py-2 flex flex-col gap-1">
-                        {item?.records?.map((doc) => (
-                          <div
-                            key={doc.id}
-                            className="flex items-center gap-2 justify-between bg-slate-100 dark:text-white dark:bg-gray-800 p-2 rounded-lg"
-                          >
-                            <div className="text-tiny">
-                              {doc.document_type?.name}
-                            </div>
-                            <div className="text-tiny ml-5">
-                              GH¢{" "}
-                              {Math.floor(
-                                doc?.document_type?.base_fee +
-                                  doc?.number_of_copies *
-                                    doc?.document_type?.printing_fee
-                              ).toFixed(2)}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </PopoverContent>
-                  </Popover>
-                ) : (
-                  item?.records[0]?.document_type?.name
-                )}
+                {item?.document_format == "hard_copy"
+                  ? "Hard Copy"
+                  : "Soft Copy"}
               </TableCell>
               <TableCell>
                 <StatusChip status={item?.status} />
@@ -406,21 +379,6 @@ export default function DocumentRequest() {
         <div className="h-full flex flex-col justify-between">
           <div className="flex flex-col gap-2 mb-6">
             <div className="flex flex-col gap-1">
-              {/* <div className="flex space-x-2 items-center">
-                <p className="font-semibold">
-                  Unique Code:{" "}
-                  <span className="uppercase">{data?.unique_code}</span>
-                </p>
-                <div
-                  className={`flex items-center border px-4 py-1 rounded-full text-xs uppercase ${
-                    data?.payment_status == "paid"
-                      ? "bg-green-200 border-green-600 text-green-600"
-                      : "bg-gray-200 border-gray-600 text-gray-600"
-                  }`}
-                >
-                  {data?.payment_status}
-                  </div>
-                  </div> */}
               <ItemCard title="Request ID" value={data?.unique_code} />
               <ItemCard
                 title="Requested On"
@@ -432,10 +390,10 @@ export default function DocumentRequest() {
                 value={data?.delivery_address}
               />
               <ItemCard title="Total Cost (GH¢)" value={data?.total_amount} />
-              <ItemCard
+              {/* <ItemCard
                 title="Payment Status"
                 value={<StatusChip status={data?.payment_status} />}
-              />
+              /> */}
             </div>
 
             <Card className="dark:bg-slate-950">
@@ -469,133 +427,123 @@ export default function DocumentRequest() {
               </CardHeader>
 
               <CardBody className="flex flex-col gap-3 px-2">
-                {data?.records?.map((item, index) => (
-                  <div
-                    key={index}
-                    className="w-full grid grid-cols-2 xl:grid-cols-3 gap-2"
-                  >
-                    {/* Document type and description */}
-                    <div className="col-span-2 flex items-center space-x-4 w-full">
-                      <div>
-                        <p className="font-medium text-gray-700">
-                          {item?.document_type.name}
-                        </p>
-                        <p className="text-sm text-gray-500">
-                          {item?.document_type?.description}
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Copies, Format, and Total Amount */}
-                    <div className="text-sm font-semibold text-gray-700">
-                      <div className="grid grid-cols-2 gap-2">
-                        <p className="">Copies:</p>
-                        <p className="">{item?.number_of_copies}</p>
-                      </div>
-                      <div className="grid grid-cols-2 gap-2">
-                        <p className="">Format:</p>
-                        <p className="">
-                          {item?.document_type.document_format === "soft_copy"
-                            ? "Soft Copy"
-                            : "Hard Copy"}
-                        </p>
-                      </div>
-                      <div className="grid grid-cols-2 gap-2">
-                        <p className="">Total Amt:</p>
-                        <p>
-                          GH¢{" "}
-                          {Math.floor(
-                            item?.document_type?.base_fee +
-                              item?.number_of_copies *
-                                item?.document_type?.printing_fee
-                          ).toFixed(2)}
-                        </p>
-                      </div>
+                <div className="w-full grid grid-cols-2 xl:grid-cols-3 gap-2">
+                  {/* Document type and description */}
+                  <div className="col-span-2 flex items-center space-x-4 w-full">
+                    <div>
+                      <p className="font-medium text-gray-700">
+                        {data?.document_type.name}
+                      </p>
+                      <p className="text-sm text-gray-500">
+                        {data?.document_type?.description}
+                      </p>
                     </div>
                   </div>
-                ))}
+
+                  {/* Copies, Format, and Total Amount */}
+                  <div className="text-sm font-semibold text-gray-700">
+                    <div className="grid grid-cols-2 gap-2">
+                      <p className="">Copies:</p>
+                      <p className="">{data?.number_of_copies}</p>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      <p className="">Format:</p>
+                      <p className="">
+                        {data?.document_type.document_format === "soft_copy"
+                          ? "Soft Copy"
+                          : "Hard Copy"}
+                      </p>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      <p className="">Total Amt:</p>
+                      <p>GH¢ {Math.floor(data?.total_amount).toFixed(2)}</p>
+                    </div>
+                  </div>
+                </div>
               </CardBody>
             </Card>
 
-            <div className="mt-11">
-              <section className="mb-3 flex items-center justify-between">
-                <div className="flex gap-2 items-center">
-                  <ClipIcon />
-                  <p className="font-semibold ">Attachmets</p>
-                </div>
+            {data?.document_format == "soft_copy" ? (
+              <div className="mt-11">
+                <section className="mb-3 flex items-center justify-between">
+                  <div className="flex gap-2 items-center">
+                    <ClipIcon />
+                    <p className="font-semibold ">Attachmets</p>
+                  </div>
 
-                {data?.files.length >= 1 && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    color="primary"
-                    isLoading={bulkDownloadLoading}
-                    isDisabled={bulkDownloadLoading}
-                    onClick={() => {
-                      setBulkDownloadLoading(true);
-                      handleBulkDownload(data.files.map((f) => f.path));
-                    }}
-                    startContent={<DownloadIcon />}
-                  >
-                    Download all
-                  </Button>
-                )}
-              </section>
-
-              <section className="grid grid-cols-2 gap-3">
-                {data?.files.length >= 1 ? (
-                  data?.files?.map((item) => (
-                    <div
-                      key={item?.id}
-                      className="flex items-center gap-3 p-2 rounded-lg border dark:border-white/10"
+                  {data?.files.length >= 1 && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      color="primary"
+                      isLoading={bulkDownloadLoading}
+                      isDisabled={bulkDownloadLoading}
+                      onClick={() => {
+                        setBulkDownloadLoading(true);
+                        handleBulkDownload(data.files.map((f) => f.path));
+                      }}
+                      startContent={<DownloadIcon />}
                     >
-                      {item?.extension === "pdf" ? (
-                        <PdfIcon className="size-11" color="red" />
-                      ) : (
-                        <WordIcon className="size-11" color="blue" />
-                      )}
-                      <div className="w-full flex flex-col h-full">
-                        <p className="font-semibold line-clamp-2">
-                          {item?.name}
-                        </p>
+                      Download all
+                    </Button>
+                  )}
+                </section>
 
-                        <div className="flex justify-between items-center mt-auto">
-                          <p>{filesize(item.size)}</p>
-                          <p
-                            className="cursor-pointer p-1 rounded-lg bg-primary text-white text-xs"
-                            onClick={() => {
-                              window.location.href =
-                                "https://backend.baccheck.online/api/document/download" +
-                                "?path=" +
-                                encodeURIComponent(item.path);
-                            }}
-                          >
-                            Download
+                <section className="grid grid-cols-2 gap-3">
+                  {data?.files.length >= 1 ? (
+                    data?.files?.map((item) => (
+                      <div
+                        key={item?.id}
+                        className="flex items-center gap-3 p-2 rounded-lg border dark:border-white/10"
+                      >
+                        {item?.extension === "pdf" ? (
+                          <PdfIcon className="size-11" color="red" />
+                        ) : (
+                          <WordIcon className="size-11" color="blue" />
+                        )}
+                        <div className="w-full flex flex-col h-full">
+                          <p className="font-semibold line-clamp-2">
+                            {item?.name}
                           </p>
+
+                          <div className="flex justify-between items-center mt-auto">
+                            <p>{filesize(item.size)}</p>
+                            <p
+                              className="cursor-pointer p-1 rounded-lg bg-primary text-white text-xs"
+                              onClick={() => {
+                                window.location.href =
+                                  "https://backend.baccheck.online/api/document/download" +
+                                  "?path=" +
+                                  encodeURIComponent(item.path);
+                              }}
+                            >
+                              Download
+                            </p>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))
-                ) : (
-                  <p>Nothing here</p>
-                )}
+                    ))
+                  ) : (
+                    <p>Nothing here</p>
+                  )}
 
-                {data?.status == "processing" && (
-                  <div className="flex items-center">
-                    <Button
-                      size="sm"
-                      color="danger"
-                      onClick={() => {
-                        fileUploadDisclosure.onOpen();
-                      }}
-                      startContent={<PlusIcon />}
-                    >
-                      Upload Document
-                    </Button>
-                  </div>
-                )}
-              </section>
-            </div>
+                  {data?.status == "processing" && (
+                    <div className="flex items-center">
+                      <Button
+                        size="sm"
+                        color="danger"
+                        onClick={() => {
+                          fileUploadDisclosure.onOpen();
+                        }}
+                        startContent={<PlusIcon />}
+                      >
+                        Upload Document
+                      </Button>
+                    </div>
+                  )}
+                </section>
+              </div>
+            ) : null}
           </div>
 
           <div className="flex items-center gap-3 justify-end">
@@ -609,10 +557,10 @@ export default function DocumentRequest() {
             >
               Close
             </Button>
-              
+
             {data?.status !== "created" && data?.status !== "completed" && (
               <Button
-                color="secondary"
+                color="danger"
                 className="font-montserrat font-semibold w-1/2"
                 size="sm"
                 onClick={() => changeStatusDisclosure.onOpen()}
@@ -778,7 +726,7 @@ export default function DocumentRequest() {
         onButtonClick={async () => {
           setProcessing(true);
           const resss = await axios.post(
-            `/institution/requests/document-requests/${data?.unique_code}/status`,
+            `/institution/requests/document-requests/${data?.id}/status`,
             {
               status:
                 data?.status == "submitted"
@@ -794,7 +742,7 @@ export default function DocumentRequest() {
             return;
           }
           console.log(resss?.data);
-          setData(resss?.data[0]);
+          setData(resss?.data);
           setProcessing(false);
           toast.success("Request status updated successfully");
           mutate("/institution/requests/document-requests");

@@ -49,7 +49,7 @@ const App = () => {
         <Route path="/account-setup" element={<Outlet />}>
           <Route exact path="" element={<CompleteProfile />} />
 
-          {/* <Route path="profile" element={<InstitutionData />} />
+          <Route path="profile" element={<InstitutionData />} />
           <Route path="institution-teams" element={<InstitutionTeams />} />
           <Route path="terms-conditions" element={<TermsConditions />} />
           <Route path="operations-certificate" element={<OperationsCert />} />
@@ -67,7 +67,7 @@ const App = () => {
           <Route
             path="institution-teams/:institutionId"
             element={<InstitutionUsers />}
-          /> */}
+          />
         </Route>
 
         <Route exact path="/dashboard" element={<Dashboard />} />
