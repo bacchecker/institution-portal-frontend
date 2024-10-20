@@ -454,20 +454,7 @@ export default function ValidationRequest() {
             >
               Close
             </Button>
-            <Button
-                color="secondary"
-                className="font-montserrat font-semibold w-1/2"
-                size="sm"
-                onClick={() => changeStatusDisclosure.onOpen()}
-              >
-                {data?.status === "submitted"
-                  ? "Acknowledge Request"
-                  : data?.status === "received"
-                  ? "Process Request"
-                  : data?.status == "processing"
-                  ? "Complete Request"
-                  : "Acknowledge Request"}
-              </Button>
+            
             {data?.status !== "created" && data?.status !== "completed" && (
               <Button
                 color="secondary"

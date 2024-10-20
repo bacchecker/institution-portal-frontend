@@ -855,24 +855,28 @@ class UpdateDocumentFee extends Component {
                 label="Document Validation Fee"
                 name="validation_fee"
                 value={validation_fee}
+                type="number"
                 onChange={this.handleInputChange}
               />
               <Textbox
                 label="Document Verification Fee"
                 name="verification_fee"
                 value={verification_fee}
+                type="number"
                 onChange={this.handleInputChange}
               />
               <Textbox
                 label="Document Requisition Fee"
                 name="base_fee"
                 value={base_fee}
+                type="number"
                 onChange={this.handleInputChange}
               />
               <Textbox
                 label="Printing Fee"
                 name="printing_fee"
                 value={printing_fee}
+                type="number"
                 onChange={this.handleInputChange}
               />
               <div className="w-full absolute bottom-4 right-0 flex space-x-4 px-4">

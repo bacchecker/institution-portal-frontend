@@ -28,7 +28,10 @@ const TermsConditions = () => {
         const response = await axios.post('/institution/accept-terms');
         
         toast.success(response.data.message)
-        navigate('/dashboard');
+        setTimeout(() => {
+            window.location.href = '/dashboard';
+          }, 3000);
+
         } catch (error) {
         toast.error(error?.response?.data?.message || "Error submitting agreement form");
         

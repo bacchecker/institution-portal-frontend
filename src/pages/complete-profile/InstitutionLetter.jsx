@@ -17,7 +17,8 @@ class InstitutionLetter extends Component {
       activeTab: "validation_letters",
       activeSubTab: "validation_approved_letter",
       validation_approved_content: `
-                        <p style="margin-left: 25px">​​​​​<br><br><br>{{date_of_letter}}</p><p style="margin-left: 25px">{{recepient_institution}}<br></p><p style="margin-left: 25px">{{recepient_institution_mail}}<br></p><p style="margin-left: 25px">{{recepient_institution_address}}<br></p><p style="margin-left: 25px"><br></p><p style="margin-left: 25px">Dear Sir / Madam,</p><p style="text-align: center;margin-left: 25px"><span style="font-size: 18px"><span style="color: rgb(61, 0, 153)"><u><strong>APPROVAL OF DOCUMENT&nbsp; VALIDATION REQUEST</strong></u></span></span><br></p><p style="margin-left: 25px"><span style="font-size: 16px"><u><strong>​</strong></u></span></p><div style="margin-left: 25px"><span style="color: rgb(0, 0, 0)">                                We are writing to inform you about the verification process for the document(s) submitted for validation on </span><strong><span style="color: rgb(53, 53, 53)">{{date_of_request}}</span></strong><span style="color: rgb(0, 0, 0)"> in relation to </span><span style="color: rgb(53, 53, 53)"><strong>{{document_owner_name}}</strong>.</span><span style="color: rgb(0, 0, 0)">                                 After a thorough review, we have determined the following regarding the submitted document(s):                            </span></div><p style="margin-left: 25px"><span style="font-size: 16px"><u><strong><br></strong></u></span></p><p style="margin-left: 25px"><span style="font-size: 16px"><span style="color: rgb(34, 34, 34)"><strong>Document Title / Reference: {{document_name}}</strong></span></span></p><p style="margin-left: 25px"><span style="font-size: 14px;color: rgb(34, 34, 34)">{{verification_review_results}}</span></p><p style="margin-left: 25px"><span style="font-size: 16px"><span style="color: rgb(34, 34, 34)"><strong>Summary of Findings</strong></span></span></p><div style="margin-left: 25px"><span style="color: rgb(0, 0, 0)">                                Based on the responses above, we are pleased to inform you that all document verification questions have returned true. The document(s) submitted have been successfully verified, and no inconsistencies were found.                            </span></div><div style="margin-left: 25px"><span style="color: rgb(0, 0, 0)">                                If you require any clarification regarding this, please do not hesitate to contact us at&nbsp;                            </span><strong><span style="color: rgb(0, 0, 0)">{{institution_email}}</span></strong></div><div style="margin-left: 25px"><strong><span style="color: rgb(0, 0, 0)"><br></span></strong></div><div style="margin-left: 25px"><strong><span style="color: rgb(0, 0, 0)"><br></span></strong></div><div style="margin-left: 25px"><span style="color: rgb(0, 0, 0)">Sincerely,</span></div><div style="margin-left: 25px"><span style="color: rgb(0, 0, 0)"><br></span></div><div style="margin-left: 25px"><span style="color: rgb(0, 0, 0)">_______________________</span></div><div style="margin-left: 25px"><span style="color: rgb(0, 0, 0)">{{validator_name}}</span></div>
+                        <p>​​​​​<br><br><br>{{date_of_letter}}</p><p>{{recepient_first_name}} {{recepient_last_name}}<br></p><p>{{recepient_email}}<br></p><p>{{recepient_address}}<br></p><p><br></p><p>Dear Sir / Madam,</p><p style="text-align: center"><span style="font-size: 18px"><span style="color: rgb(61, 0, 153)"><u><strong>APPROVAL OF DOCUMENT&nbsp; VALIDATION REQUEST</strong></u></span></span><br></p><p><span style="font-size: 16px"><u><strong>​</strong></u></span></p><div><span style="color: rgb(0, 0, 0)">We are writing to inform you about the verification process for the document(s) submitted for validation on</span><strong><span style="color: rgb(53, 53, 53)"> {{date_of_request}} </span></strong><span style="color: rgb(0, 0, 0)">in relation to </span><span style="color: rgb(53, 53, 53)"><strong>{{document_owner_name}}</strong>.</span><span style="color: rgb(0, 0, 0)"> After a thorough review, we have determined the following regarding the submitted document(s):</span></div><div><span style="color: rgb(0, 0, 0)"><br></span></div><div><span style="color: rgb(0, 0, 0)">Our team has carefully reviewed the details provided and confirmed the authenticity of the document. You can now access the validated copy through your user account or via the email address provided during your request.<br></span></div><div><span style="color: rgb(0, 0, 0)"><br></span></div><p><span style="font-size: 16px"><span style="color: rgb(34, 34, 34)"><strong>Summary of Findings</strong></span></span></p><div><span style="color: rgb(0, 0, 0)">Based on the responses above, we are pleased to inform you that all document verification questions have returned true. The document(s) submitted have been successfully verified, and no inconsistencies were found.</span></div><div><span style="color: rgb(0, 0, 0)">If you require any clarification regarding this, please do not hesitate to contact us at&nbsp;</span><strong><span style="color: rgb(0, 0, 0)">{{institution_email}}</span></strong></div><div><strong><span style="color: rgb(0, 0, 0)"><br></span></strong></div><div><strong><span style="color: rgb(0, 0, 0)"><br></span></strong></div><div><span style="color: rgb(0, 0, 0)">Sincerely,</span></div><div><span style="color: rgb(0, 0, 0)"><br></span></div><div><span style="color: rgb(0, 0, 0)">_______________________</span></div><div><span style="color: rgb(0, 0, 0)">{{validator_name}}</span></div>
+
                     `,
       validation_declined_content: `
                         <p>​​​​​<br><br><br>{{date_of_letter}}</p><p>{{recepient_institution}}<br></p><p>{{recepient_institution_mail}}<br></p><p>{{recepient_institution_address}}<br></p><p><br></p><p>Dear Sir / Madam,</p><p style="text-align: center"><span style="font-size: 18px"><span style="color: rgb(61, 0, 153)"><u><strong>DECLINE OF DOCUMENT VALIDATION REQUEST</strong></u></span></span><br></p><p><span style="font-size: 16px"><u><strong>​</strong></u></span></p><div><span style="color: rgb(0, 0, 0)">We are writing to inform you about the verification process for the document(s) submitted for validation on</span><strong><span style="color: rgb(53, 53, 53)">{{date_of_request}}</span></strong><span style="color: rgb(0, 0, 0)">in relation to&nbsp;</span><span style="color: rgb(53, 53, 53)"><strong>{{document_owner_name}}</strong></span><span style="color: rgb(0, 0, 0)">. After a thorough review, we have determined the following regarding the submitted document(s):</span></div><p><span style="font-size: 16px"><u><strong><br></strong></u></span></p><p><span style="font-size: 16px"><strong>Document Title / Reference: {{document_name}}</strong></span></p><p><span style="font-size: 14px">{{verification_review_results}}</span></p><p><span style="font-size: 16px"><strong>Summary of Findings</strong></span></p><div><span style="color: rgb(0, 0, 0)">Based on the responses above, we have determined that while the majority of the document verification questions returned true, there are some inconsistencies that require further investigation.</span></div><div><span style="color: rgb(0, 0, 0)">If you require any clarification regarding this, please do not hesitate to contact us at&nbsp;</span><strong><span style="color: rgb(0, 0, 0)">{{institution_email}}</span></strong></div><div><strong><span style="color: rgb(0, 0, 0)"><br></span></strong></div><div><strong><span style="color: rgb(0, 0, 0)"><br></span></strong></div><div><span style="color: rgb(0, 0, 0)">Sincerely,</span></div><div><span style="color: rgb(0, 0, 0)"><br></span></div><div><span style="color: rgb(0, 0, 0)">_______________________</span></div><div><span style="color: rgb(0, 0, 0)">{{validator_name}}</span></div>
@@ -35,6 +36,7 @@ class InstitutionLetter extends Component {
       institution_email: "",
       helpline_contact: "",
       mailing_address: "",
+      institution_admin: "",
       isSaving: false,
     };
     this.editorRef = createRef();
@@ -107,6 +109,7 @@ class InstitutionLetter extends Component {
           institution_email: institutionData.institution_email,
           helpline_contact: institutionData.helpline_contact,
           mailing_address: institutionData.mailing_address,
+          institution_admin: `${institutionData.user.first_name} ${institutionData.user.last_name}`,
         });
       }
     } catch (error) {
@@ -161,6 +164,8 @@ class InstitutionLetter extends Component {
 
   previewValidationApprovedTemplate = () => {
     const { validation_approved_content } = this.state;
+    console.log(validation_approved_content);
+    
     this.setState({
       renderedContent: validation_approved_content,
     });
@@ -233,6 +238,7 @@ class InstitutionLetter extends Component {
       address,
       logo,
       mailing_address,
+      institution_admin,
       helpline_contact,
       renderedContent,
       activeTab,
@@ -250,16 +256,19 @@ class InstitutionLetter extends Component {
         address,
         mailing_address,
         helpline_contact,
-        /* Placeholders */
+        /* Placeholders For Institution*/
         date_of_letter: new Date().toLocaleDateString(),
         document_owner_name: "Jane Aba Doe",
         recepient_institution: "XYC Company Ltd",
         recepient_institution_mail: "P.O.Box, 25KMS",
         recepient_institution_address: "Bannerman Street, Winneba",
         document_name: "Sample Document",
-        validator_name: "John Doe",
-        verification_review_results:
-          "<-------------------------------Verification results content----------------------------->",
+        validator_name: institution_admin,
+        /* Placeholders For Users*/
+        recepient_first_name: "Philip",
+        recepient_last_name: "Gbeho",
+        recepient_email: "pgbeho@gmail.com",
+        recepient_address: "Aputuogya Alley, Komantse",
         date_of_request: new Date().toLocaleDateString(),
       };
       renderedHtml = template(data);
@@ -466,26 +475,34 @@ class InstitutionLetter extends Component {
                         </tr>
                         <tr>
                           <td class="px-2 py-1 border-b border-r border-gray-200">
-                            {"{{recepient_institution}}"}
+                            {"{{recepient_first_name}}"}
                           </td>
                           <td class="px-2 py-1 border-b border-gray-200">
-                            The recipient institution's name.
+                            The recipient first name.
                           </td>
                         </tr>
                         <tr>
                           <td class="px-2 py-1 border-b border-r border-gray-200">
-                            {"{{recepient_institution_mail}}"}
+                            {"{{recepient_last_name}}"}
                           </td>
                           <td class="px-2 py-1 border-b border-gray-200">
-                            The recipient institution's email address.
+                            The recipient last name.
                           </td>
                         </tr>
                         <tr>
                           <td class="px-2 py-1 border-b border-r border-gray-200">
-                            {"{{recepient_institution_address}}"}
+                            {"{{recepient_email}}"}
                           </td>
                           <td class="px-2 py-1 border-b border-gray-200">
-                            The recipient institution's geographic address.
+                            The recipient's email address.
+                          </td>
+                        </tr>
+                        <tr>
+                          <td class="px-2 py-1 border-b border-r border-gray-200">
+                            {"{{recepient_address}}"}
+                          </td>
+                          <td class="px-2 py-1 border-b border-gray-200">
+                            The recipient's geographic address.
                           </td>
                         </tr>
                         <tr>
@@ -501,7 +518,7 @@ class InstitutionLetter extends Component {
                             {"{{document_owner_name}}"}
                           </td>
                           <td class="px-2 py-1 border-b border-gray-200">
-                            Personal owner of the document being verified
+                            Personal owner of the document being validated
                           </td>
                         </tr>
                         <tr>
@@ -512,14 +529,7 @@ class InstitutionLetter extends Component {
                             Name of the document type in question
                           </td>
                         </tr>
-                        <tr>
-                          <td class="px-2 py-1 border-b border-r border-gray-200">
-                            {"{{verification_review_results}}"}
-                          </td>
-                          <td class="px-2 py-1 border-b border-gray-200">
-                            Verification template question results
-                          </td>
-                        </tr>
+                        
                       </tbody>
                     </table>
                   </div>
