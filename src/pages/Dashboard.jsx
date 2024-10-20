@@ -4,12 +4,25 @@ import { GrValidate } from "react-icons/gr";
 import { IoIosMail, IoIosNotificationsOutline } from "react-icons/io";
 import { IoDocumentAttach, IoDocuments } from "react-icons/io5";
 import { LuClipboardEdit } from "react-icons/lu";
-import { MdClose, MdManageHistory, MdOutlineVerifiedUser } from "react-icons/md";
+import {
+  MdClose,
+  MdManageHistory,
+  MdOutlineVerifiedUser,
+} from "react-icons/md";
 import withRouter from "@components/withRouter";
 import axios from "@utils/axiosConfig";
 import { toast } from "react-hot-toast";
 import AuthLayout from "@components/AuthLayout";
-import { Button, Card, CardBody, Input, Select, SelectItem, Spinner, Textarea } from "@nextui-org/react";
+import {
+  Button,
+  Card,
+  CardBody,
+  Input,
+  Select,
+  SelectItem,
+  Spinner,
+  Textarea,
+} from "@nextui-org/react";
 import { BsSend } from "react-icons/bs";
 
 class Dashboard extends Component {
@@ -24,7 +37,6 @@ class Dashboard extends Component {
     profileComplete: this.props.profileComplete,
     showTicketModal: false,
     title: "",
-    description: "",
     type: "",
     category: "",
     isSaving: false,
@@ -112,14 +124,16 @@ class Dashboard extends Component {
   };
 
   render() {
-    const { type,
+    const {
+      type,
       category,
       description,
       title,
       typeData,
       categoryData,
       isSaving,
-      showTicketModal} = this.state
+      showTicketModal,
+    } = this.state;
     return (
       <AuthLayout title="Dashboard">
         {this.state.status == "inactive" && (
@@ -181,7 +195,9 @@ class Dashboard extends Component {
               style={{
                 right: 0,
                 position: "absolute",
-                transform: showTicketModal ? "translateX(0)" : "translateX(100%)",
+                transform: showTicketModal
+                  ? "translateX(0)"
+                  : "translateX(100%)",
               }}
             >
               <div className="flex justify-between items-center font-medium border-b-2 p-4">
@@ -203,31 +219,26 @@ class Dashboard extends Component {
                     onChange={this.handleInputChange}
                   />
 
-                 
-                  <Select 
-                    label="Select your type" 
-                    className="" 
+                  <Select
+                    label="Select your type"
+                    className=""
                     name="type"
                     value={type}
                     onChange={this.handleInputChange}
                   >
                     {typeData.map((type) => (
-                      <SelectItem key={type.id}>
-                        {type.name}
-                      </SelectItem>
+                      <SelectItem key={type.id}>{type.name}</SelectItem>
                     ))}
                   </Select>
-                  <Select 
-                    label="Select category" 
-                    className="" 
+                  <Select
+                    label="Select category"
+                    className=""
                     name="category"
                     value={category}
                     onChange={this.handleInputChange}
                   >
                     {categoryData.map((category) => (
-                      <SelectItem key={category.id}>
-                        {category.name}
-                      </SelectItem>
+                      <SelectItem key={category.id}>{category.name}</SelectItem>
                     ))}
                   </Select>
                   <Textarea
