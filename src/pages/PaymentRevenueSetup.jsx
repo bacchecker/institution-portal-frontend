@@ -67,14 +67,12 @@ const PaymentRevenueSetup = () => {
     }
   };
 
-  // const fetcher =
   const { data, error } = useSWR("/institution/payment-accounts", (url) =>
     axios.get(url).then((res) => res.data)
   );
 
   useEffect(() => {
     setLoadingData(true);
-    // fetchPaymentAccounts();
   }, []);
 
   useEffect(() => {

@@ -22,6 +22,7 @@ import ValidationRequest from "./pages/requests/ValidationRequest";
 import DocumentRequest from "./pages/requests/document-request/DocumentRequest";
 import DocumentDetails from "./pages/requests/document-request/DocumentDetails";
 import TermsConditions from "./pages/complete-profile/TermsConditions";
+import RolesAndPermissions from "./pages/security/RolesAndPermissions";
 
 const App = () => {
   const navigate = useNavigate();
@@ -84,6 +85,14 @@ const App = () => {
             exact
             path="validation-requests"
             element={<ValidationRequest />}
+          />
+        </Route>
+
+        <Route exact path="/security" element={<Outlet />}>
+          <Route
+            exact
+            path="roles-permissions"
+            element={<RolesAndPermissions />}
           />
         </Route>
 
