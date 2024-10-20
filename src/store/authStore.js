@@ -31,6 +31,10 @@ const useAuthStore = create(
         set({
           institution,
         }),
+      updateUser: (user) =>
+        set({
+          user,
+        }),
     }),
     {
       name: "auth-storage", // Name of the localStorage key

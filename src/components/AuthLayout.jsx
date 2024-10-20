@@ -51,10 +51,10 @@ export default function AuthLayout({ children, title = "Page Title" }) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const hasPermission = (userPermissions, routeAcl) => {
-    if (!routeAcl) return true; // If no ACL is defined, route is accessible to all
-    return routeAcl.some((permission) => userPermissions.includes(permission));
-  };
+  // const hasPermission = (userPermissions, routeAcl) => {
+  //   if (!routeAcl) return true; // If no ACL is defined, route is accessible to all
+  //   return routeAcl.some((permission) => userPermissions.includes(permission));
+  // };
 
   // const getAccessibleRoutes = (routes, userPermissions) => {
   //   return routes
@@ -95,7 +95,11 @@ export default function AuthLayout({ children, title = "Page Title" }) {
 
     const filteredRoutes = navLinks.filter((route) => {
       if (route.showOn) {
-        return route.showOn.includes(institution?.status);
+        return (
+          route.profile_complete ==
+          (institution?.profile_complete == "yes" ? true : false)
+        );
+        // return route.showOn.includes(institution?.status);
       }
       // return true;
     });
@@ -105,6 +109,14 @@ export default function AuthLayout({ children, title = "Page Title" }) {
   if (!isAuthenticated) {
     console.log("Not authenticated");
     return <Navigate to="/login" replace />;
+  }
+
+  if (institution?.profile_complete === "no") {
+    // check current route, if not account-setup, redirect to account-setup
+    if (!url.startsWith("/account-setup")) {
+      return <Navigate to="/account-setup/profile" replace />;
+    }
+    // return <Navigate to="/account-inactive" replace />;
   }
 
   // if (institution?.status === "inactive") {
