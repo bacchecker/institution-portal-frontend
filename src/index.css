@@ -33,7 +33,9 @@
 .animate-slide-up {
   animation: slide-up 0.2s ease-out;
 }
-/* 
+* {
+  font-family: "Inter", sans-serif;
+}
 a,
 p,
 h1,
@@ -65,4 +67,4 @@ img,
 svg,
 footer {
   font-family: "Inter", sans-serif;
-} */
+}
