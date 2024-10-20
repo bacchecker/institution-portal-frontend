@@ -28,9 +28,12 @@ const VerifyOTP = () => {
           state: { institutionData: responseData.institution },
         });
       } else {
-        navigate("/account-setup/profile", {
+        navigate("/account-setup", {
           state: { institutionData: responseData.institution },
         });
+        // navigate("/account-setup/profile", {
+        //   state: { institutionData: responseData.institution },
+        // });
       }
     } catch (error) {
       toast.error(error.response?.data?.message || "An error occurred");

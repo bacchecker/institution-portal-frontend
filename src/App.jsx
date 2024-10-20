@@ -47,7 +47,9 @@ const App = () => {
         {/* Account Setup Routes */}
 
         <Route path="/account-setup" element={<Outlet />}>
-          <Route path="profile" element={<InstitutionData />} />
+          <Route exact path="" element={<CompleteProfile />} />
+
+          {/* <Route path="profile" element={<InstitutionData />} />
           <Route path="institution-teams" element={<InstitutionTeams />} />
           <Route path="terms-conditions" element={<TermsConditions />} />
           <Route path="operations-certificate" element={<OperationsCert />} />
@@ -65,10 +67,8 @@ const App = () => {
           <Route
             path="institution-teams/:institutionId"
             element={<InstitutionUsers />}
-          />
+          /> */}
         </Route>
-
-        <Route exact path="/complete-profile" element={<CompleteProfile />} />
 
         <Route exact path="/dashboard" element={<Dashboard />} />
 

@@ -13,9 +13,9 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["Figtree", ...defaultTheme.fontFamily.sans],
+        sans: ["Inter", ...defaultTheme.fontFamily.sans],
       },
-
+      // Inter
       colors: {
         primaryRed: "#FE0000",
         bChkRed: "#FD0D0E",

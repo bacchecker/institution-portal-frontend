@@ -63,17 +63,18 @@ const Login = () => {
 
       login(responseData.user, responseData?.institution, responseData.token);
 
-      // if (responseData.institution.status === "inactive") {
-      //   navigate("/account-inactive");
-      //   return;
-      // }
-
       if (type === "institution") {
+        if (responseData.institution.status === "inactive") {
+          console.log(responseData?.institution);
+          return navigate("/account-inactive");
+        }
+
         toast.success(response.data.message, {});
         if (responseData.institution.profile_complete === "yes") {
           navigate("/dashboard");
         } else {
-          navigate("/account-setup/profile");
+          navigate("/account-setup");
+          // navigate("/account-setup/profile");
         }
       } else {
         toast.error("You are not an institution");
@@ -87,9 +88,9 @@ const Login = () => {
     }
   };
 
-  if (isAuthenticated) {
-    return <Navigate to="/dashboard" replace />;
-  }
+  // if (isAuthenticated) {
+  //   return <Navigate to="/dashboard" replace />;
+  // }
 
   return (
     <>

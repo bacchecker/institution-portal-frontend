@@ -123,16 +123,16 @@ export default function AuthLayout({ children, title = "Page Title" }) {
 
   console.log(url);
 
-  if (institution?.status === "inactive" && url !== "/dashboard") {
-    return <Navigate to="/dashboard" replace />;
+  if (institution?.status === "inactive") {
+    return <Navigate to="/account-inactive" replace />;
   }
 
-  if (institution?.profile_complete === "no") {
-    // check current route, if not account-setup, redirect to account-setup
-    if (!url.startsWith("/account-setup") && url !== "/dashboard") {
-      return <Navigate to="/account-setup/profile" replace />;
-    }
-  }
+  // if (institution?.profile_complete === "no") {
+  //   // check current route, if not account-setup, redirect to account-setup
+  //   if (!url.startsWith("/account-setup") && url !== "/dashboard") {
+  //     return <Navigate to="/account-setup/profile" replace />;
+  //   }
+  // }
 
   // if (institution?.status === "inactive") {
   //   (async () => {

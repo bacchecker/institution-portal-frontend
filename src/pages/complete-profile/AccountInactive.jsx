@@ -37,6 +37,7 @@ class AccountInactive extends Component {
       { id: "other", name: "Other" },
     ],
     institutionStatus: null,
+    setupStarted: false,
   };
 
   componentDidMount() {
@@ -53,6 +54,7 @@ class AccountInactive extends Component {
 
       this.setState({
         institutionStatus: status !== "inactive", // Set to true if status is not 'inactive'
+        setupStarted: institutionData?.setup_started,
       });
     } catch (error) {
       toast.error(error.response.data.message);
@@ -113,9 +115,11 @@ class AccountInactive extends Component {
       showModal,
     } = this.state;
 
-    // if (this.state.institutionStatus == true) {
-    //   return <Navigate to="/dashboard" />;
-    // }
+    if (this.state.setupStarted == true) {
+      // setup_started
+      // return <Navigate to="/account-setup" />;
+      return <Navigate to="/account-setup/profile" />;
+    }
 
     return (
       <>

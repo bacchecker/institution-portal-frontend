@@ -14,7 +14,7 @@ export const navLinks = [
     label: "Dashboard",
     path: "/dashboard",
     icon: <DashboardIcon />,
-    profile_complete: ["yes", "no"],
+    profile_complete: ["yes"],
     showOn: ["inactive", "active"],
     children: [],
   },
@@ -48,31 +48,32 @@ export const navLinks = [
     profile_complete: ["yes", "no"],
     showOn: ["inactive", "active"],
     children: [
-      {
-        label: "Profile",
-        path: "/account-setup/profile",
-        acl: ["view users"],
-      },
-      {
-        label: "Document Types",
-        path: "/account-setup/document-types",
-      },
-      {
-        label: "Operations Certificate",
-        path: "/account-setup/operations-certificate",
-      },
-      {
-        label: "Letter Templates",
-        path: "/account-setup/letter-templates",
-      },
-      {
-        label: "Setup Team",
-        path: "/account-setup/institution-teams",
-      },
-      {
-        label: "Terms & Conditions",
-        path: "/account-setup/terms-conditions",
-      },
+      // {
+      //   label: "Profile",
+      //   path: "/account-setup",
+      //   // path: "/account-setup/profile",
+      //   acl: ["view users"],
+      // },
+      // {
+      //   label: "Document Types",
+      //   path: "/account-setup/document-types",
+      // },
+      // {
+      //   label: "Operations Certificate",
+      //   path: "/account-setup/operations-certificate",
+      // },
+      // {
+      //   label: "Letter Templates",
+      //   path: "/account-setup/letter-templates",
+      // },
+      // {
+      //   label: "Setup Team",
+      //   path: "/account-setup/institution-teams",
+      // },
+      // {
+      //   label: "Terms & Conditions",
+      //   path: "/account-setup/terms-conditions",
+      // },
     ],
   },
   {
