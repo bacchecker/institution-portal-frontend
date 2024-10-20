@@ -13,7 +13,7 @@ export const navLinks = [
     label: "Dashboard",
     path: "/dashboard",
     icon: <DashboardIcon />,
-    profile_complete: false,
+    profile_complete: ["yes", "no"],
     showOn: ["inactive", "active"],
     children: [],
   },
@@ -22,7 +22,7 @@ export const navLinks = [
     label: "Requests",
     path: "/requests",
     icon: <TasksListIcon />,
-    profile_complete: true,
+    profile_complete: ["yes"],
     showOn: ["active"],
     children: [
       {
@@ -44,7 +44,7 @@ export const navLinks = [
     path: "/account-setup",
     icon: <PersonCircleIcon />,
     acl: ["view users", "view institutions"],
-    profile_complete: false,
+    profile_complete: ["yes", "no"],
     showOn: ["inactive", "active"],
     children: [
       {
@@ -79,7 +79,7 @@ export const navLinks = [
     path: "/payment-revenue-setup",
     icon: <MoneyIcon />,
     acl: ["view payments"],
-    profile_complete: true,
+    profile_complete: ["yes"],
     showOn: ["active"],
     children: [],
   },
@@ -88,7 +88,7 @@ export const navLinks = [
     path: "/reports",
     icon: <AnalysisIcon />,
     acl: ["view payments"],
-    profile_complete: true,
+    profile_complete: ["yes"],
     showOn: ["active"],
     children: [
       {
@@ -102,7 +102,7 @@ export const navLinks = [
     path: "/supports",
     icon: <SupportIcon />,
     acl: ["view support tickets", "view support ticket categories"],
-    profile_complete: true,
+    profile_complete: ["yes"],
     showOn: ["active"],
     children: [
       {

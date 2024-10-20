@@ -108,10 +108,7 @@ export default function AuthLayout({ children, title = "Page Title" }) {
 
     const filteredRoutes = navLinks.filter((route) => {
       if (route.showOn) {
-        return (
-          route.profile_complete ==
-          (institution?.profile_complete == "yes" ? true : false)
-        );
+        return route.profile_complete.includes(institution?.profile_complete);
         // return route.showOn.includes(institution?.status);
       }
       // return true;
