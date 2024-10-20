@@ -609,7 +609,7 @@ export default function DocumentRequest() {
             >
               Close
             </Button>
-
+              
             {data?.status !== "created" && data?.status !== "completed" && (
               <Button
                 color="secondary"

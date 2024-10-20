@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 
 class SelectSmall extends Component {
   render() {
-    const { label, value, onChange, menuItems, name, itemNameKey, error_message } = this.props;
+    const { label, value, onChange, menuItems, name, itemNameKey, error_message, disabled } = this.props;
 
     return (
       <div className="w-full">
@@ -17,6 +17,7 @@ class SelectSmall extends Component {
           name={name}
           value={value}
           onChange={onChange}
+          disabled={disabled}
           className="bg-gray-100 text-gray-900 focus:outline-0 text-sm focus:ring-blue-500 focus:border-blue-500 block w-full px-2.5 py-2.5 rounded-md"
         >
           <option value="" disabled>

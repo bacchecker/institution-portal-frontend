@@ -203,25 +203,42 @@ class InstitutionData extends Component {
       const institutionData = response.data.institutionData;
 
       if (institutionData) {
-        this.setState({
-          formData: {
-            name: institutionData.name,
-            address: institutionData.address,
-            institution_email: institutionData.institution_email,
-            helpline_contact: institutionData.helpline_contact,
-            prefix: institutionData.prefix,
-            description: institutionData.description,
-            digital_address: institutionData.digital_address,
-            mailing_address: institutionData.mailing_address,
-            region: institutionData.region,
-            academic_level: institutionData.academic_level,
-            website_url: institutionData.website_url,
-            alternate_contacts: institutionData.alternate_contacts,
-            logo: institutionData.logo,
-            logoFile: null,
+        this.setState(
+          {
+            formData: {
+              name: institutionData.name,
+              address: institutionData.address,
+              institution_email: institutionData.institution_email,
+              helpline_contact: institutionData.helpline_contact,
+              prefix: institutionData.prefix,
+              description: institutionData.description,
+              digital_address: institutionData.digital_address,
+              mailing_address: institutionData.mailing_address,
+              region: institutionData.region,
+              academic_level: institutionData.academic_level,
+              website_url: institutionData.website_url,
+              alternate_contacts: institutionData.alternate_contacts,
+              logo: institutionData.logo,
+              logoFile: null,
+            },
           },
-        });
+          () => {
+            this.setState({
+              disable_name: !!this.state.formData.name,
+              disable_prefix: !!this.state.formData.prefix,
+              disable_institution_email: !!this.state.formData.institution_email,
+              disable_helpline_contact: !!this.state.formData.helpline_contact,
+              disable_address: !!this.state.formData.address,
+              disable_digital_address: !!this.state.formData.digital_address,
+              disable_description: !!this.state.formData.description,
+              disable_mailing_address: !!this.state.formData.mailing_address,
+              disable_region: !!this.state.formData.region,
+              disable_academic_level: !!this.state.formData.academic_level,
+            });
+          }
+        );
       }
+      
     } catch (error) {
       toast.error(
         error.response?.data?.message || "Failed to fetch institution data"
@@ -261,7 +278,7 @@ class InstitutionData extends Component {
                   name="name"
                   value={formData.name}
                   onChange={this.handleInputChange}
-                  disabled={true}
+                  disabled={this.state.disable_name}
                   isInvalid={errors.name}
                   errorMessage={errors.name}
                   className="w-[80%]"
@@ -271,7 +288,7 @@ class InstitutionData extends Component {
                   name="prefix"
                   value={formData.prefix}
                   onChange={this.handleInputChange}
-                  disabled={true}
+                  disabled={this.state.disable_prefix}
                   isInvalid={errors.prefix}
                   errorMessage={errors.prefix}
                   className="flex-1"
@@ -283,6 +300,7 @@ class InstitutionData extends Component {
                     label="Institution Email"
                     name="institution_email"
                     value={formData.institution_email}
+                    disabled={this.state.disable_institution_email}
                     onChange={this.handleInputChange}
                     isInvalid={errors.institution_email}
                     errorMessage={errors.institution_email}
@@ -292,6 +310,7 @@ class InstitutionData extends Component {
                   <Input
                     label="Help Line Contact"
                     name="helpline_contact"
+                    disabled={this.state.disable_helpline_contact}
                     value={formData.helpline_contact}
                     onChange={this.handleInputChange}
                     isInvalid={errors.helpline_contact}
@@ -303,6 +322,7 @@ class InstitutionData extends Component {
                 label="Description"
                 name="description"
                 value={formData.description}
+                disabled={this.state.disable_description}
                 onChange={this.handleInputChange}
                 isInvalid={errors.description}
                 errorMessage={errors.description}
@@ -314,6 +334,7 @@ class InstitutionData extends Component {
                   name="academic_level"
                   value={formData.academic_level}
                   itemNameKey="name"
+                  disabled={this.state.disable_academic_level}
                   menuItems={academicLeveData}
                   onChange={this.handleInputChange}
                   error_message={errors.academic_level}
@@ -323,6 +344,7 @@ class InstitutionData extends Component {
                   name="region"
                   value={formData.region}
                   itemNameKey="name"
+                  disabled={this.state.disable_region}
                   menuItems={regionData}
                   onChange={this.handleInputChange}
                   error_message={errors.region}
@@ -335,6 +357,7 @@ class InstitutionData extends Component {
                     label="Address"
                     name="address"
                     value={formData.address}
+                    disabled={this.state.disable_address}
                     onChange={this.handleInputChange}
                     error_message={errors.address}
                   />
@@ -343,6 +366,7 @@ class InstitutionData extends Component {
                   <Textbox
                     label="Digital Address"
                     name="digital_address"
+                    disabled={this.state.disable_digital_address}
                     value={formData.digital_address}
                     onChange={this.handleInputChange}
                     error_message={errors.digital_address}

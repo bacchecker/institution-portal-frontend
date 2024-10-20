@@ -16,7 +16,7 @@ class BasicTextFields extends Component {
             onChange={onChange} 
             value={value} 
             type={type}
-            disabled={disabled} // Passing disabled prop here
+            disabled={disabled}
           />
           {error}
           <label className="absolute left-3 -top-[18px] text-gray-900 transition-all pointer-events-none text-sm font-normal text-blue-gray-700 leading-tight 
