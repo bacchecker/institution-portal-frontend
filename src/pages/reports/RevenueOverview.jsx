@@ -15,7 +15,7 @@ export default function RevenueOverview() {
   const [currentTab, setCurrentTab] = useState(1);
   const [lineStyle, setLineStyle] = useState({ width: 0, left: 0 });
   const institution_id = JSON?.parse(localStorage.getItem("auth-storage"))
-  ?.state?.institution?.id;
+    ?.state?.institution?.id;
   const handleTabClick = (e) => {
     const target = e.target;
     setLineStyle({
@@ -28,8 +28,9 @@ export default function RevenueOverview() {
     data: resData,
     error,
     isLoading,
-  } = useSWR(`/institution/reports/total-income?institution_id=${institution_id}`, (url) =>
-    axios.get(url).then((res) => res.data)
+  } = useSWR(
+    `/institution/reports/total-income?institution_id=${institution_id}`,
+    (url) => axios.get(url).then((res) => res.data)
   );
 
   console.log(resData);
@@ -62,7 +63,7 @@ export default function RevenueOverview() {
           </div>
           <div className="border rounded-xl p-4 bg-white">
             <div className="flex space-x-2 text-gray-700">
-              <div className="flex items-center justify-center w-6 h-6 bg-blue-700 text-white p-1 rounded-md">
+              <div className="flex items-center justify-center w-6 h-6 bg-red-700 text-white p-1 rounded-md">
                 <IoDocuments size={16} />
               </div>
               <p className="font-medium">Document Requests Revenue</p>
@@ -75,7 +76,7 @@ export default function RevenueOverview() {
                   <p className="font-bold text-3xl">
                     GH¢ {parseInt(resData?.document_request_revenue).toFixed(2)}
                   </p>
-                  <div className="h-1 w-12 bg-blue-700 rounded-full"></div>
+                  <div className="h-1 w-12 bg-red-700 rounded-full"></div>
                 </>
               )}
             </div>

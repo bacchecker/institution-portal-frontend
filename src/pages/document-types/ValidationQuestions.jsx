@@ -184,7 +184,7 @@ class ValidationQuestions extends Component {
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 lg:gap-2 pl-3">
               <div className="min-h-screen shadow-lg">
-                <h2 className="bg-blue-700 text-white pl-6 pr-4 py-2">
+                <h2 className="bg-red-700 text-white pl-6 pr-4 py-2">
                   Document Billings
                 </h2>
                 <div className="my-4">
@@ -212,14 +212,14 @@ class ValidationQuestions extends Component {
                       <p>GH₵{document_type_details.printing_fee ?? "0.00"}</p>
                     </div>
                     <div
-                      className="w-1/2 self-end flex space-x-2 text-sm items-center justify-center mt-8 border border-blue-700 text-blue-700 hover:bg-blue-600 hover:text-white rounded-md px-3 h-8 cursor-pointer"
+                      className="w-1/2 self-end flex space-x-2 text-sm items-center justify-center mt-8 border border-blue-700 text-blue-700 hover:bg-red-600 hover:text-white rounded-md px-3 h-8 cursor-pointer"
                       onClick={this.toggleBaseFeeModal}
                     >
                       <p>Edit Fees</p> <MdEdit />
                     </div>
                   </div>
 
-                  <h2 className="bg-blue-700 text-white pl-6 pr-4 py-2 mt-4">
+                  <h2 className="bg-red-700 text-white pl-6 pr-4 py-2 mt-4">
                     Document Formats
                   </h2>
                   <form
@@ -256,7 +256,7 @@ class ValidationQuestions extends Component {
                       <button
                         type="submit"
                         disabled={isSaving}
-                        className="w-1/2 flex space-x-2 text-sm items-center justify-center mt-8 border border-blue-700 text-blue-700 hover:bg-blue-600 hover:text-white rounded-md px-3 h-8 cursor-pointer"
+                        className="w-1/2 flex space-x-2 text-sm items-center justify-center mt-8 border border-blue-700 text-blue-700 hover:bg-red-600 hover:text-white rounded-md px-3 h-8 cursor-pointer"
                       >
                         {isSaving ? (
                           <>

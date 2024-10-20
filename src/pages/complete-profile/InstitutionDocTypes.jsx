@@ -196,7 +196,7 @@ const InstitutionDocTypes = forwardRef((props, ref) => {
                       className={`cursor-pointer flex items-center rounded-full px-4 py-2 transition-all duration-200 ${
                         selectedDocumentTypes.includes(request.id)
                           ? "bg-green-600 text-white"
-                          : "bg-blue-600 text-white"
+                          : "bg-red-600 text-white"
                       }`}
                     >
                       <input

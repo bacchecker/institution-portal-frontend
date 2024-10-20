@@ -599,7 +599,7 @@ export default function DocumentRequest() {
                       <div
                         className={`p-3 border-2 border-dashed rounded-lg ${
                           dragActive
-                            ? "border-blue-400 bg-blue-50"
+                            ? "border-blue-400 bg-red-50"
                             : "border-gray-300"
                         }`}
                       >

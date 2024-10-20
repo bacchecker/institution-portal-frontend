@@ -78,7 +78,7 @@ const HorizontalLinearStepper = () => {
   return (
     <div className="w-full">
       {/* Stepper */}
-      <div className="flex items-center justify-around py-4 bg-blue-300 shadow-lg text-white rounded-lg">
+      <div className="flex items-center justify-around py-4 bg-red-300 shadow-lg text-white rounded-lg">
         {steps.map((step, index) => {
           const StepIcon = step.icon;
           return (
@@ -88,7 +88,7 @@ const HorizontalLinearStepper = () => {
                   ${
                     activeStep >= index
                       ? "bg-gradient-to-tr from-black via-red-700 to-red-600 text-white border-white"
-                      : "bg-blue-100 text-blue-300 border-blue-300"
+                      : "bg-red-100 text-blue-300 border-blue-300"
                   }`}
               />
               <span className="mt-2 text-center text-xs lg:text-sm">
@@ -211,7 +211,7 @@ const HorizontalLinearStepper = () => {
             All steps completed - you're finished!
           </p>
           <button
-            className="px-4 py-2 bg-blue-500 text-white rounded-lg shadow mt-4"
+            className="px-4 py-2 bg-red-500 text-white rounded-lg shadow mt-4"
             onClick={handleReset}
           >
             Reset

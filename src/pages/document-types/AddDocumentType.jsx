@@ -240,7 +240,7 @@ class AddDocumentType extends Component {
 
     return (
       <>
-      <AuthLayout title='Add / Remove Documents'>
+        <AuthLayout title="Add / Remove Documents">
           {/* Available Document Types */}
           <div className="bg-white w-full p-6 shadow-md shadow-gray-500">
             <p className="-mt-4 mb-3 uppercase bg-white font-bold px-2">
@@ -289,7 +289,10 @@ class AddDocumentType extends Component {
             </div>
             <div className="">
               {isLoading ? (
-                <div role="status" className="space-y-2.5 animate-pulse max-w-lg">
+                <div
+                  role="status"
+                  className="space-y-2.5 animate-pulse max-w-lg"
+                >
                   <div className="flex items-center w-full">
                     <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-32"></div>
                     <div className="h-2.5 ms-2 bg-gray-300 rounded-full dark:bg-gray-600 w-24"></div>
@@ -332,14 +335,16 @@ class AddDocumentType extends Component {
                           className={`cursor-pointer flex items-center rounded-full px-4 py-2 transition-all duration-200 ${
                             selectedDocumentTypes.includes(request.id)
                               ? "bg-green-600 text-white"
-                              : "bg-blue-600 text-white"
+                              : "bg-red-600 text-white"
                           }`}
                         >
                           <input
                             type="checkbox"
                             value={request.id}
                             checked={selectedDocumentTypes.includes(request.id)}
-                            onChange={() => this.handleCheckboxChange(request.id)}
+                            onChange={() =>
+                              this.handleCheckboxChange(request.id)
+                            }
                             className="mr-2 accent-green-600"
                           />
                           {request.name}
@@ -364,7 +369,7 @@ class AddDocumentType extends Component {
                       className={`flex items-center text-base ${
                         isSaving
                           ? "bg-gray-300 text-gray-500"
-                          : "bg-blue-200 text-blue-700 hover:bg-blue-300"
+                          : "bg-red-200 text-blue-700 hover:bg-red-300"
                       } border border-blue-700 px-4 py-1 rounded-md`}
                       type="submit"
                       disabled={isSaving}
@@ -425,7 +430,10 @@ class AddDocumentType extends Component {
             </div>
             <div className="">
               {isLoading ? (
-                <div role="status" className="space-y-2.5 animate-pulse max-w-lg">
+                <div
+                  role="status"
+                  className="space-y-2.5 animate-pulse max-w-lg"
+                >
                   <div className="flex items-center w-full">
                     <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-32"></div>
                     <div className="h-2.5 ms-2 bg-gray-300 rounded-full dark:bg-gray-600 w-24"></div>
@@ -610,8 +618,7 @@ class AddDocumentType extends Component {
               </form>
             </div>
           )}
-      </AuthLayout>
-        
+        </AuthLayout>
       </>
     );
   }

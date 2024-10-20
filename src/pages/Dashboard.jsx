@@ -345,14 +345,14 @@ class Dashboard extends Component {
                 </div>
                 <div className="border rounded-md p-4 bg-white">
                   <div className="flex space-x-2 text-gray-700">
-                    <div className="flex items-center justify-center w-6 h-6 bg-blue-700 text-white p-1 rounded-md">
+                    <div className="flex items-center justify-center w-6 h-6 bg-red-700 text-white p-1 rounded-md">
                       <IoDocuments size={16} />
                     </div>
                     <p className="font-medium">Reviewed Documents</p>
                   </div>
                   <div className="mt-6">
                     <p className="font-bold text-3xl">15</p>
-                    <div className="h-1 w-12 bg-blue-700 rounded-full"></div>
+                    <div className="h-1 w-12 bg-red-700 rounded-full"></div>
                   </div>
                 </div>
                 <div className="border rounded-md p-4 bg-white">
@@ -381,7 +381,7 @@ class Dashboard extends Component {
                 </div>
               </div>
               <div className="col-span-2 xl:col-span-1 flex flex-col justify-center bg-white xl:-mt-12 p-6">
-                <div className="flex xl:hidden justify-center items-center bg-blue-200 rounded-full w-12 h-12 hover:bg-blue-300 hover:cursor-pointer">
+                <div className="flex xl:hidden justify-center items-center bg-red-200 rounded-full w-12 h-12 hover:bg-red-300 hover:cursor-pointer">
                   <LuClipboardEdit size={24} className="text-blue-600" />
                 </div>
 
@@ -417,7 +417,7 @@ class Dashboard extends Component {
               <div className="col-span-3 border p-4 rounded-md mt-6 bg-white">
                 <p className="font-bold text-xl mb-4">Recent Requests</p>
                 <div className="grid grid-cols-7 gap-4 border rounded-lg p-4">
-                  <div className="flex items-center justify-center bg-blue-200 rounded-full w-12 h-12">
+                  <div className="flex items-center justify-center bg-red-200 rounded-full w-12 h-12">
                     <IoDocumentAttach className="text-gray-900" size={20} />
                   </div>
                   <div className="col-span-3">
@@ -434,7 +434,7 @@ class Dashboard extends Component {
                       Thu 21 Apr, 2022
                     </p>
                   </div>
-                  <button className="border rounded-md text-xs font-medium text-gray-700 h-8 self-center hover:bg-blue-200">
+                  <button className="border rounded-md text-xs font-medium text-gray-700 h-8 self-center hover:bg-red-200">
                     View Request
                   </button>
                 </div>

@@ -165,7 +165,7 @@ class InstitutionLetter extends Component {
   previewValidationApprovedTemplate = () => {
     const { validation_approved_content } = this.state;
     console.log(validation_approved_content);
-    
+
     this.setState({
       renderedContent: validation_approved_content,
     });
@@ -321,7 +321,7 @@ class InstitutionLetter extends Component {
                   <button
                     className={`px-4 py-2 font-semibold focus:outline-none transition-all duration-300 text-sm ${
                       activeSubTab === "validation_approved_letter"
-                        ? "bg-blue-600 text-white rounded-t-md"
+                        ? "bg-red-600 text-white rounded-t-md"
                         : "text-gray-600"
                     }`}
                     onClick={() =>
@@ -333,7 +333,7 @@ class InstitutionLetter extends Component {
                   <button
                     className={`ml-4 px-4 py-2 font-semibold focus:outline-none transition-all duration-300 text-sm ${
                       activeSubTab === "validation_declined_letter"
-                        ? "bg-blue-600 text-white rounded-t-md"
+                        ? "bg-red-600 text-white rounded-t-md"
                         : "text-gray-600"
                     }`}
                     onClick={() =>
@@ -359,7 +359,7 @@ class InstitutionLetter extends Component {
                   <button
                     className={`px-4 py-2 font-semibold focus:outline-none transition-all duration-300 text-sm ${
                       activeSubTab === "verification_approved_letter"
-                        ? "bg-blue-600 text-white rounded-t-md"
+                        ? "bg-red-600 text-white rounded-t-md"
                         : "text-gray-600"
                     }`}
                     onClick={() =>
@@ -371,7 +371,7 @@ class InstitutionLetter extends Component {
                   <button
                     className={`ml-4 px-4 py-2 font-semibold focus:outline-none transition-all duration-300 text-sm ${
                       activeSubTab === "verification_declined_letter"
-                        ? "bg-blue-600 text-white rounded-t-md"
+                        ? "bg-red-600 text-white rounded-t-md"
                         : "text-gray-600"
                     }`}
                     onClick={() =>
@@ -413,7 +413,7 @@ class InstitutionLetter extends Component {
                       />
 
                       <button
-                        className="bg-blue-800 text-white px-6 rounded-md py-1 my-2"
+                        className="bg-red-800 text-white px-6 rounded-md py-1 my-2"
                         onClick={this.previewValidationApprovedTemplate}
                       >
                         Preview Template
@@ -529,7 +529,6 @@ class InstitutionLetter extends Component {
                             Name of the document type in question
                           </td>
                         </tr>
-                        
                       </tbody>
                     </table>
                   </div>
@@ -537,7 +536,9 @@ class InstitutionLetter extends Component {
                     <div className=" w-full border rounded-md p-6 bg-white">
                       <div className="w-full flex flex-col items-center justify-center">
                         <img
-                          src={`${import.meta.env.VITE_BASE_URL}/storage/app/public/${logo}`}
+                          src={`${
+                            import.meta.env.VITE_BASE_URL
+                          }/storage/app/public/${logo}`}
                           alt=""
                           className="w-20 h-20 mb-2"
                         />
@@ -618,7 +619,7 @@ class InstitutionLetter extends Component {
                       />
 
                       <button
-                        className="bg-blue-800 text-white px-6 rounded-md py-1 my-2"
+                        className="bg-red-800 text-white px-6 rounded-md py-1 my-2"
                         onClick={this.previewValidationDeclinedTemplate}
                       >
                         Preview Template
@@ -741,7 +742,9 @@ class InstitutionLetter extends Component {
                     <div className=" w-full border rounded-md p-6 bg-white">
                       <div className="w-full flex flex-col items-center justify-center">
                         <img
-                          src={`${import.meta.env.VITE_BASE_URL}/storage/app/public/${logo}`}
+                          src={`${
+                            import.meta.env.VITE_BASE_URL
+                          }/storage/app/public/${logo}`}
                           alt=""
                           className="w-20 h-20 mb-2"
                         />
@@ -826,7 +829,7 @@ class InstitutionLetter extends Component {
                       />
 
                       <button
-                        className="bg-blue-800 text-white px-6 rounded-md py-1 my-2"
+                        className="bg-red-800 text-white px-6 rounded-md py-1 my-2"
                         onClick={this.previewVerificationApprovedTemplate}
                       >
                         Preview Template
@@ -949,7 +952,9 @@ class InstitutionLetter extends Component {
                     <div className=" w-full border rounded-md p-6 bg-white">
                       <div className="w-full flex flex-col items-center justify-center">
                         <img
-                          src={`${import.meta.env.VITE_BASE_URL}/storage/app/public/${logo}`}
+                          src={`${
+                            import.meta.env.VITE_BASE_URL
+                          }/storage/app/public/${logo}`}
                           alt=""
                           className="w-20 h-20 mb-2"
                         />
@@ -1030,7 +1035,7 @@ class InstitutionLetter extends Component {
                       />
 
                       <button
-                        className="bg-blue-800 text-white px-6 rounded-md py-1 my-2"
+                        className="bg-red-800 text-white px-6 rounded-md py-1 my-2"
                         onClick={this.previewVerificationDeclinedTemplate}
                       >
                         Preview Template
@@ -1153,7 +1158,9 @@ class InstitutionLetter extends Component {
                     <div className=" w-full border rounded-md p-6 bg-white">
                       <div className="w-full flex flex-col items-center justify-center">
                         <img
-                          src={`${import.meta.env.VITE_BASE_URL}/storage/app/public/${logo}`}
+                          src={`${
+                            import.meta.env.VITE_BASE_URL
+                          }/storage/app/public/${logo}`}
                           alt=""
                           className="w-20 h-20 mb-2"
                         />

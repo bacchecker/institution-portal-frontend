@@ -79,7 +79,7 @@ class DocumentDetails extends Component {
   getStatusClass = (status) => {
     switch (status) {
       case "created":
-        return "bg-blue-100 text-blue-700";
+        return "bg-red-100 text-blue-700";
       case "submitted":
         return "bg-yellow-100 text-yellow-700";
       case "received":
@@ -423,7 +423,7 @@ class DocumentDetails extends Component {
                     <div className="flex justify-end mt-2">
                       <button
                         disabled={isNoting}
-                        className="flex items-center space-x-2 border border-blue-700 rounded-md text-blue-700 hover:text-white hover:bg-blue-700 text-xs px-4 py-1"
+                        className="flex items-center space-x-2 border border-blue-700 rounded-md text-blue-700 hover:text-white hover:bg-red-700 text-xs px-4 py-1"
                       >
                         {isNoting ? (
                           <>
@@ -465,7 +465,7 @@ class DocumentDetails extends Component {
                   <div className="flex space-x-4">
                     <a
                       href=""
-                      className="flex w-8 h-8 bg-blue-600 opacity-60 hover:opacity-100 items-center justify-center rounded-full cursor-pointer"
+                      className="flex w-8 h-8 bg-red-600 opacity-60 hover:opacity-100 items-center justify-center rounded-full cursor-pointer"
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -559,7 +559,7 @@ class DocumentDetails extends Component {
                   <div className="w-full flex justify-end">
                     <button
                       type="submit"
-                      className="flex space-x-2 items-center border border-blue-700 rounded-md text-blue-700 hover:text-white hover:bg-blue-700 text-sm px-4 py-1"
+                      className="flex space-x-2 items-center border border-blue-700 rounded-md text-blue-700 hover:text-white hover:bg-red-700 text-sm px-4 py-1"
                     >
                       <IoIosCloudUpload size={16} /> <p>Upload</p>
                     </button>
