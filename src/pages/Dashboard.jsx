@@ -4,12 +4,13 @@ import { GrValidate } from "react-icons/gr";
 import { IoIosMail, IoIosNotificationsOutline } from "react-icons/io";
 import { IoDocumentAttach, IoDocuments } from "react-icons/io5";
 import { LuClipboardEdit } from "react-icons/lu";
-import { MdManageHistory, MdOutlineVerifiedUser } from "react-icons/md";
+import { MdClose, MdManageHistory, MdOutlineVerifiedUser } from "react-icons/md";
 import withRouter from "@components/withRouter";
 import axios from "@utils/axiosConfig";
 import { toast } from "react-hot-toast";
 import AuthLayout from "@components/AuthLayout";
-import { Card, CardBody } from "@nextui-org/react";
+import { Button, Card, CardBody, Input, Select, SelectItem, Spinner, Textarea } from "@nextui-org/react";
+import { BsSend } from "react-icons/bs";
 
 class Dashboard extends Component {
   constructor(props) {
@@ -21,11 +22,71 @@ class Dashboard extends Component {
     prefix: "",
     institutionStatus: this.props.institutionStatus,
     profileComplete: this.props.profileComplete,
+    showTicketModal: false,
+    title: "",
+    description: "",
+    type: "",
+    category: "",
+    isSaving: false,
+    typeData: [
+      { id: "general", name: "General" },
+      { id: "technical", name: "Technical" },
+      { id: "financial", name: "Financial" },
+      { id: "other", name: "Other" },
+    ],
+    categoryData: [
+      { id: "complaint", name: "Complaint" },
+      { id: "inquiry", name: "Inquiry" },
+      { id: "request", name: "Request" },
+      { id: "suggestion", name: "Suggestion" },
+      { id: "other", name: "Other" },
+    ],
   };
 
   componentDidMount() {
     this.fetchInstitution();
   }
+
+  toggleTicketModal = () => {
+    this.setState((prevState) => ({
+      showTicketModal: !prevState.showTicketModal,
+    }));
+    this.handleClear();
+  };
+
+  handleInputChange = (event) => {
+    const { name, value } = event.target;
+    this.setState({
+      [name]: value,
+    });
+  };
+
+  handleClear = () => {
+    (this.state.title = ""),
+      (this.state.description = ""),
+      (this.state.type = ""),
+      (this.state.category = "");
+  };
+
+  handleSubmit = async (event) => {
+    event.preventDefault();
+    const { title, description, type, category } = this.state;
+    this.setState({ isSaving: true });
+    const formData = { title, description, type, category };
+    try {
+      const response = await axios.post("/tickets", formData);
+      this.toggleTicketModal();
+      this.handleClear();
+
+      toast.success(response.data.message, {});
+      this.setState({ isSaving: false });
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message || "An error occurred. Please try again."
+      );
+      this.setState({ isSaving: false });
+    }
+  };
 
   fetchInstitution = async () => {
     try {
@@ -51,12 +112,20 @@ class Dashboard extends Component {
   };
 
   render() {
+    const { type,
+      category,
+      description,
+      title,
+      typeData,
+      categoryData,
+      isSaving,
+      showTicketModal} = this.state
     return (
       <AuthLayout title="Dashboard">
         {this.state.status == "inactive" && (
           <section className="p-3">
             <Card>
-              <CardBody className="flex flex-row items-center justify-evenly">
+              <CardBody className="flex flex-row items-center justify-evenly bg-bChkRed">
                 <img
                   src="/images/review.png"
                   alt="account review img"
@@ -65,12 +134,12 @@ class Dashboard extends Component {
 
                 <div className="flex flex-col">
                   <div className="my-2">
-                    <p className="text-xl font-semibold text-gray-900">
+                    <p className="text-xl font-semibold text-gray-100">
                       Your institution profile is under review
                     </p>
                   </div>
                   <div className="w-full lg:w-[500px]">
-                    <p className="text-justify text-gray-700 text-sm">
+                    <p className="text-justify text-white text-sm">
                       Your institution's account is currently under review.
                       Customer service will contact you within 48 hours. If you
                       have any questions, please reach out to our support team.
@@ -78,13 +147,13 @@ class Dashboard extends Component {
                   </div>
                   <div className="my-4 flex items-center justify-center">
                     <button
-                      onClick={this.toggleModal}
-                      className="flex items-center w-40 space-x-2 bg-blue-700 hover:bg-blue-600 text-white px-4 py-1.5 rounded-md"
+                      onClick={this.toggleTicketModal}
+                      className="flex items-center justify-center w-40 space-x-2 bg-white hover:bg-gray-100 text-gray-900 px-4 py-1.5 rounded-md"
                     >
-                      {/* <BsSend /> <p>Issue Ticket</p> */}
+                      <BsSend /> <p>Issue Ticket</p>
                     </button>
                   </div>
-                  <div className="flex space-x-6 text-gray-600 text-sm">
+                  <div className="flex space-x-6 hover:text-white text-red-200 text-sm">
                     <div className="flex items-center space-x-1">
                       {/* <FaPhoneVolume /> */}
                       <p>0(303)856478996</p>
@@ -104,7 +173,102 @@ class Dashboard extends Component {
             </Card>
           </section>
         )}
+        {showTicketModal && (
+          <div className="fixed z-50 inset-0 bg-black bg-opacity-60 flex justify-end">
+            <form
+              onSubmit={this.handleSubmit}
+              className="w-1/2 lg:w-1/3 xl:w-[28%] h-full bg-white shadow-lg transition-transform duration-700 ease-in-out transform"
+              style={{
+                right: 0,
+                position: "absolute",
+                transform: showTicketModal ? "translateX(0)" : "translateX(100%)",
+              }}
+            >
+              <div className="flex justify-between items-center font-medium border-b-2 p-4">
+                <h2 className="text-lg">Issue a Ticket</h2>
+                <button
+                  onClick={this.toggleTicketModal}
+                  className="flex items-center justify-center h-8 w-8 bg-red-200 rounded-md"
+                >
+                  <MdClose size={20} className="text-red-600" />
+                </button>
+              </div>
 
+              <div className="relative flex flex-col space-y-7 px-4 py-6 overflow-y-auto h-[calc(100%-4rem)]">
+                <div className="flex flex-col space-y-4 mb-4">
+                  <Input
+                    label="Title"
+                    name="title"
+                    value={title}
+                    onChange={this.handleInputChange}
+                  />
+
+                 
+                  <Select 
+                    label="Select your type" 
+                    className="" 
+                    name="type"
+                    value={type}
+                    onChange={this.handleInputChange}
+                  >
+                    {typeData.map((type) => (
+                      <SelectItem key={type.id}>
+                        {type.name}
+                      </SelectItem>
+                    ))}
+                  </Select>
+                  <Select 
+                    label="Select category" 
+                    className="" 
+                    name="category"
+                    value={category}
+                    onChange={this.handleInputChange}
+                  >
+                    {categoryData.map((category) => (
+                      <SelectItem key={category.id}>
+                        {category.name}
+                      </SelectItem>
+                    ))}
+                  </Select>
+                  <Textarea
+                    label="Describe your issue..."
+                    name="description"
+                    value={description}
+                    onChange={this.handleInputChange}
+                  />
+                </div>
+
+                <div className="w-full absolute bottom-4 right-0 flex space-x-4 px-4">
+                  <button
+                    onClick={this.toggleTicketModal}
+                    type="button"
+                    className="text-xs w-1/2 text-gray-600 border px-4 py-1.5 rounded-full"
+                  >
+                    Close
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isSaving}
+                    className={`w-1/2 flex items-center justify-center rounded-full ${
+                      isSaving
+                        ? "bg-gray-400 text-gray-700"
+                        : "bg-buttonLog text-white"
+                    } py-1.5 text-xs ${isSaving ? "cursor-not-allowed" : ""}`}
+                  >
+                    {isSaving ? (
+                      <>
+                        <Spinner size="sm" />
+                        Sending...
+                      </>
+                    ) : (
+                      "Send"
+                    )}
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        )}
         <div className="w-full p-3">
           <div className="grid grid-cols-2 xl:grid-cols-4 gap-8">
             <div className="col-span-3 flex items-center xl:space-x-8 space-x-4">

@@ -527,9 +527,7 @@ class InstitutionLetter extends Component {
                     <div className=" w-full border rounded-md p-6 bg-white">
                       <div className="w-full flex flex-col items-center justify-center">
                         <img
-                          src={`${
-                            import.meta.env.VITE_BASE_URL
-                          }/storage/${logo}`}
+                          src={`${import.meta.env.VITE_BASE_URL}/storage/app/public/${logo}`}
                           alt=""
                           className="w-20 h-20 mb-2"
                         />
@@ -733,9 +731,7 @@ class InstitutionLetter extends Component {
                     <div className=" w-full border rounded-md p-6 bg-white">
                       <div className="w-full flex flex-col items-center justify-center">
                         <img
-                          src={`${
-                            import.meta.env.VITE_BASE_URL
-                          }/storage/${logo}`}
+                          src={`${import.meta.env.VITE_BASE_URL}/storage/app/public/${logo}`}
                           alt=""
                           className="w-20 h-20 mb-2"
                         />
@@ -943,9 +939,7 @@ class InstitutionLetter extends Component {
                     <div className=" w-full border rounded-md p-6 bg-white">
                       <div className="w-full flex flex-col items-center justify-center">
                         <img
-                          src={`${
-                            import.meta.env.VITE_BASE_URL
-                          }/storage/${logo}`}
+                          src={`${import.meta.env.VITE_BASE_URL}/storage/app/public/${logo}`}
                           alt=""
                           className="w-20 h-20 mb-2"
                         />
@@ -1149,9 +1143,7 @@ class InstitutionLetter extends Component {
                     <div className=" w-full border rounded-md p-6 bg-white">
                       <div className="w-full flex flex-col items-center justify-center">
                         <img
-                          src={`${
-                            import.meta.env.VITE_BASE_URL
-                          }/storage/${logo}`}
+                          src={`${import.meta.env.VITE_BASE_URL}/storage/app/public/${logo}`}
                           alt=""
                           className="w-20 h-20 mb-2"
                         />

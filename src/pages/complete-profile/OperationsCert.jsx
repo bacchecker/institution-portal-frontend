@@ -130,7 +130,7 @@ class OperationsCert extends Component {
 
     return (
       <AuthLayout title="Operation Certificates">
-        <div className="rounded-md px-2 py-8 md:px-3">
+        <div className="bg-white px-2 py-8 md:px-3">
           <form
             onSubmit={this.handleSubmit}
             className="w-full flex flex-col items-center"

@@ -10,6 +10,7 @@ import Textarea from "@components/Textarea";
 import Select from "@components/Select";
 import Spinner from "@components/Spinner";
 import AuthLayout from "@components/AuthLayout";
+import { Input } from "@nextui-org/react";
 
 class ValidationQuestions extends Component {
   constructor(props) {
@@ -896,9 +897,9 @@ class UpdateDocumentFee extends Component {
         {confirmPasswordModal && (
           <div className="fixed z-50 backdrop-blur-sm bg-black inset-0 overflow-y-auto bg-opacity-60">
             <div className="flex items-center justify-center min-h-screen px-2">
-              <div className="w-full md:w-2/3 lg:w-1/2 xl:w-1/3 h-44 relative bg-white shadow-lg mx-2">
-                <div className="flex justify-between bg-bChkRed text-white">
-                  <h2 className="text-xl font-semibold py-2 px-4">
+              <div className="w-full md:w-2/3 lg:w-1/2 xl:w-1/3 h-52 relative bg-white shadow-lg mx-2">
+                <div className="flex justify-between bg-slate-700 text-white">
+                  <h2 className="text-xl font-medium py-2 px-4">
                     Confirm You Password
                   </h2>
                   <button
@@ -909,7 +910,8 @@ class UpdateDocumentFee extends Component {
                   </button>
                 </div>
                 <div className="py-6 px-4">
-                  <Textbox
+                  <Input
+                    isRequired
                     label="Password"
                     name="password"
                     type="password"
@@ -933,7 +935,7 @@ class UpdateDocumentFee extends Component {
                     className={`w-full flex items-center justify-center  ${
                       isUpdating
                         ? "bg-gray-400 text-gray-700"
-                        : "bg-bChkRed text-white"
+                        : "bg-slate-700 text-white"
                     }  py-2 px-4 text-sm uppercase ${
                       isUpdating ? "cursor-not-allowed" : ""
                     }`}
