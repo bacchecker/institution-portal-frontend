@@ -113,9 +113,9 @@ class AccountInactive extends Component {
       showModal,
     } = this.state;
 
-    if (this.state.institutionStatus == true) {
-      return <Navigate to="/dashboard" />;
-    }
+    // if (this.state.institutionStatus == true) {
+    //   return <Navigate to="/dashboard" />;
+    // }
 
     return (
       <>

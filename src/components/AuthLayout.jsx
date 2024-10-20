@@ -86,10 +86,11 @@ export default function AuthLayout({ children, title = "Page Title" }) {
       console.log(responseData.status);
       if (responseData.status == "active") {
         updateInstitution(responseData);
-      } else {
-        updateInstitution(responseData);
-        navigate("/account-inactive");
       }
+      // else {
+      //   updateInstitution(responseData);
+      //   navigate("/account-inactive");
+      // }
     })();
     /**
      *  TODO: Dont delete this code, Will be used later when roles and permissions are implemented
@@ -122,13 +123,16 @@ export default function AuthLayout({ children, title = "Page Title" }) {
     console.log("Not authenticated");
     return <Navigate to="/login" replace />;
   }
-  // if (institution?.status === "inactive") {
-  //   return <Navigate to="/account-inactive" replace />;
-  // }
+
+  console.log(url);
+
+  if (institution?.status === "inactive" && url !== "/dashboard") {
+    return <Navigate to="/dashboard" replace />;
+  }
 
   if (institution?.profile_complete === "no") {
     // check current route, if not account-setup, redirect to account-setup
-    if (!url.startsWith("/account-setup")) {
+    if (!url.startsWith("/account-setup") && url !== "/dashboard") {
       return <Navigate to="/account-setup/profile" replace />;
     }
   }

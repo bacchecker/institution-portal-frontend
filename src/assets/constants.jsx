@@ -13,7 +13,7 @@ export const navLinks = [
     label: "Dashboard",
     path: "/dashboard",
     icon: <DashboardIcon />,
-    profile_complete: true,
+    profile_complete: false,
     showOn: ["inactive", "active"],
     children: [],
   },

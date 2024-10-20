@@ -9,6 +9,7 @@ import withRouter from "@components/withRouter";
 import axios from "@utils/axiosConfig";
 import { toast } from "react-hot-toast";
 import AuthLayout from "@components/AuthLayout";
+import { Card, CardBody } from "@nextui-org/react";
 
 class Dashboard extends Component {
   constructor(props) {
@@ -41,6 +42,7 @@ class Dashboard extends Component {
           region: institutionData.region,
           academic_level: institutionData.academic_level,
           logo: institutionData.logo,
+          status: institutionData.status,
         });
       }
     } catch (error) {
@@ -50,8 +52,60 @@ class Dashboard extends Component {
 
   render() {
     return (
-      <AuthLayout title='Dashboard'>
-        <div className="w-full md:px-3">
+      <AuthLayout title="Dashboard">
+        {this.state.status == "inactive" && (
+          <section className="p-3">
+            <Card>
+              <CardBody className="flex flex-row items-center justify-evenly">
+                <img
+                  src="/images/review.png"
+                  alt="account review img"
+                  className="size-44"
+                />
+
+                <div className="flex flex-col">
+                  <div className="my-2">
+                    <p className="text-xl font-semibold text-gray-900">
+                      Your institution profile is under review
+                    </p>
+                  </div>
+                  <div className="w-full lg:w-[500px]">
+                    <p className="text-justify text-gray-700 text-sm">
+                      Your institution's account is currently under review.
+                      Customer service will contact you within 48 hours. If you
+                      have any questions, please reach out to our support team.
+                    </p>
+                  </div>
+                  <div className="my-4 flex items-center justify-center">
+                    <button
+                      onClick={this.toggleModal}
+                      className="flex items-center w-40 space-x-2 bg-blue-700 hover:bg-blue-600 text-white px-4 py-1.5 rounded-md"
+                    >
+                      {/* <BsSend /> <p>Issue Ticket</p> */}
+                    </button>
+                  </div>
+                  <div className="flex space-x-6 text-gray-600 text-sm">
+                    <div className="flex items-center space-x-1">
+                      {/* <FaPhoneVolume /> */}
+                      <p>0(303)856478996</p>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <IoIosMail size={18} />
+                      <a
+                        target="blank"
+                        href="https://mail.google.com/mail/?view=cm&fs=1&to=info@bacchecker.online"
+                      >
+                        info@bacchecker.online
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </CardBody>
+            </Card>
+          </section>
+        )}
+
+        <div className="w-full p-3">
           <div className="grid grid-cols-2 xl:grid-cols-4 gap-8">
             <div className="col-span-3 flex items-center xl:space-x-8 space-x-4">
               <div className="">

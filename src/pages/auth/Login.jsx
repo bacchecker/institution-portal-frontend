@@ -63,10 +63,10 @@ const Login = () => {
 
       login(responseData.user, responseData?.institution, responseData.token);
 
-      if (responseData.institution.status === "inactive") {
-        navigate("/account-inactive");
-        return;
-      }
+      // if (responseData.institution.status === "inactive") {
+      //   navigate("/account-inactive");
+      //   return;
+      // }
 
       if (type === "institution") {
         toast.success(response.data.message, {});
