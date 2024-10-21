@@ -245,7 +245,6 @@ export default function ValidationRequest() {
             "Documents",
             "Status",
             "Total Amount",
-            "Payment Status",
             "",
           ]}
           loadingState={resData ? false : true}
@@ -273,48 +272,11 @@ export default function ValidationRequest() {
               <TableCell>
                 {moment(item?.created_at).format("Do MMMM, YYYY")}
               </TableCell>
-              <TableCell>
-                {item?.records?.length > 1 ? (
-                  <Popover placement="right">
-                    <PopoverTrigger>
-                      <Button size="sm" color="danger">
-                        {item?.records?.length} Docs
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent>
-                      <div className="px-1 py-2 flex flex-col gap-1">
-                        {item?.records?.map((doc) => (
-                          <div
-                            key={doc.id}
-                            className="flex items-center gap-2 justify-between bg-slate-100 dark:text-white dark:bg-gray-800 p-2 rounded-lg"
-                          >
-                            <div className="text-tiny">
-                              {doc.document_type?.name}
-                            </div>
-                            <div className="text-tiny ml-5">
-                              GH¢{" "}
-                              {Math.floor(
-                                doc?.document_type?.base_fee +
-                                  doc?.number_of_copies *
-                                    doc?.document_type?.printing_fee
-                              ).toFixed(2)}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </PopoverContent>
-                  </Popover>
-                ) : (
-                  item?.records[0]?.document_type?.name
-                )}
-              </TableCell>
+              <TableCell>{item?.document_type?.name}</TableCell>
               <TableCell>
                 <StatusChip status={item?.status} />
               </TableCell>
               <TableCell> GH¢ {item?.total_amount}</TableCell>
-              <TableCell>
-                <StatusChip status={item?.payment_status} />
-              </TableCell>
               <TableCell className="flex items-center h-16 gap-3">
                 <Button
                   size="sm"
@@ -347,10 +309,10 @@ export default function ValidationRequest() {
                 value={moment(data?.created_at).format("Do MMMM, YYYY")}
               />
               <ItemCard title="Total Cost (GH¢)" value={data?.total_amount} />
-              <ItemCard
+              {/* <ItemCard
                 title="Payment Status"
                 value={<StatusChip status={data?.payment_status} />}
-              />
+              /> */}
               <ItemCard
                 title="Request Status"
                 value={<StatusChip status={data?.status} />}
@@ -401,44 +363,30 @@ export default function ValidationRequest() {
               </section>
 
               <section className="grid grid-cols-2 gap-3">
-                {data?.records?.map((item) => (
-                  <div
-                    key={item?.id}
-                    className="gap-3 p-2 rounded-lg border dark:border-white/10"
-                  >
-                    <div className="w-full flex flex-col gap-1">
-                      <p className="font-semibold">
-                        {item?.document_type?.name}
-                      </p>
-                      <p>
-                        GH¢{" "}
-                        {Math.floor(
-                          item?.document_type?.base_fee +
-                            item?.number_of_copies *
-                              item?.document_type?.printing_fee
-                        ).toFixed(2)}
-                      </p>
+                <div className="gap-3 p-2 rounded-lg border dark:border-white/10">
+                  <div className="w-full flex flex-col gap-1">
+                    <p className="font-semibold">{data?.document_type?.name}</p>
+                    <p>GH¢ {data?.total_amount}</p>
 
-                      <div className="flex justify-between">
-                        <div className="flex gap-2 items-center">
-                          <Chip size="sm">{item?.file?.extension}</Chip>
-                          <p>{filesize(item?.file?.size ?? 1000)}</p>
-                        </div>
-                        <p
-                          className="cursor-pointer p-1 rounded-lg bg-primary text-white text-xs"
-                          onClick={() => {
-                            window.location.href =
-                              "https://backend.baccheck.online/api/document/download" +
-                              "?path=" +
-                              encodeURIComponent(item?.file?.path);
-                          }}
-                        >
-                          Download
-                        </p>
+                    <div className="flex justify-between">
+                      <div className="flex gap-2 items-center">
+                        <Chip size="sm">{data?.file?.extension}</Chip>
+                        <p>{filesize(data?.file?.size ?? 1000)}</p>
                       </div>
+                      <p
+                        className="cursor-pointer p-1 rounded-lg bg-primary text-white text-xs"
+                        onClick={() => {
+                          window.location.href =
+                            "https://backend.baccheck.online/api/document/download" +
+                            "?path=" +
+                            encodeURIComponent(data?.file?.path);
+                        }}
+                      >
+                        Download
+                      </p>
                     </div>
                   </div>
-                ))}
+                </div>
               </section>
             </div>
           </div>
@@ -482,8 +430,9 @@ export default function ValidationRequest() {
         onButtonClick={async () => {
           setProcessing(true);
           const resss = await axios.post(
-            `/institution/requests/validation-requests/${data?.unique_code}/status`,
+            `/institution/requests/validation-requests/${data?.id}/status`,
             {
+              id: data?.id,
               institution_id: data?.institution_id,
               user_id: data?.user_id,
               unique_code: data?.unique_code,
@@ -501,8 +450,8 @@ export default function ValidationRequest() {
             setProcessing(false);
             return;
           }
-          console.log(resss);
-          setData(resss?.data[0]);
+          console.log(resss.data);
+          setData(resss?.data);
           setProcessing(false);
           toast.success("Request status updated successfully");
           mutate("/institution/requests/validation-requests");

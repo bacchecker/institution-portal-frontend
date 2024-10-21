@@ -705,7 +705,7 @@ export default function DocumentRequest() {
                     }
 
                     console.log(resss?.data);
-                    setData(resss?.data[0]);
+                    setData(resss?.data);
                     setProcessing(false);
                     toast.success("Documents uploaded successfully");
                     mutate("/institution/requests/document-requests");
