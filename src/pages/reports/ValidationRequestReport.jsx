@@ -16,9 +16,10 @@ import CustomTable from "@components/CustomTable";
 import moment from "moment";
 import StatusChip from "@components/status-chip";
 import { createSearchParams, useSearchParams } from "react-router-dom";
+import secureLocalStorage from "react-secure-storage";
 
 function ValidationRequestReport() {
-  const institution_id = JSON?.parse(localStorage.getItem("auth-storage"))
+  const institution_id = JSON?.parse(secureLocalStorage.getItem("auth-storage"))
     ?.state?.institution?.id;
 
   const [searchParams, setSearchParams] = useSearchParams();

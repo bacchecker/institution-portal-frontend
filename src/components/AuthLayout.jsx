@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from "react";
 import axios from "@utils/axiosConfig";
-//     import { toast, Toaster } from "sonner";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   Button,
@@ -18,6 +17,7 @@ import ThemeSwitcher from "./ThemeSwitcher";
 import { navLinks } from "@assets/constants";
 import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
 import useAuthStore from "@store/authStore";
+import secureLocalStorage from "react-secure-storage";
 
 export default function AuthLayout({ children, title = "Page Title" }) {
   const [isDesktopExpanded, setIsDesktopExpanded] = useState(true);
@@ -28,11 +28,12 @@ export default function AuthLayout({ children, title = "Page Title" }) {
     useAuthStore();
   const navigate = useNavigate();
 
+
   useEffect(() => {
     setIsDesktopExpanded(
-      localStorage.getItem("isDesktopExpanded") === "true"
+      secureLocalStorage.getItem("isDesktopExpanded") === "true"
         ? true
-        : localStorage.getItem("isDesktopExpanded") === null
+        : secureLocalStorage.getItem("isDesktopExpanded") === null
         ? true
         : false
     );
@@ -83,7 +84,6 @@ export default function AuthLayout({ children, title = "Page Title" }) {
     (async () => {
       const response = await axios.get("/institution/institution-data");
       const responseData = response.data.institutionData;
-      console.log(responseData.status);
       if (responseData.status == "active") {
         updateInstitution(responseData);
       }
@@ -107,6 +107,8 @@ export default function AuthLayout({ children, title = "Page Title" }) {
     // setAccessibleRoutes(filteredRoutes);
 
     const filteredRoutes = navLinks.filter((route) => {
+      console.log("rout", route?.profile_complete);
+      
       if (route.showOn) {
         return route.profile_complete.includes(institution?.profile_complete);
         // return route.showOn.includes(institution?.status);

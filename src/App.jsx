@@ -23,6 +23,7 @@ import DocumentRequest from "./pages/requests/document-request/DocumentRequest";
 import DocumentDetails from "./pages/requests/document-request/DocumentDetails";
 import TermsConditions from "./pages/complete-profile/TermsConditions";
 import RolesAndPermissions from "./pages/security/RolesAndPermissions";
+import AccountSetupPage from "./pages/AccountSetupPage";
 
 const App = () => {
   const navigate = useNavigate();
@@ -43,32 +44,7 @@ const App = () => {
         <Route exact path="/account-inactive" element={<AccountInactive />} />
         <Route exact path="/user-profile" element={<Profile />} />
         <Route exact path="/verify-otp" element={<VerifyOTP />} />
-
-        {/* Account Setup Routes */}
-
-        <Route path="/account-setup" element={<Outlet />}>
-          <Route exact path="" element={<CompleteProfile />} />
-
-          <Route path="profile" element={<InstitutionData />} />
-          <Route path="institution-teams" element={<InstitutionTeams />} />
-          <Route path="terms-conditions" element={<TermsConditions />} />
-          <Route path="operations-certificate" element={<OperationsCert />} />
-          <Route path="letter-templates" element={<InstitutionLetter />} />
-
-          <Route path="document-types" element={<DocumentTypes />} />
-          <Route
-            path="document-types/add-remove"
-            element={<AddDocumentType />}
-          />
-          <Route
-            path="document-types/:documentId"
-            element={<ValidationQuestions />}
-          />
-          <Route
-            path="institution-teams/:institutionId"
-            element={<InstitutionUsers />}
-          />
-        </Route>
+        <Route exact path="/account-setup" element={<AccountSetupPage />} />
 
         <Route exact path="/dashboard" element={<Dashboard />} />
 

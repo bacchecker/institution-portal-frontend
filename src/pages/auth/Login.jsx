@@ -4,10 +4,11 @@ import withRouter from "@components/withRouter";
 import ReCAPTCHA from "react-google-recaptcha";
 import { toast } from "react-hot-toast";
 import { IoLockOpen, IoPerson, IoEyeOff, IoEye } from "react-icons/io5";
-import { Button, Card, Input } from "@nextui-org/react";
+import { Button, Card, Input, Spinner } from "@nextui-org/react";
 import ThemeSwitcher from "@components/ThemeSwitcher";
 import { Navigate, useNavigate } from "react-router-dom";
 import useAuthStore from "@store/authStore";
+import secureLocalStorage from "react-secure-storage";
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -39,7 +40,6 @@ const Login = () => {
       setIsLoading(false);
       return;
     }
-
     try {
       const response = await axios.post("/auth/login", {
         email: formData.email,
@@ -51,31 +51,22 @@ const Login = () => {
       if (responseData?.show_otp) {
         navigate("/verify-otp");
       }
-
-      console.log(response.data);
       responseData = response.data?.data;
-
-      localStorage.setItem("authToken", responseData.token);
-      localStorage.setItem("type", responseData.user.type);
+      secureLocalStorage.setItem("authToken", responseData.token);
+      secureLocalStorage.setItem("user", responseData.user);
+      secureLocalStorage.setItem("institution", responseData.institution);
       setIsLoading(false);
 
-      const type = localStorage.getItem("type");
-
       login(responseData.user, responseData?.institution, responseData.token);
-
-      if (type === "institution") {
+      if (responseData.user.type === "institution") {
         if (responseData.institution.status === "inactive") {
-          console.log(responseData?.institution);
           return navigate("/account-inactive");
-        }
-
-        toast.success(response.data.message, {});
-        if (responseData.institution.profile_complete === "yes") {
+        } else if (responseData.institution.setup_done) {
           navigate("/dashboard");
         } else {
           navigate("/account-setup");
-          // navigate("/account-setup/profile");
         }
+        toast.success(response.data.message, {});
       } else {
         toast.error("You are not an institution");
         setIsLoading(false);
@@ -166,17 +157,25 @@ const Login = () => {
               />
             </div>
 
-            <Button
-              color="danger"
+            <button
+              className={`w-full flex items-center justify-center bg-[#ff0404] hover:bg-[#fa4848] text-white px-4 py-2 rounded-md font-medium ${
+                isLoading && "cursor-not-allowed bg-[#fa4848]"
+              }`}
               onClick={loginUser}
-              isLoading={isLoading}
               disabled={isLoading}
             >
-              Login
-            </Button>
+              {isLoading ? (
+                <div className="flex items-center justify-center gap-2">
+                  <Spinner size="sm" color="white" />
+                  <h4>Processing...</h4>
+                </div>
+              ) : (
+                <h4>Login</h4>
+              )}
+            </button>
 
             <p className="text-center text-sm text-gray-600 dark:text-white">
-              Forgot your Password?{" "}
+              Forgot your Password?
               <a
                 href="https://backend.baccheck.online/forgot-password"
                 className="text-red-600"

@@ -23,8 +23,8 @@ class SelectSmall extends Component {
           <option value="" disabled>
             Select an option
           </option>
-          {menuItems.map((item, id) => (
-            <option key={id} value={item.id}>
+          {menuItems?.map((item, id) => (
+            <option key={id} value={item?.id}>
               {item[itemNameKey]}
             </option>
           ))}

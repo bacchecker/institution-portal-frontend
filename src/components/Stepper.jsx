@@ -87,8 +87,8 @@ const HorizontalLinearStepper = () => {
                 className={`w-10 h-10 p-2 rounded-full border-2 
                   ${
                     activeStep >= index
-                      ? "bg-gradient-to-tr from-black via-red-700 to-red-600 text-white border-white"
-                      : "bg-red-100 text-blue-300 border-blue-300"
+                      ? "bg-gradient-to-tr from-black via-[#ff0404] to-[#ff0404] text-white border-white"
+                      : "bg-red-100 text-[#fda2a2] border-[#fda2a2]"
                   }`}
               />
               <span className="mt-2 text-center text-xs lg:text-sm">
@@ -100,7 +100,7 @@ const HorizontalLinearStepper = () => {
       </div>
 
       {/* Step Content */}
-      <div className="px-8 py-6">
+      <div className="">
         <Suspense
           fallback={
             <div

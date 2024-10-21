@@ -151,7 +151,7 @@ const AccountInactive = () => {
             </div>
             <div className="">
               <div className="text-center my-2">
-                <p className="text-xl font-semibold text-green-800">
+                <p className="text-xl font-semibold text-[#ff0404]">
                   Your institution profile has been activated
                 </p>
               </div>
@@ -171,7 +171,7 @@ const AccountInactive = () => {
             <div className="my-4 flex items-center justify-center">
               <NavLink
                 to={`/account-setup/profile`}
-                className="flex items-center w-44 space-x-2 bg-green-700 hover:bg-green-600 text-white px-4 py-1.5 rounded-md"
+                className="flex items-center w-44 space-x-2 bg-[#ff0404] hover:bg-[#f84848] text-white px-4 py-1.5 rounded-md"
               >
                 <FaUser /> <p>Setup Account</p>
               </NavLink>

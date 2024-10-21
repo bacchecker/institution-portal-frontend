@@ -3,6 +3,7 @@ import { MdLogout } from "react-icons/md";
 import { toast } from "react-hot-toast";
 import Toastify from "@components/Toastify";
 import { FaSignOutAlt } from "react-icons/fa";
+import secureLocalStorage from "react-secure-storage";
 
 class Logout extends Component {
   constructor(props) {
@@ -24,7 +25,7 @@ class Logout extends Component {
   handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      localStorage.clear();
+      secureLocalStorage.clear();
       window.location.href = "/login";
     } catch (error) {
       toast.error(error.response?.data?.message || "An error occurred");

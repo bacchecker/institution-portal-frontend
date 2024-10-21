@@ -8,13 +8,14 @@ import useSWR from "swr";
 import axios from "@utils/axiosConfig";
 import DoumentRequestReport from "./DoumentRequestReport";
 import ValidationRequestReport from "./ValidationRequestReport";
+import secureLocalStorage from "react-secure-storage";
 
 export default function RevenueOverview() {
   const lineRef = useRef(null);
   const [data, setData] = useState(null);
   const [currentTab, setCurrentTab] = useState(1);
   const [lineStyle, setLineStyle] = useState({ width: 0, left: 0 });
-  const institution_id = JSON?.parse(localStorage.getItem("auth-storage"))
+  const institution_id = JSON?.parse(secureLocalStorage.getItem("auth-storage"))
     ?.state?.institution?.id;
   const handleTabClick = (e) => {
     const target = e.target;

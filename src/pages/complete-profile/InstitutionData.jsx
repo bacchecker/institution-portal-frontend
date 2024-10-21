@@ -164,8 +164,12 @@ class InstitutionData extends Component {
       newErrors.institution_email = "Institution email is required";
     } else if (!emailPattern.test(institution_email)) {
       newErrors.institution_email = "Please enter a valid email address";
-    } else if (institution_email.endsWith("gmail.com") || institution_email.endsWith("yahoo.com")) {
-      newErrors.institution_email = "Institution email cannot be a Gmail or Yahoo address";
+    } else if (
+      institution_email.endsWith("gmail.com") ||
+      institution_email.endsWith("yahoo.com")
+    ) {
+      newErrors.institution_email =
+        "Institution email cannot be a Gmail or Yahoo address";
     }
     if (!helpline_contact)
       newErrors.helpline_contact = "Help line contact is required";
@@ -183,7 +187,8 @@ class InstitutionData extends Component {
     }
     if (
       (!operationCertFile && !operation_certificate) ||
-      (operationCertFile && operationCertFile.name === "default-operation-cert.png")
+      (operationCertFile &&
+        operationCertFile.name === "default-operation-cert.png")
     ) {
       newErrors.operationCertFile =
         "Operation Certificate is required and cannot be default.";
@@ -207,9 +212,10 @@ class InstitutionData extends Component {
 
     // Check if both logoFile and operation_certificate are present
     if (
-      formData.logoFile && 
-      formData.logoFile.name !== "default-logo.png" && 
-      formData.operation_certificate && formData.operationCertFile.name !== "default-operation-cert.png"
+      formData.logoFile &&
+      formData.logoFile.name !== "default-logo.png" &&
+      formData.operation_certificate &&
+      formData.operationCertFile.name !== "default-operation-cert.png"
     ) {
       // Append logoFile and operation_certificate to FormData
       form.append("logo", formData.logoFile);
@@ -266,7 +272,8 @@ class InstitutionData extends Component {
             this.setState({
               disable_name: !!this.state.formData.name,
               disable_prefix: !!this.state.formData.prefix,
-              disable_institution_email: !!this.state.formData.institution_email,
+              disable_institution_email:
+                !!this.state.formData.institution_email,
               disable_helpline_contact: !!this.state.formData.helpline_contact,
               disable_address: !!this.state.formData.address,
               disable_digital_address: !!this.state.formData.digital_address,
@@ -280,7 +287,6 @@ class InstitutionData extends Component {
           }
         );
       }
-      
     } catch (error) {
       toast.error(
         error.response?.data?.message || "Failed to fetch institution data"
@@ -300,11 +306,12 @@ class InstitutionData extends Component {
     }/public/images/profile/default-operation-cert.png`;
 
     return (
-        <div className="w-full flex flex-col bg-white dark:bg-slate-900 rounded-md md:px-3">
+      <div className="w-full flex justify-center py-8">
+        <div className="w-full flex flex-col bg-white dark:bg-slate-900 rounded-md md:px-3 border border-[#ff0404]">
           <div className="mx-auto my-6 px-4 w-full">
             <div>
               <p className="text-gray-500 text-lg">Let's get started</p>
-              <p className="text-2xl font-bold my-2">
+              <p className="text-2xl font-bold my-2 text-[#ff0404]">
                 Complete your account setup
               </p>
               <p className="font-medium text-gray-700 text-sm">
@@ -362,19 +369,18 @@ class InstitutionData extends Component {
                     errorMessage={errors.helpline_contact}
                   />
                 </div>
-                
               </div>
               <div className="flex-1 pb-3">
-                  <Textarea
-                    label="Description"
-                    name="description"
-                    value={formData.description}
-                    disabled={this.state.disable_description}
-                    onChange={this.handleInputChange}
-                    isInvalid={errors.description}
-                    errorMessage={errors.description}
-                  />
-                </div>
+                <Textarea
+                  label="Description"
+                  name="description"
+                  value={formData.description}
+                  disabled={this.state.disable_description}
+                  onChange={this.handleInputChange}
+                  isInvalid={errors.description}
+                  errorMessage={errors.description}
+                />
+              </div>
 
               <div className="flex flex-col xl:flex-row xl:space-x-4 space-y-10 xl:space-y-0">
                 <Select
@@ -397,13 +403,11 @@ class InstitutionData extends Component {
                   disabled={this.state.disable_region}
                   error_message={errors.region}
                 />
-                
-                
               </div>
 
               <div className="flex flex-col xl:flex-row xl:space-x-4 space-y-8 xl:space-y-0">
                 <div className="flex-1">
-                 <Input
+                  <Input
                     label="Address"
                     name="address"
                     disabled={this.state.disable_address}
@@ -482,14 +486,16 @@ class InstitutionData extends Component {
 
                   <div className="relative flex items-center justify-center w-auto group border">
                     <img
-                    className="w-36 h-36"
+                      className="w-36 h-36"
                       src={
                         this.state.formData.logo
                           ? `https://backend.baccheck.online/storage/app/public/${this.state.formData.logo}`
                           : this.state.formData.logoFile
                           ? `${
                               import.meta.env.VITE_BASE_URL
-                            }/storage/app/public/${this.state.formData.logoFile}`
+                            }/storage/app/public/${
+                              this.state.formData.logoFile
+                            }`
                           : defaultLogoUrl
                       }
                       alt="Institution Logo"
@@ -534,7 +540,9 @@ class InstitutionData extends Component {
                           : this.state.formData.operationCertFile
                           ? `${
                               import.meta.env.VITE_BASE_URL
-                            }/storage/app/public/${this.state.formData.operationCertFile}`
+                            }/storage/app/public/${
+                              this.state.formData.operationCertFile
+                            }`
                           : defaultOperationCertUrl
                       }
                       alt="Institution Operation Certificate"
@@ -544,7 +552,10 @@ class InstitutionData extends Component {
                       className="absolute cursor-pointer opacity-0 group-hover:opacity-100 inset-0 bg-white/50 text-gray-600 grid place-items-center"
                       onClick={() =>
                         this.setState((prevState) => ({
-                          formData: { ...prevState.formData, operationCert: null },
+                          formData: {
+                            ...prevState.formData,
+                            operationCert: null,
+                          },
                         }))
                       }
                     >
@@ -553,11 +564,11 @@ class InstitutionData extends Component {
                   </div>
                 </div>
               </div>
-              
+
               <div className="flex justify-end">
                 <button
                   type="submit"
-                  className={`flex items-center bg-green-700 hover:bg-green-600 text-white px-4 py-1.5 rounded-md font-medium ${
+                  className={`flex items-center bg-[#ff0404] hover:bg-[#ff0404] text-white px-4 py-1.5 rounded-md font-medium ${
                     isSaving ? "cursor-not-allowed bg-gray-400" : ""
                   }`}
                   disabled={isSaving}
@@ -578,6 +589,7 @@ class InstitutionData extends Component {
             </form>
           </div>
         </div>
+      </div>
     );
   }
 }
