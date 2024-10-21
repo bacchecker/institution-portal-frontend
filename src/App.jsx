@@ -24,6 +24,7 @@ import DocumentDetails from "./pages/requests/document-request/DocumentDetails";
 import TermsConditions from "./pages/complete-profile/TermsConditions";
 import RolesAndPermissions from "./pages/security/RolesAndPermissions";
 import AccountSetupPage from "./pages/AccountSetupPage";
+import { Toaster } from "sonner";
 
 const App = () => {
   const navigate = useNavigate();
@@ -37,6 +38,7 @@ const App = () => {
   return (
     <>
       <Toastify />
+      <Toaster richColors />
 
       <Routes>
         <Route exact path="/" element={<Login />} />

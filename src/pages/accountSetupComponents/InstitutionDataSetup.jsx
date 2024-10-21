@@ -3,8 +3,10 @@ import useSWR from "swr";
 import axios from "@utils/axiosConfig";
 import { Input, Spinner, Textarea, user } from "@nextui-org/react";
 import { FaAnglesRight } from "react-icons/fa6";
+import secureLocalStorage from "react-secure-storage";
+import { toast } from "sonner";
 
-function InstitutionDataSetup() {
+function InstitutionDataSetup({ setActiveStep }) {
   const [userInput, setUserInput] = useState([]);
   const [selectedImage, setSelectedImage] = useState(null);
   const [selectedCert, setSelectedCert] = useState(null);
@@ -17,7 +19,7 @@ function InstitutionDataSetup() {
     axios.get(url).then((res) => res.data)
   );
 
-  console.log("inss", institutionData?.institutionData);
+  console.log("inss", secureLocalStorage.getItem("institution"));
 
   useEffect(() => {
     if (institutionData) {
@@ -43,6 +45,7 @@ function InstitutionDataSetup() {
       region,
       address,
       institution_email,
+      website_url,
       helpline_contact,
       prefix,
       digital_address,
@@ -56,11 +59,11 @@ function InstitutionDataSetup() {
     form.append("description", description);
     form.append("academic_level", academic_level);
     form.append("region", region);
+    form.append("website_url", website_url);
     form.append("institution_email", institution_email);
     form.append("helpline_contact", helpline_contact);
     form.append("prefix", prefix);
     form.append("digital_address", digital_address);
-    form.append("mailing_address", mailing_address);
     form.append("mailing_address", mailing_address);
     selectedImage && form.append("logo", selectedImage);
     selectedCert && form.append("operation_certificate", selectedCert);
@@ -68,7 +71,8 @@ function InstitutionDataSetup() {
     try {
       const response = await axios.post("/institution/account-setup", form);
       toast.success(response.data.message);
-      props.navigate("/account-setup/document-types");
+      secureLocalStorage.setItem("institution", response?.data.institution);
+      setActiveStep(2);
     } catch (error) {
       toast.error(error.response?.data?.message || "An error occurred");
     } finally {
@@ -309,7 +313,7 @@ function InstitutionDataSetup() {
           <button
             type="submit"
             className={`flex items-center bg-[#ff0404] hover:bg-[#f77f7f] text-white px-4 py-2.5 rounded-[0.3rem] font-medium ${
-              isSaving ? "cursor-not-allowed bg-gray-400" : ""
+              isSaving && "cursor-not-allowed bg-[#f77f7f]"
             }`}
             disabled={isSaving}
           >

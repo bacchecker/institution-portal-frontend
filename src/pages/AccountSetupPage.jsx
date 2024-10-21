@@ -73,8 +73,12 @@ function AccountSetupPage() {
               </div>
             </div>
             <div className="flex justify-between mx-5 pt-4 pb-2 border border-[#ff040459] mt-4 rounded-[0.5rem]">
-              {parseInt(current_step) === 1 && <InstitutionDataSetup />}
-              {parseInt(current_step) === 2 && <InstitutionDocumentTypes />}
+              {(parseInt(current_step) === 1) && (
+                <InstitutionDataSetup setActiveStep={(e) => setActiveStep(e)} />
+              )}
+              {(parseInt(current_step) === 2 || activeStep === 2) && (
+                <InstitutionDocumentTypes />
+              )}
             </div>
           </CardBody>
         </Card>
