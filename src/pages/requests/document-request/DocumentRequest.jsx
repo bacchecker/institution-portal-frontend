@@ -684,7 +684,7 @@ export default function DocumentRequest() {
                 </Button>
                 <Button
                   isLoading={processing}
-                  isDisabled={data.documents?.length < 1 || processing}
+                  isDisabled={data?.documents?.length < 1 || processing}
                   color="danger"
                   onClick={async () => {
                     setProcessing(true);
@@ -692,9 +692,10 @@ export default function DocumentRequest() {
                     const resss = await axios.post(
                       `/institution/upload-document`,
                       {
-                        documents: data.documents,
-                        unique_code: data.unique_code,
-                        institution_id: data.institution_id,
+                        documents: data?.documents,
+                        unique_code: data?.unique_code,
+                        institution_id: data?.institution_id,
+                        id: data?.id,
                       }
                     );
 
