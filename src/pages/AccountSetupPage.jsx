@@ -7,7 +7,7 @@ import {
   IoDocuments,
   IoDocumentText,
 } from "react-icons/io5";
-import InstitutionDataSetup from "./accountSetupComponents/institutionDataSetup";
+import InstitutionDataSetup from "./accountSetupComponents/InstitutionDataSetup";
 import secureLocalStorage from "react-secure-storage";
 import InstitutionDocumentTypes from "./accountSetupComponents/InstitutionDocumentTypes";
 function AccountSetupPage() {
