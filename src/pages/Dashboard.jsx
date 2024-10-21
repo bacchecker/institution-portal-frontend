@@ -11,7 +11,6 @@ import {
 } from "react-icons/md";
 import withRouter from "@components/withRouter";
 import axios from "@utils/axiosConfig";
-import { toast } from "react-hot-toast";
 import AuthLayout from "@components/AuthLayout";
 import {
   Button,
@@ -24,6 +23,7 @@ import {
   Textarea,
 } from "@nextui-org/react";
 import { BsSend } from "react-icons/bs";
+import { toast } from "sonner";
 
 class Dashboard extends Component {
   constructor(props) {

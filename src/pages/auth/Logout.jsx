@@ -1,9 +1,9 @@
 import React, { Component } from "react";
 import { MdLogout } from "react-icons/md";
-import { toast } from "react-hot-toast";
 import Toastify from "@components/Toastify";
 import { FaSignOutAlt } from "react-icons/fa";
 import secureLocalStorage from "react-secure-storage";
+import { toast } from "sonner";
 
 class Logout extends Component {
   constructor(props) {

@@ -8,9 +8,9 @@ import Textarea from "@components/Textarea";
 import Textbox from "@components/Textbox";
 import Select from "@components/Select";
 import Spinner from "@components/Spinner";
-import { toast } from "react-hot-toast";
 import { Navigate, NavLink } from "react-router-dom";
 import { MdClose } from "react-icons/md";
+import { toast } from "sonner";
 
 const AccountInactive = () => {
   const features = [

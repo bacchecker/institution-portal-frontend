@@ -1,5 +1,4 @@
 import React, { Component, useRef, useState } from "react";
-import { toast } from "react-hot-toast";
 import { Navigate, useNavigate } from "react-router-dom";
 import axios from "@utils/axiosConfig";
 import {
@@ -9,6 +8,7 @@ import {
   InputOTPSlot,
 } from "@components/input-otp";
 import useAuthStore from "@store/authStore";
+import { toast } from "sonner";
 
 const VerifyOTP = () => {
   const [otp, setOtp] = useState();
