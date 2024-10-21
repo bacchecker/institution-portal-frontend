@@ -112,6 +112,27 @@ class InstitutionData extends Component {
     }
   };
 
+  handleFileChange = (event) => {
+    const file = event.target.files[0];
+
+    if (file) {
+      const reader = new FileReader();
+
+      reader.onloadend = () => {
+        // Set the base64 string to `logo` to preview the image
+        this.setState((prevState) => ({
+          formData: {
+            ...prevState.formData,
+            operationCertFile: file, // Keep the actual file
+            operation_certificate: reader.result, // Set base64 string for preview
+          },
+        }));
+      };
+
+      reader.readAsDataURL(file); // Read file as base64 string
+    }
+  };
+
   validateForm = () => {
     const {
       name,
@@ -125,7 +146,9 @@ class InstitutionData extends Component {
       digital_address,
       mailing_address,
       logoFile,
+      operationCertFile,
       logo,
+      operation_certificate,
     } = this.state.formData;
 
     let newErrors = {};
@@ -158,6 +181,13 @@ class InstitutionData extends Component {
       newErrors.logoFile =
         "Institution Logo is required and cannot be default.";
     }
+    if (
+      (!operationCertFile && !operation_certificate) ||
+      (operationCertFile && operationCertFile.name === "default-operation-cert.png")
+    ) {
+      newErrors.operationCertFile =
+        "Operation Certificate is required and cannot be default.";
+    }
 
     this.setState({ errors: newErrors });
     return Object.keys(newErrors).length === 0;
@@ -174,14 +204,21 @@ class InstitutionData extends Component {
 
     const form = new FormData();
     const { formData } = this.state;
+
+    // Check if both logoFile and operation_certificate are present
+    if (
+      formData.logoFile && 
+      formData.logoFile.name !== "default-logo.png" && 
+      formData.operation_certificate && formData.operationCertFile.name !== "default-operation-cert.png"
+    ) {
+      // Append logoFile and operation_certificate to FormData
+      form.append("logo", formData.logoFile);
+      form.append("operation_certificate", formData.operationCertFile);
+    }
+
+    // Append the rest of the form data
     Object.keys(formData).forEach((key) => {
-      if (
-        key === "logoFile" &&
-        formData.logoFile &&
-        formData.logoFile.name !== "default-logo.png"
-      ) {
-        form.append("logo", formData.logoFile);
-      } else {
+      if (key !== "logoFile" && key !== "operationCertFile") {
         form.append(key, formData[key]);
       }
     });
@@ -220,7 +257,9 @@ class InstitutionData extends Component {
               website_url: institutionData.website_url,
               alternate_contacts: institutionData.alternate_contacts,
               logo: institutionData.logo,
+              operation_certificate: institutionData.operation_certificate,
               logoFile: null,
+              operationCertFile: null,
             },
           },
           () => {
@@ -236,6 +275,7 @@ class InstitutionData extends Component {
               disable_region: !!this.state.formData.region,
               disable_academic_level: !!this.state.formData.academic_level,
               disable_logo: !!this.state.formData.logo,
+              disable_cert: !!this.state.formData.operation_certificate,
             });
           }
         );
@@ -255,10 +295,13 @@ class InstitutionData extends Component {
       import.meta.env.VITE_BASE_URL
     }/public/images/profile/default-logo.png`;
 
+    const defaultOperationCertUrl = `${
+      import.meta.env.VITE_BASE_URL
+    }/public/images/profile/default-operation-cert.png`;
+
     return (
-      <AuthLayout title="Account Profile">
         <div className="w-full flex flex-col bg-white dark:bg-slate-900 rounded-md md:px-3">
-          <div className="mx-auto my-6 px-4 w-full md:w-4/5">
+          <div className="mx-auto my-6 px-4 w-full">
             <div>
               <p className="text-gray-500 text-lg">Let's get started</p>
               <p className="text-2xl font-bold my-2">
@@ -417,51 +460,100 @@ class InstitutionData extends Component {
                 />
               </div>
 
-              <div className="space-y-6">
-                <div className="space-y-3 flex flex-col w-full">
-                  <label htmlFor="logo" className="form-label">
-                    Institution Logo
-                  </label>
-                  <input
-                    id="logo"
-                    type="file"
-                    accept="image/*"
-                    disabled={this.state.disable_logo}
-                    onChange={this.handleImageChange}
-                  />
-                  {this.state.errors.logoFile && (
-                    <span className="text-red-600 text-sm">
-                      {this.state.errors.logoFile}
-                    </span>
-                  )}
+              <div className="flex xl:flex-row space-x-4">
+                <div className="space-y-6">
+                  <div className="space-y-3 flex flex-col w-full">
+                    <label htmlFor="logo" className="form-label">
+                      Institution Logo
+                    </label>
+                    <input
+                      id="logo"
+                      type="file"
+                      accept="image/*"
+                      disabled={this.state.disable_logo}
+                      onChange={this.handleImageChange}
+                    />
+                    {this.state.errors.logoFile && (
+                      <span className="text-red-600 text-sm">
+                        {this.state.errors.logoFile}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="relative flex items-center justify-center w-auto group border">
+                    <img
+                    className="w-36 h-36"
+                      src={
+                        this.state.formData.logo
+                          ? `https://backend.baccheck.online/storage/app/public/${this.state.formData.logo}`
+                          : this.state.formData.logoFile
+                          ? `${
+                              import.meta.env.VITE_BASE_URL
+                            }/storage/app/public/${this.state.formData.logoFile}`
+                          : defaultLogoUrl
+                      }
+                      alt="Institution Logo"
+                    />
+
+                    <div
+                      className="absolute cursor-pointer opacity-0 group-hover:opacity-100 inset-0 bg-white/50 text-gray-600 grid place-items-center"
+                      onClick={() =>
+                        this.setState((prevState) => ({
+                          formData: { ...prevState.formData, logo: null },
+                        }))
+                      }
+                    >
+                      <IoMdClose size={25} />
+                    </div>
+                  </div>
                 </div>
+                <div className="flex-1 space-y-6">
+                  <div className="space-y-3 flex flex-col w-full">
+                    <label htmlFor="operationCert" className="form-label">
+                      Operation Certificate
+                    </label>
+                    <input
+                      id="operationCert"
+                      type="file"
+                      accept="image/*"
+                      disabled={this.state.disable_operationCert}
+                      onChange={this.handleFileChange}
+                    />
+                    {this.state.errors.operationCertFile && (
+                      <span className="text-red-600 text-sm">
+                        {this.state.errors.operationCertFile}
+                      </span>
+                    )}
+                  </div>
 
-                <div className="relative h-32 w-32 group">
-                  <img
-                    src={
-                      this.state.formData.logo // If logo is base64 (file preview)
-                        ? `https://backend.baccheck.online/storage/app/public/${this.state.formData.logo}`
-                        : this.state.formData.logoFile // If file from backend exists, display it
-                        ? `${
-                            import.meta.env.VITE_BASE_URL
-                          }/storage/app/public/${this.state.formData.logoFile}`
-                        : defaultLogoUrl // If no file or logo, use the default image
-                    }
-                    alt="Institution Logo"
-                  />
+                  <div className="relative flex items-center justify-center max-h-36 w-full group border">
+                    <img
+                      src={
+                        this.state.formData.operation_certificate
+                          ? `https://backend.baccheck.online/storage/app/public/${this.state.formData.operation_certificate}`
+                          : this.state.formData.operationCertFile
+                          ? `${
+                              import.meta.env.VITE_BASE_URL
+                            }/storage/app/public/${this.state.formData.operationCertFile}`
+                          : defaultOperationCertUrl
+                      }
+                      alt="Institution Operation Certificate"
+                    />
 
-                  <div
-                    className="absolute cursor-pointer opacity-0 group-hover:opacity-100 inset-0 bg-white/50 text-gray-600 grid place-items-center"
-                    onClick={() =>
-                      this.setState((prevState) => ({
-                        formData: { ...prevState.formData, logo: null },
-                      }))
-                    }
-                  >
-                    <IoMdClose size={25} />
+                    <div
+                      className="absolute cursor-pointer opacity-0 group-hover:opacity-100 inset-0 bg-white/50 text-gray-600 grid place-items-center"
+                      onClick={() =>
+                        this.setState((prevState) => ({
+                          formData: { ...prevState.formData, operationCert: null },
+                        }))
+                      }
+                    >
+                      <IoMdClose size={25} />
+                    </div>
                   </div>
                 </div>
               </div>
+              
               <div className="flex justify-end">
                 <button
                   type="submit"
@@ -486,7 +578,6 @@ class InstitutionData extends Component {
             </form>
           </div>
         </div>
-      </AuthLayout>
     );
   }
 }
