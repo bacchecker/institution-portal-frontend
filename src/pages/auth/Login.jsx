@@ -1,4 +1,4 @@
-import React, { Component, useRef, useState } from "react";
+import React, { Component, useEffect, useRef, useState } from "react";
 import axios from "@utils/axiosConfig";
 import withRouter from "@components/withRouter";
 import ReCAPTCHA from "react-google-recaptcha";
@@ -30,6 +30,10 @@ const Login = () => {
   const onRecaptchaChange = (token) => {
     setRecaptchaToken(token);
   };
+
+  useEffect(() => {
+    secureLocalStorage.clear();
+  }, []);
 
   const loginUser = async (e) => {
     e.preventDefault();
