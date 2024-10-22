@@ -53,9 +53,16 @@ function InstitutionDocumentTypes({ setActiveStep }) {
   };
 
   return (
-    <div className="w-full p-5">
+    <div className="w-full px-5">
       <div className="border-b border-[#ff0404] py-4">
-        <h4 className="text-[1.1rem] font-[600] mb-2">
+        <h4 className="text-[1rem] font-[600] mb-4">
+          Each institution utilizes specific document types for their
+          operations. To proceed with your account setup, please add the
+          document types accepted by your school. Below is a list of common
+          document types used by {institution?.academic_level ?? "Business or government"} institutions. You may add from the <span className="text-[#ff0404]">existing
+          options</span> or <span className="text-[#ff0404]">add new document types if necessary</span>.
+        </h4>
+        <h4 className="text-[1rem] font-[600] mb-2">
           Existing Document Types
         </h4>
         <div className="w-full flex flex-wrap gap-2">
