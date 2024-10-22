@@ -54,30 +54,51 @@ function InstitutionDocumentTypes({ setActiveStep }) {
 
   return (
     <div className="w-full p-5">
-      <div className="">
-        <h4 className="text-[1.1rem] font-[600] mb-2">Existing Document Types</h4>
-        <div className="flex flex-wrap gap-2">
-          {existingInstitutionDocumentTypes?.data?.types?.map(
-            (documentType, i) => {
-              return (
-                <div className="w-fit h-fit border border-[#000000] px-2 py-2 rounded-[0.3rem]">
-                  {documentType?.name}
-                </div>
-              );
-            }
+      <div className="border-b border-[#ff0404] py-4">
+        <h4 className="text-[1.1rem] font-[600] mb-2">
+          Existing Document Types
+        </h4>
+        <div className="w-full flex flex-wrap gap-2">
+          {institutionDocsLoading ? (
+            <div className="w-full h-[5rem] flex justify-center items-center">
+              <Spinner size="sm" color="danger" />
+            </div>
+          ) : (
+            <>
+              {existingInstitutionDocumentTypes?.data?.types?.map(
+                (documentType, i) => {
+                  return (
+                    <div className="w-fit h-fit border border-[#333333] px-2 py-2 rounded-[0.3rem]">
+                      {documentType?.name}
+                    </div>
+                  );
+                }
+              )}
+            </>
           )}
         </div>
       </div>
-      <div className="my-3 w-full flex justify-end mx-auto dark:bg-slate-900">
-        <button
-          type="button"
-          onClick={() => {
-            setOpenDrawer(true);
-          }}
-          className="w-fit flex items-center bg-[#ff0404] hover:bg-[#f77f7f] text-white px-4 py-2.5 rounded-[0.3rem] font-medium"
-        >
-          Add Document Type
-        </button>
+      <div className="my-3 w-full flex justify-end mx-auto dark:bg-slate-900 mt-6">
+        <div className="flex gap-4 items-center">
+          <button
+            type="button"
+            onClick={() => {
+              setOpenDrawer(true);
+            }}
+            className="w-fit flex items-center bg-[#000000] hover:bg-[#282727] text-white px-4 py-2.5 rounded-[0.3rem] font-medium"
+          >
+            Add From Existing Type
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setOpenDrawer(true);
+            }}
+            className="w-fit flex items-center bg-[#ff0404] hover:bg-[#f77f7f] text-white px-4 py-2.5 rounded-[0.3rem] font-medium"
+          >
+            Add New Document Type
+          </button>
+        </div>
       </div>
       <div>
         <Drawer
