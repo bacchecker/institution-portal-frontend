@@ -251,7 +251,6 @@ export default function ValidationRequest() {
           page={resData?.current_page}
           setPage={(page) =>
             navigate({
-              // pathname: "listing",
               search: createSearchParams({ ...filters, page }).toString(),
             })
           }
@@ -298,7 +297,7 @@ export default function ValidationRequest() {
         title="Request Details"
         isOpen={openDrawer}
         setIsOpen={setOpenDrawer}
-        classNames="w-[100vw] md:w-[40vw]"
+        classNames="w-[100vw] md:w-[45vw]"
       >
         <div className="h-full flex flex-col justify-between">
           <div className="flex flex-col gap-2 mb-6">
