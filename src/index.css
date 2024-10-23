@@ -66,3 +66,6 @@ svg,
 footer {
   font-family: "Inter", sans-serif;
 }
+.custom-checkbox {
+  --nextui-checkbox-color: #ff0404; /* Your custom color */
+}

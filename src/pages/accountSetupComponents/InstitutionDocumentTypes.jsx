@@ -1,15 +1,38 @@
-import { Button, Card, CardBody, Input, Spinner } from "@nextui-org/react";
+import {
+  Button,
+  Card,
+  CardBody,
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownTrigger,
+  Input,
+  Spinner,
+  TableCell,
+  TableRow,
+  useDisclosure,
+} from "@nextui-org/react";
 import React, { useState } from "react";
+import CustomTable from "@components/CustomTable";
 import { FaAnglesLeft, FaAnglesRight } from "react-icons/fa6";
 import secureLocalStorage from "react-secure-storage";
-import useSWR from "swr";
+import useSWR, { mutate } from "swr";
+import DeleteModal from "@components/DeleteModal";
 import axios from "@utils/axiosConfig";
+import Elipsis from "@assets/icons/elipsis";
 import Drawer from "../../components/Drawer";
+import ExistingDocumentTypeCreation from "./ExistingDocumentTypeCreation";
+import NewDocumentTypeCreation from "./NewDocumentTypeCreation";
+import EditDocumentType from "./EditDocumentType";
 
 function InstitutionDocumentTypes({ setActiveStep }) {
   const [isSaving, setSaving] = useState(false);
-  const [drawerTitle, setDrawerTitle] = useState("Document Types Details");
+  const [isDeleting, setDeleting] = useState(false);
   const [openDrawer, setOpenDrawer] = useState(false);
+  const [openNewDrawer, setOpenNewDrawer] = useState(false);
+  const [openEditDrawer, setOpenEditDrawer] = useState(false);
+  const [selectedData, setSelectedData] = useState({});
+  const deleteDisclosure = useDisclosure();
 
   const institution = secureLocalStorage.getItem("institution");
   const setInstitution = (newInstitution) => {
@@ -32,14 +55,14 @@ function InstitutionDocumentTypes({ setActiveStep }) {
   );
 
   const {
-    data: institutionDatcc,
+    data: institutionDocuments,
     error: institutionError,
     isLoading: institutionDocsLoading,
-  } = useSWR("/institution/document-types/available", (url) =>
+  } = useSWR("/institution/document-types", (url) =>
     axios.get(url).then((res) => res.data)
   );
 
-  console.log("institutionDocuments", existingInstitutionDocumentTypes);
+  console.log("institutionDatcc", institutionDocuments);
 
   const handleBackButton = () => {
     const updatedInstitution = {
@@ -53,20 +76,24 @@ function InstitutionDocumentTypes({ setActiveStep }) {
   };
 
   return (
-    <div className="w-full px-5">
+    <div className="w-full px-5 pb-4">
       <div className="border-b border-[#ff0404] py-4">
         <h4 className="text-[1rem] font-[600] mb-4">
           Each institution utilizes specific document types for their
           operations. To proceed with your account setup, please add the
           document types accepted by your school. Below is a list of common
-          document types used by {institution?.academic_level ?? "Business or government"} institutions. You may add from the <span className="text-[#ff0404]">existing
-          options</span> or <span className="text-[#ff0404]">add new document types if necessary</span>.
+          document types used by{" "}
+          {institution?.academic_level ?? "Business or government"}{" "}
+          institutions. You may add from the{" "}
+          <span className="text-[#ff0404]">existing options</span> or{" "}
+          <span className="text-[#ff0404]">
+            add new document types if necessary
+          </span>
+          .
         </h4>
-        <h4 className="text-[1rem] font-[600] mb-2">
-          Existing Document Types
-        </h4>
+        <h4 className="text-[1rem] font-[600] mb-2">Existing Document Types</h4>
         <div className="w-full flex flex-wrap gap-2">
-          {institutionDocsLoading ? (
+          {isLoading ? (
             <div className="w-full h-[5rem] flex justify-center items-center">
               <Spinner size="sm" color="danger" />
             </div>
@@ -99,7 +126,7 @@ function InstitutionDocumentTypes({ setActiveStep }) {
           <button
             type="button"
             onClick={() => {
-              setOpenDrawer(true);
+              setOpenNewDrawer(true);
             }}
             className="w-fit flex items-center bg-[#ff0404] hover:bg-[#f77f7f] text-white px-4 py-2.5 rounded-[0.3rem] font-medium"
           >
@@ -108,214 +135,132 @@ function InstitutionDocumentTypes({ setActiveStep }) {
         </div>
       </div>
       <div>
-        <Drawer
-          title={drawerTitle}
-          isOpen={openDrawer}
-          setIsOpen={setOpenDrawer}
-        >
-          <form className="h-full flex flex-col justify-between">
-            <div className="flex flex-col gap-6 mb-6">
-              <Input
-                size="sm"
-                label="Account Name"
-                type="text"
-                name="account_name"
-                // value={selectedData.account_name}
-              />
-
-              {/*<Input
-                size="sm"
-                label="Account Number"
-                type="text"
-                name="account_number"
-                value={selectedData.account_number}
-                id="name"
-                onChange={(e) =>
-                  setSelectedData((prev) => ({
-                    ...prev,
-                    account_number: e.target.value,
-                  }))
-                }
-                errorMessage={errors.account_number}
-                isInvalid={!!errors.account_number}
-              />
-
-              <Input
-                size="sm"
-                label="Bank Name"
-                type="text"
-                name="bank_name"
-                value={selectedData.bank_name}
-                onChange={(e) =>
-                  setSelectedData((prev) => ({
-                    ...prev,
-                    bank_name: e.target.value,
-                  }))
-                }
-                errorMessage={errors.bank_name}
-                isInvalid={!!errors.bank_name}
-              />
-
-              <Input
-                size="sm"
-                label="Bank Branch"
-                type="text"
-                name="bank_branch"
-                value={selectedData.bank_branch}
-                onChange={(e) =>
-                  setSelectedData((prev) => ({
-                    ...prev,
-                    bank_branch: e.target.value,
-                  }))
-                }
-                errorMessage={errors.bank_branch}
-                isInvalid={!!errors.bank_branch}
-              />
-
-              <Select
-                size="sm"
-                label="Account Type"
-                className="w-full"
-                name="account_type"
-                defaultSelectedKeys={[selectedData?.account_type]}
-                onChange={(e) =>
-                  setSelectedData((prev) => ({
-                    ...prev,
-                    account_type: e.target.value,
-                  }))
-                }
-              >
-                {[
-                  {
-                    key: "savings",
-                    label: "Savings",
-                  },
-                  {
-                    key: "current",
-                    label: "Current",
-                  },
-                  {
-                    key: "domiciliary",
-                    label: "Domiciliary",
-                  },
-                ].map((item) => (
-                  <SelectItem key={item.key}>{item.label}</SelectItem>
-                ))}
-              </Select>
-
-              <Input
-                size="sm"
-                label="Swift Code"
-                type="text"
-                name="swift_code"
-                value={selectedData.swift_code}
-                onChange={(e) =>
-                  setSelectedData((prev) => ({
-                    ...prev,
-                    swift_code: e.target.value,
-                  }))
-                }
-                errorMessage={errors.swift_code}
-                isInvalid={!!errors.swift_code}
-              />
-
-              <Input
-                size="sm"
-                label="Currency"
-                type="text"
-                name="currency"
-                value={selectedData.currency}
-                maxLength={3}
-                onChange={(e) =>
-                  setSelectedData((prev) => ({
-                    ...prev,
-                    currency: e.target.value,
-                  }))
-                }
-                errorMessage={errors.currency}
-                isInvalid={!!errors.currency}
-              /> */}
-              {/* 
-            <Switch
-              size="sm"
-              name="is_default"
-              checked={selectedData.is_default}
-              onValueChange={(value) =>
-                setSelectedData((prev) => ({ ...prev, is_default: value }))
-              }
-              errorMessage={errors.is_default}
-              isInvalid={!!errors.is_default}
-            >
-              Default Account
-            </Switch> */}
-
-              {/* 
-                        <Select
-                            size="sm"
-                            label="Institution Type"
-                            name="institution_type"
-                            // value={selectedData.institution_type}
-                            defaultSelectedKeys={[selectedData.institution_type]}
-                            onChange={(e) =>
-                                setSelectedData("institution_type", e.target.value)
-                            }
-                            errorMessage={errors.institution_type}
-                            isInvalid={!!errors.institution_type}
-                        >
-                            {[
-                                {
-                                    label: "Academic",
-                                    key: "academic",
-                                },
-                                {
-                                    label: "Non-academic",
-                                    key: "non-academic",
-                                },
-                            ].map((role) => (
-                                <SelectItem key={role.key}>
-                                    {role.label}
-                                </SelectItem>
-                            ))}
-                        </Select> */}
-            </div>
-
-            <div className="flex items-center gap-3">
-              <Button
-                className="w-1/2"
-                size="sm"
-                color="default"
-                onClick={() => {
-                  setOpenDrawer(false);
-                  reset();
-                }}
-              >
-                Close
-              </Button>
-
-              {/* <Button
-                color="danger"
-                className="font-montserrat font-semibold w-1/2"
-                isLoading={processing}
-                type="submit"
-                size="sm"
-                onClick={(e) => {
-                  e.preventDefault();
-                  save();
-                }}
-              >
-                Save
-              </Button> */}
-            </div>
-          </form>
-        </Drawer>
+        <ExistingDocumentTypeCreation
+          setOpenDrawer={setOpenDrawer}
+          openDrawer={openDrawer}
+          existingInstitutionDocumentTypes={existingInstitutionDocumentTypes}
+        />
+        <NewDocumentTypeCreation
+          setOpenDrawer={setOpenNewDrawer}
+          openDrawer={openNewDrawer}
+        />
+        <EditDocumentType
+          setOpenDrawer={setOpenEditDrawer}
+          openDrawer={openEditDrawer}
+          selectedData={selectedData}
+        />
       </div>
+      <section className="md:w-full w-[98vw] min-h-[60vh] mx-auto">
+        {institutionDocsLoading ? (
+          <div className="w-full h-[5rem] flex justify-center items-center">
+            <Spinner size="sm" color="danger" />
+          </div>
+        ) : (
+          <>
+            <CustomTable
+              columns={[
+                "Name",
+                "Document Format(s)",
+                "Document Fee",
+                "Printing Fee",
+                "Validation Fee",
+                "Verification Fee",
+                "",
+              ]}
+              // loadingState={resData ? false : true}
+              // page={resData?.current_page}
+              // setPage={(page) =>
+              //   navigate({
+              //     // pathname: "listing",
+              //     search: createSearchParams({ ...filters, page }).toString(),
+              //   })
+              // }
+              // totalPages={Math.ceil(resData?.total / resData?.per_page)}
+            >
+              {institutionDocuments?.data?.types?.map((item) => (
+                <TableRow key={item?.id}>
+                  <TableCell>{item?.document_type?.name}</TableCell>
+                  <TableCell>
+                    {item?.soft_copy && item?.hard_copy
+                      ? "hard copy, soft copy"
+                      : !item?.soft_copy && item?.hard_copy
+                      ? "hard copy"
+                      : "soft copy"}
+                  </TableCell>
+                  <TableCell>GH¢ {item?.base_fee}</TableCell>
+                  <TableCell>GH¢ {item?.printing_fee}</TableCell>
+                  <TableCell>GH¢ {item?.validation_fee}</TableCell>
+                  <TableCell> GH¢ {item?.verification_fee}</TableCell>
+                  <TableCell className="flex items-center h-16 gap-3">
+                    <Dropdown>
+                      <DropdownTrigger>
+                        <Button variant="bordered" size="sm" isIconOnly>
+                          <Elipsis />
+                        </Button>
+                      </DropdownTrigger>
+                      <DropdownMenu aria-label="Static Actions">
+                        <DropdownItem
+                          key="edit"
+                          onClick={() => {
+                            setSelectedData(item);
+                            setOpenEditDrawer(true);
+                          }}
+                        >
+                          Update
+                        </DropdownItem>
+                        <DropdownItem
+                          key="delete"
+                          onClick={() => {
+                            deleteDisclosure.onOpen();
+                            setSelectedData(item);
+                          }}
+                        >
+                          Delete
+                        </DropdownItem>
+                      </DropdownMenu>
+                    </Dropdown>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </CustomTable>
+          </>
+        )}
+      </section>
+      <DeleteModal
+        disclosure={deleteDisclosure}
+        title="Delete Document Type"
+        processing={isDeleting}
+        onButtonClick={async () => {
+          setDeleting(true);
+          try {
+            const response = await axios.delete(
+              `/institution/document-types/${selectedData?.id}`
+            );
+            deleteDisclosure.onClose();
+            toast.success(response.data.message);
+            mutate("/institution/document-types");
+            setDeleting(false);
+          } catch (error) {
+            console.log(error);
+            setErrors(error.response.data.message);
+            setDeleting(false);
+          }
+        }}
+      >
+        <p className="font-quicksand">
+          Are you sure you want to delete this document type?{" "}
+          <span className="font-semibold">
+            {selectedData?.document_type?.name}
+          </span>
+        </p>
+      </DeleteModal>
       <div className="flex justify-between w-full mt-[4rem!important]">
         <button
           type="button"
           onClick={handleBackButton}
           className="flex items-center bg-[#ffffff] border border-[#ff0404] hover:bg-[#ff0404] text-[#ff0404] hover:text-white px-4 py-2.5 rounded-[0.3rem] font-medium"
         >
-          <FaAnglesLeft className="ml-2" />
+          <FaAnglesLeft className="mr-2" />
           Back
         </button>
         <button

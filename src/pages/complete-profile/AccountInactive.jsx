@@ -8,7 +8,7 @@ import Textarea from "@components/Textarea";
 import Textbox from "@components/Textbox";
 import Select from "@components/Select";
 import Spinner from "@components/Spinner";
-import { Navigate, NavLink } from "react-router-dom";
+import { Navigate, NavLink, useNavigate } from "react-router-dom";
 import { MdClose } from "react-icons/md";
 import { toast } from "sonner";
 
@@ -37,6 +37,7 @@ const AccountInactive = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [type, setType] = useState("");
+  const navigate = useNavigate();
   const [category, setCategory] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [institutionStatus, setInstitutionStatus] = useState(null);
@@ -169,12 +170,12 @@ const AccountInactive = () => {
             </div>
 
             <div className="my-4 flex items-center justify-center">
-              <NavLink
-                to={`/account-setup`}
-                className="flex items-center w-44 space-x-2 bg-[#ff0404] hover:bg-[#f84848] text-white px-4 py-1.5 rounded-md"
+              <button
+                onClick={() => navigate("/account-setup")}
+                className="flex items-center w-fit space-x-2 bg-[#ff0404] hover:bg-[#f84848] text-white px-4 py-1.5 rounded-md"
               >
                 <FaUser /> <p>Continue to set up account</p>
-              </NavLink>
+              </button>
             </div>
           </div>
         ) : (

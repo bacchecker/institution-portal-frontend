@@ -120,7 +120,7 @@ export default function AuthLayout({ children, title = "Page Title" }) {
 
   if (!isAuthenticated) {
     console.log("Not authenticated");
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/" replace />;
   }
 
   console.log(url);

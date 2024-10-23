@@ -86,7 +86,6 @@ function InstitutionDataSetup({ setActiveStep }) {
     }
   };
 
-  console.log("inspr", userInput);
 
   return (
     <div className="mx-auto my-6 px-4 w-full">
@@ -271,7 +270,7 @@ function InstitutionDataSetup({ setActiveStep }) {
                   type="file"
                   id="img"
                   className="hidden"
-                  accept=".jpg, .jpeg, .pdf, .png"
+                  accept=".jpg, .jpeg, .png"
                   onChange={(e) => setSelectedImage(e.target.files[0])}
                 />
                 Browse to Upload file or image
@@ -279,7 +278,7 @@ function InstitutionDataSetup({ setActiveStep }) {
             </div>
           </div>
           <div className="w-[49%] h-[10rem]">
-            <h4 className="text-[0.9rem] mb-[0.4rem]">Operation Certificate</h4>
+            <h4 className="text-[0.9rem] mb-[0.4rem]">Operation Certificate<span className="text-[#ff0404]">*</span></h4>
             <div className="w-full h-full flex justify-center items-center rounded-[0.6rem] border">
               <label
                 htmlFor="operationCert"

@@ -7,7 +7,7 @@ import {
   Button,
 } from "@nextui-org/react";
 
-const DeleteModal = ({ title, children, disclosure, onButtonClick }) => {
+const DeleteModal = ({ title, children, disclosure, onButtonClick, processing }) => {
   return (
     <Modal
       backdrop={"opaque"}
@@ -53,9 +53,9 @@ const DeleteModal = ({ title, children, disclosure, onButtonClick }) => {
                 Cancel
               </Button>
               <Button
-                // isLoading={processing}
-                className="font-medium"
-                color="danger"
+                isLoading={processing}
+                className="font-medium bg-[#ff0404] text-white"
+                // color="danger"
                 type="submit"
                 form="form"
                 onClick={onButtonClick}

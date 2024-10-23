@@ -93,7 +93,7 @@ function AccountSetupPage() {
                 (activeStep && activeStep === 1)) && (
                 <InstitutionDataSetup setActiveStep={(e) => setActiveStep(e)} />
               )}
-              {(parseInt(current_step) === 2 || activeStep === 2) && (
+              {(parseInt(current_step) === 2 || activeStep === 2 || parseInt(current_step) === 3) && (
                 <InstitutionDocumentTypes
                   setActiveStep={(e) => setActiveStep(e)}
                 />
