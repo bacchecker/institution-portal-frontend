@@ -21,10 +21,10 @@ import { IoSearch } from "react-icons/io5";
 import axios from "@utils/axiosConfig";
 import Elipsis from "@assets/icons/elipsis";
 import DeleteModal from "@components/DeleteModal";
-import toast from "react-hot-toast";
 import AuthLayout from "@components/AuthLayout";
 import useAuthStore from "@store/authStore";
 import useSWR from "swr";
+import { toast } from "sonner";
 
 const PaymentRevenueSetup = () => {
   const [selectedData, setSelectedData] = useState({});

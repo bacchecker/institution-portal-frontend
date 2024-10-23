@@ -10,10 +10,21 @@ import {
 import InstitutionDataSetup from "./accountSetupComponents/InstitutionDataSetup";
 import secureLocalStorage from "react-secure-storage";
 import InstitutionDocumentTypes from "./accountSetupComponents/InstitutionDocumentTypes";
+import axios from "@utils/axiosConfig";
+import useSWR from "swr";
 function AccountSetupPage() {
-  const [activeStep, setActiveStep] = useState(1);
+  const [activeStep, setActiveStep] = useState();
   const current_step = secureLocalStorage.getItem("institution")?.current_step;
-  console.log("inst", current_step);
+
+  const {
+    data: institutionData,
+    error,
+    isLoading,
+  } = useSWR("/institution/institution-data", (url) =>
+    axios.get(url).then((res) => res.data)
+  );
+
+  console.log("insss", institutionData?.institutionData);
 
   const steps = [
     {
@@ -33,6 +44,7 @@ function AccountSetupPage() {
       icon: IoCheckmarkDoneCircleSharp,
     },
   ];
+  console.log("lo", activeStep);
 
   return (
     <AuthLayout title="Account Setup">
@@ -64,7 +76,11 @@ function AccountSetupPage() {
                       : "bg-red-100 text-[#fda2a2] border-[#fda2a2]"
                   }`}
                       />
-                      <span className="mt-2 text-center text-xs lg:text-sm">
+                      <span
+                        className={`mt-2 text-center text-xs lg:text-sm ${
+                          parseInt(current_step) === index + 1 && "font-[600]"
+                        }`}
+                      >
                         {step.label}
                       </span>
                     </div>
@@ -73,11 +89,14 @@ function AccountSetupPage() {
               </div>
             </div>
             <div className="flex justify-between mx-5 pt-4 pb-2 border border-[#ff040459] mt-4 rounded-[0.5rem]">
-              {(parseInt(current_step) === 1) && (
+              {(parseInt(current_step) === 1 ||
+                (activeStep && activeStep === 1)) && (
                 <InstitutionDataSetup setActiveStep={(e) => setActiveStep(e)} />
               )}
               {(parseInt(current_step) === 2 || activeStep === 2) && (
-                <InstitutionDocumentTypes />
+                <InstitutionDocumentTypes
+                  setActiveStep={(e) => setActiveStep(e)}
+                />
               )}
             </div>
           </CardBody>

@@ -8,9 +8,9 @@ import Textarea from "@components/Textarea";
 import Textbox from "@components/Textbox";
 import Select from "@components/Select";
 import Spinner from "@components/Spinner";
-import { toast } from "react-hot-toast";
 import { Navigate, NavLink } from "react-router-dom";
 import { MdClose } from "react-icons/md";
+import { toast } from "sonner";
 
 const AccountInactive = () => {
   const features = [
@@ -173,7 +173,7 @@ const AccountInactive = () => {
                 to={`/account-setup`}
                 className="flex items-center w-44 space-x-2 bg-[#ff0404] hover:bg-[#f84848] text-white px-4 py-1.5 rounded-md"
               >
-                <FaUser /> <p>Setup Account</p>
+                <FaUser /> <p>Continue to set up account</p>
               </NavLink>
             </div>
           </div>

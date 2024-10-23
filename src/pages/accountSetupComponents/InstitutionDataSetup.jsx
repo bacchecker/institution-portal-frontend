@@ -5,6 +5,7 @@ import { Input, Spinner, Textarea, user } from "@nextui-org/react";
 import { FaAnglesRight } from "react-icons/fa6";
 import secureLocalStorage from "react-secure-storage";
 import { toast } from "sonner";
+import { IoDocumentText } from "react-icons/io5";
 
 function InstitutionDataSetup({ setActiveStep }) {
   const [userInput, setUserInput] = useState([]);
@@ -18,8 +19,6 @@ function InstitutionDataSetup({ setActiveStep }) {
   } = useSWR("/institution/institution-data", (url) =>
     axios.get(url).then((res) => res.data)
   );
-
-  console.log("inss", secureLocalStorage.getItem("institution"));
 
   useEffect(() => {
     if (institutionData) {
@@ -50,36 +49,44 @@ function InstitutionDataSetup({ setActiveStep }) {
       prefix,
       digital_address,
       mailing_address,
+      operation_certificate,
     } = userInput;
 
-    const form = new FormData();
-
-    form.append("name", name);
-    form.append("address", address);
-    form.append("description", description);
-    form.append("academic_level", academic_level);
-    form.append("region", region);
-    form.append("website_url", website_url);
-    form.append("institution_email", institution_email);
-    form.append("helpline_contact", helpline_contact);
-    form.append("prefix", prefix);
-    form.append("digital_address", digital_address);
-    form.append("mailing_address", mailing_address);
-    selectedImage && form.append("logo", selectedImage);
-    selectedCert && form.append("operation_certificate", selectedCert);
-
-    try {
-      const response = await axios.post("/institution/account-setup", form);
-      toast.success(response.data.message);
-      secureLocalStorage.setItem("institution", response?.data.institution);
-      setActiveStep(2);
-    } catch (error) {
-      toast.error(error.response?.data?.message || "An error occurred");
-    } finally {
+    if (!operation_certificate && !selectedCert) {
+      toast.error("Operation Certificate is required");
       setIsSaving(false);
-      return true;
+    } else {
+      const form = new FormData();
+
+      form.append("name", name);
+      form.append("address", address);
+      form.append("description", description);
+      academic_level && form.append("academic_level", academic_level);
+      form.append("region", region);
+      form.append("website_url", website_url);
+      form.append("institution_email", institution_email);
+      form.append("helpline_contact", helpline_contact);
+      form.append("prefix", prefix);
+      form.append("digital_address", digital_address);
+      form.append("mailing_address", mailing_address);
+      selectedImage && form.append("logo", selectedImage);
+      selectedCert && form.append("operation_certificate", selectedCert);
+      try {
+        const response = await axios.post("/institution/account-setup", form);
+        toast.success(response.data.message);
+        secureLocalStorage.setItem("institution", response?.data.institution);
+        setActiveStep(2);
+      } catch (error) {
+        toast.error(error.response?.data?.message || "An error occurred");
+        setIsSaving(false);
+      } finally {
+        setIsSaving(false);
+        return true;
+      }
     }
   };
+
+  console.log("inspr", userInput);
 
   return (
     <div className="mx-auto my-6 px-4 w-full">
@@ -153,12 +160,14 @@ function InstitutionDataSetup({ setActiveStep }) {
         </div>
 
         <div className="flex flex-col xl:flex-row xl:space-x-4 space-y-10 xl:space-y-0">
-          <Input
-            label="Academic Level"
-            name="academic_level"
-            value={userInput.academic_level}
-            disabled={true}
-          />
+          {userInput?.type === "bacchecker-academic" && (
+            <Input
+              label="Academic Level"
+              name="academic_level"
+              value={userInput.academic_level}
+              disabled={true}
+            />
+          )}
           <Input
             label="Region"
             name="region"
@@ -249,7 +258,7 @@ function InstitutionDataSetup({ setActiveStep }) {
                   <div className="md:w-[4vw] w-[15vw] md:h-[4vw] h-[15vw]">
                     <img
                       src={
-                        userInput?.logo
+                        userInput?.logo && userInput?.logo !== "default.png"
                           ? `https://backend.baccheck.online/storage/app/public/${userInput?.logo}`
                           : "/assets/img/upload-t.svg"
                       }
@@ -277,36 +286,46 @@ function InstitutionDataSetup({ setActiveStep }) {
                 className="md:text-[0.9vw] text-[3vw] flex-col flex justify-center items-center cursor-pointer text-center"
               >
                 {selectedCert !== null ? (
-                  <div className="md:w-[4vw] w-[15vw] md:h-[4vw] h-[15vw]">
-                    <img
-                      src={URL.createObjectURL(selectedCert)}
-                      alt=""
-                      className="w-full h-full object-cover"
-                    />
+                  <div className="w-fit md:h-[4vw] h-[15vw] flex items-center flex-col">
+                    <IoDocumentText className="text-[3rem] text-[#ff0404]" />
+                    <h6 className="text-nowrap text-[0.7rem] text-[#ff0404] w-[10rem] overflow-hidden text-ellipsis">
+                      {selectedCert?.name}
+                    </h6>
                   </div>
                 ) : (
-                  <div className="md:w-[4vw] w-[15vw] md:h-[4vw] h-[15vw]">
-                    <img
-                      src={
-                        userInput?.operation_certificate
-                          ? `https://backend.baccheck.online/storage/app/public/${userInput?.operation_certificate}`
-                          : "/images/upload-t.svg"
-                      }
-                      alt=""
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
+                  <>
+                    {userInput?.operation_certificate ? (
+                      <div className="w-fit md:h-[4vw] h-[15vw] flex items-center flex-col">
+                        <IoDocumentText className="text-[3rem] text-[#ff0404]" />
+                        <h6 className="text-nowrap text-[0.7rem] text-[#ff0404] w-[10rem] overflow-hidden text-ellipsis">
+                          {userInput?.operation_certificate}
+                        </h6>
+                      </div>
+                    ) : (
+                      <div className="md:w-[4vw] w-[15vw] md:h-[4vw] h-[15vw]">
+                        <img
+                          src="/images/upload-t.svg"
+                          alt=""
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    )}
+                  </>
                 )}
                 <input
                   type="file"
                   id="operationCert"
                   className="hidden"
-                  accept=".jpg, .jpeg, .pdf, .png"
+                  accept=".pdf, .doc, .docx"
                   onChange={(e) => setSelectedCert(e.target.files[0])}
                 />
                 Browse to Upload file or image
               </label>
             </div>
+            <h4 className="text-[0.7rem] text-right">
+              <span className="text-[#ff0404]">Accepted Formats</span> doc,
+              docx, pdf
+            </h4>
           </div>
         </div>
         <div className="flex justify-end mt-[4rem!important]">
