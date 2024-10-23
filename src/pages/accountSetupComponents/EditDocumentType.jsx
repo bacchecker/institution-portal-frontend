@@ -128,7 +128,8 @@ function EditDocumentType({
           <div className="flex w-full gap-4">
             <Checkbox
               name="soft_copy"
-              isChecked={Boolean(userInput?.soft_copy)}
+              isSelected={userInput?.soft_copy}
+              isChecked={userInput?.soft_copy}
               onChange={handleUserInput}
               color="danger"
             >
@@ -136,6 +137,7 @@ function EditDocumentType({
             </Checkbox>
             <Checkbox
               name="hard_copy"
+              isSelected={userInput?.hard_copy}
               isChecked={Boolean(userInput?.hard_copy)}
               onChange={handleUserInput}
               color="danger"
