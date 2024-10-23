@@ -97,7 +97,12 @@ function InstitutionDocumentTypes({ setActiveStep }) {
           data
         );
         toast.success(response.data.message);
-        secureLocalStorage.setItem("institution", response?.data.institution);
+        const updatedInstitution = {
+          ...institution,
+          current_step: "3",
+        };
+        setInstitution(updatedInstitution);
+        secureLocalStorage.setItem("institution", updatedInstitution);
         setActiveStep(3);
         setSaving(false);
       } catch (error) {
