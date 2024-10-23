@@ -24,6 +24,7 @@ import Drawer from "../../components/Drawer";
 import ExistingDocumentTypeCreation from "./ExistingDocumentTypeCreation";
 import NewDocumentTypeCreation from "./NewDocumentTypeCreation";
 import EditDocumentType from "./EditDocumentType";
+import { toast } from "sonner";
 
 function InstitutionDocumentTypes({ setActiveStep }) {
   const [isSaving, setSaving] = useState(false);
@@ -62,8 +63,6 @@ function InstitutionDocumentTypes({ setActiveStep }) {
     axios.get(url).then((res) => res.data)
   );
 
-  console.log("institutionDatcc", institutionDocuments);
-
   const handleBackButton = () => {
     const updatedInstitution = {
       ...institution,
@@ -73,6 +72,42 @@ function InstitutionDocumentTypes({ setActiveStep }) {
     setInstitution(updatedInstitution);
     secureLocalStorage.setItem("institution", updatedInstitution);
     setActiveStep(1);
+  };
+
+  const handleSubmit = async () => {
+    if (institutionDocuments?.data?.types?.length === 0) {
+      toast.error("Add at least One document type", {
+        position: "top-right",
+        autoClose: 1202,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
+    } else {
+      setSaving(true);
+      const data = {
+        step: 3,
+      };
+      try {
+        const response = await axios.post(
+          "/institution/account-setup/next-step",
+          data
+        );
+        toast.success(response.data.message);
+        secureLocalStorage.setItem("institution", response?.data.institution);
+        setActiveStep(3);
+        setSaving(false);
+      } catch (error) {
+        toast.error(error.response?.data?.message || "An error occurred");
+        setSaving(false);
+      } finally {
+        setSaving(false);
+        return true;
+      }
+    }
   };
 
   return (
@@ -265,6 +300,7 @@ function InstitutionDocumentTypes({ setActiveStep }) {
         </button>
         <button
           type="button"
+          onClick={handleSubmit}
           className={`flex items-center bg-[#ff0404] hover:bg-[#f77f7f] text-white px-4 py-2.5 rounded-[0.3rem] font-medium ${
             isSaving && "cursor-not-allowed bg-[#f77f7f]"
           }`}
