@@ -24,6 +24,7 @@ import DocumentDetails from "./pages/requests/document-request/DocumentDetails";
 import TermsConditions from "./pages/complete-profile/TermsConditions";
 import RolesAndPermissions from "./pages/security/RolesAndPermissions";
 import { Toaster } from "sonner";
+import AccountSetupPage from "./pages/AccountSetupPage";
 
 const App = () => {
   const navigate = useNavigate();
@@ -45,7 +46,7 @@ const App = () => {
         <Route exact path="/account-inactive" element={<AccountInactive />} />
         <Route exact path="/user-profile" element={<Profile />} />
         <Route exact path="/verify-otp" element={<VerifyOTP />} />
-        <Route exact path="/account-setup" element={<CompleteProfile />} />
+        <Route exact path="/account-setup" element={<AccountSetupPage />} />
 
         <Route exact path="/dashboard" element={<Dashboard />} />
 
