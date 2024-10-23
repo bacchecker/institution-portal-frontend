@@ -251,7 +251,6 @@ export default function ValidationRequest() {
           page={resData?.current_page}
           setPage={(page) =>
             navigate({
-              // pathname: "listing",
               search: createSearchParams({ ...filters, page }).toString(),
             })
           }
