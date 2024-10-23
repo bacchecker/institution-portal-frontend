@@ -7,6 +7,7 @@ import {
   IoDocumentText,
 } from "react-icons/io5";
 import { GiFinishLine } from "react-icons/gi";
+import { FaAnglesRight } from "react-icons/fa6";
 
 const steps = [
   {
@@ -36,6 +37,7 @@ const steps = [
 const HorizontalLinearStepper = () => {
   const [activeStep, setActiveStep] = useState(0);
   const [isSaving, setIsSaving] = useState(false);
+  const [submitHandlers, setSubmitHandlers] = useState({});
 
   const institutionDataRef = useRef();
   const institutionDocTypesRef = useRef();
@@ -54,16 +56,26 @@ const HorizontalLinearStepper = () => {
   };
 
   const handleNext = async () => {
-    const currentRef = stepRefs[activeStep];
+    if (submitHandlers[activeStep]) {
 
-    if (currentRef.current) {
-      const isSubmitted = await currentRef.current.submitForm();
+      const isSubmitted = await submitHandlers[activeStep]();
+      
       if (isSubmitted) {
-        setActiveStep((prevStep) => prevStep + 1); // Only increment if submission was successful
-        window.scrollTo(0, 0); // Scroll to the top if submission is successful
+        setActiveStep((prevStep) => prevStep + 1);
       }
+    } else {
+      // If no submitHandler is defined, just move to the next step
+      setActiveStep((prevStep) => prevStep + 1);
     }
   };
+  
+  const passHandleSubmit = (stepIndex, handleSubmit) => {
+    setSubmitHandlers((prevHandlers) => ({
+      ...prevHandlers,
+      [stepIndex]: handleSubmit,
+    }));
+  };
+
 
   const handleBack = () => {
     setActiveStep((prevStep) => prevStep - 1);
@@ -146,29 +158,16 @@ const HorizontalLinearStepper = () => {
             </div>
           }
         >
-          {activeStep === 0 && (
-            <StepComponent
-              ref={institutionDataRef}
-              onNext={handleNext}
-              onSavingChange={handleSavingChange}
-            />
-          )}
-          {activeStep === 1 && (
-            <StepComponent
-              ref={institutionDocTypesRef}
-              onNext={handleNext}
-              onSavingChange={handleSavingChange}
-            />
-          )}
-          {activeStep === 2 && (
-            <StepComponent ref={letterTemplateRef} onNext={handleNext} />
-          )}
-          {activeStep === 3 && (
-            <StepComponent
-              ref={finalRef}
-              onNext={handleNext}
-              onSavingChange={handleSavingChange}
-            />
+          {steps.map((step, index) =>
+            index === activeStep ? (
+              <step.component
+                key={index}
+                ref={stepRefs[index]}
+                passHandleSubmit={passHandleSubmit}
+                stepIndex={index}
+                onSavingChange={handleSavingChange}
+              />
+            ) : null
           )}
         </Suspense>
       </div>
@@ -186,23 +185,28 @@ const HorizontalLinearStepper = () => {
         </button>
 
         <button
-          className="px-4 py-2 bg-green-700 text-white rounded-lg shadow"
+          className={`px-4 py-2 rounded-lg shadow ${
+            isSaving ? "bg-gray-400 cursor-not-allowed" : "bg-[#ff0404] hover:bg-[#ff0404] text-white"
+          }`}
           onClick={handleNext}
           disabled={isSaving}
         >
           {isSaving ? (
             <div className="flex items-center space-x-2">
-              <Spinner size="w-6 h-6" />
+              <Spinner size="w-4 h-4" />
               <span>Saving...</span>
             </div>
-          ) : activeStep === 2 ? (
-            "Continue"
           ) : activeStep === steps.length - 1 ? (
             "Complete Account Setup"
           ) : (
-            "Save and Progress"
+            <div className="flex items-center space-x-2">
+              
+              <span>Save and Progress</span>
+              <FaAnglesRight />
+            </div>
           )}
         </button>
+
       </div>
 
       {activeStep === steps.length && (

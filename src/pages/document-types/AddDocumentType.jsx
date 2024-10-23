@@ -8,6 +8,7 @@ import { MdClose } from "react-icons/md";
 import Textarea from "@components/Textarea";
 import Textbox from "@components/Textbox";
 import AuthLayout from "@components/AuthLayout";
+import { Input } from "@nextui-org/react";
 
 class AddDocumentType extends Component {
   constructor(props) {
@@ -44,40 +45,6 @@ class AddDocumentType extends Component {
   componentDidMount() {
     this.fetchDocumentTypes();
   }
-
-  /* componentDidUpdate(prevState) {
-    const { searchAvailableName, searchInstitutionName } = this.state;
-    if (
-      prevState.searchAvailableName !== searchAvailableName ||
-      prevState.searchInstitutionName !== searchInstitutionName
-    ) {
-      this.fetchDocumentTypes();
-    }
-  } */
-
-  /* async fetchDocumentTypes() {
-    this.setState({ isLoading: true });
-    const { searchInstitutionName } = this.state;
-    try {
-      const response = await axios.get("/institutions/document-types", {
-        params: {
-          institution_type: "academic",
-          //   academic_level: "tertiary",
-          search_institution_name: searchInstitutionName,
-        },
-      });
-
-      const insResponse = await axios.get("/institution/document-types");
-
-      this.setState({
-        institutionDocumentTypes: insResponse.data?.data?.types,
-        isLoading: false,
-      });
-    } catch (error) {
-      toast.error("Error fetching document types: " + (error.message || ""));
-      this.setState({ isLoading: false });
-    }
-  } */
 
   fetchDocumentTypes = () => {
     const { search } = this.state;
@@ -176,7 +143,7 @@ class AddDocumentType extends Component {
     try {
       const response = await axios.delete(`/institution/remove-document/${id}`);
       toast.success(response.data.message);
-      await this.fetchDocumentTypes();
+      this.fetchDocumentTypes();
     } catch (error) {
       toast.error(error.response?.data?.message || "Error deleting document");
     } finally {
@@ -546,7 +513,7 @@ class AddDocumentType extends Component {
                 </div>
 
                 <div className="relative flex flex-col space-y-7 px-4 py-6 overflow-y-auto h-[calc(100%-4rem)]">
-                  <Textbox
+                  <Input
                     label="Name"
                     name="name"
                     value={this.state.name}
@@ -558,28 +525,28 @@ class AddDocumentType extends Component {
                     value={this.state.description}
                     onChange={this.handleInputChange}
                   />
-                  <Textbox
+                  <Input
                     label="Document Validation Fee"
                     name="validation_fee"
                     type="number"
                     value={this.state.validation_fee}
                     onChange={this.handleInputChange}
                   />
-                  <Textbox
+                  <Input
                     label="Document Verification Fee"
                     name="verification_fee"
                     type="number"
                     value={this.state.verification_fee}
                     onChange={this.handleInputChange}
                   />
-                  <Textbox
+                  <Input
                     label="Document Requisition Fee"
                     name="base_fee"
                     type="number"
                     value={this.state.base_fee}
                     onChange={this.handleInputChange}
                   />
-                  <Textbox
+                  <Input
                     label="Printing Fee"
                     name="printing_fee"
                     type="number"
