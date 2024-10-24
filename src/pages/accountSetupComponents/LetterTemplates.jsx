@@ -6,6 +6,7 @@ import LetterTemplatesTable from "./letterTemplateComponents/LetterTemplatesTabl
 import AddLetterTemplate from "./letterTemplateComponents/AddLetterTemplate";
 import useSWR from "swr";
 import axios from "@utils/axiosConfig";
+import { toast } from "sonner";
 
 function LetterTemplates({ setActiveStep }) {
   const [isSaving, setSaving] = useState(false);
@@ -43,10 +44,10 @@ function LetterTemplates({ setActiveStep }) {
     axios.get(url).then((res) => res.data)
   );
 
-  console.log("letterTemplateScreen", letterTemplateScreen, currentScreen);
+  console.log("letterTemplateScreen", letterTemplates);
 
   const handleSubmit = async () => {
-    if (institutionDocuments?.data?.types?.length === 0) {
+    if (letterTemplates?.data?.length === 0) {
       toast.error("Add at least One letter template", {
         position: "top-right",
         autoClose: 1202,
@@ -67,14 +68,16 @@ function LetterTemplates({ setActiveStep }) {
           "/institution/account-setup/next-step",
           data
         );
-        toast.success("Institution Document Type(s) created successfully");
+        toast.success(
+          "Institution Document Type(s) Letter Templates created successfully"
+        );
         const updatedInstitution = {
           ...institution,
-          current_step: "3",
+          current_step: "4",
         };
         setInstitution(updatedInstitution);
         secureLocalStorage.setItem("institution", updatedInstitution);
-        setActiveStep(3);
+        setActiveStep(4);
         setSaving(false);
       } catch (error) {
         toast.error(error.response?.data?.message || "An error occurred");

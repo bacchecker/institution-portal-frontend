@@ -25,8 +25,6 @@ function AccountSetupPage() {
     axios.get(url).then((res) => res.data)
   );
 
-  console.log("insss", institutionData?.institutionData);
-
   const steps = [
     {
       label: "Institution Data",
@@ -45,7 +43,6 @@ function AccountSetupPage() {
       icon: IoCheckmarkDoneCircleSharp,
     },
   ];
-  console.log("lo", activeStep);
 
   return (
     <AuthLayout title="Account Setup">
