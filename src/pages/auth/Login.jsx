@@ -59,6 +59,7 @@ const Login = () => {
       secureLocalStorage.setItem("authToken", responseData.token);
       secureLocalStorage.setItem("user", responseData.user);
       secureLocalStorage.setItem("institution", responseData.institution);
+      secureLocalStorage.setItem("letterTemplateScreen", 1);
       setIsLoading(false);
 
       login(responseData.user, responseData?.institution, responseData.token);

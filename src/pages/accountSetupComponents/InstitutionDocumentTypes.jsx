@@ -20,7 +20,6 @@ import useSWR, { mutate } from "swr";
 import DeleteModal from "@components/DeleteModal";
 import axios from "@utils/axiosConfig";
 import Elipsis from "@assets/icons/elipsis";
-import Drawer from "../../components/Drawer";
 import ExistingDocumentTypeCreation from "./ExistingDocumentTypeCreation";
 import NewDocumentTypeCreation from "./NewDocumentTypeCreation";
 import EditDocumentType from "./EditDocumentType";
@@ -96,7 +95,7 @@ function InstitutionDocumentTypes({ setActiveStep }) {
           "/institution/account-setup/next-step",
           data
         );
-        toast.success(response.data.message);
+        toast.success("Institution Document Type(s) created successfully");
         const updatedInstitution = {
           ...institution,
           current_step: "3",
