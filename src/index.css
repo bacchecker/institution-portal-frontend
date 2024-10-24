@@ -67,5 +67,19 @@ footer {
   font-family: "Inter", sans-serif;
 }
 .custom-checkbox {
-  --nextui-checkbox-color: #ff0404; /* Your custom color */
+  --nextui-checkbox-color: #ff0404;
+}
+
+.content {
+  animation: moving 0.5s ease;
+}
+@keyframes moving {
+  from {
+    transform: translateX(1vw);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }

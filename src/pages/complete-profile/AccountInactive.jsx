@@ -171,6 +171,7 @@ const AccountInactive = () => {
 
             <div className="my-4 flex items-center justify-center">
               <button
+              type="button"
                 onClick={() => navigate("/account-setup")}
                 className="flex items-center w-fit space-x-2 bg-[#ff0404] hover:bg-[#f84848] text-white px-4 py-1.5 rounded-md"
               >

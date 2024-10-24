@@ -1,20 +1,9 @@
 import React from "react";
 import CustomTable from "@components/CustomTable";
 import { Spinner } from "@nextui-org/react";
-import useSWR from "swr";
-import axios from "@utils/axiosConfig";
 
-function LetterTemplatesTable() {
-  const {
-    data: letterTemplates,
-    error: letterTemplatesError,
-    isLoading: letterTemplatesLoading,
-  } = useSWR("/institution/letter-templates", (url) =>
-    axios.get(url).then((res) => res.data)
-  );
-
-  console.log("letterTemplates",letterTemplates);
-  
+function LetterTemplatesTable({ letterTemplates, letterTemplatesLoading }) {
+  console.log("letterTemplates", letterTemplates);
 
   return (
     <section className="md:w-full w-[98vw] min-h-[60vh] mx-auto">
@@ -27,10 +16,10 @@ function LetterTemplatesTable() {
           <CustomTable
             columns={[
               "Name",
-              "Successful Validation Message",
-              "Unsuccessful Validation Message",
-              "Successful Verification Message",
-              "Unsuccessful Verification Message",
+              "Successful Validation Letter",
+              "Unsuccessful Validation Letter",
+              "Successful Verification Letter",
+              "Unsuccessful Verification Letter",
               "",
             ]}
             // loadingState={resData ? false : true}

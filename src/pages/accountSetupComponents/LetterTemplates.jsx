@@ -4,6 +4,8 @@ import { FaAnglesLeft, FaAnglesRight } from "react-icons/fa6";
 import secureLocalStorage from "react-secure-storage";
 import LetterTemplatesTable from "./letterTemplateComponents/LetterTemplatesTable";
 import AddLetterTemplate from "./letterTemplateComponents/AddLetterTemplate";
+import useSWR from "swr";
+import axios from "@utils/axiosConfig";
 
 function LetterTemplates({ setActiveStep }) {
   const [isSaving, setSaving] = useState(false);
@@ -33,9 +35,57 @@ function LetterTemplates({ setActiveStep }) {
     setCurrentScreen(2);
   };
 
+  const {
+    data: letterTemplates,
+    error: letterTemplatesError,
+    isLoading: letterTemplatesLoading,
+  } = useSWR("/institution/letter-templates", (url) =>
+    axios.get(url).then((res) => res.data)
+  );
+
   console.log("letterTemplateScreen", letterTemplateScreen, currentScreen);
 
-  const handleSubmit = () => {};
+  const handleSubmit = async () => {
+    if (institutionDocuments?.data?.types?.length === 0) {
+      toast.error("Add at least One letter template", {
+        position: "top-right",
+        autoClose: 1202,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
+    } else {
+      setSaving(true);
+      const data = {
+        step: 3,
+      };
+      try {
+        const response = await axios.post(
+          "/institution/account-setup/next-step",
+          data
+        );
+        toast.success("Institution Document Type(s) created successfully");
+        const updatedInstitution = {
+          ...institution,
+          current_step: "3",
+        };
+        setInstitution(updatedInstitution);
+        secureLocalStorage.setItem("institution", updatedInstitution);
+        setActiveStep(3);
+        setSaving(false);
+      } catch (error) {
+        toast.error(error.response?.data?.message || "An error occurred");
+        setSaving(false);
+      } finally {
+        setSaving(false);
+        return true;
+      }
+    }
+  };
+
   return (
     <div className="w-full px-5 pb-4">
       {(letterTemplateScreen === 1 || currentScreen === 1) && (
@@ -68,7 +118,10 @@ function LetterTemplates({ setActiveStep }) {
               </button>
             </div>
           </div>
-          <LetterTemplatesTable />
+          <LetterTemplatesTable
+            letterTemplates={letterTemplates}
+            letterTemplatesLoading={letterTemplatesLoading}
+          />
         </>
       )}
       {(letterTemplateScreen === 2 || currentScreen === 2) && (
