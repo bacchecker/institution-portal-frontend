@@ -1,19 +1,47 @@
 import React, { useRef, useState } from "react";
-import { FaAnglesLeft } from "react-icons/fa6";
+import { FaAnglesLeft, FaAnglesRight } from "react-icons/fa6";
 import secureLocalStorage from "react-secure-storage";
 import useSWR from "swr";
 import axios from "@utils/axiosConfig";
 import ValidationLetterTemplate from "./addLetterTemplateComponents/ValidationLetterTemplate";
 import VerificationLetterTemplate from "./addLetterTemplateComponents/VerificationLetterTemplate";
+import { Select, SelectItem, Spinner } from "@nextui-org/react";
+import { toast } from "sonner";
 
 function AddLetterTemplate({ setCurrentScreen }) {
+  const initialUserInput = {
+    document_type_id: "",
+  };
+  const [userInput, setUserInput] = useState(initialUserInput);
   const [currentTempTab, setCurrentTempTab] = useState(1);
+  const [isSaving, setIsSaving] = useState(false);
+  const [validationSuccessfulTemplate, setValidationSuccessfulTemplate] =
+    useState("");
+  const [validationUnsuccessfulTemplate, setValidationUnsuccessfulTemplate] =
+    useState("");
+
+  const [verificationSuccessfulTemplate, setVerificationSuccessfulTemplate] =
+    useState("");
+  const [
+    verificationUnsuccessfulTemplate,
+    setVerificationUnsuccessfulTemplate,
+  ] = useState("");
+
   const institution = secureLocalStorage.getItem("institution");
+
   const handleBackButton = () => {
     secureLocalStorage.setItem("letterTemplateScreen", 1);
     setCurrentScreen(1);
   };
-  const editorRef = useRef(null);
+
+  const handleUserInput = (e) => {
+    setUserInput((userInput) => ({
+      ...userInput,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+  console.log("user", userInput);
 
   const handleDragStart = (value) => {
     return (event) => {
@@ -24,9 +52,6 @@ function AddLetterTemplate({ setCurrentScreen }) {
   const handleDrop = (event) => {
     event.preventDefault();
     const value = event.dataTransfer.getData("text/plain");
-    if (editorRef.current) {
-      editorRef.current.editor.insertHTML(value);
-    }
   };
 
   const handleDragOver = (event) => {
@@ -41,6 +66,66 @@ function AddLetterTemplate({ setCurrentScreen }) {
     axios.get(url).then((res) => res.data)
   );
   console.log("inst", institutionDocuments);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsSaving(true);
+
+    const { document_type_id } = userInput;
+
+    if (
+      !validationSuccessfulTemplate ||
+      !validationUnsuccessfulTemplate ||
+      !verificationSuccessfulTemplate ||
+      !verificationUnsuccessfulTemplate ||
+      !document_type_id
+    ) {
+      toast.error(
+        "Select document type and provide template for each scenario",
+        {
+          position: "top-right",
+          autoClose: 1202,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        }
+      );
+      setIsSaving(false);
+    } else {
+      const data = {
+        document_type_id: document_type_id,
+        positive_validation_response: validationSuccessfulTemplate,
+        negative_validation_response: validationUnsuccessfulTemplate,
+        positive_verification_response: verificationSuccessfulTemplate,
+        negative_verification_response: verificationUnsuccessfulTemplate,
+      };
+      try {
+        const response = await axios.post(
+          "/institution/letter-templates",
+          data
+        );
+        toast.success(response.data.message, {
+          position: "top-right",
+          autoClose: 1202,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
+      } catch (error) {
+        toast.error(error.response?.data?.message || "An error occurred");
+        setIsSaving(false);
+      } finally {
+        setIsSaving(false);
+        return true;
+      }
+    }
+  };
 
   return (
     <>
@@ -82,6 +167,7 @@ function AddLetterTemplate({ setCurrentScreen }) {
             <h4 className="text-[0.9rem] font-[600] underline">
               Placeholders Definition
             </h4>
+            {/* <div className="border border-[#ff040459] rounded-[0.3rem] p-1"> */}
             <h4 className="text-[0.8rem]">
               <span
                 className="text-[#ff0404]"
@@ -288,26 +374,79 @@ function AddLetterTemplate({ setCurrentScreen }) {
               </span>{" "}
               - institution's helpline contact
             </h4>
+            {/* </div> */}
           </div>
+          <h4 className="text-[0.9rem]">
+            <span className="text-[#ff0404]">Note</span>: Placeholders can be{" "}
+            <span className="text-[#ff0404] font-[600]">dragged</span> and{" "}
+            <span className="text-[#ff0404] font-[600]">drop</span> in the
+            editor
+          </h4>
         </div>
-        {currentTempTab === 1 && (
-          <ValidationLetterTemplate
-            institutionDocuments={institutionDocuments}
-            editorRef={editorRef}
-          />
-        )}
-        {currentTempTab === 2 && (
-          <VerificationLetterTemplate
-            institutionDocuments={institutionDocuments}
-          />
-        )}
+        <div className="w-[70%] border border-[#ff040459] rounded-[0.5rem] p-4 content">
+          <Select
+            size="sm"
+            label={
+              <>
+                Document Type
+                <span className="text-[#ff0404]">*</span>
+              </>
+            }
+            className="w-full border border-[#ff040459] rounded-[0.3rem] overflow-hidden"
+            name="document_type_id"
+            onChange={handleUserInput}
+          >
+            {institutionDocuments?.data?.types?.map((item) => (
+              <SelectItem key={item?.id}>
+                {item?.document_type?.name}
+              </SelectItem>
+            ))}
+          </Select>
+          {currentTempTab === 1 && (
+            <ValidationLetterTemplate
+              institutionDocuments={institutionDocuments}
+              validationSuccessfulTemplate={validationSuccessfulTemplate}
+              setValidationSuccessfulTemplate={setValidationSuccessfulTemplate}
+              validationUnsuccessfulTemplate={validationUnsuccessfulTemplate}
+              setValidationUnsuccessfulTemplate={
+                setValidationUnsuccessfulTemplate
+              }
+            />
+          )}
+          {currentTempTab === 2 && (
+            <VerificationLetterTemplate
+              institutionDocuments={institutionDocuments}
+              verificationSuccessfulTemplate={verificationSuccessfulTemplate}
+              setVerificationSuccessfulTemplate={
+                setVerificationSuccessfulTemplate
+              }
+              verificationUnsuccessfulTemplate={
+                verificationUnsuccessfulTemplate
+              }
+              setVerificationUnsuccessfulTemplate={
+                setVerificationUnsuccessfulTemplate
+              }
+            />
+          )}
+        </div>
       </div>
-      <div className="w-full flex justify-end">
+      <div className="w-full flex justify-end mt-4">
         <button
           type="button"
-          className="w-fit flex items-center bg-[#000000] hover:bg-[#282727] text-white px-4 py-2.5 rounded-[0.3rem] font-medium"
+          onClick={handleSubmit}
+          className={`flex items-center bg-[#ff0404] hover:bg-[#f77f7f] text-white px-4 py-2.5 rounded-[0.3rem] font-medium ${
+            isSaving && "cursor-not-allowed bg-[#f77f7f]"
+          }`}
+          disabled={isSaving}
         >
-          Import Default Template
+          {isSaving ? (
+            <>
+              <Spinner size="sm" color="white" />
+              <span className="ml-2">Saving...</span>
+            </>
+          ) : (
+            <>Save Template</>
+          )}
         </button>
       </div>
     </>

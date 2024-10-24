@@ -1,15 +1,14 @@
-import { Select, SelectItem } from "@nextui-org/react";
 import React, { useRef, useState } from "react";
 import SunEditor from "suneditor-react";
 
-function VerificationLetterTemplate({ institutionDocuments }) {
+function VerificationLetterTemplate({
+  institutionDocuments,
+  verificationSuccessfulTemplate,
+  setVerificationSuccessfulTemplate,
+  verificationUnsuccessfulTemplate,
+  setVerificationUnsuccessfulTemplate,
+}) {
   const [lineStyle, setLineStyle] = useState({ width: 0, left: 0 });
-  const [verificationSuccessfulTemplate, setVerificationSuccessfulTemplate] =
-    useState("");
-  const [
-    verificationUnsuccessfulTemplate,
-    setVerificationUnsuccessfulTemplate,
-  ] = useState("");
   const lineRef = useRef(null);
   const [currentTab, setCurrentTab] = useState(1);
   const handleTabClick = (e) => {
@@ -20,23 +19,7 @@ function VerificationLetterTemplate({ institutionDocuments }) {
     });
   };
   return (
-    <div className="w-[70%] border border-[#ff040459] rounded-[0.5rem] p-4 content">
-      <Select
-        size="sm"
-        label={
-          <>
-            Document Type
-            <span className="text-[#ff0404]">*</span>
-          </>
-        }
-        className="w-full border border-[#ff040459] rounded-[0.3rem] overflow-hidden"
-        name="document_type_id"
-        // onChange={(e) => handleItemChange(e, i)}
-      >
-        {institutionDocuments?.data?.types?.map((item) => (
-          <SelectItem key={item?.id}>{item?.document_type?.name}</SelectItem>
-        ))}
-      </Select>
+    <>
       <div className="w-full flex justify-end mt-4">
         {currentTab === 1 && (
           <button
@@ -134,7 +117,7 @@ function VerificationLetterTemplate({ institutionDocuments }) {
           />
         </div>
       )}
-    </div>
+    </>
   );
 }
 

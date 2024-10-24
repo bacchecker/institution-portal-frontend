@@ -2,12 +2,13 @@ import { Select, SelectItem } from "@nextui-org/react";
 import React, { useRef, useState } from "react";
 import SunEditor from "suneditor-react";
 
-function ValidationLetterTemplate({ institutionDocuments }) {
-  const initialUserInput = {
-    title: "",
-    description: "",
-  };
-  const [userInput, setUserInput] = useState(initialUserInput);
+function ValidationLetterTemplate({
+  institutionDocuments,
+  validationSuccessfulTemplate,
+  setValidationSuccessfulTemplate,
+  validationUnsuccessfulTemplate,
+  setValidationUnsuccessfulTemplate,
+}) {
   const [lineStyle, setLineStyle] = useState({ width: 0, left: 0 });
   const [defaultSuccessTemplate, setDefaultSuccessTemplate] = useState(
     `<p><br></p><p>[Institution Letterhead]<br>[Date]</p><p>[Recipient Name]<br>[Recipient Address]<br>[City, State, Zip Code]</p><p>Dear [Recipient Name],</p><p>Subject: Successful Validation</p><p>We are pleased to confirm that your validation request on ${institutionDocuments} has been successfully completed. All criteria have been met, and we appreciate your diligence in this process.</p><p>Should you have any further questions or need assistance, please feel free to reach out.</p><p>Best regards,</p><p>[Your Name]<br>[Your Title]<br>[Institution Name]<br>[Contact Information]</p>`
@@ -15,10 +16,7 @@ function ValidationLetterTemplate({ institutionDocuments }) {
   const [defaultUnsuccessTemplate, setDefaultUnsuccessTemplate] = useState(
     `<p><br></p><p>[Institution Letterhead]<br>[Date]</p><p>[Recipient Name]<br>[Recipient Address]<br>[City, State, Zip Code]</p><p>Dear [Recipient Name],</p><p>Subject: Unsuccessful Validation</p><p>We regret to inform you that your validation request has not been successful. The submission did not fulfill the necessary requirements.</p><p>We encourage you to review the criteria and resubmit your documentation. For any questions, please do not hesitate to contact us.</p><p>Thank you for your attention to this matter.</p><p>Sincerely,</p><p>[Your Name]<br>[Your Title]<br>[Institution Name]<br>[Contact Information]</p>`
   );
-  const [validationSuccessfulTemplate, setValidationSuccessfulTemplate] =
-    useState("");
-  const [validationUnsuccessfulTemplate, setValidationUnsuccessfulTemplate] =
-    useState("");
+
   const lineRef = useRef(null);
   const [currentTab, setCurrentTab] = useState(1);
   const handleTabClick = (e) => {
@@ -35,23 +33,7 @@ function ValidationLetterTemplate({ institutionDocuments }) {
   console.log("ffff", validationUnsuccessfulTemplate);
 
   return (
-    <div className="w-[70%] border border-[#ff040459] rounded-[0.5rem] p-4 content">
-      <Select
-        size="sm"
-        label={
-          <>
-            Document Type
-            <span className="text-[#ff0404]">*</span>
-          </>
-        }
-        className="w-full border border-[#ff040459] rounded-[0.3rem] overflow-hidden"
-        name="document_type_id"
-        onChange={(e) => handleUser(e, i)}
-      >
-        {institutionDocuments?.data?.types?.map((item) => (
-          <SelectItem key={item?.id}>{item?.document_type?.name}</SelectItem>
-        ))}
-      </Select>
+    <>
       <div className="w-full flex justify-end mt-4">
         {currentTab === 1 && (
           <button
@@ -157,7 +139,7 @@ function ValidationLetterTemplate({ institutionDocuments }) {
           />
         </div>
       )}
-    </div>
+    </>
   );
 }
 

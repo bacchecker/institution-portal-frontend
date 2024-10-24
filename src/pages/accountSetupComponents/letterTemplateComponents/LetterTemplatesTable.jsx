@@ -1,6 +1,6 @@
 import React from "react";
 import CustomTable from "@components/CustomTable";
-import { Spinner } from "@nextui-org/react";
+import { Spinner, TableCell, TableRow } from "@nextui-org/react";
 
 function LetterTemplatesTable({ letterTemplates, letterTemplatesLoading }) {
   console.log("letterTemplates", letterTemplates);
@@ -32,51 +32,23 @@ function LetterTemplatesTable({ letterTemplates, letterTemplatesLoading }) {
             // }
             // totalPages={Math.ceil(resData?.total / resData?.per_page)}
           >
-            {/* {institutionDocuments?.data?.types?.map((item) => (
+            {letterTemplates?.data?.map((item) => (
               <TableRow key={item?.id}>
                 <TableCell>{item?.document_type?.name}</TableCell>
                 <TableCell>
-                  {item?.soft_copy && item?.hard_copy
-                    ? "hard copy, soft copy"
-                    : !item?.soft_copy && item?.hard_copy
-                    ? "hard copy"
-                    : "soft copy"}
+                  <div
+                    dangerouslySetInnerHTML={{
+                      __html: item?.positive_validation_response,
+                    }}
+                  />
                 </TableCell>
                 <TableCell>GH¢ {item?.base_fee}</TableCell>
                 <TableCell>GH¢ {item?.printing_fee}</TableCell>
                 <TableCell>GH¢ {item?.validation_fee}</TableCell>
                 <TableCell> GH¢ {item?.verification_fee}</TableCell>
-                <TableCell className="flex items-center h-16 gap-3">
-                  <Dropdown>
-                    <DropdownTrigger>
-                      <Button variant="bordered" size="sm" isIconOnly>
-                        <Elipsis />
-                      </Button>
-                    </DropdownTrigger>
-                    <DropdownMenu aria-label="Static Actions">
-                      <DropdownItem
-                        key="edit"
-                        onClick={() => {
-                          setSelectedData(item);
-                          setOpenEditDrawer(true);
-                        }}
-                      >
-                        Update
-                      </DropdownItem>
-                      <DropdownItem
-                        key="delete"
-                        onClick={() => {
-                          deleteDisclosure.onOpen();
-                          setSelectedData(item);
-                        }}
-                      >
-                        Delete
-                      </DropdownItem>
-                    </DropdownMenu>
-                  </Dropdown>
-                </TableCell>
+                
               </TableRow>
-            ))} */}
+            ))}
           </CustomTable>
         </>
       )}
