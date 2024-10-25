@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import secureLocalStorage from "react-secure-storage";
 import SunEditor from "suneditor-react";
 
-function VerificationLetterTemplate({
+function EditVerificationLetterTemplate({
   institutionDocuments,
   verificationSuccessfulTemplate,
   setVerificationSuccessfulTemplate,
@@ -10,11 +10,12 @@ function VerificationLetterTemplate({
   setVerificationUnsuccessfulTemplate,
 }) {
   const [lineStyle, setLineStyle] = useState({ width: 0, left: 0 });
-  const [defaultSuccessTemplate, setDefaultSuccessTemplate] = useState("");
-  const [defaultUnsuccessTemplate, setDefaultUnsuccessTemplate] = useState("");
   const lineRef = useRef(null);
   const [currentTab, setCurrentTab] = useState(1);
+  const [defaultSuccessTemplate, setDefaultSuccessTemplate] = useState("");
+  const [defaultUnsuccessTemplate, setDefaultUnsuccessTemplate] = useState("");
   const institution = secureLocalStorage.getItem("institution");
+
   const handleTabClick = (e) => {
     const target = e.target;
     setLineStyle({
@@ -23,7 +24,6 @@ function VerificationLetterTemplate({
     });
   };
 
-
   const handleDefaultSuccessTemplate = () => {
     setVerificationSuccessfulTemplate(defaultSuccessTemplate);
   };
@@ -31,7 +31,6 @@ function VerificationLetterTemplate({
   const handleDefaultUnSuccessTemplate = () => {
     setVerificationUnsuccessfulTemplate(defaultUnsuccessTemplate);
   };
-
 
   useEffect(() => {
     const academicSuccessDefault = `<p><br></p><p><br>{institutionName}</p><p><br></p><p><strong>Address</strong>:&nbsp;</p><p>{institutionAddress}</p><p>{institutionRegion}</p><p><br></p><p><strong>Phone</strong>:&nbsp;{helplineContact}</p><p><strong>Email</strong>:&nbsp;{institutionEmail}</p><p><strong>Website</strong>:&nbsp;{institutionWebsiteURL}</p><p><br>{dateOfLetter}</p><p><br></p><p>To Whom It May Concern or who the letter is addressed:<br><br>Subject: Verification of {firstName} {otherName} {lastName}’s {documentTypeName}<br><br>This letter serves to confirm that {firstName}{otherName}{lastName} was a student at {institutionName}, and we have completed the verification process of their {documentTypeName}.<br><br>Based on our records, we verify that the following details are accurate:<br><br>• Full Name:&nbsp;{firstName}{otherName}{lastName}<br>• Student ID Number: {indexNumber}<br>• Degree Awarded: {programOfStudy}<br>• Graduation Date: {programEndYear}<br><br>The transcript presented for verification matches the official records held by {institutionName}. This document has been confirmed to meet all the specified criteria required by our institution for verification.<br><br>Should you require any additional information or further confirmation, please do not hesitate to contact our office at {helplineContact}.<br><br>Sincerely,&nbsp;</p><p><br></p><p>{validatedBy}<br>{position}</p><p>{validatedByEmail}<br>{institutionName}<br>{institutionAddress}</p>`;
@@ -45,7 +44,6 @@ function VerificationLetterTemplate({
       setDefaultSuccessTemplate(academicSuccessDefault);
     }
   }, [institution]);
-
   return (
     <>
       <div className="w-full flex justify-end mt-4">
@@ -151,4 +149,4 @@ function VerificationLetterTemplate({
   );
 }
 
-export default VerificationLetterTemplate;
+export default EditVerificationLetterTemplate;

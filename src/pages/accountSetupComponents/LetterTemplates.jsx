@@ -7,9 +7,11 @@ import AddLetterTemplate from "./letterTemplateComponents/AddLetterTemplate";
 import useSWR from "swr";
 import axios from "@utils/axiosConfig";
 import { toast } from "sonner";
+import EditLetterTemplate from "./letterTemplateComponents/EditLetterTemplate";
 
 function LetterTemplates({ setActiveStep }) {
   const [isSaving, setSaving] = useState(false);
+  const [selectedTemplate, setSelectedTemplate] = useState({});
   const [currentScreen, setCurrentScreen] = useState();
   const institution = secureLocalStorage.getItem("institution");
   const letterTemplateScreen = secureLocalStorage.getItem(
@@ -44,8 +46,6 @@ function LetterTemplates({ setActiveStep }) {
     axios.get(url).then((res) => res.data)
   );
 
-  console.log("letterTemplateScreen", letterTemplates);
-
   const handleSubmit = async () => {
     if (letterTemplates?.data?.length === 0) {
       toast.error("Add at least One letter template", {
@@ -61,7 +61,7 @@ function LetterTemplates({ setActiveStep }) {
     } else {
       setSaving(true);
       const data = {
-        step: 3,
+        step: 4,
       };
       try {
         const response = await axios.post(
@@ -124,11 +124,19 @@ function LetterTemplates({ setActiveStep }) {
           <LetterTemplatesTable
             letterTemplates={letterTemplates}
             letterTemplatesLoading={letterTemplatesLoading}
+            setSelectedTemplate={(e) => setSelectedTemplate(e)}
+            setCurrentScreen={setCurrentScreen}
           />
         </>
       )}
       {(letterTemplateScreen === 2 || currentScreen === 2) && (
         <AddLetterTemplate setCurrentScreen={setCurrentScreen} />
+      )}
+      {(letterTemplateScreen === 3 || currentScreen === 3) && (
+        <EditLetterTemplate
+          setCurrentScreen={setCurrentScreen}
+          selectedTemplate={selectedTemplate}
+        />
       )}
       {(letterTemplateScreen === 1 || currentScreen === 1) && (
         <>

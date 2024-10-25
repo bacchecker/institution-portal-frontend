@@ -1,18 +1,17 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { FaAnglesLeft, FaAnglesRight } from "react-icons/fa6";
 import secureLocalStorage from "react-secure-storage";
 import useSWR, { mutate } from "swr";
 import axios from "@utils/axiosConfig";
-import ValidationLetterTemplate from "./addLetterTemplateComponents/ValidationLetterTemplate";
-import VerificationLetterTemplate from "./addLetterTemplateComponents/VerificationLetterTemplate";
-import { Select, SelectItem, Spinner } from "@nextui-org/react";
+import ValidationLetterTemplate from "./editLetterTemplateComponents/EditValidationLetterTemplate";
+import VerificationLetterTemplate from "./editLetterTemplateComponents/EditVerificationLetterTemplate";
+import { Input, Select, SelectItem, Spinner } from "@nextui-org/react";
 import { toast } from "sonner";
 
-function AddLetterTemplate({ setCurrentScreen }) {
-  const initialUserInput = {
-    document_type_id: "",
-  };
-  const [userInput, setUserInput] = useState(initialUserInput);
+function EditLetterTemplate({ setCurrentScreen, selectedTemplate }) {
+  console.log("seee", selectedTemplate);
+
+  const [userInput, setUserInput] = useState([]);
   const [currentTempTab, setCurrentTempTab] = useState(1);
   const [isSaving, setIsSaving] = useState(false);
   const [validationSuccessfulTemplate, setValidationSuccessfulTemplate] =
@@ -28,6 +27,23 @@ function AddLetterTemplate({ setCurrentScreen }) {
   ] = useState("");
 
   const institution = secureLocalStorage.getItem("institution");
+  useEffect(() => {
+    if (selectedTemplate) {
+      setUserInput(selectedTemplate);
+      setValidationSuccessfulTemplate(
+        selectedTemplate?.positive_validation_response
+      );
+      setValidationUnsuccessfulTemplate(
+        selectedTemplate?.negative_validation_response
+      );
+      setVerificationSuccessfulTemplate(
+        selectedTemplate?.positive_verification_response
+      );
+      setVerificationUnsuccessfulTemplate(
+        selectedTemplate?.negative_verification_response
+      );
+    }
+  }, [selectedTemplate]);
 
   const handleBackButton = () => {
     secureLocalStorage.setItem("letterTemplateScreen", 1);
@@ -41,7 +57,7 @@ function AddLetterTemplate({ setCurrentScreen }) {
     }));
   };
 
-  console.log("user", verificationUnsuccessfulTemplate);
+  console.log("user", userInput);
 
   const handleDragStart = (value) => {
     return (event) => {
@@ -71,7 +87,7 @@ function AddLetterTemplate({ setCurrentScreen }) {
     e.preventDefault();
     setIsSaving(true);
 
-    const { document_type_id } = userInput;
+    const { document_type_id, id } = userInput;
 
     if (
       !validationSuccessfulTemplate ||
@@ -469,24 +485,13 @@ function AddLetterTemplate({ setCurrentScreen }) {
           </h4>
         </div>
         <div className="w-[70%] border border-[#ff040459] rounded-[0.5rem] p-4 content">
-          <Select
-            size="sm"
-            label={
-              <>
-                Document Type
-                <span className="text-[#ff0404]">*</span>
-              </>
-            }
-            className="w-full border border-[#ff040459] rounded-[0.3rem] overflow-hidden"
-            name="document_type_id"
-            onChange={handleUserInput}
-          >
-            {institutionDocuments?.data?.types?.map((item) => (
-              <SelectItem key={item?.id}>
-                {item?.document_type?.name}
-              </SelectItem>
-            ))}
-          </Select>
+          <Input
+            label="Document Type"
+            name="name"
+            value={userInput?.document_type?.name}
+            readOnly
+            // className="xl:w-[80%]"
+          />
           {currentTempTab === 1 && (
             <ValidationLetterTemplate
               institutionDocuments={institutionDocuments}
@@ -538,4 +543,4 @@ function AddLetterTemplate({ setCurrentScreen }) {
   );
 }
 
-export default AddLetterTemplate;
+export default EditLetterTemplate;

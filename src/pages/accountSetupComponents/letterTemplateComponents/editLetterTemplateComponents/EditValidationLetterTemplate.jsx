@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from "react";
 import secureLocalStorage from "react-secure-storage";
 import SunEditor from "suneditor-react";
 
-function ValidationLetterTemplate({
+function EditValidationLetterTemplate({
   institutionDocuments,
   validationSuccessfulTemplate,
   setValidationSuccessfulTemplate,
@@ -16,6 +16,7 @@ function ValidationLetterTemplate({
 
   const lineRef = useRef(null);
   const [currentTab, setCurrentTab] = useState(1);
+
   const institution = secureLocalStorage.getItem("institution");
 
   const handleTabClick = (e) => {
@@ -157,4 +158,4 @@ function ValidationLetterTemplate({
   );
 }
 
-export default ValidationLetterTemplate;
+export default EditValidationLetterTemplate;

@@ -1,9 +1,19 @@
 import React from "react";
 import CustomTable from "@components/CustomTable";
 import { Spinner, TableCell, TableRow } from "@nextui-org/react";
+import secureLocalStorage from "react-secure-storage";
 
-function LetterTemplatesTable({ letterTemplates, letterTemplatesLoading }) {
-  console.log("letterTemplates", letterTemplates);
+function LetterTemplatesTable({
+  letterTemplates,
+  letterTemplatesLoading,
+  setSelectedTemplate,
+  setCurrentScreen,
+}) {
+  const handleSelectedTemplate = (item) => {
+    secureLocalStorage.setItem("letterTemplateScreen", 3);
+    setCurrentScreen(3);
+    setSelectedTemplate(item);
+  };
 
   return (
     <section className="md:w-full w-[98vw] min-h-[60vh] mx-auto">
@@ -37,16 +47,45 @@ function LetterTemplatesTable({ letterTemplates, letterTemplatesLoading }) {
                 <TableCell>{item?.document_type?.name}</TableCell>
                 <TableCell>
                   <div
+                    className="ellipsis"
                     dangerouslySetInnerHTML={{
                       __html: item?.positive_validation_response,
                     }}
                   />
                 </TableCell>
-                <TableCell>GH¢ {item?.base_fee}</TableCell>
-                <TableCell>GH¢ {item?.printing_fee}</TableCell>
-                <TableCell>GH¢ {item?.validation_fee}</TableCell>
-                <TableCell> GH¢ {item?.verification_fee}</TableCell>
-                
+
+                <TableCell>
+                  <div
+                    className="ellipsis"
+                    dangerouslySetInnerHTML={{
+                      __html: item?.negative_validation_response,
+                    }}
+                  />
+                </TableCell>
+                <TableCell>
+                  <div
+                    className="ellipsis"
+                    dangerouslySetInnerHTML={{
+                      __html: item?.positive_verification_response,
+                    }}
+                  />
+                </TableCell>
+                <TableCell>
+                  <div
+                    className="ellipsis"
+                    dangerouslySetInnerHTML={{
+                      __html: item?.negative_verification_response,
+                    }}
+                  />
+                </TableCell>
+                <TableCell>
+                  <button
+                    onClick={() => handleSelectedTemplate(item)}
+                    className="w-fit h-fit border border-[#000] text-[0.9rem] px-4 py-1 text-[#000] rounded-[0.3rem] hover:bg-black hover:text-white transition-all duration-200"
+                  >
+                    view
+                  </button>
+                </TableCell>
               </TableRow>
             ))}
           </CustomTable>
