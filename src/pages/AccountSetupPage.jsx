@@ -41,7 +41,7 @@ function AccountSetupPage() {
       icon: IoDocumentText,
     },
     {
-      label: "Users, Departments, roles and permissions",
+      label: "Departments, roles and permissions",
       icon: IoBuild,
     },
     // {
