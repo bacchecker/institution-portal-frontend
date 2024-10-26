@@ -413,7 +413,7 @@ function EditLetterTemplate({ setCurrentScreen, selectedTemplate }) {
           <Input
             label="Document Type"
             name="name"
-            value={userInput?.document_type?.name}
+            value={userInput?.document_type?.document_type?.name}
             readOnly
             // className="xl:w-[80%]"
           />

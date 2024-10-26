@@ -48,7 +48,7 @@ function LetterTemplatesTable({
           >
             {letterTemplates?.data?.map((item) => (
               <TableRow key={item?.id}>
-                <TableCell>{item?.document_type?.name}</TableCell>
+                <TableCell>{item?.document_type?.document_type?.name}</TableCell>
                 <TableCell>
                   <div
                     className="ellipsis"
