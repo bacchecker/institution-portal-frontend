@@ -3,6 +3,7 @@ import AuthLayout from "../components/AuthLayout";
 import { Card, CardBody } from "@nextui-org/react";
 import { FaUser, FaGraduationCap, FaBriefcase } from "react-icons/fa";
 import {
+  IoBuild,
   IoCheckmarkDoneCircleSharp,
   IoDocuments,
   IoDocumentText,
@@ -13,6 +14,7 @@ import InstitutionDocumentTypes from "./accountSetupComponents/InstitutionDocume
 import axios from "@utils/axiosConfig";
 import useSWR from "swr";
 import LetterTemplates from "./accountSetupComponents/LetterTemplates";
+import UsersAndDepartmentsSetup from "./accountSetupComponents/UsersAndDepartmentsSetup";
 function AccountSetupPage() {
   const [activeStep, setActiveStep] = useState();
   const current_step = secureLocalStorage.getItem("institution")?.current_step;
@@ -35,13 +37,17 @@ function AccountSetupPage() {
       icon: IoDocuments,
     },
     {
-      label: "Letter Template",
+      label: "Letter Templates",
       icon: IoDocumentText,
     },
     {
-      label: "Complete Profile",
-      icon: IoCheckmarkDoneCircleSharp,
+      label: "Users, Departments, roles and permissions",
+      icon: IoBuild,
     },
+    // {
+    //   label: "Complete Profile",
+    //   icon: IoCheckmarkDoneCircleSharp,
+    // },
   ];
 
   return (
@@ -98,6 +104,9 @@ function AccountSetupPage() {
               )}
               {(parseInt(current_step) === 3 || activeStep === 3) && (
                 <LetterTemplates setActiveStep={(e) => setActiveStep(e)} />
+              )}
+              {(parseInt(current_step) === 4 || activeStep === 4) && (
+                <UsersAndDepartmentsSetup setActiveStep={(e) => setActiveStep(e)} />
               )}
             </div>
           </CardBody>

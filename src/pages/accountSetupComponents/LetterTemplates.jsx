@@ -27,7 +27,10 @@ function LetterTemplates({ setActiveStep }) {
       ...institution,
       current_step: "2",
     };
-
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
     setInstitution(updatedInstitution);
     secureLocalStorage.setItem("institution", updatedInstitution);
     setActiveStep(2);
@@ -36,6 +39,10 @@ function LetterTemplates({ setActiveStep }) {
   const handleCreateLetterTemplates = () => {
     secureLocalStorage.setItem("letterTemplateScreen", 2);
     setCurrentScreen(2);
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
   };
 
   const {
@@ -79,6 +86,10 @@ function LetterTemplates({ setActiveStep }) {
         secureLocalStorage.setItem("institution", updatedInstitution);
         setActiveStep(4);
         setSaving(false);
+        window.scrollTo({
+          top: 0,
+          behavior: "smooth",
+        });
       } catch (error) {
         toast.error(error.response?.data?.message || "An error occurred");
         setSaving(false);
@@ -88,6 +99,9 @@ function LetterTemplates({ setActiveStep }) {
       }
     }
   };
+
+  console.log("curr",currentScreen);
+  
 
   return (
     <div className="w-full px-5 pb-4">

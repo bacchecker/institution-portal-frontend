@@ -1,14 +1,13 @@
-import { Select, SelectItem } from "@nextui-org/react";
 import React, { useEffect, useRef, useState } from "react";
 import secureLocalStorage from "react-secure-storage";
 import SunEditor from "suneditor-react";
 
 function EditValidationLetterTemplate({
-  institutionDocuments,
   validationSuccessfulTemplate,
   setValidationSuccessfulTemplate,
   validationUnsuccessfulTemplate,
   setValidationUnsuccessfulTemplate,
+  setCurrentTempTab,
 }) {
   const [lineStyle, setLineStyle] = useState({ width: 0, left: 0 });
   const [defaultSuccessTemplate, setDefaultSuccessTemplate] = useState("");
@@ -47,7 +46,26 @@ function EditValidationLetterTemplate({
     }
   }, [institution]);
 
-  console.log("ffff", validationUnsuccessfulTemplate);
+  const handleProceedButton = () => {
+    if (!validationSuccessfulTemplate || !validationUnsuccessfulTemplate) {
+      toast.error("Set successful and unsuccessful validation templates", {
+        position: "top-right",
+        autoClose: 1202,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
+    } else {
+      setCurrentTempTab(2);
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
+    }
+  };
 
   return (
     <>
@@ -154,6 +172,15 @@ function EditValidationLetterTemplate({
           />
         </div>
       )}
+      <div className="w-full flex justify-end mt-4">
+        <button
+          type="button"
+          onClick={handleProceedButton}
+          className="w-fit flex items-center bg-[#ff0404] hover:bg-[#f77f7f] text-white px-4 py-2.5 rounded-[0.3rem] font-medium"
+        >
+          Proceed to Verification Templates
+        </button>
+      </div>
     </>
   );
 }

@@ -1,15 +1,23 @@
 import React, { useEffect, useRef, useState } from "react";
 import secureLocalStorage from "react-secure-storage";
 import SunEditor from "suneditor-react";
-
+import { mutate } from "swr";
+import axios from "@utils/axiosConfig";
+import { Spinner } from "@nextui-org/react";
+import { FaAnglesLeft, FaAnglesRight } from "react-icons/fa6";
 function EditVerificationLetterTemplate({
-  institutionDocuments,
   verificationSuccessfulTemplate,
   setVerificationSuccessfulTemplate,
   verificationUnsuccessfulTemplate,
   setVerificationUnsuccessfulTemplate,
+  userInput,
+  setCurrentTempTab,
+  validationSuccessfulTemplate,
+  validationUnsuccessfulTemplate,
+  setCurrentScreen,
 }) {
   const [lineStyle, setLineStyle] = useState({ width: 0, left: 0 });
+  const [isSaving, setIsSaving] = useState(false);
   const lineRef = useRef(null);
   const [currentTab, setCurrentTab] = useState(1);
   const [defaultSuccessTemplate, setDefaultSuccessTemplate] = useState("");
@@ -44,6 +52,79 @@ function EditVerificationLetterTemplate({
       setDefaultSuccessTemplate(academicSuccessDefault);
     }
   }, [institution]);
+
+  const handleBackButton = () => {
+    setCurrentTempTab(1);
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
+
+  
+  const handleSubmit = async () => {
+    setIsSaving(true);
+
+    const { document_type_id } = userInput;
+
+    if (
+      !validationSuccessfulTemplate ||
+      !validationUnsuccessfulTemplate ||
+      !verificationSuccessfulTemplate ||
+      !verificationUnsuccessfulTemplate ||
+      !document_type_id
+    ) {
+      toast.error("Set successful and unsuccessful verification templates", {
+        position: "top-right",
+        autoClose: 1202,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
+      setIsSaving(false);
+    } else {
+      const data = {
+        document_type_id: document_type_id,
+        positive_validation_response: validationSuccessfulTemplate,
+        negative_validation_response: validationUnsuccessfulTemplate,
+        positive_verification_response: verificationSuccessfulTemplate,
+        negative_verification_response: verificationUnsuccessfulTemplate,
+      };
+      try {
+        const response = await axios.post(
+          "/institution/letter-templates",
+          data
+        );
+        toast.success(response.data.message, {
+          position: "top-right",
+          autoClose: 1202,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
+        mutate("/institution/letter-templates");
+        secureLocalStorage.setItem("letterTemplateScreen", 1);
+        setCurrentScreen(1);
+        window.scrollTo({
+          top: 0,
+          behavior: "smooth",
+        });
+      } catch (error) {
+        toast.error(error.response?.data?.message || "An error occurred");
+        setIsSaving(false);
+      } finally {
+        setIsSaving(false);
+        return true;
+      }
+    }
+  };
+
   return (
     <>
       <div className="w-full flex justify-end mt-4">
@@ -145,6 +226,36 @@ function EditVerificationLetterTemplate({
           />
         </div>
       )}
+      <div className="flex w-full justify-between mt-4">
+        <button
+          type="button"
+          onClick={handleBackButton}
+          className="flex items-center bg-[#ffffff] border border-[#ff0404] hover:bg-[#ff0404] text-[#ff0404] hover:text-white px-4 py-2.5 rounded-[0.3rem] font-medium"
+        >
+          <FaAnglesLeft className="mr-2" />
+          Back
+        </button>
+        <button
+          type="button"
+          onClick={handleSubmit}
+          className={`flex items-center bg-[#ff0404] hover:bg-[#f77f7f] text-white px-4 py-2.5 rounded-[0.3rem] font-medium ${
+            isSaving && "cursor-not-allowed bg-[#f77f7f]"
+          }`}
+          disabled={isSaving}
+        >
+          {isSaving ? (
+            <>
+              <Spinner size="sm" color="white" />
+              <span className="ml-2">Updating...</span>
+            </>
+          ) : (
+            <>
+              Update Template
+              <FaAnglesRight className="ml-2" />
+            </>
+          )}
+        </button>
+      </div>
     </>
   );
 }

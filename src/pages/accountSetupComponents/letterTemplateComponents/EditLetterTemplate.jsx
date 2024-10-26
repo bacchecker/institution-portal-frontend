@@ -1,19 +1,15 @@
-import React, { useEffect, useRef, useState } from "react";
-import { FaAnglesLeft, FaAnglesRight } from "react-icons/fa6";
+import React, { useEffect, useState } from "react";
+import { FaAnglesLeft } from "react-icons/fa6";
 import secureLocalStorage from "react-secure-storage";
 import useSWR, { mutate } from "swr";
 import axios from "@utils/axiosConfig";
-import ValidationLetterTemplate from "./editLetterTemplateComponents/EditValidationLetterTemplate";
-import VerificationLetterTemplate from "./editLetterTemplateComponents/EditVerificationLetterTemplate";
-import { Input, Select, SelectItem, Spinner } from "@nextui-org/react";
-import { toast } from "sonner";
+import { Input } from "@nextui-org/react";
+import EditValidationLetterTemplate from "./editLetterTemplateComponents/EditValidationLetterTemplate";
+import EditVerificationLetterTemplate from "./editLetterTemplateComponents/EditVerificationLetterTemplate";
 
 function EditLetterTemplate({ setCurrentScreen, selectedTemplate }) {
-  console.log("seee", selectedTemplate);
-
   const [userInput, setUserInput] = useState([]);
   const [currentTempTab, setCurrentTempTab] = useState(1);
-  const [isSaving, setIsSaving] = useState(false);
   const [validationSuccessfulTemplate, setValidationSuccessfulTemplate] =
     useState("");
   const [validationUnsuccessfulTemplate, setValidationUnsuccessfulTemplate] =
@@ -48,16 +44,11 @@ function EditLetterTemplate({ setCurrentScreen, selectedTemplate }) {
   const handleBackButton = () => {
     secureLocalStorage.setItem("letterTemplateScreen", 1);
     setCurrentScreen(1);
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
   };
-
-  const handleUserInput = (e) => {
-    setUserInput((userInput) => ({
-      ...userInput,
-      [e.target.name]: e.target.value,
-    }));
-  };
-
-  console.log("user", userInput);
 
   const handleDragStart = (value) => {
     return (event) => {
@@ -81,70 +72,6 @@ function EditLetterTemplate({ setCurrentScreen, selectedTemplate }) {
   } = useSWR("/institution/document-types", (url) =>
     axios.get(url).then((res) => res.data)
   );
-  console.log("inst", institutionDocuments);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsSaving(true);
-
-    const { document_type_id, id } = userInput;
-
-    if (
-      !validationSuccessfulTemplate ||
-      !validationUnsuccessfulTemplate ||
-      !verificationSuccessfulTemplate ||
-      !verificationUnsuccessfulTemplate ||
-      !document_type_id
-    ) {
-      toast.error(
-        "Select document type and provide template for each scenario",
-        {
-          position: "top-right",
-          autoClose: 1202,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        }
-      );
-      setIsSaving(false);
-    } else {
-      const data = {
-        document_type_id: document_type_id,
-        positive_validation_response: validationSuccessfulTemplate,
-        negative_validation_response: validationUnsuccessfulTemplate,
-        positive_verification_response: verificationSuccessfulTemplate,
-        negative_verification_response: verificationUnsuccessfulTemplate,
-      };
-      try {
-        const response = await axios.post(
-          "/institution/letter-templates",
-          data
-        );
-        toast.success(response.data.message, {
-          position: "top-right",
-          autoClose: 1202,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        });
-        mutate("/institution/letter-templates");
-        secureLocalStorage.setItem("letterTemplateScreen", 1);
-        setCurrentScreen(1);
-      } catch (error) {
-        toast.error(error.response?.data?.message || "An error occurred");
-        setIsSaving(false);
-      } finally {
-        setIsSaving(false);
-        return true;
-      }
-    }
-  };
 
   return (
     <>
@@ -161,22 +88,20 @@ function EditLetterTemplate({ setCurrentScreen, selectedTemplate }) {
       <div className="w-full flex justify-between mt-4">
         <div className="w-[28%] flex flex-col gap-4">
           <div className="w-full flex flex-col gap-2 h-fit border border-[#ff040459] rounded-[0.5rem] p-4">
-            <button
-              onClick={() => setCurrentTempTab(1)}
-              className={`w-full h-fit py-2 rounded-[0.3rem] text-[1rem] ${
+            <div
+              className={`w-full flex justify-center items-center h-fit py-2 rounded-[0.3rem] text-[1rem] ${
                 currentTempTab === 1 && "text-white bg-[#ff0404]"
               }`}
             >
               Validation Letter Template
-            </button>
-            <button
-              onClick={() => setCurrentTempTab(2)}
-              className={`w-full h-fit py-2 rounded-[0.3rem] text-[1rem] ${
+            </div>
+            <div
+              className={`w-full flex justify-center items-center h-fit py-2 rounded-[0.3rem] text-[1rem] ${
                 currentTempTab === 2 && "text-white bg-[#ff0404]"
               }`}
             >
               Verification Letter Template
-            </button>
+            </div>
           </div>
           <div
             className="w-full flex flex-col  gap-2 border border-[#ff040459] rounded-[0.5rem] p-2"
@@ -493,7 +418,7 @@ function EditLetterTemplate({ setCurrentScreen, selectedTemplate }) {
             // className="xl:w-[80%]"
           />
           {currentTempTab === 1 && (
-            <ValidationLetterTemplate
+            <EditValidationLetterTemplate
               institutionDocuments={institutionDocuments}
               validationSuccessfulTemplate={validationSuccessfulTemplate}
               setValidationSuccessfulTemplate={setValidationSuccessfulTemplate}
@@ -501,10 +426,11 @@ function EditLetterTemplate({ setCurrentScreen, selectedTemplate }) {
               setValidationUnsuccessfulTemplate={
                 setValidationUnsuccessfulTemplate
               }
+              setCurrentTempTab={setCurrentTempTab}
             />
           )}
           {currentTempTab === 2 && (
-            <VerificationLetterTemplate
+            <EditVerificationLetterTemplate
               institutionDocuments={institutionDocuments}
               verificationSuccessfulTemplate={verificationSuccessfulTemplate}
               setVerificationSuccessfulTemplate={
@@ -516,28 +442,14 @@ function EditLetterTemplate({ setCurrentScreen, selectedTemplate }) {
               setVerificationUnsuccessfulTemplate={
                 setVerificationUnsuccessfulTemplate
               }
+              userInput={userInput}
+              setCurrentTempTab={setCurrentTempTab}
+              validationSuccessfulTemplate={validationSuccessfulTemplate}
+              validationUnsuccessfulTemplate={validationUnsuccessfulTemplate}
+              setCurrentScreen={setCurrentScreen}
             />
           )}
         </div>
-      </div>
-      <div className="w-full flex justify-end mt-4">
-        <button
-          type="button"
-          onClick={handleSubmit}
-          className={`flex items-center bg-[#ff0404] hover:bg-[#f77f7f] text-white px-4 py-2.5 rounded-[0.3rem] font-medium ${
-            isSaving && "cursor-not-allowed bg-[#f77f7f]"
-          }`}
-          disabled={isSaving}
-        >
-          {isSaving ? (
-            <>
-              <Spinner size="sm" color="white" />
-              <span className="ml-2">Saving...</span>
-            </>
-          ) : (
-            <>Save Template</>
-          )}
-        </button>
       </div>
     </>
   );

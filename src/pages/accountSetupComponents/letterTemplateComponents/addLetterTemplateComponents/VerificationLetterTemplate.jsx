@@ -1,17 +1,27 @@
+import { Spinner } from "@nextui-org/react";
 import React, { useEffect, useRef, useState } from "react";
+import { FaAnglesLeft, FaAnglesRight } from "react-icons/fa6";
 import secureLocalStorage from "react-secure-storage";
+import { toast } from "sonner";
 import SunEditor from "suneditor-react";
+import useSWR, { mutate } from "swr";
+import axios from "@utils/axiosConfig";
 
 function VerificationLetterTemplate({
-  institutionDocuments,
   verificationSuccessfulTemplate,
   setVerificationSuccessfulTemplate,
   verificationUnsuccessfulTemplate,
   setVerificationUnsuccessfulTemplate,
+  userInput,
+  validationSuccessfulTemplate,
+  validationUnsuccessfulTemplate,
+  setCurrentTempTab,
+  setCurrentScreen,
 }) {
   const [lineStyle, setLineStyle] = useState({ width: 0, left: 0 });
   const [defaultSuccessTemplate, setDefaultSuccessTemplate] = useState("");
   const [defaultUnsuccessTemplate, setDefaultUnsuccessTemplate] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
   const lineRef = useRef(null);
   const [currentTab, setCurrentTab] = useState(1);
   const institution = secureLocalStorage.getItem("institution");
@@ -23,7 +33,6 @@ function VerificationLetterTemplate({
     });
   };
 
-
   const handleDefaultSuccessTemplate = () => {
     setVerificationSuccessfulTemplate(defaultSuccessTemplate);
   };
@@ -31,7 +40,6 @@ function VerificationLetterTemplate({
   const handleDefaultUnSuccessTemplate = () => {
     setVerificationUnsuccessfulTemplate(defaultUnsuccessTemplate);
   };
-
 
   useEffect(() => {
     const academicSuccessDefault = `<p><br></p><p><br>{institutionName}</p><p><br></p><p><strong>Address</strong>:&nbsp;</p><p>{institutionAddress}</p><p>{institutionRegion}</p><p><br></p><p><strong>Phone</strong>:&nbsp;{helplineContact}</p><p><strong>Email</strong>:&nbsp;{institutionEmail}</p><p><strong>Website</strong>:&nbsp;{institutionWebsiteURL}</p><p><br>{dateOfLetter}</p><p><br></p><p>To Whom It May Concern or who the letter is addressed:<br><br>Subject: Verification of {firstName} {otherName} {lastName}’s {documentTypeName}<br><br>This letter serves to confirm that {firstName}{otherName}{lastName} was a student at {institutionName}, and we have completed the verification process of their {documentTypeName}.<br><br>Based on our records, we verify that the following details are accurate:<br><br>• Full Name:&nbsp;{firstName}{otherName}{lastName}<br>• Student ID Number: {indexNumber}<br>• Degree Awarded: {programOfStudy}<br>• Graduation Date: {programEndYear}<br><br>The transcript presented for verification matches the official records held by {institutionName}. This document has been confirmed to meet all the specified criteria required by our institution for verification.<br><br>Should you require any additional information or further confirmation, please do not hesitate to contact our office at {helplineContact}.<br><br>Sincerely,&nbsp;</p><p><br></p><p>{validatedBy}<br>{position}</p><p>{validatedByEmail}<br>{institutionName}<br>{institutionAddress}</p>`;
@@ -46,8 +54,92 @@ function VerificationLetterTemplate({
     }
   }, [institution]);
 
+  const handleBackButton = () => {
+    setCurrentTempTab(1);
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const { document_type_id } = userInput;
+
+    if (
+      !validationSuccessfulTemplate ||
+      !validationUnsuccessfulTemplate ||
+      !verificationSuccessfulTemplate ||
+      !verificationUnsuccessfulTemplate ||
+      !document_type_id
+    ) {
+      toast.error(
+        "Set successful and unsuccessful verification templates",
+        {
+          position: "top-right",
+          autoClose: 1202,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        }
+      );
+    } else {
+      setIsSaving(true);
+
+      const data = {
+        document_type_id: document_type_id,
+        positive_validation_response: validationSuccessfulTemplate,
+        negative_validation_response: validationUnsuccessfulTemplate,
+        positive_verification_response: verificationSuccessfulTemplate,
+        negative_verification_response: verificationUnsuccessfulTemplate,
+      };
+      try {
+        const response = await axios.post(
+          "/institution/letter-templates",
+          data
+        );
+        toast.success(response.data.message, {
+          position: "top-right",
+          autoClose: 1202,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
+        mutate("/institution/letter-templates");
+        secureLocalStorage.setItem("letterTemplateScreen", 1);
+        setCurrentScreen(1);
+        window.scrollTo({
+          top: 0,
+          behavior: "smooth",
+        });
+      } catch (error) {
+        toast.error(error.response?.data?.message || "An error occurred");
+        setIsSaving(false);
+      } finally {
+        setIsSaving(false);
+        return true;
+      }
+    }
+  };
+
   return (
     <>
+      <h4 className="text-[1rem] mt-[1rem]">
+        This section is for setting templates for{" "}
+        <span className="text-[#ff0404]">successful verification</span> and{" "}
+        <span className="text-[#ff0404]">unsuccessful verification</span>{" "}
+        templates. Toggle between "
+        <span className="text-[#ff0404]">Successful Template</span>" and "
+        <span className="text-[#ff0404]">Unsuccessful Template</span>" tabs to
+        set templates for each institance.
+      </h4>
       <div className="w-full flex justify-end mt-4">
         {currentTab === 1 && (
           <button
@@ -147,6 +239,36 @@ function VerificationLetterTemplate({
           />
         </div>
       )}
+      <div className="flex w-full justify-between mt-4">
+        <button
+          type="button"
+          onClick={handleBackButton}
+          className="flex items-center bg-[#ffffff] border border-[#ff0404] hover:bg-[#ff0404] text-[#ff0404] hover:text-white px-4 py-2.5 rounded-[0.3rem] font-medium"
+        >
+          <FaAnglesLeft className="mr-2" />
+          Back
+        </button>
+        <button
+          type="button"
+          onClick={handleSubmit}
+          className={`flex items-center bg-[#ff0404] hover:bg-[#f77f7f] text-white px-4 py-2.5 rounded-[0.3rem] font-medium ${
+            isSaving && "cursor-not-allowed bg-[#f77f7f]"
+          }`}
+          disabled={isSaving}
+        >
+          {isSaving ? (
+            <>
+              <Spinner size="sm" color="white" />
+              <span className="ml-2">Saving...</span>
+            </>
+          ) : (
+            <>
+              Save Template
+              <FaAnglesRight className="ml-2" />
+            </>
+          )}
+        </button>
+      </div>
     </>
   );
 }

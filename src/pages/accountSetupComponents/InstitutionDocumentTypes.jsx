@@ -67,7 +67,10 @@ function InstitutionDocumentTypes({ setActiveStep }) {
       ...institution,
       current_step: "1",
     };
-
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
     setInstitution(updatedInstitution);
     secureLocalStorage.setItem("institution", updatedInstitution);
     setActiveStep(1);
@@ -104,6 +107,10 @@ function InstitutionDocumentTypes({ setActiveStep }) {
         secureLocalStorage.setItem("institution", updatedInstitution);
         setActiveStep(3);
         setSaving(false);
+        window.scrollTo({
+          top: 0,
+          behavior: "smooth",
+        });
       } catch (error) {
         toast.error(error.response?.data?.message || "An error occurred");
         setSaving(false);

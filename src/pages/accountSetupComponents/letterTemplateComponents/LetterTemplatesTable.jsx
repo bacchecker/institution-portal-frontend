@@ -13,6 +13,10 @@ function LetterTemplatesTable({
     secureLocalStorage.setItem("letterTemplateScreen", 3);
     setCurrentScreen(3);
     setSelectedTemplate(item);
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
   };
 
   return (

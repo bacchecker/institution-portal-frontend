@@ -86,6 +86,10 @@ function InstitutionDataSetup({ setActiveStep }) {
         setInstitution(updatedInstitution);
         secureLocalStorage.setItem("institution", updatedInstitution);
         setActiveStep(2);
+        window.scrollTo({
+          top: 0,
+          behavior: "smooth",
+        });
       } catch (error) {
         toast.error(error.response?.data?.message || "An error occurred");
         setIsSaving(false);

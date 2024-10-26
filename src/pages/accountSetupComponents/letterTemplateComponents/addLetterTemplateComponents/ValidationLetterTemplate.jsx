@@ -1,14 +1,15 @@
-import { Select, SelectItem } from "@nextui-org/react";
 import React, { useEffect, useRef, useState } from "react";
 import secureLocalStorage from "react-secure-storage";
+import { toast } from "sonner";
 import SunEditor from "suneditor-react";
 
 function ValidationLetterTemplate({
-  institutionDocuments,
   validationSuccessfulTemplate,
   setValidationSuccessfulTemplate,
   validationUnsuccessfulTemplate,
   setValidationUnsuccessfulTemplate,
+  setCurrentTempTab,
+  userInput,
 }) {
   const [lineStyle, setLineStyle] = useState({ width: 0, left: 0 });
   const [defaultSuccessTemplate, setDefaultSuccessTemplate] = useState("");
@@ -46,10 +47,51 @@ function ValidationLetterTemplate({
     }
   }, [institution]);
 
-  console.log("ffff", validationUnsuccessfulTemplate);
+  const handleProceedButton = () => {
+    if (
+      !userInput?.document_type_id ||
+      !validationSuccessfulTemplate ||
+      !validationUnsuccessfulTemplate
+    ) {
+      toast.error(
+        "Select Document Type and design successful and unsuccessful validation templates",
+        {
+          position: "top-right",
+          autoClose: 1202,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        }
+      );
+    } else {
+      setCurrentTempTab(2);
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
+    }
+  };
 
   return (
     <>
+      <h4 className="text-[1rem] mt-[1rem]">
+        This section is for setting templates for{" "}
+        <span className="text-[#ff0404]">successful validation</span> and{" "}
+        <span className="text-[#ff0404]">unsuccessful validation </span>{" "}
+        templates. Toggle between "
+        <span className="text-[#ff0404]">Successful Template</span>" and "
+        <span className="text-[#ff0404]">Unsuccessful Template</span>" tabs to
+        set templates for each institance. <br />
+        <br /> <span className="text-[#ff0404]">Note</span>: use "
+        <span className="text-[#ff0404]">
+          Proceed to Verification Templates
+        </span>
+        " Button below the editor to set verification templates to complete
+        process"
+      </h4>
       <div className="w-full flex justify-end mt-4">
         {currentTab === 1 && (
           <button
@@ -125,12 +167,6 @@ function ValidationLetterTemplate({
               setValidationSuccessfulTemplate(validationSuccessfulTemplate)
             }
           />
-          {/* <button
-            type="button"
-            className="w-fit flex mt-2 items-center bg-[#000000] hover:bg-[#282727] text-white px-4 py-2.5 rounded-[0.3rem] font-medium"
-          >
-            Preview Template
-          </button> */}
         </div>
       )}
       {currentTab === 2 && (
@@ -153,6 +189,15 @@ function ValidationLetterTemplate({
           />
         </div>
       )}
+      <div className="w-full flex justify-end mt-4">
+        <button
+          type="button"
+          onClick={handleProceedButton}
+          className="w-fit flex items-center bg-[#ff0404] hover:bg-[#f77f7f] text-white px-4 py-2.5 rounded-[0.3rem] font-medium"
+        >
+          Proceed to Verification Templates
+        </button>
+      </div>
     </>
   );
 }
