@@ -106,11 +106,11 @@ export default function AuthLayout({ children, title = "Page Title" }) {
     // setAccessibleRoutes(filteredRoutes);
 
     const filteredRoutes = navLinks.filter((route) => {
-      console.log("rout", route?.profile_complete);
+      console.log("rout", institution);
 
       if (route.showOn) {
         return route.profile_complete.includes(
-          institution?.is_verified ? "yes" : "no"
+          institution?.setup_done ? "yes" : "no"
         );
         // return route.showOn.includes(institution?.status);
       }

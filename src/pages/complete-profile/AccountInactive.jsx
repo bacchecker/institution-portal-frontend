@@ -41,7 +41,6 @@ const AccountInactive = () => {
   const [category, setCategory] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [institutionStatus, setInstitutionStatus] = useState(null);
-  const [setupStarted, setSetupStarted] = useState(false);
   const [activeFeature, setActiveFeature] = useState(0);
 
   useEffect(() => {
@@ -77,7 +76,6 @@ const AccountInactive = () => {
       const { status } = institutionData;
 
       setInstitutionStatus(status !== "inactive");
-      setSetupStarted(institutionData?.setup_started);
     } catch (error) {
       toast.error(error.response.data.message);
     }
@@ -113,10 +111,6 @@ const AccountInactive = () => {
       setIsSaving(false);
     }
   };
-
-  if (setupStarted) {
-    return <Navigate to="/account-setup/profile" />;
-  }
 
   return (
     <>
@@ -170,12 +164,12 @@ const AccountInactive = () => {
             </div>
 
             <div className="my-4 flex items-center justify-center">
-              <NavLink
-                to={`/account-setup`}
+              <button
+                onClick={() => navigate("/account-setup")}
                 className="flex items-center w-fit space-x-2 bg-[#ff0404] hover:bg-[#f84848] text-white px-4 py-1.5 rounded-md"
               >
                 <FaUser /> <p>Continue to set up account</p>
-              </NavLink>
+              </button>
             </div>
           </div>
         ) : (
