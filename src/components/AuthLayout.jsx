@@ -83,6 +83,8 @@ export default function AuthLayout({ children, title = "Page Title" }) {
     (async () => {
       const response = await axios.get("/institution/institution-data");
       const responseData = response.data.institutionData;
+      console.log("respa", responseData);
+
       if (responseData.status == "active") {
         updateInstitution(responseData);
       }
@@ -130,12 +132,12 @@ export default function AuthLayout({ children, title = "Page Title" }) {
     return <Navigate to="/account-inactive" replace />;
   }
 
-  // if (institution?.profile_complete === "no") {
-  //   // check current route, if not account-setup, redirect to account-setup
-  //   if (!url.startsWith("/account-setup") && url !== "/dashboard") {
-  //     return <Navigate to="/account-setup/profile" replace />;
-  //   }
-  // }
+
+  if (institution?.setup_done === 0) {
+    if (!url.startsWith("/account-setup")) {
+      return <Navigate to="/account-setup" replace />;
+    }
+  }
 
   // if (institution?.status === "inactive") {
   //   (async () => {
