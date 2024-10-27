@@ -14,7 +14,7 @@ import InstitutionDocumentTypes from "./accountSetupComponents/InstitutionDocume
 import axios from "@utils/axiosConfig";
 import useSWR from "swr";
 import LetterTemplates from "./accountSetupComponents/LetterTemplates";
-import UsersAndDepartmentsSetup from "./accountSetupComponents/UsersAndDepartmentsSetup";
+import DepartmentsSetup from "./accountSetupComponents/DepartmentsSetup";
 function AccountSetupPage() {
   const [activeStep, setActiveStep] = useState();
   const current_step = secureLocalStorage.getItem("institution")?.current_step;
@@ -106,7 +106,7 @@ function AccountSetupPage() {
                 <LetterTemplates setActiveStep={(e) => setActiveStep(e)} />
               )}
               {(parseInt(current_step) === 4 || activeStep === 4) && (
-                <UsersAndDepartmentsSetup setActiveStep={(e) => setActiveStep(e)} />
+                <DepartmentsSetup setActiveStep={(e) => setActiveStep(e)} />
               )}
             </div>
           </CardBody>
