@@ -111,7 +111,7 @@ function LetterTemplates({ setActiveStep }) {
             <h4 className="text-[1rem] font-[600] mb-4">
               Institutions utilize specific{" "}
               <span className="text-[#ff0404]">letter templates</span> for{" "}
-              <span className="text-[#ff0404]">verification</span> and
+              <span className="text-[#ff0404]">verification</span> and{" "}
               <span className="text-[#ff0404]">validation</span> processes. Each
               template is designed to clearly communicate the outcome, with
               distinct letters issued for{" "}

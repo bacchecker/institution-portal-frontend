@@ -22,8 +22,10 @@ import secureLocalStorage from "react-secure-storage";
 export default function AuthLayout({ children, title = "Page Title" }) {
   const [isDesktopExpanded, setIsDesktopExpanded] = useState(true);
   const [isMobileExpanded, setIsMobileExpanded] = useState(false);
+  const [setupTrue, setSetupTrue] = useState();
   const url = useLocation().pathname;
   const [accessibleRoutes, setAccessibleRoutes] = useState([]);
+  const [responseInstitution, setResponseInstitution] = useState({});
   const { isAuthenticated, user, institution, logout, updateInstitution } =
     useAuthStore();
   const navigate = useNavigate();
@@ -39,6 +41,13 @@ export default function AuthLayout({ children, title = "Page Title" }) {
   }, []);
 
   const mobileNavRef = useRef(null);
+
+  useEffect(() => {
+    if (url === "/dashboard") {
+      setSetupTrue(1);
+    }
+  }, [url]);
+  console.log("url", url);
 
   useEffect(() => {
     // fetchUserData();
@@ -83,8 +92,19 @@ export default function AuthLayout({ children, title = "Page Title" }) {
     (async () => {
       const response = await axios.get("/institution/institution-data");
       const responseData = response.data.institutionData;
+      setResponseInstitution(response.data.institutionData);
+
       if (responseData.status == "active") {
         updateInstitution(responseData);
+      }
+
+      if (responseData?.setup_done === 0) {
+        if (!url.startsWith("/account-setup")) {
+          return <Navigate to="/account-setup" replace />;
+        }
+      }
+      if (responseData?.status === "inactive") {
+        return <Navigate to="/account-inactive" replace />;
       }
       // else {
       //   updateInstitution(responseData);
@@ -104,20 +124,24 @@ export default function AuthLayout({ children, title = "Page Title" }) {
     //   return true;
     // });
     // setAccessibleRoutes(filteredRoutes);
+  }, []);
 
+  useEffect(() => {
     const filteredRoutes = navLinks.filter((route) => {
-      console.log("rout", route?.profile_complete);
-
       if (route.showOn) {
         return route.profile_complete.includes(
-          institution?.is_verified ? "yes" : "no"
+          institution?.setup_done ||
+            responseInstitution?.setup_done ||
+            setupTrue === 1
+            ? "yes"
+            : "no"
         );
         // return route.showOn.includes(institution?.status);
       }
       // return true;
     });
     setAccessibleRoutes(filteredRoutes);
-  }, []);
+  }, [navLinks, setupTrue, institution, responseInstitution]);
 
   if (!isAuthenticated) {
     console.log("Not authenticated");
@@ -126,16 +150,11 @@ export default function AuthLayout({ children, title = "Page Title" }) {
 
   console.log(url);
 
-  if (institution?.status === "inactive") {
-    return <Navigate to="/account-inactive" replace />;
+  if (institution?.setup_done === 1) {
+    if (url.startsWith("/account-setup")) {
+      return <Navigate to="/dashboard" replace />;
+    }
   }
-
-  // if (institution?.profile_complete === "no") {
-  //   // check current route, if not account-setup, redirect to account-setup
-  //   if (!url.startsWith("/account-setup") && url !== "/dashboard") {
-  //     return <Navigate to="/account-setup/profile" replace />;
-  //   }
-  // }
 
   // if (institution?.status === "inactive") {
   //   (async () => {

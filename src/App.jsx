@@ -36,7 +36,7 @@ const App = () => {
     location.pathname === "/verify-otp";
 
   return (
-    <>
+    <div className="font-figtree">
       <Toastify />
       <Toaster richColors />
 
@@ -105,7 +105,7 @@ const App = () => {
           }
         />
       </Routes>
-    </>
+    </div>
   );
 };
 // }
