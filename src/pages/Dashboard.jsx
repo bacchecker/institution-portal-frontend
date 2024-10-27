@@ -184,7 +184,7 @@ class Dashboard extends Component {
             <div className="col-span-3 flex items-center xl:space-x-8 space-x-4">
               <div className="">
                 <p className="font-semibold text-lg">{timeOfDay} {loggedInUser.first_name}!</p>
-                <p className="text-gray-500 text-sm font-light">
+                <p className="text-gray-500 text-sm">
                   Let's do something great today!
                 </p>
               </div>
@@ -200,7 +200,7 @@ class Dashboard extends Component {
                       <div className="my-2">
                         <p className="font-bold text-3xl">{totalRequests}</p>
                         <p className="font-medium text-base ">Document Requests</p>
-                        <p className="text-xs font-light">Overview of all document requests.</p>
+                        <p className="text-xs text-gray-400">Overview of all document requests.</p>
                       </div>
                     </div>  
                     <div className="mt-2 mr-2">
@@ -222,7 +222,7 @@ class Dashboard extends Component {
                       <div className="my-2">
                         <p className="font-bold text-3xl">{totalValidations}</p>
                         <p className="font-medium text-base ">Validation Requests</p>
-                        <p className="text-xs font-light">Overview of all validation requests.</p>
+                        <p className="text-xs text-gray-400">Overview of all validation requests.</p>
                       </div>
                     </div>  
                     
@@ -244,7 +244,7 @@ class Dashboard extends Component {
                       <div className="my-2">
                         <p className="font-bold text-3xl">0</p>
                         <p className="font-medium text-base ">Verification Requests</p>
-                        <p className="text-xs font-light">Overview of all verification requests.</p>
+                        <p className="text-xs text-gray-400">Overview of all verification requests.</p>
                       </div>
                     </div>  
                     
