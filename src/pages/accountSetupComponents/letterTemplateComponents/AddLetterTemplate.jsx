@@ -58,6 +58,8 @@ function AddLetterTemplate({ setCurrentScreen }) {
     event.preventDefault();
   };
 
+  console.log("hamm", verificationSuccessfulTemplate);
+
   const {
     data: institutionDocuments,
     error: institutionError,
@@ -186,16 +188,28 @@ function AddLetterTemplate({ setCurrentScreen }) {
               - applicant's document requested date
             </h4>
             {institution?.type !== "bacchecker-academic" && (
-              <h4 className="text-[0.8rem]">
-                <span
-                  className="text-[#ff0404]"
-                  draggable
-                  onDragStart={handleDragStart("{employeeID}")}
-                >
-                  {"{employeeID}"}
-                </span>{" "}
-                - applicant's employee id
-              </h4>
+              <>
+                <h4 className="text-[0.8rem]">
+                  <span
+                    className="text-[#ff0404]"
+                    draggable
+                    onDragStart={handleDragStart("{employeeID}")}
+                  >
+                    {"{employeeID}"}
+                  </span>{" "}
+                  - applicant's employee id
+                </h4>
+                <h4 className="text-[0.8rem]">
+                  <span
+                    className="text-[#ff0404]"
+                    draggable
+                    onDragStart={handleDragStart("{programStartYear}")}
+                  >
+                    {"{programStartYear}"}
+                  </span>{" "}
+                  - year of employment
+                </h4>
+              </>
             )}
             {institution?.type === "bacchecker-academic" && (
               <>

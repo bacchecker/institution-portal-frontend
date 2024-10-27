@@ -45,7 +45,7 @@ export const navLinks = [
     path: "/account-setup",
     icon: <PersonCircleIcon />,
     acl: ["view users", "view institutions"],
-    profile_complete: ["yes", "no"],
+    profile_complete: ["no"],
     showOn: ["inactive", "active"],
     children: [
       // {

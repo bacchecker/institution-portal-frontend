@@ -44,13 +44,18 @@ function VerificationLetterTemplate({
   useEffect(() => {
     const academicSuccessDefault = `<p><br></p><p><br>{institutionName}</p><p><br></p><p><strong>Address</strong>:&nbsp;</p><p>{institutionAddress}</p><p>{institutionRegion}</p><p><br></p><p><strong>Phone</strong>:&nbsp;{helplineContact}</p><p><strong>Email</strong>:&nbsp;{institutionEmail}</p><p><strong>Website</strong>:&nbsp;{institutionWebsiteURL}</p><p><br>{dateOfLetter}</p><p><br></p><p>To Whom It May Concern or who the letter is addressed:<br><br>Subject: Verification of {firstName} {otherName} {lastName}’s {documentTypeName}<br><br>This letter serves to confirm that {firstName}{otherName}{lastName} was a student at {institutionName}, and we have completed the verification process of their {documentTypeName}.<br><br>Based on our records, we verify that the following details are accurate:<br><br>• Full Name:&nbsp;{firstName}{otherName}{lastName}<br>• Student ID Number: {indexNumber}<br>• Degree Awarded: {programOfStudy}<br>• Graduation Date: {programEndYear}<br><br>The transcript presented for verification matches the official records held by {institutionName}. This document has been confirmed to meet all the specified criteria required by our institution for verification.<br><br>Should you require any additional information or further confirmation, please do not hesitate to contact our office at {helplineContact}.<br><br>Sincerely,&nbsp;</p><p><br></p><p>{validatedBy}<br>{position}</p><p>{validatedByEmail}<br>{institutionName}<br>{institutionAddress}</p>`;
 
+    const nonacademicSuccessDefault = `<p><strong>{institutionName}</strong></p><p><strong><br></strong></p><p><strong>Address:</strong><br>{institutionAddress}<br>{institutionRegion}</p><p><br></p><p><strong>Phone:</strong> {helplineContact}<br><strong>Email:</strong> {institutionEmail}<br><strong>Website:</strong> {institutionWebsiteURL}</p><p><br></p><p><strong>{dateOfLetter}</strong></p><p><strong><br></strong></p><p>To Whom It May Concern or who the letter is addressed:</p><p><br></p><p><strong>Subject:</strong> Verification of {firstName} {otherName} {lastName}’s {documentTypeName}</p><p><br></p><p>This letter serves to confirm that {firstName} {otherName} {lastName} was associated with {institutionName}, and we have completed the verification process of their {documentTypeName}.</p><p><br></p><p>Based on our records, we verify that the following details are accurate:</p><ul><li><strong>Full Name:</strong> {firstName} {otherName} {lastName}</li><li><strong>Employee ID Number:</strong> {employeeID}<br></li><li><strong>Start Year:</strong> {programStartYear}</li></ul><p>The document presented for verification matches the official records held by {institutionName}. This document has been confirmed to meet all the specified criteria required by our institution for verification.</p><p><br></p><p>Should you require any additional information or further confirmation, please do not hesitate to contact our office at {helplineContact}.</p><p><br></p><p>Sincerely,</p><p>{validatedBy}<br>{position}<br>{validatedByEmail}<br>{institutionName}<br>{institutionAddress}</p>`;
+
     const academicUnsuccessDefault = `<p><br></p><p>{institutionName}</p><p><br></p><p><strong>Address</strong>:&nbsp;</p><p>{institutionAddress}</p><p>{institutionRegion}</p><p><br></p><p><strong>Phone</strong>:&nbsp;{helplineContact}</p><p><strong>Email</strong>:&nbsp;{institutionEmail}</p><p><strong>Website</strong>:&nbsp;{institutionWebsiteURL}</p><p><br>{dateOfLetter}</p><p><br></p><p>Subject: Discrepancy Found in the Verification of {firstName} {otherName} {lastName}’s {documentTypeName}<br><br>Dear Sir/Madam,<br><br>This letter is to inform you that during our verification process for the academic transcript submitted by [Applicant Name], we have identified significant discrepancies that prevent us from confirming the authenticity of the document.<br><br>The following issues were found:<br><br>	•	Applicant Name: {firstName} {otherName} {lastName}<br>	•	Student ID Number: {indexNumber}<br>	•	Document Submitted: {documentTypeName}<br>	•	Reason for Rejection: {rejectedReason}<br><br>After a thorough review of our official records, we were unable to validate the transcript provided as an accurate representation of the individual’s academic achievements at {institutionName}. This document does not match the official records maintained by our institution.<br><br>Furthermore, our investigation has raised concerns that the document may have been tampered with or fraudulently altered. As a result, we are unable to verify the legitimacy of the submitted credential.<br><br>We take such matters very seriously and have made a formal note of this discrepancy in our records. Please contact us directly if you require further clarification or wish to discuss the findings.<br><br>Should you have any questions, or if [Applicant Name] would like to provide additional information for further review, please feel free to reach out to our office at {helplineContact}.<br><br>Sincerely,<br></p><p><br></p><p>{validatedBy}<br>{position}</p><p>{validatedByEmail}<br>{institutionName}<br>{institutionAddress}</p><p><br></p><p><br></p><p><br></p>`;
+
+    const nonacademicUnsuccessDefault = `<p><strong>{institutionName}</strong></p><p><strong><br></strong></p><p><strong>Address:</strong><br>{institutionAddress}<br>{institutionRegion}</p><p><br></p><p><strong>Phone:</strong> {helplineContact}<br><strong>Email:</strong> {institutionEmail}<br><strong>Website:</strong> {institutionWebsiteURL}</p><p><br></p><p><strong>{dateOfLetter}</strong></p><p><strong><br></strong></p><p><strong>Subject:</strong> Discrepancy Found in the Verification of {firstName} {otherName} {lastName}’s {documentTypeName}</p><p><br></p><p>Dear Sir/Madam,</p><p><br></p><p>This letter is to inform you that during our verification process for the document submitted by {firstName} {otherName} {lastName}, we have identified significant discrepancies that prevent us from confirming the authenticity of the document.</p><p><br></p><p>The following issues were found:</p><ul><li><strong>Applicant Name:</strong> {firstName} {otherName} {lastName}</li><li><strong>Employee ID Number:</strong> {employeeID}</li><li><strong>Document Submitted:</strong> {documentTypeName}</li><li><strong>Reason for Rejection:</strong> {rejectedReason}</li></ul><p>After a thorough review of our official records, we were unable to validate the document provided as an accurate representation of the individual’s professional qualifications at {institutionName}. This document does not match the official records maintained by our institution.</p><p><br></p><p>Furthermore, our investigation has raised concerns that the document may have been tampered with or fraudulently altered. As a result, we are unable to verify the legitimacy of the submitted credential.</p><p><br></p><p>We take such matters very seriously and have made a formal note of this discrepancy in our records. Please contact us directly if you require further clarification or wish to discuss the findings.</p><p><br></p><p>Should you have any questions, or if {firstName} {otherName} {lastName} would like to provide additional information for further review, please feel free to reach out to our office at {helplineContact}.</p><p><br></p><p>Sincerely,</p><p>{validatedBy}<br>{position}<br>{validatedByEmail}<br>{institutionName}<br>{institutionAddress}</p>`;
 
     if (institution?.type === "bacchecker-academic") {
       setDefaultSuccessTemplate(academicSuccessDefault);
       setDefaultUnsuccessTemplate(academicUnsuccessDefault);
     } else {
-      setDefaultSuccessTemplate(academicSuccessDefault);
+      setDefaultSuccessTemplate(nonacademicSuccessDefault);
+      setDefaultUnsuccessTemplate(nonacademicUnsuccessDefault);
     }
   }, [institution]);
 
@@ -74,19 +79,16 @@ function VerificationLetterTemplate({
       !verificationUnsuccessfulTemplate ||
       !document_type_id
     ) {
-      toast.error(
-        "Set successful and unsuccessful verification templates",
-        {
-          position: "top-right",
-          autoClose: 1202,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        }
-      );
+      toast.error("Set successful and unsuccessful verification templates", {
+        position: "top-right",
+        autoClose: 1202,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
     } else {
       setIsSaving(true);
 
