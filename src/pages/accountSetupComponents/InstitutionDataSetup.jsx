@@ -12,6 +12,11 @@ function InstitutionDataSetup({ setActiveStep }) {
   const [selectedImage, setSelectedImage] = useState(null);
   const [selectedCert, setSelectedCert] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
+  const institution = secureLocalStorage.getItem("institution");
+  const setInstitution = (newInstitution) => {
+    secureLocalStorage.setItem("institution", newInstitution);
+  };
+
   const {
     data: institutionData,
     error,
@@ -74,8 +79,17 @@ function InstitutionDataSetup({ setActiveStep }) {
       try {
         const response = await axios.post("/institution/account-setup", form);
         toast.success(response.data.message);
-        secureLocalStorage.setItem("institution", response?.data.institution);
+        const updatedInstitution = {
+          ...institution,
+          current_step: "2",
+        };
+        setInstitution(updatedInstitution);
+        secureLocalStorage.setItem("institution", updatedInstitution);
         setActiveStep(2);
+        window.scrollTo({
+          top: 0,
+          behavior: "smooth",
+        });
       } catch (error) {
         toast.error(error.response?.data?.message || "An error occurred");
         setIsSaving(false);
@@ -85,8 +99,6 @@ function InstitutionDataSetup({ setActiveStep }) {
       }
     }
   };
-
-  console.log("inspr", userInput);
 
   return (
     <div className="mx-auto my-6 px-4 w-full">
@@ -271,7 +283,7 @@ function InstitutionDataSetup({ setActiveStep }) {
                   type="file"
                   id="img"
                   className="hidden"
-                  accept=".jpg, .jpeg, .pdf, .png"
+                  accept=".jpg, .jpeg, .png"
                   onChange={(e) => setSelectedImage(e.target.files[0])}
                 />
                 Browse to Upload file or image
@@ -279,7 +291,9 @@ function InstitutionDataSetup({ setActiveStep }) {
             </div>
           </div>
           <div className="w-[49%] h-[10rem]">
-            <h4 className="text-[0.9rem] mb-[0.4rem]">Operation Certificate</h4>
+            <h4 className="text-[0.9rem] mb-[0.4rem]">
+              Operation Certificate<span className="text-[#ff0404]">*</span>
+            </h4>
             <div className="w-full h-full flex justify-center items-center rounded-[0.6rem] border">
               <label
                 htmlFor="operationCert"

@@ -1,84 +1,61 @@
 import {
   Button,
-  Card,
-  CardBody,
   Dropdown,
   DropdownItem,
   DropdownMenu,
   DropdownTrigger,
-  Input,
   Spinner,
   TableCell,
   TableRow,
   useDisclosure,
 } from "@nextui-org/react";
 import React, { useState } from "react";
-import CustomTable from "@components/CustomTable";
 import { FaAnglesLeft, FaAnglesRight } from "react-icons/fa6";
 import secureLocalStorage from "react-secure-storage";
-import useSWR, { mutate } from "swr";
-import DeleteModal from "@components/DeleteModal";
-import axios from "@utils/axiosConfig";
-import Elipsis from "@assets/icons/elipsis";
-import ExistingDocumentTypeCreation from "./ExistingDocumentTypeCreation";
-import NewDocumentTypeCreation from "./NewDocumentTypeCreation";
-import EditDocumentType from "./EditDocumentType";
 import { toast } from "sonner";
+import axios from "@utils/axiosConfig";
+import useSWR, { mutate } from "swr";
+import { useNavigate } from "react-router-dom";
+import CustomTable from "@components/CustomTable";
+import DeleteModal from "@components/DeleteModal";
+import AddNewDepartment from "./departmentComponents/AddNewDepartment";
+import EditDepartment from "./departmentComponents/EditDepartment";
+import Elipsis from "../../assets/icons/elipsis";
 
-function InstitutionDocumentTypes({ setActiveStep }) {
+function DepartmentsSetup({ setActiveStep }) {
   const [isSaving, setSaving] = useState(false);
-  const [isDeleting, setDeleting] = useState(false);
-  const [openDrawer, setOpenDrawer] = useState(false);
-  const [openNewDrawer, setOpenNewDrawer] = useState(false);
-  const [openEditDrawer, setOpenEditDrawer] = useState(false);
-  const [selectedData, setSelectedData] = useState({});
   const deleteDisclosure = useDisclosure();
-
+  const [openDrawer, setOpenDrawer] = useState(false);
+  const [selectedData, setSelectedData] = useState({});
+  const [openEditDrawer, setOpenEditDrawer] = useState(false);
+  const [isDeleting, setDeleting] = useState(false);
+  const navigate = useNavigate();
   const institution = secureLocalStorage.getItem("institution");
   const setInstitution = (newInstitution) => {
     secureLocalStorage.setItem("institution", newInstitution);
   };
 
   const {
-    data: existingInstitutionDocumentTypes,
-    error,
-    isLoading,
-  } = useSWR(
-    () => {
-      if (institution?.type === "bacchecker-academic") {
-        return `/institutions/document-types?academic_level=${institution?.academic_level}`;
-      } else {
-        return `/institutions/document-types?institution_type=non-academic`;
-      }
-    },
-    (url) => axios.get(url).then((res) => res.data)
-  );
-
-  const {
-    data: institutionDocuments,
+    data: institutionDepartments,
     error: institutionError,
     isLoading: institutionDocsLoading,
-  } = useSWR("/institution/document-types", (url) =>
+  } = useSWR("/institution/departments", (url) =>
     axios.get(url).then((res) => res.data)
   );
 
   const handleBackButton = () => {
     const updatedInstitution = {
       ...institution,
-      current_step: "1",
+      current_step: "3",
     };
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
+
     setInstitution(updatedInstitution);
     secureLocalStorage.setItem("institution", updatedInstitution);
-    setActiveStep(1);
+    setActiveStep(3);
   };
-
   const handleSubmit = async () => {
-    if (institutionDocuments?.data?.types?.length === 0) {
-      toast.error("Add at least One document type", {
+    if (institutionDepartments?.data?.length === 0) {
+      toast.error("Add at least One Department", {
         position: "top-right",
         autoClose: 1202,
         hideProgressBar: false,
@@ -91,26 +68,31 @@ function InstitutionDocumentTypes({ setActiveStep }) {
     } else {
       setSaving(true);
       const data = {
-        step: 3,
+        step: 5,
       };
       try {
         const response = await axios.post(
           "/institution/account-setup/next-step",
           data
         );
-        toast.success("Institution Document Type(s) created successfully");
+        toast.success("Account Setup Completed Successfully", {
+          position: "top-right",
+          autoClose: 1202,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
         const updatedInstitution = {
           ...institution,
-          current_step: "3",
+          current_step: "5",
         };
         setInstitution(updatedInstitution);
         secureLocalStorage.setItem("institution", updatedInstitution);
-        setActiveStep(3);
+        navigate("/dashboard");
         setSaving(false);
-        window.scrollTo({
-          top: 0,
-          behavior: "smooth",
-        });
       } catch (error) {
         toast.error(error.response?.data?.message || "An error occurred");
         setSaving(false);
@@ -120,77 +102,25 @@ function InstitutionDocumentTypes({ setActiveStep }) {
       }
     }
   };
-
   return (
     <div className="w-full px-5 pb-4">
-      <div className="border-b border-[#ff0404] py-4">
-        <h4 className="text-[1rem] font-[600] mb-4">
-          Each institution utilizes specific document types for their
-          operations. To proceed with your account setup, please add the
-          document types accepted by your school. Below is a list of common
-          document types used by{" "}
-          {institution?.academic_level ?? "Business or government"}{" "}
-          institutions. You may add from the{" "}
-          <span className="text-[#ff0404]">existing options</span> or{" "}
-          <span className="text-[#ff0404]">
-            add new document types if necessary
-          </span>
-          .
-        </h4>
-        <h4 className="text-[1rem] font-[600] mb-2">Existing Document Types</h4>
-        <div className="w-full flex flex-wrap gap-2">
-          {isLoading ? (
-            <div className="w-full h-[5rem] flex justify-center items-center">
-              <Spinner size="sm" color="danger" />
-            </div>
-          ) : (
-            <>
-              {existingInstitutionDocumentTypes?.data?.types?.map(
-                (documentType, i) => {
-                  return (
-                    <div className="w-fit h-fit border border-[#333333] px-2 py-2 rounded-[0.3rem]">
-                      {documentType?.name}
-                    </div>
-                  );
-                }
-              )}
-            </>
-          )}
-        </div>
-      </div>
       <div className="my-3 w-full flex justify-end mx-auto dark:bg-slate-900 mt-6">
-        <div className="flex gap-4 items-center">
-          <button
-            type="button"
-            onClick={() => {
-              setOpenDrawer(true);
-            }}
-            className="w-fit flex items-center bg-[#000000] hover:bg-[#282727] text-white px-4 py-2.5 rounded-[0.3rem] font-medium"
-          >
-            Add From Existing Type
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setOpenNewDrawer(true);
-            }}
-            className="w-fit flex items-center bg-[#ff0404] hover:bg-[#f77f7f] text-white px-4 py-2.5 rounded-[0.3rem] font-medium"
-          >
-            Add New Document Type
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={() => {
+            setOpenDrawer(true);
+          }}
+          className="w-fit flex items-center bg-[#ff0404] hover:bg-[#f77f7f] text-white px-4 py-2.5 rounded-[0.3rem] font-medium"
+        >
+          Add New Department
+        </button>
       </div>
       <div>
-        <ExistingDocumentTypeCreation
+        <AddNewDepartment
           setOpenDrawer={setOpenDrawer}
           openDrawer={openDrawer}
-          existingInstitutionDocumentTypes={existingInstitutionDocumentTypes}
         />
-        <NewDocumentTypeCreation
-          setOpenDrawer={setOpenNewDrawer}
-          openDrawer={openNewDrawer}
-        />
-        <EditDocumentType
+        <EditDepartment
           setOpenDrawer={setOpenEditDrawer}
           openDrawer={openEditDrawer}
           selectedData={selectedData}
@@ -204,15 +134,7 @@ function InstitutionDocumentTypes({ setActiveStep }) {
         ) : (
           <>
             <CustomTable
-              columns={[
-                "Name",
-                "Document Format(s)",
-                "Document Fee",
-                "Printing Fee",
-                "Validation Fee",
-                "Verification Fee",
-                "",
-              ]}
+              columns={["Name", "Role", "Description", ""]}
               // loadingState={resData ? false : true}
               // page={resData?.current_page}
               // setPage={(page) =>
@@ -223,20 +145,13 @@ function InstitutionDocumentTypes({ setActiveStep }) {
               // }
               // totalPages={Math.ceil(resData?.total / resData?.per_page)}
             >
-              {institutionDocuments?.data?.types?.map((item) => (
+              {institutionDepartments?.data?.map((item) => (
                 <TableRow key={item?.id}>
-                  <TableCell>{item?.document_type?.name}</TableCell>
-                  <TableCell>
-                    {item?.soft_copy && item?.hard_copy
-                      ? "hard copy, soft copy"
-                      : !item?.soft_copy && item?.hard_copy
-                      ? "hard copy"
-                      : "soft copy"}
-                  </TableCell>
-                  <TableCell>GH¢ {item?.base_fee}</TableCell>
-                  <TableCell>GH¢ {item?.printing_fee}</TableCell>
-                  <TableCell>GH¢ {item?.validation_fee}</TableCell>
-                  <TableCell> GH¢ {item?.verification_fee}</TableCell>
+                  <TableCell>{item?.name}</TableCell>
+
+                  <TableCell>{item?.role}</TableCell>
+                  <TableCell>{item?.description}</TableCell>
+
                   <TableCell className="flex items-center h-16 gap-3">
                     <Dropdown>
                       <DropdownTrigger>
@@ -274,17 +189,17 @@ function InstitutionDocumentTypes({ setActiveStep }) {
       </section>
       <DeleteModal
         disclosure={deleteDisclosure}
-        title="Delete Document Type"
+        title="Delete Department"
         processing={isDeleting}
         onButtonClick={async () => {
           setDeleting(true);
           try {
             const response = await axios.delete(
-              `/institution/document-types/${selectedData?.id}`
+              `/institution/departments/${selectedData?.id}`
             );
             deleteDisclosure.onClose();
             toast.success(response.data.message);
-            mutate("/institution/document-types");
+            mutate("/institution/departments");
             setDeleting(false);
           } catch (error) {
             console.log(error);
@@ -294,7 +209,7 @@ function InstitutionDocumentTypes({ setActiveStep }) {
         }}
       >
         <p className="font-quicksand">
-          Are you sure you want to delete this document type?{" "}
+          Are you sure you want to delete this department?{" "}
           <span className="font-semibold">
             {selectedData?.document_type?.name}
           </span>
@@ -320,11 +235,11 @@ function InstitutionDocumentTypes({ setActiveStep }) {
           {isSaving ? (
             <>
               <Spinner size="sm" color="white" />
-              <span className="ml-2">Saving...</span>
+              <span className="ml-2">Proceeding...</span>
             </>
           ) : (
             <>
-              Save and Continue
+              Proceed to dashboard
               <FaAnglesRight className="ml-2" />
             </>
           )}
@@ -334,4 +249,4 @@ function InstitutionDocumentTypes({ setActiveStep }) {
   );
 }
 
-export default InstitutionDocumentTypes;
+export default DepartmentsSetup;

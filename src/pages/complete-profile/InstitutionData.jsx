@@ -57,6 +57,8 @@ class InstitutionData extends Component {
   }
 
   componentDidMount() {
+    this.props.passHandleSubmit(this.props.stepIndex, this.handleSubmit);
+
     this.fetchInstitution();
     const { institutionData } = this.props.location.state || {};
     if (institutionData) {
@@ -200,7 +202,7 @@ class InstitutionData extends Component {
 
   handleSubmit = async (event) => {
     if (event) event.preventDefault();
-    this.setState({ isSaving: true });
+    this.props.onSavingChange(true);
 
     if (!this.validateForm()) {
       this.setState({ isSaving: false });
@@ -232,11 +234,14 @@ class InstitutionData extends Component {
     try {
       const response = await axios.post("/institution/account-setup", form);
       toast.success(response.data.message);
-      this.props.navigate("/account-setup/document-types");
+      this.props.onSavingChange(false);
     } catch (error) {
       toast.error(error.response?.data?.message || "An error occurred");
+      this.props.onSavingChange(false);
+      return false
     } finally {
       this.setState({ isSaving: false });
+      this.props.onSavingChange(false);
       return true;
     }
   };
@@ -321,7 +326,7 @@ class InstitutionData extends Component {
               </p>
             </div>
             <form
-              onSubmit={this.handleSubmit}
+             
               className="flex flex-col space-y-6 mt-10"
             >
               <div className="flex flex-col xl:flex-row xl:space-x-4 space-y-4 xl:space-y-0">
@@ -474,7 +479,6 @@ class InstitutionData extends Component {
                       id="logo"
                       type="file"
                       accept="image/*"
-                      disabled={this.state.disable_logo}
                       onChange={this.handleImageChange}
                     />
                     {this.state.errors.logoFile && (
@@ -484,7 +488,7 @@ class InstitutionData extends Component {
                     )}
                   </div>
 
-                  <div className="relative flex items-center justify-center w-auto group border">
+                  <div className="relative flex items-center justify-center max-h-40 w-auto group border">
                     <img
                       className="w-36 h-36"
                       src={
@@ -532,8 +536,9 @@ class InstitutionData extends Component {
                     )}
                   </div>
 
-                  <div className="relative flex items-center justify-center max-h-36 w-full group border">
+                  <div className="relative flex items-center justify-center max-h-40 w-full group border">
                     <img
+                      className="h-36 w-auto"
                       src={
                         this.state.formData.operation_certificate
                           ? `https://backend.baccheck.online/storage/app/public/${this.state.formData.operation_certificate}`
@@ -565,7 +570,7 @@ class InstitutionData extends Component {
                 </div>
               </div>
 
-              <div className="flex justify-end">
+              {/* <div className="flex justify-end">
                 <button
                   type="submit"
                   className={`flex items-center bg-[#ff0404] hover:bg-[#ff0404] text-white px-4 py-1.5 rounded-md font-medium ${
@@ -585,7 +590,7 @@ class InstitutionData extends Component {
                     </>
                   )}
                 </button>
-              </div>
+              </div> */}
             </form>
           </div>
         </div>

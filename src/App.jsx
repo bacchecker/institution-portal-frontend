@@ -23,8 +23,8 @@ import DocumentRequest from "./pages/requests/document-request/DocumentRequest";
 import DocumentDetails from "./pages/requests/document-request/DocumentDetails";
 import TermsConditions from "./pages/complete-profile/TermsConditions";
 import RolesAndPermissions from "./pages/security/RolesAndPermissions";
-import AccountSetupPage from "./pages/AccountSetupPage";
 import { Toaster } from "sonner";
+import AccountSetupPage from "./pages/AccountSetupPage";
 
 const App = () => {
   const navigate = useNavigate();

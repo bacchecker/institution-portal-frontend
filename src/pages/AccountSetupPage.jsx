@@ -3,6 +3,7 @@ import AuthLayout from "../components/AuthLayout";
 import { Card, CardBody } from "@nextui-org/react";
 import { FaUser, FaGraduationCap, FaBriefcase } from "react-icons/fa";
 import {
+  IoBuild,
   IoCheckmarkDoneCircleSharp,
   IoDocuments,
   IoDocumentText,
@@ -12,6 +13,8 @@ import secureLocalStorage from "react-secure-storage";
 import InstitutionDocumentTypes from "./accountSetupComponents/InstitutionDocumentTypes";
 import axios from "@utils/axiosConfig";
 import useSWR from "swr";
+import LetterTemplates from "./accountSetupComponents/LetterTemplates";
+import DepartmentsSetup from "./accountSetupComponents/DepartmentsSetup";
 function AccountSetupPage() {
   const [activeStep, setActiveStep] = useState();
   const current_step = secureLocalStorage.getItem("institution")?.current_step;
@@ -24,8 +27,6 @@ function AccountSetupPage() {
     axios.get(url).then((res) => res.data)
   );
 
-  console.log("insss", institutionData?.institutionData);
-
   const steps = [
     {
       label: "Institution Data",
@@ -36,15 +37,18 @@ function AccountSetupPage() {
       icon: IoDocuments,
     },
     {
-      label: "Letter Template",
+      label: "Letter Templates",
       icon: IoDocumentText,
     },
     {
-      label: "Complete Profile",
-      icon: IoCheckmarkDoneCircleSharp,
+      label: "Departments, roles and permissions",
+      icon: IoBuild,
     },
+    // {
+    //   label: "Complete Profile",
+    //   icon: IoCheckmarkDoneCircleSharp,
+    // },
   ];
-  console.log("lo", activeStep);
 
   return (
     <AuthLayout title="Account Setup">
@@ -97,6 +101,12 @@ function AccountSetupPage() {
                 <InstitutionDocumentTypes
                   setActiveStep={(e) => setActiveStep(e)}
                 />
+              )}
+              {(parseInt(current_step) === 3 || activeStep === 3) && (
+                <LetterTemplates setActiveStep={(e) => setActiveStep(e)} />
+              )}
+              {(parseInt(current_step) === 4 || activeStep === 4) && (
+                <DepartmentsSetup setActiveStep={(e) => setActiveStep(e)} />
               )}
             </div>
           </CardBody>
