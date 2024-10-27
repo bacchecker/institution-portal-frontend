@@ -479,7 +479,6 @@ class InstitutionData extends Component {
                       id="logo"
                       type="file"
                       accept="image/*"
-                      disabled={this.state.disable_logo}
                       onChange={this.handleImageChange}
                     />
                     {this.state.errors.logoFile && (
