@@ -28,7 +28,6 @@ export default function AuthLayout({ children, title = "Page Title" }) {
     useAuthStore();
   const navigate = useNavigate();
 
-
   useEffect(() => {
     setIsDesktopExpanded(
       secureLocalStorage.getItem("isDesktopExpanded") === "true"
@@ -108,9 +107,11 @@ export default function AuthLayout({ children, title = "Page Title" }) {
 
     const filteredRoutes = navLinks.filter((route) => {
       console.log("rout", route?.profile_complete);
-      
+
       if (route.showOn) {
-        return route.profile_complete.includes(institution?.profile_complete);
+        return route.profile_complete.includes(
+          institution?.is_verified ? "yes" : "no"
+        );
         // return route.showOn.includes(institution?.status);
       }
       // return true;
