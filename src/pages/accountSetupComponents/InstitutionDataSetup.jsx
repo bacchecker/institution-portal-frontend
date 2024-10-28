@@ -229,6 +229,7 @@ function InstitutionDataSetup({ setActiveStep }) {
                   <span className="text-[#ff0404]">*</span>
                 </>
               }
+              type="text"
               name="mailing_address"
               value={userInput.mailing_address}
               onChange={handleUserInput}

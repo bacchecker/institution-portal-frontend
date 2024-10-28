@@ -11,12 +11,12 @@ import EditLetterTemplate from "./letterTemplateComponents/EditLetterTemplate";
 
 function LetterTemplates({ setActiveStep }) {
   const [isSaving, setSaving] = useState(false);
-  const [selectedTemplate, setSelectedTemplate] = useState({});
   const [currentScreen, setCurrentScreen] = useState();
   const institution = secureLocalStorage.getItem("institution");
-  const letterTemplateScreen = secureLocalStorage.getItem(
-    "letterTemplateScreen"
-  );
+
+  const templateScreen = JSON.parse(institution?.template_screens);
+
+  console.log("templateScreen", templateScreen);
 
   const setInstitution = (newInstitution) => {
     secureLocalStorage.setItem("institution", newInstitution);
@@ -37,8 +37,13 @@ function LetterTemplates({ setActiveStep }) {
   };
 
   const handleCreateLetterTemplates = () => {
-    secureLocalStorage.setItem("letterTemplateScreen", 2);
     setCurrentScreen(2);
+    const updatedInstitution = {
+      ...institution,
+      template_screens: JSON.stringify([2, 1, 1]),
+    };
+    setInstitution(updatedInstitution);
+    secureLocalStorage.setItem("institution", updatedInstitution);
     window.scrollTo({
       top: 0,
       behavior: "smooth",
@@ -100,12 +105,12 @@ function LetterTemplates({ setActiveStep }) {
     }
   };
 
-  console.log("curr",currentScreen);
+  console.log("cuerer", currentScreen);
   
 
   return (
     <div className="w-full px-5 pb-4">
-      {(letterTemplateScreen === 1 || currentScreen === 1) && (
+      {(currentScreen === 1 || templateScreen[0] === 1) && (
         <>
           <div className="border-b border-[#ff0404] py-4">
             <h4 className="text-[1rem] font-[600] mb-4">
@@ -138,21 +143,19 @@ function LetterTemplates({ setActiveStep }) {
           <LetterTemplatesTable
             letterTemplates={letterTemplates}
             letterTemplatesLoading={letterTemplatesLoading}
-            setSelectedTemplate={(e) => setSelectedTemplate(e)}
             setCurrentScreen={setCurrentScreen}
           />
         </>
       )}
-      {(letterTemplateScreen === 2 || currentScreen === 2) && (
+      {(templateScreen[0] === 2 || currentScreen === 2) && (
         <AddLetterTemplate setCurrentScreen={setCurrentScreen} />
       )}
-      {(letterTemplateScreen === 3 || currentScreen === 3) && (
+      {(templateScreen[0] === 3 || currentScreen === 3) && (
         <EditLetterTemplate
           setCurrentScreen={setCurrentScreen}
-          selectedTemplate={selectedTemplate}
         />
       )}
-      {(letterTemplateScreen === 1 || currentScreen === 1) && (
+      {(templateScreen[0] === 1 || currentScreen === 1) && (
         <>
           <div className="flex justify-between w-full mt-[4rem!important]">
             <button

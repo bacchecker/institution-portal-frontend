@@ -15,9 +15,31 @@ function ValidationLetterTemplate({
   const [defaultSuccessTemplate, setDefaultSuccessTemplate] = useState("");
   const [defaultUnsuccessTemplate, setDefaultUnsuccessTemplate] = useState("");
 
+  useEffect(() => {
+    const savedTemplate = secureLocalStorage.getItem(
+      "validationSuccessfulTemplate"
+    );
+    const savedUnTemplate = secureLocalStorage.getItem(
+      "validationUnsuccessfulTemplate"
+    );
+
+    if (savedTemplate) {
+      setValidationSuccessfulTemplate(savedTemplate);
+    }
+    if (savedUnTemplate) {
+      setValidationUnsuccessfulTemplate(savedUnTemplate);
+    }
+  }, []);
+
   const lineRef = useRef(null);
-  const [currentTab, setCurrentTab] = useState(1);
+  const [currentTab, setCurrentTab] = useState();
   const institution = secureLocalStorage.getItem("institution");
+
+  const setInstitution = (newInstitution) => {
+    secureLocalStorage.setItem("institution", newInstitution);
+  };
+
+  const templateScreen = JSON.parse(institution?.template_screens);
 
   const handleTabClick = (e) => {
     const target = e.target;
@@ -32,6 +54,26 @@ function ValidationLetterTemplate({
 
   const handleDefaultUnSuccessTemplate = () => {
     setValidationUnsuccessfulTemplate(defaultUnsuccessTemplate);
+  };
+
+  const handleCurrentTab1Screen = () => {
+    setCurrentTab(1);
+    const updatedInstitution = {
+      ...institution,
+      template_screens: JSON.stringify([2, 1, 1]),
+    };
+    setInstitution(updatedInstitution);
+    secureLocalStorage.setItem("institution", updatedInstitution);
+  };
+
+  const handleCurrentTab2Screen = () => {
+    setCurrentTab(2);
+    const updatedInstitution = {
+      ...institution,
+      template_screens: JSON.stringify([2, 1, 2]),
+    };
+    setInstitution(updatedInstitution);
+    secureLocalStorage.setItem("institution", updatedInstitution);
   };
 
   useEffect(() => {
@@ -77,6 +119,12 @@ function ValidationLetterTemplate({
         top: 0,
         behavior: "smooth",
       });
+      const updatedInstitution = {
+        ...institution,
+        template_screens: JSON.stringify([2, 2, 1]),
+      };
+      setInstitution(updatedInstitution);
+      secureLocalStorage.setItem("institution", updatedInstitution);
     }
   };
 
@@ -98,7 +146,7 @@ function ValidationLetterTemplate({
         process"
       </h4>
       <div className="w-full flex justify-end mt-4">
-        {currentTab === 1 && (
+        {(currentTab === 1 || templateScreen[2] === 1) && (
           <button
             type="button"
             onClick={handleDefaultSuccessTemplate}
@@ -107,7 +155,7 @@ function ValidationLetterTemplate({
             Import Default Template
           </button>
         )}
-        {currentTab === 2 && (
+        {(currentTab === 2 || templateScreen[2] === 2) && (
           <button
             type="button"
             onClick={handleDefaultUnSuccessTemplate}
@@ -120,22 +168,22 @@ function ValidationLetterTemplate({
       <div className="w-full border-b border-[#d5d6d6] flex md:mt-[3vw] mt-[8vw] md:gap-[2vw] gap-[6vw] relative">
         <button
           className={`text-[1rem] py-[0.3rem] ${
-            currentTab === 1 && "text-[#ff0404]"
+            (currentTab === 1 || templateScreen[2] === 1) && "text-[#ff0404]"
           }`}
           onClick={(e) => {
             handleTabClick(e);
-            setCurrentTab(1);
+            handleCurrentTab1Screen();
           }}
         >
           Successful Template
         </button>
         <button
           className={`text-[1rem] py-[0.3rem] ${
-            currentTab === 2 && "text-[#ff0404]"
+            (currentTab === 2 || templateScreen[2] === 2) && "text-[#ff0404]"
           }`}
           onClick={(e) => {
             handleTabClick(e);
-            setCurrentTab(2);
+            handleCurrentTab2Screen();
           }}
         >
           Unsuccessful Template
@@ -154,7 +202,7 @@ function ValidationLetterTemplate({
           }}
         ></div>
       </div>
-      {currentTab === 1 && (
+      {(currentTab === 1 || templateScreen[2] === 1) && (
         <div className="w-full min-h-[50vh] mt-4 content">
           <SunEditor
             height="600"
@@ -168,13 +216,17 @@ function ValidationLetterTemplate({
                 ["formatBlock", "paragraphStyle", "fullScreen"],
               ],
             }}
-            onChange={(validationSuccessfulTemplate) =>
-              setValidationSuccessfulTemplate(validationSuccessfulTemplate)
-            }
+            onChange={(newContent) => {
+              setValidationSuccessfulTemplate(newContent);
+              secureLocalStorage.setItem(
+                "validationSuccessfulTemplate",
+                newContent
+              );
+            }}
           />
         </div>
       )}
-      {currentTab === 2 && (
+      {(currentTab === 2 || templateScreen[2] === 2) && (
         <div className="w-full min-h-[50vh] mt-4 content">
           <SunEditor
             height="600"
@@ -188,9 +240,13 @@ function ValidationLetterTemplate({
                 ["formatBlock", "paragraphStyle", "fullScreen"],
               ],
             }}
-            onChange={(validationUnsuccessfulTemplate) =>
-              setValidationUnsuccessfulTemplate(validationUnsuccessfulTemplate)
-            }
+            onChange={(newContent) => {
+              setValidationUnsuccessfulTemplate(newContent);
+              secureLocalStorage.setItem(
+                "validationUnsuccessfulTemplate",
+                newContent
+              );
+            }}
           />
         </div>
       )}

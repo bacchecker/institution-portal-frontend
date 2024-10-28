@@ -6,18 +6,31 @@ import secureLocalStorage from "react-secure-storage";
 function LetterTemplatesTable({
   letterTemplates,
   letterTemplatesLoading,
-  setSelectedTemplate,
   setCurrentScreen,
 }) {
+  const institution = secureLocalStorage.getItem("institution");
+  const setInstitution = (newInstitution) => {
+    secureLocalStorage.setItem("institution", newInstitution);
+  };
+
+  const templateScreen = JSON.parse(institution?.template_screens);
+
   const handleSelectedTemplate = (item) => {
-    secureLocalStorage.setItem("letterTemplateScreen", 3);
+    secureLocalStorage.setItem("selectedTemplate", item);
     setCurrentScreen(3);
-    setSelectedTemplate(item);
     window.scrollTo({
       top: 0,
       behavior: "smooth",
     });
+    const updatedInstitution = {
+      ...institution,
+      template_screens: JSON.stringify([3, 1, 1]),
+    };
+    setInstitution(updatedInstitution);
+    secureLocalStorage.setItem("institution", updatedInstitution);
   };
+
+  console.log("templateScreen", templateScreen);
 
   return (
     <section className="md:w-full w-[98vw] min-h-[60vh] mx-auto">
@@ -48,12 +61,16 @@ function LetterTemplatesTable({
           >
             {letterTemplates?.data?.map((item) => (
               <TableRow key={item?.id}>
-                <TableCell>{item?.document_type?.document_type?.name}</TableCell>
+                <TableCell>
+                  {item?.document_type?.document_type?.name}
+                </TableCell>
                 <TableCell>
                   <div
                     className="ellipsis"
                     dangerouslySetInnerHTML={{
-                      __html: item?.positive_validation_response,
+                      __html:
+                        item?.positive_validation_response ||
+                        "<p>No template</p>",
                     }}
                   />
                 </TableCell>
@@ -62,7 +79,9 @@ function LetterTemplatesTable({
                   <div
                     className="ellipsis"
                     dangerouslySetInnerHTML={{
-                      __html: item?.negative_validation_response,
+                      __html:
+                        item?.negative_validation_response ||
+                        "<p>No template</p>",
                     }}
                   />
                 </TableCell>
@@ -70,7 +89,9 @@ function LetterTemplatesTable({
                   <div
                     className="ellipsis"
                     dangerouslySetInnerHTML={{
-                      __html: item?.positive_verification_response,
+                      __html:
+                        item?.positive_verification_response ||
+                        "<p>No template</p>",
                     }}
                   />
                 </TableCell>
@@ -78,7 +99,9 @@ function LetterTemplatesTable({
                   <div
                     className="ellipsis"
                     dangerouslySetInnerHTML={{
-                      __html: item?.negative_verification_response,
+                      __html:
+                        item?.negative_verification_response ||
+                        "<p>No template</p>",
                     }}
                   />
                 </TableCell>

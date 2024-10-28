@@ -5,6 +5,7 @@ import { mutate } from "swr";
 import axios from "@utils/axiosConfig";
 import { Spinner } from "@nextui-org/react";
 import { FaAnglesLeft, FaAnglesRight } from "react-icons/fa6";
+import { toast } from "sonner";
 function EditVerificationLetterTemplate({
   verificationSuccessfulTemplate,
   setVerificationSuccessfulTemplate,
@@ -23,6 +24,13 @@ function EditVerificationLetterTemplate({
   const [defaultSuccessTemplate, setDefaultSuccessTemplate] = useState("");
   const [defaultUnsuccessTemplate, setDefaultUnsuccessTemplate] = useState("");
   const institution = secureLocalStorage.getItem("institution");
+  const setInstitution = (newInstitution) => {
+    secureLocalStorage.setItem("institution", newInstitution);
+  };
+
+  const templateScreen = JSON.parse(institution?.template_screens);
+
+  const selectedTemplate = secureLocalStorage.getItem("selectedTemplate");
 
   const handleTabClick = (e) => {
     const target = e.target;
@@ -64,19 +72,41 @@ function EditVerificationLetterTemplate({
       top: 0,
       behavior: "smooth",
     });
+    const updatedInstitution = {
+      ...institution,
+      template_screens: JSON.stringify([3, 1, 1]),
+    };
+    setInstitution(updatedInstitution);
+    secureLocalStorage.setItem("institution", updatedInstitution);
+  };
+
+  const handleCurrentTab1Screen = () => {
+    setCurrentTab(1);
+    const updatedInstitution = {
+      ...institution,
+      template_screens: JSON.stringify([3, 2, 1]),
+    };
+    setInstitution(updatedInstitution);
+    secureLocalStorage.setItem("institution", updatedInstitution);
+  };
+
+  const handleCurrentTab2Screen = () => {
+    setCurrentTab(2);
+    const updatedInstitution = {
+      ...institution,
+      template_screens: JSON.stringify([3, 2, 2]),
+    };
+    setInstitution(updatedInstitution);
+    secureLocalStorage.setItem("institution", updatedInstitution);
   };
 
   const handleSubmit = async () => {
-    setIsSaving(true);
-
-    const { document_type_id } = userInput;
-
     if (
       !validationSuccessfulTemplate ||
       !validationUnsuccessfulTemplate ||
       !verificationSuccessfulTemplate ||
       !verificationUnsuccessfulTemplate ||
-      !document_type_id
+      !selectedTemplate?.document_type_id
     ) {
       toast.error("Set successful and unsuccessful verification templates", {
         position: "top-right",
@@ -90,8 +120,10 @@ function EditVerificationLetterTemplate({
       });
       setIsSaving(false);
     } else {
+      setIsSaving(true);
+
       const data = {
-        document_type_id: document_type_id,
+        document_type_id: selectedTemplate?.document_type_id,
         positive_validation_response: validationSuccessfulTemplate,
         negative_validation_response: validationUnsuccessfulTemplate,
         positive_verification_response: verificationSuccessfulTemplate,
@@ -113,12 +145,17 @@ function EditVerificationLetterTemplate({
           theme: "light",
         });
         mutate("/institution/letter-templates");
-        secureLocalStorage.setItem("letterTemplateScreen", 1);
         setCurrentScreen(1);
         window.scrollTo({
           top: 0,
           behavior: "smooth",
         });
+        const updatedInstitution = {
+          ...institution,
+          template_screens: JSON.stringify([1, 1, 1]),
+        };
+        setIsSaving(false);
+        setInstitution(updatedInstitution);
       } catch (error) {
         toast.error(error.response?.data?.message || "An error occurred");
         setIsSaving(false);
@@ -132,7 +169,7 @@ function EditVerificationLetterTemplate({
   return (
     <>
       <div className="w-full flex justify-end mt-4">
-        {currentTab === 1 && (
+        {(currentTab === 1 || templateScreen[2] === 1) && (
           <button
             type="button"
             onClick={handleDefaultSuccessTemplate}
@@ -141,7 +178,7 @@ function EditVerificationLetterTemplate({
             Import Default Template
           </button>
         )}
-        {currentTab === 2 && (
+        {(currentTab === 2 || templateScreen[2] === 2) && (
           <button
             type="button"
             onClick={handleDefaultUnSuccessTemplate}
@@ -154,22 +191,22 @@ function EditVerificationLetterTemplate({
       <div className="w-full border-b border-[#d5d6d6] flex md:mt-[3vw] mt-[8vw] md:gap-[2vw] gap-[6vw] relative">
         <button
           className={`text-[1rem] py-[0.3rem] ${
-            currentTab === 1 && "text-[#ff0404]"
+            (currentTab === 1 || templateScreen[2] === 1) && "text-[#ff0404]"
           }`}
           onClick={(e) => {
             handleTabClick(e);
-            setCurrentTab(1);
+            handleCurrentTab1Screen();
           }}
         >
           Successful Template
         </button>
         <button
           className={`text-[1rem] py-[0.3rem] ${
-            currentTab === 2 && "text-[#ff0404]"
+            (currentTab === 2 || templateScreen[2] === 2) && "text-[#ff0404]"
           }`}
           onClick={(e) => {
             handleTabClick(e);
-            setCurrentTab(2);
+            handleCurrentTab2Screen();
           }}
         >
           Unsuccessful Template
@@ -188,7 +225,7 @@ function EditVerificationLetterTemplate({
           }}
         ></div>
       </div>
-      {currentTab === 1 && (
+      {(currentTab === 1 || templateScreen[2] === 1) && (
         <div className="w-full mt-4 content">
           <SunEditor
             setContents={verificationSuccessfulTemplate}
@@ -208,7 +245,7 @@ function EditVerificationLetterTemplate({
           />
         </div>
       )}
-      {currentTab === 2 && (
+      {(currentTab === 2 || templateScreen[2] === 2) && (
         <div className="w-full mt-4 content">
           <SunEditor
             setContents={verificationUnsuccessfulTemplate}

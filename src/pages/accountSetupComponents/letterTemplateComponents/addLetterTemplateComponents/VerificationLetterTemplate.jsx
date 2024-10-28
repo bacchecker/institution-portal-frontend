@@ -23,8 +23,30 @@ function VerificationLetterTemplate({
   const [defaultUnsuccessTemplate, setDefaultUnsuccessTemplate] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const lineRef = useRef(null);
-  const [currentTab, setCurrentTab] = useState(1);
+  const [currentTab, setCurrentTab] = useState();
   const institution = secureLocalStorage.getItem("institution");
+  const setInstitution = (newInstitution) => {
+    secureLocalStorage.setItem("institution", newInstitution);
+  };
+
+  const templateScreen = JSON.parse(institution?.template_screens);
+
+  useEffect(() => {
+    const savedTemplate = secureLocalStorage.getItem(
+      "verificationSuccessfulTemplate"
+    );
+    const savedUnTemplate = secureLocalStorage.getItem(
+      "verificationUnsuccessfulTemplate"
+    );
+
+    if (savedTemplate) {
+      setVerificationSuccessfulTemplate(savedTemplate);
+    }
+    if (savedUnTemplate) {
+      setVerificationUnsuccessfulTemplate(savedUnTemplate);
+    }
+  }, []);
+
   const handleTabClick = (e) => {
     const target = e.target;
     setLineStyle({
@@ -65,6 +87,32 @@ function VerificationLetterTemplate({
       top: 0,
       behavior: "smooth",
     });
+    const updatedInstitution = {
+      ...institution,
+      template_screens: JSON.stringify([2, 1, 1]),
+    };
+    setInstitution(updatedInstitution);
+    secureLocalStorage.setItem("institution", updatedInstitution);
+  };
+
+  const handleCurrentTab1Screen = () => {
+    setCurrentTab(1);
+    const updatedInstitution = {
+      ...institution,
+      template_screens: JSON.stringify([2, 2, 1]),
+    };
+    setInstitution(updatedInstitution);
+    secureLocalStorage.setItem("institution", updatedInstitution);
+  };
+
+  const handleCurrentTab2Screen = () => {
+    setCurrentTab(2);
+    const updatedInstitution = {
+      ...institution,
+      template_screens: JSON.stringify([2, 2, 2]),
+    };
+    setInstitution(updatedInstitution);
+    secureLocalStorage.setItem("institution", updatedInstitution);
   };
 
   const handleSubmit = async (e) => {
@@ -115,8 +163,18 @@ function VerificationLetterTemplate({
           theme: "light",
         });
         mutate("/institution/letter-templates");
-        secureLocalStorage.setItem("letterTemplateScreen", 1);
         setCurrentScreen(1);
+        const updatedInstitution = {
+          ...institution,
+          template_screens: JSON.stringify([1, 1, 1]),
+        };
+        setInstitution(updatedInstitution);
+        secureLocalStorage.setItem("validationSuccessfulTemplate", "");
+        secureLocalStorage.setItem("validationUnsuccessfulTemplate", "");
+        secureLocalStorage.setItem("verificationSuccessfulTemplate", "");
+        secureLocalStorage.setItem("verificationUnsuccessfulTemplate", "");
+
+        secureLocalStorage.setItem("institution", updatedInstitution);
         window.scrollTo({
           top: 0,
           behavior: "smooth",
@@ -143,7 +201,7 @@ function VerificationLetterTemplate({
         set templates for each institance.
       </h4>
       <div className="w-full flex justify-end mt-4">
-        {currentTab === 1 && (
+        {(currentTab === 1 || templateScreen[2] === 1) && (
           <button
             type="button"
             onClick={handleDefaultSuccessTemplate}
@@ -152,7 +210,7 @@ function VerificationLetterTemplate({
             Import Default Template
           </button>
         )}
-        {currentTab === 2 && (
+        {(currentTab === 2 || templateScreen[2] === 2) && (
           <button
             type="button"
             onClick={handleDefaultUnSuccessTemplate}
@@ -165,22 +223,22 @@ function VerificationLetterTemplate({
       <div className="w-full border-b border-[#d5d6d6] flex md:mt-[3vw] mt-[8vw] md:gap-[2vw] gap-[6vw] relative">
         <button
           className={`text-[1rem] py-[0.3rem] ${
-            currentTab === 1 && "text-[#ff0404]"
+            (currentTab === 1 || templateScreen[2] === 1) && "text-[#ff0404]"
           }`}
           onClick={(e) => {
             handleTabClick(e);
-            setCurrentTab(1);
+            handleCurrentTab1Screen();
           }}
         >
           Successful Template
         </button>
         <button
           className={`text-[1rem] py-[0.3rem] ${
-            currentTab === 2 && "text-[#ff0404]"
+            (currentTab === 2 || templateScreen[2] === 2) && "text-[#ff0404]"
           }`}
           onClick={(e) => {
             handleTabClick(e);
-            setCurrentTab(2);
+            handleCurrentTab2Screen();
           }}
         >
           Unsuccessful Template
@@ -199,7 +257,7 @@ function VerificationLetterTemplate({
           }}
         ></div>
       </div>
-      {currentTab === 1 && (
+      {(currentTab === 1 || templateScreen[2] === 1) && (
         <div className="w-full mt-4 content">
           <SunEditor
             setContents={verificationSuccessfulTemplate}
@@ -213,13 +271,17 @@ function VerificationLetterTemplate({
                 ["formatBlock", "paragraphStyle", "fullScreen"],
               ],
             }}
-            onChange={(verificationSuccessfulTemplate) =>
-              setVerificationSuccessfulTemplate(verificationSuccessfulTemplate)
-            }
+            onChange={(newContent) => {
+              setVerificationSuccessfulTemplate(newContent);
+              secureLocalStorage.setItem(
+                "verificationSuccessfulTemplate",
+                newContent
+              );
+            }}
           />
         </div>
       )}
-      {currentTab === 2 && (
+      {(currentTab === 2 || templateScreen[2] === 2) && (
         <div className="w-full mt-4 content">
           <SunEditor
             setContents={verificationUnsuccessfulTemplate}
@@ -233,11 +295,13 @@ function VerificationLetterTemplate({
                 ["formatBlock", "paragraphStyle", "fullScreen"],
               ],
             }}
-            onChange={(verificationUnsuccessfulTemplate) =>
-              setVerificationUnsuccessfulTemplate(
-                verificationUnsuccessfulTemplate
-              )
-            }
+            onChange={(newContent) => {
+              setVerificationUnsuccessfulTemplate(newContent);
+              secureLocalStorage.setItem(
+                "verificationUnsuccessfulTemplate",
+                newContent
+              );
+            }}
           />
         </div>
       )}

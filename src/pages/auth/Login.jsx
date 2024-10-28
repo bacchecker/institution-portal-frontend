@@ -3,7 +3,7 @@ import axios from "@utils/axiosConfig";
 import withRouter from "@components/withRouter";
 import ReCAPTCHA from "react-google-recaptcha";
 import { IoLockOpen, IoPerson, IoEyeOff, IoEye } from "react-icons/io5";
-import { Button, Card, Input, Spinner } from "@nextui-org/react";
+import { Button, Card, Input, Spinner, Switch } from "@nextui-org/react";
 import ThemeSwitcher from "@components/ThemeSwitcher";
 import { Navigate, useNavigate } from "react-router-dom";
 import useAuthStore from "@store/authStore";
@@ -19,6 +19,7 @@ const Login = () => {
     email: "",
     password: "",
   });
+  const [isSelected, setIsSelected] = useState(false);
   const [recaptchaToken, setRecaptchaToken] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -48,6 +49,7 @@ const Login = () => {
       const response = await axios.post("/auth/login", {
         email: formData.email,
         password: formData.password,
+        remember: isSelected,
         recaptcha_token: recaptchaToken,
       });
       let responseData = response.data;
@@ -59,7 +61,7 @@ const Login = () => {
       secureLocalStorage.setItem("authToken", responseData.token);
       secureLocalStorage.setItem("user", responseData.user);
       secureLocalStorage.setItem("institution", responseData.institution);
-      secureLocalStorage.setItem("letterTemplateScreen", 1);
+      secureLocalStorage.setItem("selectedTemplate", responseData.letter_template);
       setIsLoading(false);
 
       login(responseData.user, responseData?.institution, responseData.token);
@@ -83,10 +85,6 @@ const Login = () => {
       setIsLoading(false);
     }
   };
-
-  // if (isAuthenticated) {
-  //   return <Navigate to="/dashboard" replace />;
-  // }
 
   return (
     <>
@@ -152,8 +150,17 @@ const Login = () => {
                 )
               }
             />
+            <div className="flex flex-col gap-2">
+              <Switch
+                isSelected={isSelected}
+                onValueChange={setIsSelected}
+                color="danger"
+              >
+                Remember me
+              </Switch>
+            </div>
 
-            <div className="flex ">
+            <div className="flex">
               <ReCAPTCHA
                 sitekey="6LeT50QqAAAAAOjlgT3V74eIOT3DwvtemCjWOM-K"
                 onChange={onRecaptchaChange}
@@ -178,12 +185,20 @@ const Login = () => {
                 <h4>Login</h4>
               )}
             </button>
-
+            <p className="text-center text-sm text-gray-600 dark:text-white">
+              Don’t have an account?
+              <a
+                href="https://portal.baccheck.online/sign-up"
+                className="text-[#ff0404] ml-[0.2rem]"
+              >
+                Sign Up
+              </a>
+            </p>
             <p className="text-center text-sm text-gray-600 dark:text-white">
               Forgot your Password?
               <a
                 href="https://backend.baccheck.online/forgot-password"
-                className="text-red-600"
+                className="text-[#ff0404] ml-[0.2rem]"
               >
                 Reset
               </a>

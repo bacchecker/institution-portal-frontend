@@ -2,14 +2,17 @@ import React, { useEffect, useState } from "react";
 import { FaAnglesLeft } from "react-icons/fa6";
 import secureLocalStorage from "react-secure-storage";
 import useSWR, { mutate } from "swr";
+import useAuthStore from "@store/authStore";
 import axios from "@utils/axiosConfig";
-import { Input } from "@nextui-org/react";
+import { Input, Spinner } from "@nextui-org/react";
 import EditValidationLetterTemplate from "./editLetterTemplateComponents/EditValidationLetterTemplate";
 import EditVerificationLetterTemplate from "./editLetterTemplateComponents/EditVerificationLetterTemplate";
 
-function EditLetterTemplate({ setCurrentScreen, selectedTemplate }) {
+function EditLetterTemplate({ setCurrentScreen }) {
   const [userInput, setUserInput] = useState([]);
-  const [currentTempTab, setCurrentTempTab] = useState(1);
+  const [isSaving, setIsSaving] = useState(false);
+  const { logout } = useAuthStore();
+  const [currentTempTab, setCurrentTempTab] = useState();
   const [validationSuccessfulTemplate, setValidationSuccessfulTemplate] =
     useState("");
   const [validationUnsuccessfulTemplate, setValidationUnsuccessfulTemplate] =
@@ -23,6 +26,9 @@ function EditLetterTemplate({ setCurrentScreen, selectedTemplate }) {
   ] = useState("");
 
   const institution = secureLocalStorage.getItem("institution");
+  const selectedTemplate = secureLocalStorage.getItem("selectedTemplate");
+  console.log("wwe", selectedTemplate);
+
   useEffect(() => {
     if (selectedTemplate) {
       setUserInput(selectedTemplate);
@@ -41,13 +47,24 @@ function EditLetterTemplate({ setCurrentScreen, selectedTemplate }) {
     }
   }, [selectedTemplate]);
 
+  const setInstitution = (newInstitution) => {
+    secureLocalStorage.setItem("institution", newInstitution);
+  };
+
+  const templateScreen = JSON.parse(institution?.template_screens);
+
   const handleBackButton = () => {
-    secureLocalStorage.setItem("letterTemplateScreen", 1);
     setCurrentScreen(1);
     window.scrollTo({
       top: 0,
       behavior: "smooth",
     });
+    const updatedInstitution = {
+      ...institution,
+      template_screens: JSON.stringify([1, 1, 1]),
+    };
+    setInstitution(updatedInstitution);
+    secureLocalStorage.setItem("institution", updatedInstitution);
   };
 
   const handleDragStart = (value) => {
@@ -73,6 +90,55 @@ function EditLetterTemplate({ setCurrentScreen, selectedTemplate }) {
     axios.get(url).then((res) => res.data)
   );
 
+  const handleSubmit = async () => {
+    const { document_type_id } = userInput;
+
+    if (!document_type_id) {
+      toast.error("Select Document Type and save", {
+        position: "top-right",
+        autoClose: 1202,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
+    } else {
+      setIsSaving(true);
+      const data = {
+        document_type_id: document_type_id,
+        positive_validation_response: validationSuccessfulTemplate,
+        negative_validation_response: validationUnsuccessfulTemplate,
+        positive_verification_response: verificationSuccessfulTemplate,
+        negative_verification_response: verificationUnsuccessfulTemplate,
+      };
+
+      const tempData = {
+        template_screens: JSON.stringify(templateScreen),
+      };
+      try {
+        const response = await axios.post(
+          "/institution/letter-templates",
+          data
+        );
+        const secondResponse = await axios.post(
+          "/institution/account-setup/template-screens",
+          tempData
+        );
+        if (secondResponse.status === 200 || secondResponse.status === 201) {
+          logout();
+        }
+      } catch (error) {
+        toast.error(error.response?.data?.message || "An error occurred");
+        setIsSaving(false);
+      } finally {
+        setIsSaving(false);
+        return true;
+      }
+    }
+  };
+
   return (
     <>
       <div className="flex justify-end w-full">
@@ -90,14 +156,16 @@ function EditLetterTemplate({ setCurrentScreen, selectedTemplate }) {
           <div className="w-full flex flex-col gap-2 h-fit border border-[#ff040459] rounded-[0.5rem] p-4">
             <div
               className={`w-full flex justify-center items-center h-fit py-2 rounded-[0.3rem] text-[1rem] ${
-                currentTempTab === 1 && "text-white bg-[#ff0404]"
+                (currentTempTab === 1 || templateScreen[1] === 1) &&
+                "text-white bg-[#ff0404]"
               }`}
             >
               Validation Letter Template
             </div>
             <div
               className={`w-full flex justify-center items-center h-fit py-2 rounded-[0.3rem] text-[1rem] ${
-                currentTempTab === 2 && "text-white bg-[#ff0404]"
+                (currentTempTab === 2 || templateScreen[1] === 2) &&
+                "text-white bg-[#ff0404]"
               }`}
             >
               Verification Letter Template
@@ -417,7 +485,7 @@ function EditLetterTemplate({ setCurrentScreen, selectedTemplate }) {
             readOnly
             // className="xl:w-[80%]"
           />
-          {currentTempTab === 1 && (
+          {(currentTempTab === 1 || templateScreen[1] === 1) && (
             <EditValidationLetterTemplate
               institutionDocuments={institutionDocuments}
               validationSuccessfulTemplate={validationSuccessfulTemplate}
@@ -429,7 +497,7 @@ function EditLetterTemplate({ setCurrentScreen, selectedTemplate }) {
               setCurrentTempTab={setCurrentTempTab}
             />
           )}
-          {currentTempTab === 2 && (
+          {(currentTempTab === 2 || templateScreen[1] === 2) && (
             <EditVerificationLetterTemplate
               institutionDocuments={institutionDocuments}
               verificationSuccessfulTemplate={verificationSuccessfulTemplate}
@@ -451,6 +519,22 @@ function EditLetterTemplate({ setCurrentScreen, selectedTemplate }) {
           )}
         </div>
       </div>
+      <button
+        type="button"
+        onClick={handleSubmit}
+        className="flex items-center bg-[#ffffff] border border-[#ff0404] hover:bg-[#ff0404] text-[#ff0404] hover:text-white px-4 py-2.5 rounded-[0.3rem] font-medium"
+      >
+        {isSaving ? (
+          <>
+            <Spinner size="sm" color="white" />
+            <span className="ml-2">Saving...</span>
+          </>
+        ) : (
+          <>
+            Save And Continue Later
+          </>
+        )}
+      </button>
     </>
   );
 }

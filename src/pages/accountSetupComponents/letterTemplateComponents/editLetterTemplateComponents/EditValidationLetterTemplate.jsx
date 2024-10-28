@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import secureLocalStorage from "react-secure-storage";
+import { toast } from "sonner";
 import SunEditor from "suneditor-react";
 
 function EditValidationLetterTemplate({
@@ -14,9 +15,14 @@ function EditValidationLetterTemplate({
   const [defaultUnsuccessTemplate, setDefaultUnsuccessTemplate] = useState("");
 
   const lineRef = useRef(null);
-  const [currentTab, setCurrentTab] = useState(1);
+  const [currentTab, setCurrentTab] = useState();
 
   const institution = secureLocalStorage.getItem("institution");
+  const setInstitution = (newInstitution) => {
+    secureLocalStorage.setItem("institution", newInstitution);
+  };
+
+  const templateScreen = JSON.parse(institution?.template_screens);
 
   const handleTabClick = (e) => {
     const target = e.target;
@@ -31,6 +37,26 @@ function EditValidationLetterTemplate({
 
   const handleDefaultUnSuccessTemplate = () => {
     setValidationUnsuccessfulTemplate(defaultUnsuccessTemplate);
+  };
+
+  const handleCurrentTab1Screen = () => {
+    setCurrentTab(1);
+    const updatedInstitution = {
+      ...institution,
+      template_screens: JSON.stringify([3, 1, 1]),
+    };
+    setInstitution(updatedInstitution);
+    secureLocalStorage.setItem("institution", updatedInstitution);
+  };
+
+  const handleCurrentTab2Screen = () => {
+    setCurrentTab(2);
+    const updatedInstitution = {
+      ...institution,
+      template_screens: JSON.stringify([3, 1, 2]),
+    };
+    setInstitution(updatedInstitution);
+    secureLocalStorage.setItem("institution", updatedInstitution);
   };
 
   useEffect(() => {
@@ -69,13 +95,19 @@ function EditValidationLetterTemplate({
         top: 0,
         behavior: "smooth",
       });
+      const updatedInstitution = {
+        ...institution,
+        template_screens: JSON.stringify([3, 2, 1]),
+      };
+      setInstitution(updatedInstitution);
+      secureLocalStorage.setItem("institution", updatedInstitution);
     }
   };
 
   return (
     <>
       <div className="w-full flex justify-end mt-4">
-        {currentTab === 1 && (
+        {(currentTab === 1 || templateScreen[2] === 1) && (
           <button
             type="button"
             onClick={handleDefaultSuccessTemplate}
@@ -84,7 +116,7 @@ function EditValidationLetterTemplate({
             Import Default Template
           </button>
         )}
-        {currentTab === 2 && (
+        {(currentTab === 2 || templateScreen[2] === 2) && (
           <button
             type="button"
             onClick={handleDefaultUnSuccessTemplate}
@@ -97,22 +129,22 @@ function EditValidationLetterTemplate({
       <div className="w-full border-b border-[#d5d6d6] flex md:mt-[3vw] mt-[8vw] md:gap-[2vw] gap-[6vw] relative">
         <button
           className={`text-[1rem] py-[0.3rem] ${
-            currentTab === 1 && "text-[#ff0404]"
+            (currentTab === 1 || templateScreen[2] === 1) && "text-[#ff0404]"
           }`}
           onClick={(e) => {
             handleTabClick(e);
-            setCurrentTab(1);
+            handleCurrentTab1Screen();
           }}
         >
           Successful Template
         </button>
         <button
           className={`text-[1rem] py-[0.3rem] ${
-            currentTab === 2 && "text-[#ff0404]"
+            (currentTab === 2 || templateScreen[2] === 2) && "text-[#ff0404]"
           }`}
           onClick={(e) => {
             handleTabClick(e);
-            setCurrentTab(2);
+            handleCurrentTab2Screen();
           }}
         >
           Unsuccessful Template
@@ -131,7 +163,7 @@ function EditValidationLetterTemplate({
           }}
         ></div>
       </div>
-      {currentTab === 1 && (
+      {(currentTab === 1 || templateScreen[2] === 1) && (
         <div className="w-full min-h-[50vh] mt-4 content">
           <SunEditor
             height="600"
@@ -149,15 +181,9 @@ function EditValidationLetterTemplate({
               setValidationSuccessfulTemplate(validationSuccessfulTemplate)
             }
           />
-          {/* <button
-            type="button"
-            className="w-fit flex mt-2 items-center bg-[#000000] hover:bg-[#282727] text-white px-4 py-2.5 rounded-[0.3rem] font-medium"
-          >
-            Preview Template
-          </button> */}
         </div>
       )}
-      {currentTab === 2 && (
+      {(currentTab === 2 || templateScreen[2] === 2) && (
         <div className="w-full min-h-[50vh] mt-4 content">
           <SunEditor
             height="600"
