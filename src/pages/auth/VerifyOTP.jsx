@@ -9,15 +9,17 @@ import {
 } from "@components/input-otp";
 import useAuthStore from "@store/authStore";
 import { toast } from "sonner";
+import { Spinner } from "@nextui-org/react";
 
 const VerifyOTP = () => {
   const [otp, setOtp] = useState();
   const navigate = useNavigate(); // Assuming you're using react-router for navigation
   const { isAuthenticated } = useAuthStore();
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    setIsLoading(true);
     try {
       const response = await axios.post("/otp/verify", { otp });
       const responseData = response.data.data;
@@ -27,10 +29,12 @@ const VerifyOTP = () => {
         navigate("/dashboard", {
           state: { institutionData: responseData.institution },
         });
+        setIsLoading(false);
       } else {
         navigate("/account-setup", {
           state: { institutionData: responseData.institution },
         });
+        setIsLoading(false);
         // navigate("/account-setup/profile", {
         //   state: { institutionData: responseData.institution },
         // });
@@ -78,8 +82,16 @@ const VerifyOTP = () => {
           <button
             type="submit"
             className="w-full py-2 px-4 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-400"
+            disabled={isLoading}
           >
-            Verify OTP
+            {isLoading ? (
+              <div className="flex items-center justify-center gap-2">
+                <Spinner size="sm" color="white" />
+                <h4>Verifying...</h4>
+              </div>
+            ) : (
+              <h4>Verify OTP</h4>
+            )}
           </button>
         </form>
       </div>

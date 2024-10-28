@@ -331,7 +331,7 @@ class Dashboard extends Component {
               </div>
             </div>
             <div className="grid grid-cols-2 xl:grid-cols-3 gap-4 my-4 ">
-              <div className="col-span-2 w-full flex flex-col items-center bg-white rounded-2xl justify-center pt-6 pb-4">
+              <div className="h-64 md:h-96 col-span-2 w-full bg-white rounded-2xl justify-center pt-6 pb-4">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart
                     width={500}

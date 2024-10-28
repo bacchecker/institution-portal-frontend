@@ -286,9 +286,9 @@ export default function AuthLayout({ children, title = "Page Title" }) {
             isMobileExpanded ? "w-[65%] sm:w-[17%]" : "w-0"
           } transition-all duration-300 ease-in-out`}
         >
-          <div className="px-2 py-3">
-            <div className="rounded-2xl px-4 py-3 flex flex-col gap-2 shadow-2xl shadow-blue-800/30 mb-10">
-              <img src={"/images/bclogo.jpg"} alt="logo" className="" />
+          <div className="">
+            <div className="px-4 flex flex-col shadow-2xl shadow-blue-800/30 mb-10">
+              <img src={"/images/back-logo.png"} alt="logo" className="h-[54px] w-44" />
             </div>
           </div>
 

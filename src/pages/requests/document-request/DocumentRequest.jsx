@@ -349,7 +349,7 @@ export default function DocumentRequest() {
               <TableCell>
                 <StatusChip status={item?.status} />
               </TableCell>
-              <TableCell> GH¢ {item?.total_amount}</TableCell>
+              <TableCell>GH¢ {item?.total_amount}</TableCell>
               <TableCell>
                 <StatusChip status={item?.payment_status} />
               </TableCell>
@@ -449,7 +449,7 @@ export default function DocumentRequest() {
                     <div className="grid grid-cols-2 gap-2">
                       <p className="">Format:</p>
                       <p className="">
-                        {data?.document_type.document_format === "soft_copy"
+                        {data?.document_format === "soft_copy"
                           ? "Soft Copy"
                           : "Hard Copy"}
                       </p>
