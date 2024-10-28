@@ -3,7 +3,7 @@ import axios from "@utils/axiosConfig";
 import withRouter from "@components/withRouter";
 import ReCAPTCHA from "react-google-recaptcha";
 import { IoLockOpen, IoPerson, IoEyeOff, IoEye } from "react-icons/io5";
-import { Button, Card, Input, Spinner } from "@nextui-org/react";
+import { Card, Input, Spinner } from "@nextui-org/react";
 import ThemeSwitcher from "@components/ThemeSwitcher";
 import { useNavigate } from "react-router-dom";
 import useAuthStore from "@store/authStore";
@@ -71,6 +71,7 @@ const Login = () => {
         // Check if OTP verification is required
         if (response.data?.show_otp === true) {
           navigate("/verify-otp");
+          toast.success(response.data.message);
           return; // Stop further execution if OTP verification is required
         }
         
