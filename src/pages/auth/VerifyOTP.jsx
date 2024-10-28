@@ -81,7 +81,7 @@ const VerifyOTP = () => {
           </div>
           <button
             type="submit"
-            className="w-full py-2 px-4 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-400"
+            className="w-full py-2 px-4 bg-[#ff0404] text-white font-bold rounded-lg hover:bg-[#ff5d5d] focus:outline-none focus:ring-2 focus:ring-[#ff0404]"
             disabled={isLoading}
           >
             {isLoading ? (
