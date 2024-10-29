@@ -25,7 +25,7 @@ const VerifyOTP = () => {
       const responseData = response.data.data;
       toast.success(response.data.message);
 
-      if (responseData.institution.profile_complete === "yes") {
+      if (responseData.institution.setup_done) {
         navigate("/dashboard", {
           state: { institutionData: responseData.institution },
         });

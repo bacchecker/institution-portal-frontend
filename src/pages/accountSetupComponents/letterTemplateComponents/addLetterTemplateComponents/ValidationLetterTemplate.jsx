@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import secureLocalStorage from "react-secure-storage";
-import { toast } from "sonner";
 import SunEditor from "suneditor-react";
+import Swal from "sweetalert2";
 
 function ValidationLetterTemplate({
   validationSuccessfulTemplate,
@@ -100,19 +100,12 @@ function ValidationLetterTemplate({
       !validationSuccessfulTemplate ||
       !validationUnsuccessfulTemplate
     ) {
-      toast.error(
-        "Select Document Type and design successful and unsuccessful validation templates",
-        {
-          position: "top-right",
-          autoClose: 1202,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        }
-      );
+      Swal.fire({
+        title: "Error",
+        text: "Select Document Type and design successful and unsuccessful validation templates",
+        icon: "error",
+        button: "OK",
+      });
     } else {
       setCurrentTempTab(2);
       window.scrollTo({
@@ -152,7 +145,7 @@ function ValidationLetterTemplate({
             onClick={handleDefaultSuccessTemplate}
             className="w-fit flex items-center bg-[#000000] hover:bg-[#282727] text-white px-4 py-2.5 rounded-[0.3rem] font-medium"
           >
-            Import Default Template
+            Use Default Template
           </button>
         )}
         {(currentTab === 2 || templateScreen[2] === 2) && (
@@ -161,7 +154,7 @@ function ValidationLetterTemplate({
             onClick={handleDefaultUnSuccessTemplate}
             className="w-fit flex items-center bg-[#000000] hover:bg-[#282727] text-white px-4 py-2.5 rounded-[0.3rem] font-medium"
           >
-            Import Default Template
+            Use Default Template
           </button>
         )}
       </div>

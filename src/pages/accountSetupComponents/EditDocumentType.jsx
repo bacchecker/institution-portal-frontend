@@ -103,7 +103,6 @@ function EditDocumentType({
     }
   };
 
-  console.log("userrrr", userInput);
 
   return (
     <Drawer title={drawerTitle} isOpen={openDrawer} setIsOpen={setOpenDrawer}>

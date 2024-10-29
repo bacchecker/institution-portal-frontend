@@ -164,7 +164,6 @@ class InstitutionLetter extends Component {
 
   previewValidationApprovedTemplate = () => {
     const { validation_approved_content } = this.state;
-    console.log(validation_approved_content);
 
     this.setState({
       renderedContent: validation_approved_content,

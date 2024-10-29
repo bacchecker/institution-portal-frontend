@@ -68,7 +68,6 @@ export default function ValidationRequest() {
     (url) => axios.get(url).then((res) => res.data)
   );
 
-  console.log(searchParams.get("search_query"));
 
   const handleBulkDownload = async (filePaths) => {
     try {
@@ -449,7 +448,6 @@ export default function ValidationRequest() {
             setProcessing(false);
             return;
           }
-          console.log(resss.data);
           setData(resss?.data);
           setProcessing(false);
           toast.success("Request status updated successfully");

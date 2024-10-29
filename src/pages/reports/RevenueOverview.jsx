@@ -34,7 +34,6 @@ export default function RevenueOverview() {
     (url) => axios.get(url).then((res) => res.data)
   );
 
-  console.log(resData);
   return (
     <AuthLayout title="Report Overview">
       <section className="md:px-3 md:w-full w-[98vw] mx-auto">

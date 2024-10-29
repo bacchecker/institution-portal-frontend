@@ -96,7 +96,6 @@ const Login = () => {
         setIsLoading(false);
       }
     } catch (error) {
-      console.log(error?.response);
       toast.error(error.response.data.message);
       recaptchaRef.current.reset();
       setIsLoading(false);

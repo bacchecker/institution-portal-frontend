@@ -178,7 +178,6 @@ export default function DocumentRequest() {
         return <Elipsis />;
     }
   };
-  console.log(data);
 
   return (
     <AuthLayout title="Document Request">
@@ -704,7 +703,6 @@ export default function DocumentRequest() {
                       return;
                     }
 
-                    console.log(resss?.data);
                     setData(resss?.data);
                     setProcessing(false);
                     toast.success("Documents uploaded successfully");
@@ -742,7 +740,6 @@ export default function DocumentRequest() {
             toast.error("Failed to update request status");
             return;
           }
-          console.log(resss?.data);
           setData(resss?.data);
           setProcessing(false);
           toast.success("Request status updated successfully");

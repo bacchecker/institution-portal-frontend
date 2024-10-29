@@ -6,7 +6,7 @@ import LetterTemplatesTable from "./letterTemplateComponents/LetterTemplatesTabl
 import AddLetterTemplate from "./letterTemplateComponents/AddLetterTemplate";
 import useSWR from "swr";
 import axios from "@utils/axiosConfig";
-import { toast } from "sonner";
+import Swal from "sweetalert2";
 import EditLetterTemplate from "./letterTemplateComponents/EditLetterTemplate";
 
 function LetterTemplates({ setActiveStep }) {
@@ -16,7 +16,13 @@ function LetterTemplates({ setActiveStep }) {
 
   const templateScreen = JSON.parse(institution?.template_screens);
 
-  console.log("templateScreen", templateScreen);
+  const {
+    data: letterTemplates,
+    error: letterTemplatesError,
+    isLoading: letterTemplatesLoading,
+  } = useSWR("/institution/letter-templates", (url) =>
+    axios.get(url).then((res) => res.data)
+  );
 
   const setInstitution = (newInstitution) => {
     secureLocalStorage.setItem("institution", newInstitution);
@@ -36,39 +42,62 @@ function LetterTemplates({ setActiveStep }) {
     setActiveStep(2);
   };
 
-  const handleCreateLetterTemplates = () => {
-    setCurrentScreen(2);
-    const updatedInstitution = {
-      ...institution,
-      template_screens: JSON.stringify([2, 1, 1]),
-    };
-    setInstitution(updatedInstitution);
-    secureLocalStorage.setItem("institution", updatedInstitution);
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
-  };
-
-  const {
-    data: letterTemplates,
-    error: letterTemplatesError,
-    isLoading: letterTemplatesLoading,
-  } = useSWR("/institution/letter-templates", (url) =>
-    axios.get(url).then((res) => res.data)
+  const mostCurrentTemplate = letterTemplates?.data?.reduce(
+    (mostRecent, current) => {
+      return new Date(current.created_at) > new Date(mostRecent.created_at)
+        ? current
+        : mostRecent;
+    }
   );
+
+
+  const handleCreateLetterTemplates = () => {
+    if (
+      mostCurrentTemplate?.negative_validation_response === null ||
+      mostCurrentTemplate?.negative_verification_response === null ||
+      mostCurrentTemplate?.positive_validation_response === null ||
+      mostCurrentTemplate?.positive_verification_response === null
+    ) {
+      Swal.fire({
+        title: "Error",
+        text: `Provide all templates for ${mostCurrentTemplate?.document_type?.document_type?.name}`,
+        icon: "error",
+        button: "OK",
+      });
+    } else {
+      setCurrentScreen(2);
+      const updatedInstitution = {
+        ...institution,
+        template_screens: JSON.stringify([2, 1, 1]),
+      };
+      setInstitution(updatedInstitution);
+      secureLocalStorage.setItem("institution", updatedInstitution);
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
+    }
+  };
 
   const handleSubmit = async () => {
     if (letterTemplates?.data?.length === 0) {
-      toast.error("Add at least One letter template", {
-        position: "top-right",
-        autoClose: 1202,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
+      Swal.fire({
+        title: "Error",
+        text: "Add at least One letter template",
+        icon: "error",
+        button: "OK",
+      });
+    } else if (
+      mostCurrentTemplate?.negative_validation_response === null ||
+      mostCurrentTemplate?.negative_verification_response === null ||
+      mostCurrentTemplate?.positive_validation_response === null ||
+      mostCurrentTemplate?.positive_verification_response === null
+    ) {
+      Swal.fire({
+        title: "Error",
+        text: `Provide all templates for ${mostCurrentTemplate?.document_type?.document_type?.name}`,
+        icon: "error",
+        button: "OK",
       });
     } else {
       setSaving(true);
@@ -80,23 +109,35 @@ function LetterTemplates({ setActiveStep }) {
           "/institution/account-setup/next-step",
           data
         );
-        toast.success(
-          "Institution Document Type(s) Letter Templates created successfully"
-        );
-        const updatedInstitution = {
-          ...institution,
-          current_step: "4",
-        };
-        setInstitution(updatedInstitution);
-        secureLocalStorage.setItem("institution", updatedInstitution);
-        setActiveStep(4);
-        setSaving(false);
-        window.scrollTo({
-          top: 0,
-          behavior: "smooth",
+        Swal.fire({
+          title: "Success",
+          text: "Institution Document Type(s) Letter Templates created successfully",
+          icon: "success",
+          button: "OK",
+          confirmButtonColor: "#00b17d",
+        }).then((isOkay) => {
+          if (isOkay) {
+            const updatedInstitution = {
+              ...institution,
+              current_step: "4",
+            };
+            setInstitution(updatedInstitution);
+            secureLocalStorage.setItem("institution", updatedInstitution);
+            setActiveStep(4);
+            setSaving(false);
+            window.scrollTo({
+              top: 0,
+              behavior: "smooth",
+            });
+          }
         });
       } catch (error) {
-        toast.error(error.response?.data?.message || "An error occurred");
+        Swal.fire({
+          title: "Error",
+          text: error.response?.data?.message,
+          icon: "error",
+          button: "OK",
+        });
         setSaving(false);
       } finally {
         setSaving(false);
@@ -104,9 +145,6 @@ function LetterTemplates({ setActiveStep }) {
       }
     }
   };
-
-  console.log("cuerer", currentScreen);
-  
 
   return (
     <div className="w-full px-5 pb-4">
@@ -151,9 +189,7 @@ function LetterTemplates({ setActiveStep }) {
         <AddLetterTemplate setCurrentScreen={setCurrentScreen} />
       )}
       {(templateScreen[0] === 3 || currentScreen === 3) && (
-        <EditLetterTemplate
-          setCurrentScreen={setCurrentScreen}
-        />
+        <EditLetterTemplate setCurrentScreen={setCurrentScreen} />
       )}
       {(templateScreen[0] === 1 || currentScreen === 1) && (
         <>

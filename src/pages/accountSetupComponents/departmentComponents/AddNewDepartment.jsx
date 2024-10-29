@@ -8,10 +8,10 @@ import {
   Spinner,
   Textarea,
 } from "@nextui-org/react";
-import { toast } from "sonner";
 import { FaAnglesRight } from "react-icons/fa6";
 import { mutate } from "swr";
 import axios from "@utils/axiosConfig";
+import Swal from "sweetalert2";
 
 function AddNewDepartment({ setOpenDrawer, openDrawer }) {
   const initialUserInput = {
@@ -36,8 +36,6 @@ function AddNewDepartment({ setOpenDrawer, openDrawer }) {
     }));
   };
 
-  console.log("role", userInput);
-
   useEffect(() => {
     if (!openDrawer) {
       setUserInput(initialUserInput);
@@ -52,15 +50,11 @@ function AddNewDepartment({ setOpenDrawer, openDrawer }) {
 
     if (!name || !description || !role) {
       setIsSaving(false);
-      toast.error("Fill All required fields", {
-        position: "top-right",
-        autoClose: 1202,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
+      Swal.fire({
+        title: "Error",
+        text: "Fill All required fields",
+        icon: "error",
+        button: "OK",
       });
     } else {
       const data = {
@@ -70,12 +64,26 @@ function AddNewDepartment({ setOpenDrawer, openDrawer }) {
       };
       try {
         const response = await axios.post("/institution/departments", data);
-        toast.success(response.data.message);
-        mutate("/institution/departments");
-        setOpenDrawer(!openDrawer);
-        setUserInput(initialUserInput);
+        Swal.fire({
+          title: "Success",
+          text: response.data.message,
+          icon: "success",
+          button: "OK",
+          confirmButtonColor: "#00b17d",
+        }).then((isOkay) => {
+          if (isOkay) {
+            mutate("/institution/departments");
+            setOpenDrawer(!openDrawer);
+            setUserInput(initialUserInput);
+          }
+        });
       } catch (error) {
-        toast.error(error.response?.data?.message || "An error occurred");
+        Swal.fire({
+          title: "Error",
+          text: error.response?.data?.message,
+          icon: "error",
+          button: "OK",
+        });
       } finally {
         setIsSaving(false);
       }

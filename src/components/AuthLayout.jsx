@@ -47,7 +47,6 @@ export default function AuthLayout({ children, title = "Page Title" }) {
       setSetupTrue(1);
     }
   }, [url]);
-  console.log("url", url);
 
   useEffect(() => {
     // fetchUserData();
@@ -144,11 +143,9 @@ export default function AuthLayout({ children, title = "Page Title" }) {
   }, [navLinks, setupTrue, institution, responseInstitution]);
 
   if (!isAuthenticated) {
-    console.log("Not authenticated");
     return <Navigate to="/" replace />;
   }
 
-  console.log(url);
 
   if (institution?.setup_done === 1) {
     if (url.startsWith("/account-setup")) {

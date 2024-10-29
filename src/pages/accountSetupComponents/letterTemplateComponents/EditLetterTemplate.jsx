@@ -7,6 +7,7 @@ import axios from "@utils/axiosConfig";
 import { Input, Spinner } from "@nextui-org/react";
 import EditValidationLetterTemplate from "./editLetterTemplateComponents/EditValidationLetterTemplate";
 import EditVerificationLetterTemplate from "./editLetterTemplateComponents/EditVerificationLetterTemplate";
+import Swal from "sweetalert2";
 
 function EditLetterTemplate({ setCurrentScreen }) {
   const [userInput, setUserInput] = useState([]);
@@ -27,7 +28,6 @@ function EditLetterTemplate({ setCurrentScreen }) {
 
   const institution = secureLocalStorage.getItem("institution");
   const selectedTemplate = secureLocalStorage.getItem("selectedTemplate");
-  console.log("wwe", selectedTemplate);
 
   useEffect(() => {
     if (selectedTemplate) {
@@ -94,47 +94,61 @@ function EditLetterTemplate({ setCurrentScreen }) {
     const { document_type_id } = userInput;
 
     if (!document_type_id) {
-      toast.error("Select Document Type and save", {
-        position: "top-right",
-        autoClose: 1202,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
+      Swal.fire({
+        title: "Error",
+        text: "Select Document Type and save",
+        icon: "error",
+        button: "OK",
       });
     } else {
-      setIsSaving(true);
-      const data = {
-        document_type_id: document_type_id,
-        positive_validation_response: validationSuccessfulTemplate,
-        negative_validation_response: validationUnsuccessfulTemplate,
-        positive_verification_response: verificationSuccessfulTemplate,
-        negative_verification_response: verificationUnsuccessfulTemplate,
-      };
+      const result = await Swal.fire({
+        title: "Are you sure you want to save and continue later?",
+        text: "This action will save your entry and log you out.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#febf4c",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, I'm sure",
+        cancelButtonText: "No, cancel",
+      });
 
-      const tempData = {
-        template_screens: JSON.stringify(templateScreen),
-      };
-      try {
-        const response = await axios.post(
-          "/institution/letter-templates",
-          data
-        );
-        const secondResponse = await axios.post(
-          "/institution/account-setup/template-screens",
-          tempData
-        );
-        if (secondResponse.status === 200 || secondResponse.status === 201) {
-          logout();
+      if (result.isConfirmed) {
+        setIsSaving(true);
+        const data = {
+          document_type_id: document_type_id,
+          positive_validation_response: validationSuccessfulTemplate,
+          negative_validation_response: validationUnsuccessfulTemplate,
+          positive_verification_response: verificationSuccessfulTemplate,
+          negative_verification_response: verificationUnsuccessfulTemplate,
+        };
+
+        const tempData = {
+          template_screens: JSON.stringify(templateScreen),
+        };
+        try {
+          const response = await axios.post(
+            "/institution/letter-templates",
+            data
+          );
+          const secondResponse = await axios.post(
+            "/institution/account-setup/template-screens",
+            tempData
+          );
+          if (secondResponse.status === 200 || secondResponse.status === 201) {
+            logout();
+          }
+        } catch (error) {
+          Swal.fire({
+            title: "Error",
+            text: error.response?.data?.message,
+            icon: "error",
+            button: "OK",
+          });
+          setIsSaving(false);
+        } finally {
+          setIsSaving(false);
+          return true;
         }
-      } catch (error) {
-        toast.error(error.response?.data?.message || "An error occurred");
-        setIsSaving(false);
-      } finally {
-        setIsSaving(false);
-        return true;
       }
     }
   };
@@ -522,17 +536,15 @@ function EditLetterTemplate({ setCurrentScreen }) {
       <button
         type="button"
         onClick={handleSubmit}
-        className="flex items-center bg-[#ffffff] border border-[#ff0404] hover:bg-[#ff0404] text-[#ff0404] hover:text-white px-4 py-2.5 rounded-[0.3rem] font-medium"
+        className="flex items-center mt-[4rem] bg-[#ffffff] border border-[#ff0404] hover:bg-[#ff0404] text-[#ff0404] hover:text-white px-4 py-2.5 rounded-[0.3rem] font-medium"
       >
         {isSaving ? (
           <>
-            <Spinner size="sm" color="white" />
+            <Spinner size="sm" color="danger" />
             <span className="ml-2">Saving...</span>
           </>
         ) : (
-          <>
-            Save And Continue Later
-          </>
+          <>Save And Continue Later</>
         )}
       </button>
     </>

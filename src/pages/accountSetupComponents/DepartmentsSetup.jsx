@@ -12,7 +12,6 @@ import {
 import React, { useState } from "react";
 import { FaAnglesLeft, FaAnglesRight } from "react-icons/fa6";
 import secureLocalStorage from "react-secure-storage";
-import { toast } from "sonner";
 import axios from "@utils/axiosConfig";
 import useSWR, { mutate } from "swr";
 import { useNavigate } from "react-router-dom";
@@ -21,6 +20,7 @@ import DeleteModal from "@components/DeleteModal";
 import AddNewDepartment from "./departmentComponents/AddNewDepartment";
 import EditDepartment from "./departmentComponents/EditDepartment";
 import Elipsis from "../../assets/icons/elipsis";
+import Swal from "sweetalert2";
 
 function DepartmentsSetup({ setActiveStep }) {
   const [isSaving, setSaving] = useState(false);
@@ -55,15 +55,11 @@ function DepartmentsSetup({ setActiveStep }) {
   };
   const handleSubmit = async () => {
     if (institutionDepartments?.data?.length === 0) {
-      toast.error("Add at least One Department", {
-        position: "top-right",
-        autoClose: 1202,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
+      Swal.fire({
+        title: "Error",
+        text: "Add at least One Department",
+        icon: "error",
+        button: "OK",
       });
     } else {
       setSaving(true);
@@ -75,26 +71,31 @@ function DepartmentsSetup({ setActiveStep }) {
           "/institution/account-setup/next-step",
           data
         );
-        toast.success("Account Setup Completed Successfully", {
-          position: "top-right",
-          autoClose: 1202,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
+        Swal.fire({
+          title: "Account Setup Completed Successfully",
+          text: "You're welcome to Bacchecker Institution Portal. Thank You!!",
+          icon: "success",
+          button: "OK",
+          confirmButtonColor: "#00b17d",
+        }).then((isOkay) => {
+          if (isOkay) {
+            const updatedInstitution = {
+              ...institution,
+              current_step: "5",
+            };
+            setInstitution(updatedInstitution);
+            secureLocalStorage.setItem("institution", updatedInstitution);
+            navigate("/dashboard");
+            setSaving(false);
+          }
         });
-        const updatedInstitution = {
-          ...institution,
-          current_step: "5",
-        };
-        setInstitution(updatedInstitution);
-        secureLocalStorage.setItem("institution", updatedInstitution);
-        navigate("/dashboard");
-        setSaving(false);
       } catch (error) {
-        toast.error(error.response?.data?.message || "An error occurred");
+        Swal.fire({
+          title: "Error",
+          text: error.response?.data?.message,
+          icon: "error",
+          button: "OK",
+        });
         setSaving(false);
       } finally {
         setSaving(false);
@@ -198,9 +199,18 @@ function DepartmentsSetup({ setActiveStep }) {
               `/institution/departments/${selectedData?.id}`
             );
             deleteDisclosure.onClose();
-            toast.success(response.data.message);
-            mutate("/institution/departments");
-            setDeleting(false);
+            Swal.fire({
+              title: "Success",
+              text: response.data.message,
+              icon: "success",
+              button: "OK",
+              confirmButtonColor: "#00b17d",
+            }).then((isOkay) => {
+              if (isOkay) {
+                mutate("/institution/departments");
+                setDeleting(false);
+              }
+            });
           } catch (error) {
             console.log(error);
             setErrors(error.response.data.message);

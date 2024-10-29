@@ -5,7 +5,7 @@ import { mutate } from "swr";
 import axios from "@utils/axiosConfig";
 import { Spinner } from "@nextui-org/react";
 import { FaAnglesLeft, FaAnglesRight } from "react-icons/fa6";
-import { toast } from "sonner";
+import Swal from "sweetalert2";
 function EditVerificationLetterTemplate({
   verificationSuccessfulTemplate,
   setVerificationSuccessfulTemplate,
@@ -108,16 +108,13 @@ function EditVerificationLetterTemplate({
       !verificationUnsuccessfulTemplate ||
       !selectedTemplate?.document_type_id
     ) {
-      toast.error("Set successful and unsuccessful verification templates", {
-        position: "top-right",
-        autoClose: 1202,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
+      Swal.fire({
+        title: "Error",
+        text: "Set successful and unsuccessful verification templates",
+        icon: "error",
+        button: "OK",
       });
+
       setIsSaving(false);
     } else {
       setIsSaving(true);
@@ -134,30 +131,35 @@ function EditVerificationLetterTemplate({
           "/institution/letter-templates",
           data
         );
-        toast.success(response.data.message, {
-          position: "top-right",
-          autoClose: 1202,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
+        Swal.fire({
+          title: "Success",
+          text: response.data.message,
+          icon: "success",
+          button: "OK",
+          confirmButtonColor: "#00b17d",
+        }).then((isOkay) => {
+          if (isOkay) {
+            mutate("/institution/letter-templates");
+            setCurrentScreen(1);
+            window.scrollTo({
+              top: 0,
+              behavior: "smooth",
+            });
+            const updatedInstitution = {
+              ...institution,
+              template_screens: JSON.stringify([1, 1, 1]),
+            };
+            setIsSaving(false);
+            setInstitution(updatedInstitution);
+          }
         });
-        mutate("/institution/letter-templates");
-        setCurrentScreen(1);
-        window.scrollTo({
-          top: 0,
-          behavior: "smooth",
-        });
-        const updatedInstitution = {
-          ...institution,
-          template_screens: JSON.stringify([1, 1, 1]),
-        };
-        setIsSaving(false);
-        setInstitution(updatedInstitution);
       } catch (error) {
-        toast.error(error.response?.data?.message || "An error occurred");
+        Swal.fire({
+          title: "Error",
+          text: error.response?.data?.message,
+          icon: "error",
+          button: "OK",
+        });
         setIsSaving(false);
       } finally {
         setIsSaving(false);
@@ -175,7 +177,7 @@ function EditVerificationLetterTemplate({
             onClick={handleDefaultSuccessTemplate}
             className="w-fit flex items-center bg-[#000000] hover:bg-[#282727] text-white px-4 py-2.5 rounded-[0.3rem] font-medium"
           >
-            Import Default Template
+            Use Default Template
           </button>
         )}
         {(currentTab === 2 || templateScreen[2] === 2) && (
@@ -184,7 +186,7 @@ function EditVerificationLetterTemplate({
             onClick={handleDefaultUnSuccessTemplate}
             className="w-fit flex items-center bg-[#000000] hover:bg-[#282727] text-white px-4 py-2.5 rounded-[0.3rem] font-medium"
           >
-            Import Default Template
+            Use Default Template
           </button>
         )}
       </div>

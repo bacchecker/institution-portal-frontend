@@ -212,7 +212,6 @@ class Dashboard extends Component {
       requests: requestData[index] || 0,
       validations: validationData[index] || 0,
     }));
-    console.log(totalRequests);
 
     return (
       <AuthLayout title="Dashboard">

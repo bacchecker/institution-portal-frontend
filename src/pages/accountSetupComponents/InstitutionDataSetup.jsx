@@ -6,6 +6,7 @@ import { FaAnglesRight } from "react-icons/fa6";
 import secureLocalStorage from "react-secure-storage";
 import { toast } from "sonner";
 import { IoDocumentText } from "react-icons/io5";
+import Swal from "sweetalert2";
 
 function InstitutionDataSetup({ setActiveStep }) {
   const [userInput, setUserInput] = useState([]);
@@ -78,20 +79,34 @@ function InstitutionDataSetup({ setActiveStep }) {
       selectedCert && form.append("operation_certificate", selectedCert);
       try {
         const response = await axios.post("/institution/account-setup", form);
-        toast.success(response.data.message);
-        const updatedInstitution = {
-          ...institution,
-          current_step: "2",
-        };
-        setInstitution(updatedInstitution);
-        secureLocalStorage.setItem("institution", updatedInstitution);
-        setActiveStep(2);
-        window.scrollTo({
-          top: 0,
-          behavior: "smooth",
+        Swal.fire({
+          title: "Success",
+          text: response.data.message,
+          icon: "success",
+          button: "OK",
+          confirmButtonColor: "#00b17d",
+        }).then((isOkay) => {
+          if (isOkay) {
+            const updatedInstitution = {
+              ...institution,
+              current_step: "2",
+            };
+            setInstitution(updatedInstitution);
+            secureLocalStorage.setItem("institution", updatedInstitution);
+            setActiveStep(2);
+            window.scrollTo({
+              top: 0,
+              behavior: "smooth",
+            });
+          }
         });
       } catch (error) {
-        toast.error(error.response?.data?.message || "An error occurred");
+        Swal.fire({
+          title: "Error",
+          text: error.response?.data?.message,
+          icon: "error",
+          button: "OK",
+        });
         setIsSaving(false);
       } finally {
         setIsSaving(false);

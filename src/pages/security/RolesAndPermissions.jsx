@@ -37,7 +37,6 @@ export default function RolesAndPermissions() {
     (url) => axios.get(url).then((res) => res.data)
   );
 
-  console.log(resData);
 
   const handlePermission = (permission) => {
     if (data.permissions.includes(permission)) {
@@ -63,7 +62,6 @@ export default function RolesAndPermissions() {
           `/institution/payment-accounts/${data?.id}`,
           data
         );
-        console.log(response?.data);
         // toast.success(response.data);
         // fetchPaymentAccounts();
         setProcessing(false);

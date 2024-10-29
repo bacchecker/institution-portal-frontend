@@ -23,7 +23,7 @@ import Elipsis from "@assets/icons/elipsis";
 import ExistingDocumentTypeCreation from "./ExistingDocumentTypeCreation";
 import NewDocumentTypeCreation from "./NewDocumentTypeCreation";
 import EditDocumentType from "./EditDocumentType";
-import { toast } from "sonner";
+import Swal from "sweetalert2";
 
 function InstitutionDocumentTypes({ setActiveStep }) {
   const [isSaving, setSaving] = useState(false);
@@ -78,15 +78,11 @@ function InstitutionDocumentTypes({ setActiveStep }) {
 
   const handleSubmit = async () => {
     if (institutionDocuments?.data?.types?.length === 0) {
-      toast.error("Add at least One document type", {
-        position: "top-right",
-        autoClose: 1202,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
+      Swal.fire({
+        title: "Error",
+        text: "Add at least One document type",
+        icon: "error",
+        button: "OK",
       });
     } else {
       setSaving(true);
@@ -98,21 +94,35 @@ function InstitutionDocumentTypes({ setActiveStep }) {
           "/institution/account-setup/next-step",
           data
         );
-        toast.success("Institution Document Type(s) created successfully");
-        const updatedInstitution = {
-          ...institution,
-          current_step: "3",
-        };
-        setInstitution(updatedInstitution);
-        secureLocalStorage.setItem("institution", updatedInstitution);
-        setActiveStep(3);
-        setSaving(false);
-        window.scrollTo({
-          top: 0,
-          behavior: "smooth",
+        Swal.fire({
+          title: "Success",
+          text: "Institution Document Type(s) created successfully",
+          icon: "success",
+          button: "OK",
+          confirmButtonColor: "#00b17d",
+        }).then((isOkay) => {
+          if (isOkay) {
+            const updatedInstitution = {
+              ...institution,
+              current_step: "3",
+            };
+            setInstitution(updatedInstitution);
+            secureLocalStorage.setItem("institution", updatedInstitution);
+            setActiveStep(3);
+            setSaving(false);
+            window.scrollTo({
+              top: 0,
+              behavior: "smooth",
+            });
+          }
         });
       } catch (error) {
-        toast.error(error.response?.data?.message || "An error occurred");
+        Swal.fire({
+          title: "Error",
+          text: error.response?.data?.message,
+          icon: "error",
+          button: "OK",
+        });
         setSaving(false);
       } finally {
         setSaving(false);
@@ -283,9 +293,18 @@ function InstitutionDocumentTypes({ setActiveStep }) {
               `/institution/document-types/${selectedData?.id}`
             );
             deleteDisclosure.onClose();
-            toast.success(response.data.message);
-            mutate("/institution/document-types");
-            setDeleting(false);
+            Swal.fire({
+              title: "Success",
+              text: response.data.message,
+              icon: "success",
+              button: "OK",
+              confirmButtonColor: "#00b17d",
+            }).then((isOkay) => {
+              if (isOkay) {
+                mutate("/institution/document-types");
+                setDeleting(false);
+              }
+            });
           } catch (error) {
             console.log(error);
             setErrors(error.response.data.message);

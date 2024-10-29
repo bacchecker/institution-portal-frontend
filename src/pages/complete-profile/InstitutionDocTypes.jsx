@@ -211,7 +211,6 @@ class InstitutionDocTypes extends Component {
   };
 
   handleSubmit = () => {
-    console.log('Documents');
     
   }
 

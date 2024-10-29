@@ -45,7 +45,6 @@ const PaymentRevenueSetup = () => {
           `/institution/payment-accounts/${selectedData?.id}`,
           selectedData
         );
-        console.log(response?.data);
         // toast.success(response.data);
         // fetchPaymentAccounts();
         setProcessing(false);

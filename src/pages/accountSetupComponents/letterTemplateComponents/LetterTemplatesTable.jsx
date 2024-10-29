@@ -30,7 +30,6 @@ function LetterTemplatesTable({
     secureLocalStorage.setItem("institution", updatedInstitution);
   };
 
-  console.log("templateScreen", templateScreen);
 
   return (
     <section className="md:w-full w-[98vw] min-h-[60vh] mx-auto">
