@@ -60,7 +60,6 @@ export default function DocumentRequest() {
   const [filters, setFilters] = useState({
     search_query: "",
     status: "",
-    payment_status: "",
   });
   const { mutate } = useSWRConfig();
 
@@ -230,32 +229,6 @@ export default function DocumentRequest() {
                   <SelectItem key={item.key}>{item.label}</SelectItem>
                 ))}
               </Select>
-
-              <Select
-                size="sm"
-                placeholder="Payment Status"
-                className="max-w-[130px] min-w-[130px]"
-                name="payment_status"
-                defaultSelectedKeys={[filters?.payment_status]}
-              >
-                {[
-                  {
-                    key: "pending",
-                    label: "Pending",
-                  },
-                  {
-                    key: "failed",
-                    label: "Failed",
-                  },
-                  {
-                    key: "paid",
-                    label: "Paid",
-                  },
-                ].map((item) => (
-                  <SelectItem key={item.key}>{item.label}</SelectItem>
-                ))}
-              </Select>
-
               <DateRangePicker
                 visibleMonths={2}
                 className="w-[30%]"
@@ -350,9 +323,7 @@ export default function DocumentRequest() {
                 <StatusChip status={item?.status} />
               </TableCell>
               <TableCell>GH¢ {item?.total_amount}</TableCell>
-              <TableCell>
-                <StatusChip status={item?.payment_status} />
-              </TableCell>
+              
               <TableCell className="flex items-center h-16 gap-3">
                 <Button
                   size="sm"
