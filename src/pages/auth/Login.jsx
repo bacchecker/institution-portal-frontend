@@ -22,12 +22,12 @@ const Login = () => {
   const [isSelected, setIsSelected] = useState(false);
   const [recaptchaToken, setRecaptchaToken] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const recaptchaRef = useRef();
   const navigate = useNavigate();
 
   const { login, isAuthenticated } = useAuthStore();
+
 
   const onRecaptchaChange = (token) => {
     setRecaptchaToken(token);
@@ -37,38 +37,36 @@ const Login = () => {
     secureLocalStorage.clear();
   }, []);
 
-  const handleCheckboxChange = () => {
-    setRememberMe((prev) => !prev);
-  };
-
   const loginUser = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-  
+
     if (!recaptchaToken) {
       toast.error("Please complete the reCAPTCHA");
       setIsLoading(false);
       return;
     }
-  
+
     try {
       const response = await axios.post("/auth/login", {
         email: formData.email,
         password: formData.password,
         remember: isSelected,
         recaptcha_token: recaptchaToken,
-        remember: rememberMe,
       });
       let responseData = response.data.data;
-  
+
       secureLocalStorage.setItem("authToken", responseData.token);
       secureLocalStorage.setItem("user", responseData.user);
       secureLocalStorage.setItem("institution", responseData.institution);
-      secureLocalStorage.setItem("selectedTemplate", responseData.letter_template);
+      secureLocalStorage.setItem(
+        "selectedTemplate",
+        responseData.letter_template
+      );
       setIsLoading(false);
-  
+
       login(responseData.user, responseData.institution, responseData.token);
-  
+
       if (responseData.user.type === "institution") {
         // Check if OTP verification is required
         if (response.data?.show_otp === true) {
@@ -76,20 +74,20 @@ const Login = () => {
           toast.success(response.data.message);
           return; // Stop further execution if OTP verification is required
         }
-        
+
         // Check if the institution is inactive
         if (responseData.institution.status === "inactive") {
           navigate("/account-inactive");
           return; // Stop further execution if account is inactive
         }
-  
+
         // Check if account setup is done
         if (responseData.institution.setup_done) {
           navigate("/dashboard");
         } else {
           navigate("/account-setup");
         }
-  
+
         toast.success(response.data.message);
       } else {
         toast.error("You are not an institution");
@@ -101,7 +99,6 @@ const Login = () => {
       setIsLoading(false);
     }
   };
-  
 
   return (
     <>

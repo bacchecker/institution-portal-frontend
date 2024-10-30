@@ -42,21 +42,22 @@ function LetterTemplates({ setActiveStep }) {
     setActiveStep(2);
   };
 
-  const mostCurrentTemplate = letterTemplates?.data?.reduce(
-    (mostRecent, current) => {
-      return new Date(current.created_at) > new Date(mostRecent.created_at)
-        ? current
-        : mostRecent;
-    }
-  );
-
+  const mostCurrentTemplate =
+    letterTemplates?.data && letterTemplates.data.length > 0
+      ? letterTemplates.data.reduce((mostRecent, current) => {
+          return new Date(current.created_at) > new Date(mostRecent.created_at)
+            ? current
+            : mostRecent;
+        })
+      : null;
 
   const handleCreateLetterTemplates = () => {
     if (
-      mostCurrentTemplate?.negative_validation_response === null ||
-      mostCurrentTemplate?.negative_verification_response === null ||
-      mostCurrentTemplate?.positive_validation_response === null ||
-      mostCurrentTemplate?.positive_verification_response === null
+      mostCurrentTemplate &&
+      (mostCurrentTemplate?.negative_validation_response === null ||
+        mostCurrentTemplate?.negative_verification_response === null ||
+        mostCurrentTemplate?.positive_validation_response === null ||
+        mostCurrentTemplate?.positive_verification_response === null)
     ) {
       Swal.fire({
         title: "Error",
@@ -88,10 +89,11 @@ function LetterTemplates({ setActiveStep }) {
         button: "OK",
       });
     } else if (
-      mostCurrentTemplate?.negative_validation_response === null ||
-      mostCurrentTemplate?.negative_verification_response === null ||
-      mostCurrentTemplate?.positive_validation_response === null ||
-      mostCurrentTemplate?.positive_verification_response === null
+      mostCurrentTemplate &&
+      (mostCurrentTemplate?.negative_validation_response === null ||
+        mostCurrentTemplate?.negative_verification_response === null ||
+        mostCurrentTemplate?.positive_validation_response === null ||
+        mostCurrentTemplate?.positive_verification_response === null)
     ) {
       Swal.fire({
         title: "Error",
