@@ -177,7 +177,6 @@ export default function DocumentRequest() {
         return <Elipsis />;
     }
   };
-  console.log(data);
 
   return (
     <AuthLayout title="Document Request">
@@ -322,7 +321,7 @@ export default function DocumentRequest() {
                 <StatusChip status={item?.status} />
               </TableCell>
               <TableCell>GH¢ {item?.total_amount}</TableCell>
-              
+
               <TableCell className="flex items-center h-16 gap-3">
                 <Button
                   size="sm"
@@ -360,7 +359,6 @@ export default function DocumentRequest() {
                 value={data?.delivery_address}
               />
               <ItemCard title="Total Cost (GH¢)" value={data?.total_amount} />
-             
             </div>
 
             <Card className="dark:bg-slate-950">
@@ -663,11 +661,18 @@ export default function DocumentRequest() {
                         unique_code: data?.unique_code,
                         institution_id: data?.institution_id,
                         id: data?.id,
+                      },
+                      {
+                        headers: {
+                          "Content-Type": "multipart/form-data",
+                        },
                       }
                     );
 
                     if (resss.status !== 200) {
                       toast.error("Failed to upload file(s)");
+                      setProcessing(false);
+                      toast.error("Documents uploaded failed");
                       return;
                     }
 
@@ -707,9 +712,11 @@ export default function DocumentRequest() {
 
           if (resss.status !== 200) {
             toast.error("Failed to update request status");
+            setProcessing(false);
+            toast.error("Request status updated failed");
             return;
           }
-          console.log(resss?.data);
+
           setData(resss?.data);
           setProcessing(false);
           toast.success("Request status updated successfully");
