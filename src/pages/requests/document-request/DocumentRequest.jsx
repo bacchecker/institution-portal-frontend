@@ -177,6 +177,7 @@ export default function DocumentRequest() {
         return <Elipsis />;
     }
   };
+  console.log(data);
 
   return (
     <AuthLayout title="Document Request">
@@ -280,7 +281,6 @@ export default function DocumentRequest() {
             "Format",
             "Status",
             "Total Amount",
-            "Payment Status",
             "",
           ]}
           loadingState={resData ? false : true}
@@ -360,10 +360,7 @@ export default function DocumentRequest() {
                 value={data?.delivery_address}
               />
               <ItemCard title="Total Cost (GH¢)" value={data?.total_amount} />
-              {/* <ItemCard
-                title="Payment Status"
-                value={<StatusChip status={data?.payment_status} />}
-              /> */}
+             
             </div>
 
             <Card className="dark:bg-slate-950">
@@ -674,6 +671,7 @@ export default function DocumentRequest() {
                       return;
                     }
 
+                    console.log(resss?.data);
                     setData(resss?.data);
                     setProcessing(false);
                     toast.success("Documents uploaded successfully");
@@ -711,6 +709,7 @@ export default function DocumentRequest() {
             toast.error("Failed to update request status");
             return;
           }
+          console.log(resss?.data);
           setData(resss?.data);
           setProcessing(false);
           toast.success("Request status updated successfully");
