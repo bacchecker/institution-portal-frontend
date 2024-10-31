@@ -125,8 +125,8 @@ export const navLinks = [
     ],
   },
   {
-    label: "Security",
-    path: "/security",
+    label: "Account Settings",
+    path: "/account-settings",
     icon: <SecurityIcon />,
     profile_complete: ["yes"],
     showOn: ["active"],
@@ -136,11 +136,33 @@ export const navLinks = [
       "view suspicious accounts",
     ],
     children: [
+      
       {
-        label: "Roles and Permissions",
-        path: "/security/roles-permissions",
-        acl: ["view roles and permissions"],
+        label: "Document Types",
+        path: "/account-settings/document-types",
+        acl: ["view document types"],
       },
+      {
+        label: "Letter Templates",
+        path: "/account-settings/letter-templates",
+        acl: ["view letter templates"],
+      },
+      // {
+      //   label: "Roles and Permissions",
+      //   path: "/account-settings/roles-permissions",
+      //   acl: ["view roles and permissions"],
+      // },
+      {
+        label: "Department Management",
+        path: "/account-settings/departments",
+        acl: ["view departments"],
+      },
+      {
+        label: "Users Management",
+        path: "/account-settings/users",
+        acl: ["view users"],
+      },
+      
       // {
       //   label: "Activity Logs",
       //   path: "/security/activity-logs",

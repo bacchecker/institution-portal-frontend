@@ -2,18 +2,10 @@ import Dashboard from "./pages/Dashboard";
 import { Routes, Route, Outlet, useNavigate } from "react-router-dom";
 import Login from "./pages/auth/Login";
 import withRouter from "./components/withRouter";
-import CompleteProfile from "./pages/CompleteProfile";
-import AddDocumentType from "./pages/document-types/AddDocumentType";
 import VerifyOTP from "./pages/auth/VerifyOTP";
 import Toastify from "./components/Toastify";
 import DocumentTypes from "./pages/document-types/DocumentTypes";
-import ValidationQuestions from "./pages/document-types/ValidationQuestions";
 import Profile from "./pages/user-profile/Profile";
-import InstitutionData from "./pages/complete-profile/InstitutionData";
-import OperationsCert from "./pages/complete-profile/OperationsCert";
-import InstitutionTeams from "./pages/institution-teams/InstitutionTeams";
-import InstitutionUsers from "./pages/institution-teams/InstitutionUsers";
-import InstitutionLetter from "./pages/complete-profile/InstitutionLetter";
 import AccountInactive from "./pages/complete-profile/AccountInactive";
 import PaymentRevenueSetup from "./pages/PaymentRevenueSetup";
 import RevenueOverview from "./pages/reports/RevenueOverview";
@@ -21,10 +13,13 @@ import { Button } from "@nextui-org/react";
 import ValidationRequest from "./pages/requests/ValidationRequest";
 import DocumentRequest from "./pages/requests/document-request/DocumentRequest";
 import DocumentDetails from "./pages/requests/document-request/DocumentDetails";
-import TermsConditions from "./pages/complete-profile/TermsConditions";
+import InstitutionDocumentTypes from "./pages/accountSettingsComponents/InstitutionDocumentTypes";
 import RolesAndPermissions from "./pages/security/RolesAndPermissions";
 import { Toaster } from "sonner";
 import AccountSetupPage from "./pages/AccountSetupPage";
+import LetterTemplates from "./pages/accountSettingsComponents/LetterTemplates";
+import DepartmentManagement from "./pages/accountSettingsComponents/DepartmentManagement";
+import UserManagement from "./pages/accountSettingsComponents/UserManagement";
 
 const App = () => {
   const navigate = useNavigate();
@@ -64,6 +59,17 @@ const App = () => {
             path="validation-requests"
             element={<ValidationRequest />}
           />
+        </Route>
+
+        <Route exact path="/account-settings" element={<Outlet />}>
+          <Route
+            exact
+            path="document-types"
+            element={<InstitutionDocumentTypes />}
+          />
+          <Route exact path="letter-templates" element={<LetterTemplates />} />
+          <Route exact path="departments" element={<DepartmentManagement />} />
+          <Route exact path="users" element={<UserManagement />} />
         </Route>
 
         <Route exact path="/security" element={<Outlet />}>
