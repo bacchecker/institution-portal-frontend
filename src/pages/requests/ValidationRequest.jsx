@@ -269,7 +269,7 @@ export default function ValidationRequest() {
               <TableCell>
                 {moment(item?.created_at).format("Do MMMM, YYYY")}
               </TableCell>
-              <TableCell>{item?.document_type?.name}</TableCell>
+              <TableCell>{item?.institution_document_type?.name}</TableCell>
               <TableCell>
                 <StatusChip status={item?.status} />
               </TableCell>
