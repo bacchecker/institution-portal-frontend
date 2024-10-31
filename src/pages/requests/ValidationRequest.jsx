@@ -68,7 +68,6 @@ export default function ValidationRequest() {
     (url) => axios.get(url).then((res) => res.data)
   );
 
-
   const handleBulkDownload = async (filePaths) => {
     try {
       const csrfTokenMeta = document?.querySelector('meta[name="csrf-token"]');
@@ -427,32 +426,36 @@ export default function ValidationRequest() {
         title="Change Request Status"
         onButtonClick={async () => {
           setProcessing(true);
-          const resss = await axios.post(
-            `/institution/requests/validation-requests/${data?.id}/status`,
-            {
-              id: data?.id,
-              institution_id: data?.institution_id,
-              user_id: data?.user_id,
-              unique_code: data?.unique_code,
-              status:
-                data?.status == "submitted"
-                  ? "received"
-                  : data?.status == "received"
-                  ? "processing"
-                  : "completed",
-            }
-          );
-
-          if (resss.status !== 200) {
-            toast.error("Failed to update request status");
-            setProcessing(false);
-            return;
-          }
-          setData(resss?.data);
-          setProcessing(false);
-          toast.success("Request status updated successfully");
-          mutate("/institution/requests/validation-requests");
-          changeStatusDisclosure.onClose();
+          const resss = await axios
+            .post(
+              `/institution/requests/validation-requests/${data?.id}/status`,
+              {
+                id: data?.id,
+                institution_id: data?.institution_id,
+                user_id: data?.user_id,
+                unique_code: data?.unique_code,
+                status:
+                  data?.status == "submitted"
+                    ? "received"
+                    : data?.status == "received"
+                    ? "processing"
+                    : "completed",
+              }
+            )
+            .then((res) => {
+              setData(resss?.data);
+              setProcessing(false);
+              toast.success("Request status updated successfully");
+              mutate("/institution/requests/validation-requests");
+              changeStatusDisclosure.onClose();
+            })
+            .catch((err) => {
+              console.log(err);
+              toast.error(err.response.data.message);
+              setProcessing(false);
+              changeStatusDisclosure.onClose();
+              return;
+            });
         }}
       >
         <p className="font-quicksand">
