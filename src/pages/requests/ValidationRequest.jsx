@@ -269,7 +269,11 @@ export default function ValidationRequest() {
               <TableCell>
                 {moment(item?.created_at).format("Do MMMM, YYYY")}
               </TableCell>
-              <TableCell>{item?.institution_document_type?.name}</TableCell>
+              <TableCell>
+                {item.institution_document_type
+                  ? item?.institution_document_type?.document_type?.name
+                  : item?.document_type?.name}
+              </TableCell>
               <TableCell>
                 <StatusChip status={item?.status} />
               </TableCell>
@@ -426,7 +430,7 @@ export default function ValidationRequest() {
         title="Change Request Status"
         onButtonClick={async () => {
           setProcessing(true);
-          const resss = await axios
+          await axios
             .post(
               `/institution/requests/validation-requests/${data?.id}/status`,
               {
@@ -443,7 +447,9 @@ export default function ValidationRequest() {
               }
             )
             .then((res) => {
-              setData(resss?.data);
+              console.log(res);
+
+              setData(res?.data);
               setProcessing(false);
               toast.success("Request status updated successfully");
               mutate("/institution/requests/validation-requests");

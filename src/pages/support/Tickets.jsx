@@ -1,5 +1,10 @@
 import React from "react";
+import AuthLayout from "../../components/AuthLayout";
 
 export default function Tickets() {
-  return <div>Tickets</div>;
+  return (
+    <AuthLayout title="Tickets">
+      <p>asda</p>
+    </AuthLayout>
+  );
 }

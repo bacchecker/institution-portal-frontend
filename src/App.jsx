@@ -20,6 +20,7 @@ import AccountSetupPage from "./pages/AccountSetupPage";
 import LetterTemplates from "./pages/accountSettingsComponents/LetterTemplates";
 import DepartmentManagement from "./pages/accountSettingsComponents/DepartmentManagement";
 import UserManagement from "./pages/accountSettingsComponents/UserManagement";
+import Tickets from "./pages/support/Tickets";
 
 const App = () => {
   const navigate = useNavigate();
@@ -78,6 +79,10 @@ const App = () => {
             path="roles-permissions"
             element={<RolesAndPermissions />}
           />
+        </Route>
+
+        <Route exact path="/supports" element={<Outlet />}>
+          <Route exact path="tickets" element={<Tickets />} />
         </Route>
 
         {/* // Kwamina */}
