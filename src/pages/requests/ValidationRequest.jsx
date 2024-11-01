@@ -341,6 +341,11 @@ export default function ValidationRequest() {
                     <p className="font-semibold">Phone:</p>
                     <p className="col-span-4">{data?.user?.phone}</p>
                   </div>
+
+                  <div className="grid grid-cols-5 gap-1">
+                    <p className="font-semibold">Index Number:</p>
+                    <p className="col-span-4">{data?.index_number}</p>
+                  </div>
                 </div>
               </CardBody>
             </Card>
