@@ -137,6 +137,7 @@ function EditUser({ setOpenDrawer, openDrawer, selectedData, fetchData }) {
         <div className="flex flex-col">
             <Input
                 size="sm"
+                disabled
                 label={
                 <>
                     First Name
@@ -151,6 +152,7 @@ function EditUser({ setOpenDrawer, openDrawer, selectedData, fetchData }) {
             />
             <Input
                 size="sm"
+                disabled
                 label={
                 <>
                 Last Name
@@ -165,6 +167,7 @@ function EditUser({ setOpenDrawer, openDrawer, selectedData, fetchData }) {
             />
             <Input
                 size="sm"
+                disabled
                 label={
                 <>
                 Other Name
@@ -178,6 +181,7 @@ function EditUser({ setOpenDrawer, openDrawer, selectedData, fetchData }) {
             />
             <Input
                 size="sm"
+                disabled
                 label={
                 <>
                 Email
@@ -192,6 +196,7 @@ function EditUser({ setOpenDrawer, openDrawer, selectedData, fetchData }) {
             />
             <Input
                 size="sm"
+                disabled
                 label={
                 <>
                 Phone
@@ -206,6 +211,7 @@ function EditUser({ setOpenDrawer, openDrawer, selectedData, fetchData }) {
             />
             <Select
                 size="sm"
+                isDisabled
                 label={
                 <>
                     Gender
