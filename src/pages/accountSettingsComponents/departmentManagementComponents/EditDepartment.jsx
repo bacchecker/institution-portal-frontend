@@ -14,8 +14,8 @@ import axios from "@utils/axiosConfig";
 import Swal from "sweetalert2";
 
 function EditDepartment({ setOpenDrawer, openDrawer, selectedData }) {
-  const [userInput, setUserInput] = useState([]);
-  const [userInitialInput, setUserInitialInput] = useState([]);
+  const [userInput, setUserInput] = useState({});
+  const [userInitialInput, setUserInitialInput] = useState({});
   const [drawerTitle, setDrawerTitle] = useState("Department Details");
   const [isSaving, setIsSaving] = useState(false);
   const roles = [
@@ -24,6 +24,8 @@ function EditDepartment({ setOpenDrawer, openDrawer, selectedData }) {
     { name: "Customer Service" },
     { name: "HR" },
   ];
+
+  console.log(userInput);
 
   useEffect(() => {
     if (selectedData) {
@@ -105,12 +107,8 @@ function EditDepartment({ setOpenDrawer, openDrawer, selectedData }) {
         <div className="flex flex-col">
           <Input
             size="sm"
-            label={
-              <>
-                Name
-                <span className="text-[#ff0404]">*</span>
-              </>
-            }
+            isRequired
+            label="Name"
             type="text"
             name="name"
             className="mt-4"
@@ -118,28 +116,22 @@ function EditDepartment({ setOpenDrawer, openDrawer, selectedData }) {
             onChange={handleUserInput}
           />
           <Select
+            isRequired
             size="sm"
-            label={
-              <>
-                Role
-                <span className="text-[#ff0404]">*</span>
-              </>
-            }
+            label="Role"
             className="w-full mt-4"
             name="role"
-            value={userInput?.role}
+            // value={userInput?.role}
             onChange={handleUserInput}
+            selectedKeys={[userInput?.role]}
+            defaultSelectedKeys={[userInput?.role]}
           >
             {roles?.map((item) => (
               <SelectItem key={item.name}>{item.name}</SelectItem>
             ))}
           </Select>
           <Textarea
-            label={
-              <>
-                Description<span className="text-[#ff0404]">*</span>
-              </>
-            }
+            label="Description"
             name="description"
             className="mt-4"
             value={userInput.description}
@@ -149,35 +141,22 @@ function EditDepartment({ setOpenDrawer, openDrawer, selectedData }) {
 
         <div className="w-full flex items-center justify-between">
           <Button
-            className="py-2.5 font-medium rounded-[0.3rem]"
             color="default"
             onClick={() => {
               setOpenDrawer(false);
-              reset();
             }}
           >
             Close
           </Button>
 
-          <button
+          <Button
             type="submit"
-            className={`flex items-center bg-[#ff0404] hover:bg-[#f77f7f] text-white px-4 py-2.5 rounded-[0.3rem] font-medium ${
-              isSaving && "cursor-not-allowed bg-[#f77f7f]"
-            }`}
+            isLoading={isSaving}
+            color="danger"
             disabled={isSaving}
           >
-            {isSaving ? (
-              <>
-                <Spinner size="sm" color="white" />
-                <span className="ml-2">Updating...</span>
-              </>
-            ) : (
-              <>
-                Update
-                <FaAnglesRight className="ml-2" />
-              </>
-            )}
-          </button>
+            Update
+          </Button>
         </div>
       </form>
     </Drawer>

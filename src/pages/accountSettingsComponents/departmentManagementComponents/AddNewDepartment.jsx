@@ -99,12 +99,8 @@ function AddNewDepartment({ setOpenDrawer, openDrawer }) {
         <div className="flex flex-col">
           <Input
             size="sm"
-            label={
-              <>
-                Name
-                <span className="text-[#ff0404]">*</span>
-              </>
-            }
+            isRequired
+            label="Name"
             type="text"
             name="name"
             className="mt-4"
@@ -113,27 +109,21 @@ function AddNewDepartment({ setOpenDrawer, openDrawer }) {
           />
           <Select
             size="sm"
-            label={
-              <>
-                Role
-                <span className="text-[#ff0404]">*</span>
-              </>
-            }
+            isRequired
+            label="Role"
             className="w-full mt-4"
             name="role"
             value={userInput?.role}
             onChange={handleUserInput}
+            defaultSelectedKeys={[userInput?.role]}
           >
             {roles?.map((item) => (
               <SelectItem key={item.name}>{item.name}</SelectItem>
             ))}
           </Select>
           <Textarea
-            label={
-              <>
-                Description<span className="text-[#ff0404]">*</span>
-              </>
-            }
+            isRequired
+            label="Description"
             name="description"
             className="mt-4"
             value={userInput.description}
@@ -143,35 +133,22 @@ function AddNewDepartment({ setOpenDrawer, openDrawer }) {
 
         <div className="w-full flex items-center justify-between">
           <Button
-            className="py-2.5 font-medium rounded-[0.3rem]"
             color="default"
             onClick={() => {
               setOpenDrawer(false);
-              reset();
             }}
           >
             Close
           </Button>
 
-          <button
+          <Button
             type="submit"
-            className={`flex items-center bg-[#ff0404] hover:bg-[#f77f7f] text-white px-4 py-2.5 rounded-[0.3rem] font-medium ${
-              isSaving && "cursor-not-allowed bg-[#f77f7f]"
-            }`}
+            isLoading={isSaving}
             disabled={isSaving}
+            color="danger"
           >
-            {isSaving ? (
-              <>
-                <Spinner size="sm" color="white" />
-                <span className="ml-2">Creating...</span>
-              </>
-            ) : (
-              <>
-                Create
-                <FaAnglesRight className="ml-2" />
-              </>
-            )}
-          </button>
+            Create
+          </Button>
         </div>
       </form>
     </Drawer>
