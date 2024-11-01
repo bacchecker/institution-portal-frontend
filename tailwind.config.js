@@ -13,10 +13,8 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        //sans: ["Inter", ...defaultTheme.fontFamily.sans],
-        "figtree": ['Figtree', 'sans-serif']
+        sans: ["Figtree", ...defaultTheme.fontFamily.sans],
       },
-      // Inter
       colors: {
         primaryRed: "#FE0000",
         bChkRed: "#FD0D0E",

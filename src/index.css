@@ -31,41 +31,7 @@
 .animate-slide-up {
   animation: slide-up 0.2s ease-out;
 }
-* {
-  font-family: "Figtree", sans-serif;
-}
-a,
-p,
-h1,
-h2,
-h3,
-h4,
-h5,
-h6,
-div,
-section,
-span,
-button,
-input,
-label,
-textarea,
-select,
-option,
-ul,
-li,
-ol,
-blockquote,
-pre,
-code,
-th,
-td,
-tr,
-table,
-img,
-svg,
-footer {
-  font-family: "Figtree", sans-serif;
-}
+
 .custom-checkbox {
   --nextui-checkbox-color: #ff0404;
 }

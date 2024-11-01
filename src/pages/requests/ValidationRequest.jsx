@@ -15,6 +15,7 @@ import {
   SelectItem,
   TableCell,
   TableRow,
+  Textarea,
   useDisclosure,
 } from "@nextui-org/react";
 import CustomTable from "@components/CustomTable";
@@ -33,6 +34,7 @@ import { filesize } from "filesize";
 import ClipIcon from "@assets/icons/clip";
 import DownloadIcon from "@assets/icons/download";
 import ConfirmModal from "../../components/confirm-modal";
+import DeleteModal from "../../components/DeleteModal";
 import toast from "react-hot-toast";
 import { parseDate } from "@internationalized/date";
 
@@ -48,6 +50,7 @@ export default function ValidationRequest() {
   const { mutate } = useSWRConfig();
 
   const changeStatusDisclosure = useDisclosure();
+  const declineDisclosure = useDisclosure();
 
   const [bulkDownloadLoading, setBulkDownloadLoading] = useState(false);
   const [openDrawer, setOpenDrawer] = useState(false);
@@ -109,6 +112,8 @@ export default function ValidationRequest() {
       console.error("Error downloading files:", error);
     }
   };
+
+  console.log(data);
 
   return (
     <AuthLayout title="Validation Request">
@@ -404,6 +409,17 @@ export default function ValidationRequest() {
               Close
             </Button>
 
+            {(data?.status == "received" || data?.status == "submitted") && (
+              <Button
+                color="danger"
+                className="font-montserrat font-semibold w-1/2"
+                size="sm"
+                onClick={() => declineDisclosure.onOpen()}
+              >
+                Decline Request
+              </Button>
+            )}
+
             {data?.status !== "created" && data?.status !== "completed" && (
               <Button
                 color="danger"
@@ -475,6 +491,56 @@ export default function ValidationRequest() {
           </span>
         </p>
       </ConfirmModal>
+
+      <DeleteModal
+        disclosure={declineDisclosure}
+        processing={processing}
+        title="Decline Request"
+        onButtonClick={async () => {
+          setProcessing(true);
+          await axios
+            .post(
+              `/institution/requests/validation-requests/${data?.id}/status`,
+              {
+                id: data?.id,
+                institution_id: data?.institution_id,
+                user_id: data?.user_id,
+                unique_code: data?.unique_code,
+                status: "rejected",
+                rejection_reason: data?.rejection_reason,
+              }
+            )
+            .then((res) => {
+              console.log(res);
+
+              setData(res?.data);
+              setProcessing(false);
+              toast.success("Request declined successfully");
+              mutate("/institution/requests/validation-requests");
+              declineDisclosure.onClose();
+            })
+            .catch((err) => {
+              console.log(err);
+              toast.error(err.response.data.message);
+              setProcessing(false);
+              declineDisclosure.onClose();
+              return;
+            });
+        }}
+      >
+        <p className="">
+          Are you sure to change status to{" "}
+          <span className="font-semibold">Delicne Request</span>?
+        </p>
+
+        <Textarea
+          name="rejection_reason"
+          label="Reason"
+          onChange={(e) =>
+            setData((prev) => ({ ...prev, rejection_reason: e.target.value }))
+          }
+        />
+      </DeleteModal>
     </AuthLayout>
   );
 }
