@@ -166,6 +166,7 @@ const Login = () => {
             />
             <div className="flex flex-col gap-2">
               <Switch
+                size="sm"
                 isSelected={isSelected}
                 onValueChange={setIsSelected}
                 color="danger"
