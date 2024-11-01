@@ -395,6 +395,42 @@ export default function ValidationRequest() {
                 </div>
               </section>
             </div>
+
+            <div>
+              {data?.status == "rejected" && (
+                <div className="mt-3">
+                  <Card className="dark:bg-slate-950">
+                    <CardHeader>
+                      <p className="font-bold">Rejection Reason</p>
+                    </CardHeader>
+                    <CardBody>
+                      <p>{data?.rejection_reason}</p>
+                    </CardBody>
+                  </Card>
+
+                  <div className="mt-3">
+                    <Card className="dark:bg-slate-950">
+                      <CardBody className="flex-row">
+                        <div className="flex-1">
+                          <p className="font-semibold">Rejected By:</p>
+                          <p className="col-span-4">
+                            {data?.rejected_by?.first_name}{" "}
+                            {data?.rejected_by?.last_name}
+                          </p>
+                        </div>
+
+                        <div className="flex-1">
+                          <p className="font-bold">Rejection Date</p>
+                          <p>
+                            {moment(data?.updated_at).format("Do MMMM, YYYY")}
+                          </p>
+                        </div>
+                      </CardBody>
+                    </Card>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="flex items-center gap-3 justify-end">
@@ -420,22 +456,24 @@ export default function ValidationRequest() {
               </Button>
             )}
 
-            {data?.status !== "created" && data?.status !== "completed" && (
-              <Button
-                color="danger"
-                className="font-montserrat font-semibold w-1/2"
-                size="sm"
-                onClick={() => changeStatusDisclosure.onOpen()}
-              >
-                {data?.status === "submitted"
-                  ? "Acknowledge Request"
-                  : data?.status === "received"
-                  ? "Process Request"
-                  : data?.status == "processing"
-                  ? "Complete Request"
-                  : "Acknowledge Request"}
-              </Button>
-            )}
+            {data?.status !== "created" &&
+              data?.status !== "completed" &&
+              data?.status !== "rejected" && (
+                <Button
+                  color="danger"
+                  className="font-montserrat font-semibold w-1/2"
+                  size="sm"
+                  onClick={() => changeStatusDisclosure.onOpen()}
+                >
+                  {data?.status === "submitted"
+                    ? "Acknowledge Request"
+                    : data?.status === "received"
+                    ? "Process Request"
+                    : data?.status == "processing"
+                    ? "Complete Request"
+                    : "Acknowledge Request"}
+                </Button>
+              )}
           </div>
         </div>
       </Drawer>
