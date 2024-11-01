@@ -479,13 +479,13 @@ class Dashboard extends Component {
                           <ul className="list-disc ml-4 mt-1 pb-2">
                             {recentDocumentValidations &&
                             recentDocumentValidations.length > 0 ? (
-                              recentDocumentValidations.map(
+                              recentDocumentValidations?.map(
                                 (validation, index) => (
                                   <li
                                     key={index}
                                     className="flex justify-between text-gray-600 text-sm py-2 border-b"
                                   >
-                                    <p>{validation.document_type.name}</p>
+                                    <p>{validation?.document_type?.name}</p>
                                     <p className="text-xs self-end">
                                       {moment(validation.created_at).format(
                                         "MMM D, YYYY"
