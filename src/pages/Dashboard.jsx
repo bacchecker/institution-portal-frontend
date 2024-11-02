@@ -71,11 +71,12 @@ class Dashboard extends Component {
     openSection: null,
     recentDocumentRequests: [],
     recentDocumentValidations: [],
+    userRole: ''
   };
 
   componentDidMount() {
     this.fetchInstitution();
-    this.fetchDashboardAnalytics();
+    
     this.getTimeOfDay();
     this.intervalId = setInterval(this.getTimeOfDay.bind(this), 60000);
   }
@@ -109,74 +110,104 @@ class Dashboard extends Component {
   fetchDashboardAnalytics = async () => {
     try {
       this.setState({ isLoading: true });
-
+  
       const response = await axios.get("/institution/dashboard-analytics");
-      const { documentRequests, documentValidations, monthlyData } =
-        response.data;
-      const { monthlyDocumentRequests, monthlyDocumentValidations } =
-        monthlyData;
-
+      const { documentRequests, documentValidations, monthlyData } = response.data;
+      const { monthlyDocumentRequests, monthlyDocumentValidations } = monthlyData;
+  
       const requestData = Array(12).fill(0);
       const validationData = Array(12).fill(0);
-      const verificationData = Array(12).fill(0);
-
-      monthlyDocumentRequests.forEach((item) => {
-        requestData[item.month - 1] = item.count;
-      });
-
-      monthlyDocumentValidations.forEach((item) => {
-        validationData[item.month - 1] = item.count;
-      });
-
-      this.setState({
-        requestData,
-        validationData,
-        verificationData,
-        totalRequests: documentRequests.total,
-        submittedRequests: documentRequests.submitted,
-        completedRequests: documentRequests.completed,
-        pendingRequests: documentRequests.pending,
-        totalValidations: documentValidations.total,
-        submittedValidations: documentValidations.submitted,
-        completedValidations: documentValidations.completed,
-        pendingValidations: documentValidations.pending,
-        recentDocumentRequests: documentRequests.recent,
-        recentDocumentValidations: documentValidations.recent,
-      });
-      this.setState({ isLoading: false });
+  
+  
+      if (this.state.userRole === "Finance") {
+        // Populate request and validation data
+        monthlyDocumentRequests.forEach((item) => {
+          requestData[item.month - 1] = item.total_payment;
+        });
+    
+        monthlyDocumentValidations.forEach((item) => {
+          validationData[item.month - 1] = item.total_payment;
+        });
+        // State update for Finance role
+        this.setState({
+          requestData,
+          validationData,
+          totalRequests: documentRequests.total_payment,
+          totalValidations: documentValidations.total_payment,
+          recentDocumentRequests: documentRequests.recent_payment,
+          recentDocumentValidations: documentValidations.recent_payment,
+          isLoading: false,
+        });
+      } else {
+        // State update for non-Finance role
+        // Populate request and validation data
+        monthlyDocumentRequests.forEach((item) => {
+          requestData[item.month - 1] = item.count;
+        });
+    
+        monthlyDocumentValidations.forEach((item) => {
+          validationData[item.month - 1] = item.count;
+        });
+        this.setState({
+          requestData,
+          validationData,
+          totalRequests: documentRequests.total,
+          submittedRequests: documentRequests.submitted,
+          completedRequests: documentRequests.completed,
+          pendingRequests: documentRequests.pending,
+          totalValidations: documentValidations.total,
+          submittedValidations: documentValidations.submitted,
+          completedValidations: documentValidations.completed,
+          pendingValidations: documentValidations.pending,
+          recentDocumentRequests: documentRequests.recent,
+          recentDocumentValidations: documentValidations.recent,
+          isLoading: false,
+        });
+      }
+  
     } catch (error) {
-      toast.error(error.response.data.message);
+      toast.error(error.response?.data?.message || "An error occurred while fetching dashboard analytics.");
       this.setState({ isLoading: false });
     }
   };
-
+  
   fetchInstitution = async () => {
     try {
       this.setState({ isLoading: true });
-
+  
       const response = await axios.get("/institution/institution-data");
       const institutionData = response.data.institutionData;
-
+  
       if (institutionData) {
-        this.setState({
-          name: institutionData.name,
-          address: institutionData.address,
-          prefix: institutionData.prefix,
-          description: institutionData.description,
-          digital_address: institutionData.digital_address,
-          region: institutionData.region,
-          academic_level: institutionData.academic_level,
-          logo: institutionData.logo,
-          status: institutionData.status,
-          loggedInUser: institutionData.user,
-        });
+        // Set institution details and user role
+        this.setState(
+          {
+            name: institutionData.institution.name,
+            address: institutionData.institution.address,
+            prefix: institutionData.institution.prefix,
+            description: institutionData.institution.description,
+            digital_address: institutionData.institution.digital_address,
+            region: institutionData.institution.region,
+            academic_level: institutionData.institution.academic_level,
+            logo: institutionData.institution.logo,
+            status: institutionData.institution.status,
+            loggedInUser: institutionData.user,
+            userRole: response.data.userRole,
+          },
+          () => {
+            // Fetch dashboard analytics after state is properly updated
+            this.fetchDashboardAnalytics();
+          }
+        );
+      } else {
+        this.setState({ isLoading: false });
       }
-      this.setState({ isLoading: false });
     } catch (error) {
-      toast.error(error.response.data.message);
+      toast.error(error.response?.data?.message || "An error occurred while fetching institution data.");
       this.setState({ isLoading: false });
     }
   };
+  
 
   render() {
     const {
@@ -190,6 +221,7 @@ class Dashboard extends Component {
       recentDocumentRequests,
       recentDocumentValidations,
       openSection,
+      userRole
     } = this.state;
 
     const monthNames = [
@@ -234,13 +266,22 @@ class Dashboard extends Component {
                 <div className="flex justify-between ">
                   <div className="">
                     <div className="my-2">
-                      <p className="font-bold text-3xl">{totalRequests}</p>
-                      <p className="font-medium text-base ">
-                        Document Requests
-                      </p>
-                      <p className="text-xs text-gray-400">
-                        Overview of all document requests.
-                      </p>
+                    <p>
+                      {userRole === "Finance" ? (
+                        <>
+                          GH¢ <span className="font-bold text-3xl">{parseFloat(totalRequests).toFixed(2)}</span>
+                        </>
+                      ) : (
+                        <span className="font-bold text-3xl">{(totalRequests)}</span>
+                      )}
+                    </p>
+
+                      <div className="font-medium text-base text-gray-600">
+                        <p>{userRole == "Finance" ? 'Document Request Payments' : 'Document Requests'}</p>
+                      </div>
+                      <div className="text-xs text-gray-400">
+                        <p>{userRole == "Finance" ? 'Total payment for document requests.' : 'Overview of all document requests.'}</p>
+                      </div>
                     </div>
                   </div>
                   <div className="mt-2 mr-2">
@@ -257,7 +298,7 @@ class Dashboard extends Component {
                   </div>
                 </div>
                 <NavLink
-                  to={`/requests/document-requests`}
+                  to={userRole === "Finance" ? `/reports/revenue-overview` : `/requests/document-requests`}
                   className="w-1/2 flex items-center space-x-2 py-0.5 border rounded-lg text-sm text-gray-600 px-4 bg-gray-100 mt-2"
                 >
                   <p>View Details</p> <FaArrowRight size={12} />
@@ -267,13 +308,21 @@ class Dashboard extends Component {
                 <div className="flex justify-between ">
                   <div className="">
                     <div className="my-2">
-                      <p className="font-bold text-3xl">{totalValidations}</p>
-                      <p className="font-medium text-base ">
-                        Validation Requests
-                      </p>
-                      <p className="text-xs text-gray-400">
-                        Overview of all validation requests.
-                      </p>
+                    <p>
+                      {userRole === "Finance" ? (
+                        <>
+                          GH¢ <span className="font-bold text-3xl">{parseFloat(totalValidations).toFixed(2)}</span>
+                        </>
+                      ) : (
+                        <span className="font-bold text-3xl">{(totalValidations)}</span>
+                      )}
+                    </p>
+                      <div className="font-medium text-base text-gray-600">
+                        <p>{userRole == "Finance" ? 'Validation Payments' : 'Validation Requests'}</p>
+                      </div>
+                      <div className="text-xs text-gray-400">
+                        <p>{userRole == "Finance" ? 'Total payment for validations.' : 'Overview of all validation requests.'}</p>
+                      </div>
                     </div>
                   </div>
 
@@ -291,7 +340,7 @@ class Dashboard extends Component {
                   </div>
                 </div>
                 <NavLink
-                  to={`/requests/validation-requests`}
+                  to={userRole === "Finance" ? `/reports/revenue-overview` : `/requests/validation-requests`}
                   className="w-1/2 flex items-center space-x-2 py-0.5 border rounded-lg text-sm text-gray-600 px-4 bg-gray-100 mt-2"
                 >
                   <p>View Details</p> <FaArrowRight size={12} />
@@ -301,13 +350,21 @@ class Dashboard extends Component {
                 <div className="flex justify-between ">
                   <div className="">
                     <div className="my-2">
-                      <p className="font-bold text-3xl">0</p>
-                      <p className="font-medium text-base ">
-                        Verification Requests
-                      </p>
-                      <p className="text-xs text-gray-400">
-                        Overview of all verification requests.
-                      </p>
+                    <p>
+                      {userRole === "Finance" ? (
+                        <>
+                          GH¢ <span className="font-bold text-3xl">{parseFloat(0).toFixed(2)}</span>
+                        </>
+                      ) : (
+                        <span className="font-bold text-3xl">{(0)}</span>
+                      )}
+                    </p>
+                      <div className="font-medium text-base text-gray-600">
+                        <p>{userRole == "Finance" ? 'Verification Request Payments' : 'Verification Requests'}</p>
+                      </div>
+                      <div className="text-xs text-gray-400">
+                        <p>{userRole == "Finance" ? 'Total payment for verification requests.' : 'Overview of all verification requests.'}</p>
+                      </div>
                     </div>
                   </div>
 
@@ -436,7 +493,17 @@ class Dashboard extends Component {
                                   key={index}
                                   className="flex justify-between text-gray-600 text-sm py-2 border-b"
                                 >
-                                  <p>{request.document_type.name}</p>
+                                  <p>
+                                    {userRole === "Finance" ? (
+                                      <div className="flex space-x-2">
+                                        <p>{request?.payment_method}</p>
+                                        <p className="font-semibold">GH¢{request?.amount}</p>
+                                      </div>
+                                    ) : (
+                                      request?.document_type?.name
+                                    )}
+                                  </p>
+
                                   <p className="text-xs self-end">
                                     {moment(request.created_at).format(
                                       "MMM D, YYYY"
@@ -485,7 +552,17 @@ class Dashboard extends Component {
                                     key={index}
                                     className="flex justify-between text-gray-600 text-sm py-2 border-b"
                                   >
-                                    <p>{validation?.document_type?.name}</p>
+                                  <p>
+                                    {userRole === "Finance" ? (
+                                      <div className="flex space-x-2">
+                                        <p>{validation?.payment_method}</p>
+                                        <p className="font-semibold">GH¢{validation?.amount}</p>
+                                      </div>
+                                    ) : (
+                                      validation?.document_type?.name
+                                    )}
+                                  </p>
+
                                     <p className="text-xs self-end">
                                       {moment(validation.created_at).format(
                                         "MMM D, YYYY"

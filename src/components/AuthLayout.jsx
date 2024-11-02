@@ -23,6 +23,7 @@ export default function AuthLayout({ children, title = "Page Title" }) {
   const [isDesktopExpanded, setIsDesktopExpanded] = useState(true);
   const [isMobileExpanded, setIsMobileExpanded] = useState(false);
   const [setupTrue, setSetupTrue] = useState();
+  const [userRole, setUserRole] = useState('');
   const url = useLocation().pathname;
   const [accessibleRoutes, setAccessibleRoutes] = useState([]);
   const [responseInstitution, setResponseInstitution] = useState({});
@@ -92,7 +93,7 @@ export default function AuthLayout({ children, title = "Page Title" }) {
       const response = await axios.get("/institution/institution-data");
       const responseData = response.data.institutionData;
       setResponseInstitution(response.data.institutionData);
-
+      setUserRole(response.data.userRole)
       if (responseData.status == "active") {
         updateInstitution(responseData);
       }

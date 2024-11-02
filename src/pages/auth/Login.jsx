@@ -68,6 +68,10 @@ const Login = () => {
       login(responseData.user, responseData.institution, responseData.token);
 
       if (responseData.user.type === "institution") {
+        if(responseData.user.password_default == true){
+          navigate("/change-password")
+          return
+        }
         // Check if OTP verification is required
         if (response.data?.show_otp === true) {
           navigate("/verify-otp");
@@ -78,15 +82,19 @@ const Login = () => {
         // Check if the institution is inactive
         if (responseData.institution.status === "inactive") {
           navigate("/account-inactive");
-          return; // Stop further execution if account is inactive
+          return;
         }
 
-        // Check if account setup is done
         if (responseData.institution.setup_done) {
+          if (responseData.user.password_default === true) {
+            navigate("/change-password");
+            return;
+          }
           navigate("/dashboard");
         } else {
           navigate("/account-setup");
         }
+        
 
         toast.success(response.data.message);
       } else {

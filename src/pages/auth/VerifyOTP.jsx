@@ -24,6 +24,11 @@ const VerifyOTP = () => {
       const response = await axios.post("/otp/verify", { otp });
       const responseData = response.data.data;
       toast.success(response.data.message);
+      
+      if(responseData.user.password_default == true){
+        navigate("/change-password")
+        return
+      }
 
       if (responseData.institution.setup_done) {
         navigate("/dashboard", {
@@ -41,6 +46,7 @@ const VerifyOTP = () => {
       }
     } catch (error) {
       toast.error(error.response?.data?.message || "An error occurred");
+      setIsLoading(false);
     }
   };
 

@@ -21,6 +21,7 @@ import LetterTemplates from "./pages/accountSettingsComponents/LetterTemplates";
 import DepartmentManagement from "./pages/accountSettingsComponents/DepartmentManagement";
 import UserManagement from "./pages/accountSettingsComponents/UserManagement";
 import Tickets from "./pages/support/Tickets";
+import ChangePassword from "./pages/auth/ChangePassword";
 
 const App = () => {
   const navigate = useNavigate();
@@ -30,6 +31,7 @@ const App = () => {
     location.pathname === "/" ||
     location.pathname === "/complete-profile" ||
     location.pathname === "/verify-otp";
+    location.pathname === "/change-password";
 
   return (
     <div className="font-figtree">
@@ -42,6 +44,7 @@ const App = () => {
         <Route exact path="/account-inactive" element={<AccountInactive />} />
         <Route exact path="/user-profile" element={<Profile />} />
         <Route exact path="/verify-otp" element={<VerifyOTP />} />
+        <Route exact path="/change-password" element={<ChangePassword />} />
         <Route exact path="/account-setup" element={<AccountSetupPage />} />
 
         <Route exact path="/dashboard" element={<Dashboard />} />
