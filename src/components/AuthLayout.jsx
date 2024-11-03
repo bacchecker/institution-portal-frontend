@@ -126,22 +126,34 @@ export default function AuthLayout({ children, title = "Page Title" }) {
     // setAccessibleRoutes(filteredRoutes);
   }, []);
 
+  // Filter accessible routes based on userRole and institution status
   useEffect(() => {
     const filteredRoutes = navLinks.filter((route) => {
-      if (route.showOn) {
-        return route.profile_complete.includes(
+      // Check if the route is allowed for the user's role
+      const isRoleAllowed =
+        !route.showForRoles || route.showForRoles.includes(userRole);
+
+      // Check if the profile is complete
+      const isProfileComplete =
+        !route.profile_complete ||
+        route.profile_complete.includes(
           institution?.setup_done ||
             responseInstitution?.setup_done ||
             setupTrue === 1
             ? "yes"
             : "no"
         );
-        // return route.showOn.includes(institution?.status);
-      }
-      // return true;
+
+      // Check if institution status is allowed
+      /* const isStatusAllowed =
+        !route.showOn || route.showOn.includes(institution?.status); */
+
+      return isRoleAllowed && isProfileComplete;
     });
+
     setAccessibleRoutes(filteredRoutes);
-  }, [navLinks, setupTrue, institution, responseInstitution]);
+  }, [userRole, setupTrue, institution, responseInstitution]);
+
 
   if (!isAuthenticated) {
     return <Navigate to="/" replace />;

@@ -35,10 +35,10 @@ export default function RevenueOverview() {
   );
 
   return (
-    <AuthLayout title="Report Overview">
+    <AuthLayout title="Financial Report Overview">
       <section className="md:px-3 md:w-full w-[98vw] mx-auto">
         <p className="font-bold text-gray-800 text-xl mb-2 mt-6">
-          Report Overview
+          Financial Report
         </p>
         <div className="col-span-2 xl:col-span-3 grid grid-cols-2 xl:grid-cols-4 gap-4">
           <div className="border rounded-xl p-4 bg-white">

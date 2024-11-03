@@ -16,6 +16,7 @@ export const navLinks = [
     icon: <DashboardIcon />,
     profile_complete: ["yes"],
     showOn: ["inactive", "active"],
+    showForRoles: ["Admin", "Finance", "Customer Service", "HR"],
     children: [],
   },
 
@@ -25,7 +26,7 @@ export const navLinks = [
     icon: <TasksListIcon />,
     profile_complete: ["yes"],
     showOn: ["active"],
-    userRole: ["Admin"],
+    showForRoles: ["Admin", "Customer Service"],
     children: [
       {
         label: "Document Requests",
@@ -48,6 +49,7 @@ export const navLinks = [
     acl: ["view users", "view institutions"],
     profile_complete: ["no"],
     showOn: ["inactive", "active"],
+    showForRoles: ["Admin", "HR"],
     children: [
       // {
       //   label: "Profile",
@@ -84,6 +86,7 @@ export const navLinks = [
     acl: ["view payments"],
     profile_complete: ["yes"],
     showOn: ["active"],
+    showForRoles: ["Admin", "Finance"],
     children: [],
   },
   {
@@ -93,6 +96,7 @@ export const navLinks = [
     acl: ["view payments"],
     profile_complete: ["yes"],
     showOn: ["active"],
+    showForRoles: ["Admin", "Finance"],
     children: [
       {
         label: "Report Overview ",
@@ -107,6 +111,7 @@ export const navLinks = [
     acl: ["view support tickets", "view support ticket categories"],
     profile_complete: ["yes"],
     showOn: ["active"],
+    showForRoles: ["Admin", "Finance", "Customer Service", "HR"],
     children: [
       {
         label: "Tickets",
@@ -131,6 +136,7 @@ export const navLinks = [
     icon: <SecurityIcon />,
     profile_complete: ["yes"],
     showOn: ["active"],
+    showForRoles: ["Admin", "HR"],
     acl: [
       "view security logs",
       "view ip blacklist",
