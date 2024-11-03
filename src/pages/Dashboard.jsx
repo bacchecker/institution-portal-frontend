@@ -71,7 +71,8 @@ class Dashboard extends Component {
     openSection: null,
     recentDocumentRequests: [],
     recentDocumentValidations: [],
-    userRole: ''
+    userRole: '',
+    constRole: ''
   };
 
   componentDidMount() {
@@ -107,25 +108,80 @@ class Dashboard extends Component {
     }));
   };
 
+  toggleUserRole = () => {
+    // Toggle the user role and refetch dashboard analytics
+    this.setState(
+      (prevState) => ({
+        userRole: prevState.userRole === "Admin" ? "Finance" : "Admin",
+      }),
+      () => {
+        // Refetch dashboard analytics after user role is toggled
+        this.fetchDashboardAnalytics();
+      }
+    );
+  };
+
+  fetchInstitution = async () => {
+    try {
+      this.setState({ isLoading: true });
+
+      const response = await axios.get("/institution/institution-data");
+      const institutionData = response.data.institutionData;
+
+      if (institutionData) {
+        // Set institution details and user role
+        this.setState(
+          {
+            name: institutionData.institution.name,
+            address: institutionData.institution.address,
+            prefix: institutionData.institution.prefix,
+            description: institutionData.institution.description,
+            digital_address: institutionData.institution.digital_address,
+            region: institutionData.institution.region,
+            academic_level: institutionData.institution.academic_level,
+            logo: institutionData.institution.logo,
+            status: institutionData.institution.status,
+            loggedInUser: institutionData.user,
+            userRole: response.data.userRole,
+            constRole: response.data.userRole,
+          },
+          () => {
+            // Fetch dashboard analytics after state is properly updated
+            this.fetchDashboardAnalytics();
+          }
+        );
+      } else {
+        this.setState({ isLoading: false });
+      }
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message ||
+          "An error occurred while fetching institution data."
+      );
+      this.setState({ isLoading: false });
+    }
+  };
+
   fetchDashboardAnalytics = async () => {
     try {
       this.setState({ isLoading: true });
-  
+
       const response = await axios.get("/institution/dashboard-analytics");
-      const { documentRequests, documentValidations, monthlyData } = response.data;
-      const { monthlyDocumentRequests, monthlyDocumentValidations } = monthlyData;
-  
+      const { documentRequests, documentValidations, monthlyData } =
+        response.data;
+      const { monthlyDocumentRequests, monthlyDocumentValidations, monthlyValRequestPayment, monthlyDocRequestPayment } =
+        monthlyData;
+
       const requestData = Array(12).fill(0);
       const validationData = Array(12).fill(0);
-  
-  
+
       if (this.state.userRole === "Finance") {
-        // Populate request and validation data
-        monthlyDocumentRequests.forEach((item) => {
+        // Populate request and validation data for Finance role
+        monthlyDocRequestPayment.forEach((item) => {
           requestData[item.month - 1] = item.total_payment;
         });
-    
-        monthlyDocumentValidations.forEach((item) => {
+
+        monthlyValRequestPayment.forEach((item) => {
           validationData[item.month - 1] = item.total_payment;
         });
         // State update for Finance role
@@ -144,7 +200,7 @@ class Dashboard extends Component {
         monthlyDocumentRequests.forEach((item) => {
           requestData[item.month - 1] = item.count;
         });
-    
+
         monthlyDocumentValidations.forEach((item) => {
           validationData[item.month - 1] = item.count;
         });
@@ -164,46 +220,11 @@ class Dashboard extends Component {
           isLoading: false,
         });
       }
-  
     } catch (error) {
-      toast.error(error.response?.data?.message || "An error occurred while fetching dashboard analytics.");
-      this.setState({ isLoading: false });
-    }
-  };
-  
-  fetchInstitution = async () => {
-    try {
-      this.setState({ isLoading: true });
-  
-      const response = await axios.get("/institution/institution-data");
-      const institutionData = response.data.institutionData;
-  
-      if (institutionData) {
-        // Set institution details and user role
-        this.setState(
-          {
-            name: institutionData.institution.name,
-            address: institutionData.institution.address,
-            prefix: institutionData.institution.prefix,
-            description: institutionData.institution.description,
-            digital_address: institutionData.institution.digital_address,
-            region: institutionData.institution.region,
-            academic_level: institutionData.institution.academic_level,
-            logo: institutionData.institution.logo,
-            status: institutionData.institution.status,
-            loggedInUser: institutionData.user,
-            userRole: response.data.userRole,
-          },
-          () => {
-            // Fetch dashboard analytics after state is properly updated
-            this.fetchDashboardAnalytics();
-          }
-        );
-      } else {
-        this.setState({ isLoading: false });
-      }
-    } catch (error) {
-      toast.error(error.response?.data?.message || "An error occurred while fetching institution data.");
+      toast.error(
+        error.response?.data?.message ||
+          "An error occurred while fetching dashboard analytics."
+      );
       this.setState({ isLoading: false });
     }
   };
@@ -221,7 +242,8 @@ class Dashboard extends Component {
       recentDocumentRequests,
       recentDocumentValidations,
       openSection,
-      userRole
+      userRole,
+      constRole
     } = this.state;
 
     const monthNames = [
@@ -258,132 +280,195 @@ class Dashboard extends Component {
                   Let's do something great today!
                 </p>
               </div>
+              
             </div>
+            {constRole === "Admin" &&
+              <label className="inline-flex items-center justify-center cursor-pointer bg-white shadow-md shadow-gray-300 rounded-2xl">
+                <input
+                  type="checkbox"
+                  value=""
+                  className="sr-only peer"
+                  onChange={this.toggleUserRole}
+                />
+                <div className="relative w-14 h-7 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-bChkRed"></div>
+                <span className="ms-3 text-sm font-medium text-bChkRed ">Switch Dashboard</span>
+              </label>
+            }
+            
           </div>
+          
+
           <div className="my-2">
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
               <div className="border border-[#ff04043f] rounded-2xl p-4 bg-white">
-                <div className="flex justify-between ">
-                  <div className="">
-                    <div className="my-2">
-                    <p>
-                      {userRole === "Finance" ? (
-                        <>
-                          GH¢ <span className="font-bold text-3xl">{parseFloat(totalRequests).toFixed(2)}</span>
-                        </>
-                      ) : (
-                        <span className="font-bold text-3xl">{(totalRequests)}</span>
-                      )}
-                    </p>
-
-                      <div className="font-medium text-base text-gray-600">
-                        <p>{userRole == "Finance" ? 'Document Request Payments' : 'Document Requests'}</p>
-                      </div>
-                      <div className="text-xs text-gray-400">
-                        <p>{userRole == "Finance" ? 'Total payment for document requests.' : 'Overview of all document requests.'}</p>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="mt-2 mr-2">
-                    <p className="bg-[#ff0404] h-4 text-white text-[11px] text-center uppercase">
-                      Requests
-                    </p>
-                    <div className="flex flex-col items-center h-10 w-[70px] justify-center bg-white rounded-b-md shadow-md">
-                      <img
-                        src="/images/request.jpg"
-                        className="w-8 h-8"
-                        alt=""
-                      />
-                    </div>
+                {isLoading ? (
+                <div className="w-full max-w-sm p-4 mx-auto bg-white border border-gray-200 rounded-lg shadow-md animate-pulse">
+                  <div className="h-12 bg-gray-300 rounded-md"></div>
+                  <div className="mt-4 space-y-3">
+                    <div className="h-3 bg-gray-300 rounded w-3/3"></div>
+                    <div className="h-4 bg-gray-300 rounded w-full"></div>
                   </div>
                 </div>
-                <NavLink
-                  to={userRole === "Finance" ? `/reports/revenue-overview` : `/requests/document-requests`}
-                  className="w-1/2 flex items-center space-x-2 py-0.5 border rounded-lg text-sm text-gray-600 px-4 bg-gray-100 mt-2"
-                >
-                  <p>View Details</p> <FaArrowRight size={12} />
-                </NavLink>
+                
+                ):(
+                <div className="">
+                  <div className="flex justify-between ">
+                    <div className="">
+                      <div className="my-2">
+                      <p>
+                        {userRole === "Finance" ? (
+                          <>
+                            GH¢ <span className="font-bold text-3xl">{parseFloat(totalRequests).toFixed(2)}</span>
+                          </>
+                        ) : (
+                          <span className="font-bold text-3xl">{(totalRequests)}</span>
+                        )}
+                      </p>
+
+                        <div className="font-medium text-base text-gray-600">
+                          <p>{userRole == "Finance" ? 'Document Request Payments' : 'Document Requests'}</p>
+                        </div>
+                        <div className="text-xs text-gray-400">
+                          <p>{userRole == "Finance" ? 'Total payment for document requests.' : 'Overview of all document requests.'}</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="mt-2 mr-2">
+                      <p className="bg-[#ff0404] h-4 text-white text-[11px] text-center uppercase">
+                        Requests
+                      </p>
+                      <div className="flex flex-col items-center h-10 w-[70px] justify-center bg-white rounded-b-md shadow-md">
+                        <img
+                          src="/images/request.jpg"
+                          className="w-8 h-8"
+                          alt=""
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <NavLink
+                    to={userRole === "Finance" ? `/reports/revenue-overview` : `/requests/document-requests`}
+                    className="w-1/2 flex items-center space-x-2 py-0.5 border rounded-lg text-sm text-gray-600 px-4 bg-gray-100 mt-2"
+                  >
+                    <p>View Details</p> <FaArrowRight size={12} />
+                  </NavLink>
+                </div>
+                )}
+                
+                
               </div>
               <div className="border border-[#ff04043f] rounded-2xl p-4 bg-white">
-                <div className="flex justify-between ">
-                  <div className="">
-                    <div className="my-2">
-                    <p>
-                      {userRole === "Finance" ? (
-                        <>
-                          GH¢ <span className="font-bold text-3xl">{parseFloat(totalValidations).toFixed(2)}</span>
-                        </>
-                      ) : (
-                        <span className="font-bold text-3xl">{(totalValidations)}</span>
-                      )}
-                    </p>
-                      <div className="font-medium text-base text-gray-600">
-                        <p>{userRole == "Finance" ? 'Validation Payments' : 'Validation Requests'}</p>
-                      </div>
-                      <div className="text-xs text-gray-400">
-                        <p>{userRole == "Finance" ? 'Total payment for validations.' : 'Overview of all validation requests.'}</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="mt-2 mr-2">
-                    <p className="bg-[#ff0404] h-4 text-white text-[11px] text-center uppercase">
-                      Validation
-                    </p>
-                    <div className="flex flex-col items-center h-10 w-[73px] justify-center bg-white rounded-b-md shadow-md">
-                      <img
-                        src="/images/validate.jpg"
-                        className="w-8 h-8"
-                        alt=""
-                      />
-                    </div>
+              {isLoading ? (
+                <div className="w-full max-w-sm p-4 mx-auto bg-white border border-gray-200 rounded-lg shadow-md animate-pulse">
+                  <div className="h-12 bg-gray-300 rounded-md"></div>
+                  <div className="mt-4 space-y-3">
+                    <div className="h-3 bg-gray-300 rounded w-3/3"></div>
+                    <div className="h-4 bg-gray-300 rounded w-full"></div>
                   </div>
                 </div>
-                <NavLink
-                  to={userRole === "Finance" ? `/reports/revenue-overview` : `/requests/validation-requests`}
-                  className="w-1/2 flex items-center space-x-2 py-0.5 border rounded-lg text-sm text-gray-600 px-4 bg-gray-100 mt-2"
-                >
-                  <p>View Details</p> <FaArrowRight size={12} />
-                </NavLink>{" "}
+                
+                ):(
+                <div className="">
+                  <div className="flex justify-between ">
+                    <div className="">
+                      <div className="my-2">
+                      <p>
+                        {userRole === "Finance" ? (
+                          <>
+                            GH¢ <span className="font-bold text-3xl">{parseFloat(totalValidations).toFixed(2)}</span>
+                          </>
+                        ) : (
+                          <span className="font-bold text-3xl">{(totalValidations)}</span>
+                        )}
+                      </p>
+                        <div className="font-medium text-base text-gray-600">
+                          <p>{userRole == "Finance" ? 'Validation Payments' : 'Validation Requests'}</p>
+                        </div>
+                        <div className="text-xs text-gray-400">
+                          <p>{userRole == "Finance" ? 'Total payment for validations.' : 'Overview of all validation requests.'}</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="mt-2 mr-2">
+                      <p className="bg-[#ff0404] h-4 text-white text-[11px] text-center uppercase">
+                        Validation
+                      </p>
+                      <div className="flex flex-col items-center h-10 w-[73px] justify-center bg-white rounded-b-md shadow-md">
+                        <img
+                          src="/images/validate.jpg"
+                          className="w-8 h-8"
+                          alt=""
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <NavLink
+                    to={
+                      userRole === "Finance"
+                        ? `/reports/revenue-overview`
+                        : userRole === "Customer Service"
+                        ? `/requests/validation-requests`
+                        : `/requests/validation-requests`
+                    }
+                    className="w-1/2 flex items-center space-x-2 py-0.5 border rounded-lg text-sm text-gray-600 px-4 bg-gray-100 mt-2"
+                  >
+                    <p>View Details</p> <FaArrowRight size={12} />
+                  </NavLink>
+                </div>
+                )}
               </div>
               <div className="border border-[#ff04043f] rounded-2xl p-4 bg-white">
-                <div className="flex justify-between ">
-                  <div className="">
-                    <div className="my-2">
-                    <p>
-                      {userRole === "Finance" ? (
-                        <>
-                          GH¢ <span className="font-bold text-3xl">{parseFloat(0).toFixed(2)}</span>
-                        </>
-                      ) : (
-                        <span className="font-bold text-3xl">{(0)}</span>
-                      )}
-                    </p>
-                      <div className="font-medium text-base text-gray-600">
-                        <p>{userRole == "Finance" ? 'Verification Request Payments' : 'Verification Requests'}</p>
-                      </div>
-                      <div className="text-xs text-gray-400">
-                        <p>{userRole == "Finance" ? 'Total payment for verification requests.' : 'Overview of all verification requests.'}</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="mt-2 mr-2">
-                    <p className="bg-[#ff0404] h-4 text-white text-[11px] text-center uppercase">
-                      verification
-                    </p>
-                    <div className="flex flex-col items-center h-10 w-[79px] justify-center bg-white rounded-b-md shadow-md">
-                      <img
-                        src="/images/verification.png"
-                        className="w-8 h-8"
-                        alt=""
-                      />
-                    </div>
+              {isLoading ? (
+                <div className="w-full max-w-sm p-4 mx-auto bg-white border border-gray-200 rounded-lg shadow-md animate-pulse">
+                  <div className="h-12 bg-gray-300 rounded-md"></div>
+                  <div className="mt-4 space-y-3">
+                    <div className="h-3 bg-gray-300 rounded w-3/3"></div>
+                    <div className="h-4 bg-gray-300 rounded w-full"></div>
                   </div>
                 </div>
-                <button className="flex items-center space-x-2 py-0.5 border rounded-lg text-sm text-gray-600 px-4 bg-gray-100 mt-2">
-                  <p>View Details</p> <FaArrowRight size={12} />
-                </button>
+                
+                ):(
+                <div className="">
+                  <div className="flex justify-between ">
+                    <div className="">
+                      <div className="my-2">
+                      <p>
+                        {userRole === "Finance" ? (
+                          <>
+                            GH¢ <span className="font-bold text-3xl">{parseFloat(0).toFixed(2)}</span>
+                          </>
+                        ) : (
+                          <span className="font-bold text-3xl">{(0)}</span>
+                        )}
+                      </p>
+                        <div className="font-medium text-base text-gray-600">
+                          <p>{userRole == "Finance" ? 'Verification Request Payments' : 'Verification Requests'}</p>
+                        </div>
+                        <div className="text-xs text-gray-400">
+                          <p>{userRole == "Finance" ? 'Total payment for verification requests.' : 'Overview of all verification requests.'}</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="mt-2 mr-2">
+                      <p className="bg-[#ff0404] h-4 text-white text-[11px] text-center uppercase">
+                        verification
+                      </p>
+                      <div className="flex flex-col items-center h-10 w-[79px] justify-center bg-white rounded-b-md shadow-md">
+                        <img
+                          src="/images/verification.png"
+                          className="w-8 h-8"
+                          alt=""
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <button className="flex items-center space-x-2 py-0.5 border rounded-lg text-sm text-gray-600 px-4 bg-gray-100 mt-2">
+                    <p>View Details</p> <FaArrowRight size={12} />
+                  </button>
+                </div>
+              )}
               </div>
             </div>
             <div className="grid grid-cols-2 xl:grid-cols-3 gap-4 my-4 ">
@@ -462,7 +547,7 @@ class Dashboard extends Component {
                   <div className="col-span-2 xl:col-span-1 flex flex-col">
                     <div className="col-span-4 rounded-md bg-white">
                       <p className="font-bold text-xl mb-4">
-                        Recent Applications
+                         {userRole == "Finance" ? 'Recent Payment' : 'Recent Applications'}
                       </p>
                       <div className="space-y-2">
                         {/* Document Requests Section */}

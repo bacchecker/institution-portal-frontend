@@ -25,6 +25,7 @@ export const navLinks = [
     icon: <TasksListIcon />,
     profile_complete: ["yes"],
     showOn: ["active"],
+    userRole: ["Admin"],
     children: [
       {
         label: "Document Requests",
