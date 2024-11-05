@@ -9,34 +9,60 @@ import {
   TableCell,
   TableRow,
 } from "@nextui-org/react";
-import React, { useState } from "react";
-import useSWR from "swr";
+import React, { useState, useEffect } from "react";
 import axios from "@utils/axiosConfig";
 import CustomTable from "@components/CustomTable";
 import moment from "moment";
 import StatusChip from "@components/status-chip";
 import { createSearchParams, useSearchParams } from "react-router-dom";
-import secureLocalStorage from "react-secure-storage";
 
 function DocumentRequestReport() {
-  const institution_id = JSON?.parse(secureLocalStorage.getItem("auth-storage"))
-    ?.state?.institution?.id;
+    const [searchParams, setSearchParams] = useSearchParams();
 
-  const [searchParams, setSearchParams] = useSearchParams();
+    const [filters, setFilters] = useState({
+      status: searchParams.get("status") || "",
+      date_range: searchParams.get("date_range") || "",
+    });
 
-  const [filters, setFilters] = useState({
-    status: searchParams.get("status") || "",
-    date_range: searchParams.get("date_range") || "",
-  });
+    const [resData, setResData] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
 
-  const queryParams = new URLSearchParams();
-  if (filters.status) queryParams.append("status", filters.status);
-  if (filters.date_range) queryParams.append("date_range", filters.date_range);
+    useEffect(() => {
+      setFilters({
+        status: searchParams.get("status") || "",
+        date_range: searchParams.get("date_range") || "",
+      });
+    }, [searchParams]);
 
-  const { data: resData, error } = useSWR(
-    `/institution/reports/document-requests?institution_id=${institution_id}&${queryParams.toString()}`,
-    (url) => axios.get(url).then((res) => res.data)
-  );
+    useEffect(() => {
+      const fetchData = async () => {
+        setLoading(true);
+        setError(null);
+        try {
+          const queryParams = new URLSearchParams();
+          if (filters.status) queryParams.append("status", filters.status);
+          if (filters.date_range) queryParams.append("date_range", filters.date_range);
+
+          const response = await axios.get(`/institution/reports/institution-requests?${queryParams.toString()}`);
+          setResData(response.data);
+        } catch (error) {
+          setError(error);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      fetchData();
+    }, [filters]);
+
+    // Update URL search parameters whenever filters change
+    useEffect(() => {
+      setSearchParams({
+        status: filters.status,
+        date_range: filters.date_range,
+      });
+    }, [filters, setSearchParams]);
 
   return (
     <>
@@ -136,15 +162,15 @@ function DocumentRequestReport() {
               <TableCell className="font-semibold">
                 {item.unique_code}
               </TableCell>
-              <TableCell>{item.document_type?.name}</TableCell>
-              <TableCell>{item.document_format}</TableCell>
+              <TableCell>{item.document_request?.document_type?.name}</TableCell>
+              <TableCell>{item.document_request?.document_format}</TableCell>
               <TableCell>
                 {moment(item.created_at).format("MM-DD-YYYY")}
               </TableCell>
               <TableCell>
-                <StatusChip status={item.status} />
+                <StatusChip status={item.document_request?.status} />
               </TableCell>
-              <TableCell>GH¢ {item.total_amount}</TableCell>
+              <TableCell>GH¢ {item.amount}</TableCell>
             </TableRow>
           ))}
         </CustomTable>

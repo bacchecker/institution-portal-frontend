@@ -1,3 +1,4 @@
+import React, { useEffect, useState } from 'react';
 import Dashboard from "./pages/Dashboard";
 import { Routes, Route, Outlet, useNavigate } from "react-router-dom";
 import Login from "./pages/auth/Login";
@@ -22,9 +23,28 @@ import DepartmentManagement from "./pages/accountSettingsComponents/DepartmentMa
 import UserManagement from "./pages/accountSettingsComponents/UserManagement";
 import Tickets from "./pages/support/Tickets";
 import ChangePassword from "./pages/auth/ChangePassword";
+import ProtectedRoute from './ProtectedROute';
+import axios from "@utils/axiosConfig";
 
 const App = () => {
   const navigate = useNavigate();
+  const [userRole, setUserRole] = useState(null);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    const fetchUserRole = async () => {
+      try {
+        const response = await axios.get("/institution/institution-data");
+
+        setUserRole(response.data.userRole);
+      } catch (error) {
+        console.error('Failed to fetch user role:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserRole();
+  }, []);
 
   const isLoginPage =
     location.pathname === "/login" ||
@@ -32,6 +52,7 @@ const App = () => {
     location.pathname === "/complete-profile" ||
     location.pathname === "/verify-otp";
     location.pathname === "/change-password";
+  
 
   return (
     <div className="font-figtree">
@@ -51,53 +72,112 @@ const App = () => {
 
         {/* Requests Routes */}
         <Route exact path="/requests" element={<Outlet />}>
-          <Route exact path="document-requests" element={<DocumentRequest />} />
-          <Route
-            exact
-            path="document-requests/:documentId"
-            element={<DocumentDetails />}
-          />
-
-          <Route
-            exact
-            path="validation-requests"
-            element={<ValidationRequest />}
-          />
-        </Route>
-
-        <Route exact path="/account-settings" element={<Outlet />}>
-          <Route
-            exact
-            path="document-types"
-            element={<InstitutionDocumentTypes />}
-          />
-          <Route exact path="letter-templates" element={<LetterTemplates />} />
-          <Route exact path="departments" element={<DepartmentManagement />} />
-          <Route exact path="users" element={<UserManagement />} />
-        </Route>
-
-        <Route exact path="/security" element={<Outlet />}>
-          <Route
-            exact
-            path="roles-permissions"
-            element={<RolesAndPermissions />}
-          />
-        </Route>
-
-        <Route exact path="/supports" element={<Outlet />}>
-          <Route exact path="tickets" element={<Tickets />} />
-        </Route>
-
-        {/* // Kwamina */}
         <Route
           exact
-          path="/payment-revenue-setup"
-          element={<PaymentRevenueSetup />}
+          path="document-requests"
+          element={
+            <ProtectedRoute userRole={userRole} allowedRoles={['Admin', 'Customer Service']}>
+              <DocumentRequest />
+            </ProtectedRoute>
+          }
         />
+        <Route
+          exact
+          path="document-requests/:documentId"
+          element={
+            <ProtectedRoute userRole={userRole} allowedRoles={['Admin', 'Customer Service']}>
+              <DocumentDetails />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          exact
+          path="validation-requests"
+          element={
+            <ProtectedRoute userRole={userRole} allowedRoles={['Customer Service', 'Admin']}>
+              <ValidationRequest />
+            </ProtectedRoute>
+          }
+        />
+      </Route>
 
-        <Route exact path="/reports" element={<Outlet />}>
-          <Route exact path="revenue-overview" element={<RevenueOverview />} />
-        </Route>
+      <Route exact path="/account-settings" element={<Outlet />}>
+        <Route
+          exact
+          path="document-types"
+          element={
+            <ProtectedRoute userRole={userRole} allowedRoles={['Admin', 'HR']}>
+              <InstitutionDocumentTypes />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          exact path="letter-templates"
+          element={
+            <ProtectedRoute userRole={userRole} allowedRoles={['Admin', 'HR']}>
+              <LetterTemplates />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          exact path="departments"
+          element={
+            <ProtectedRoute userRole={userRole} allowedRoles={['Admin']}>
+              <DepartmentManagement />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          exact path="users"
+          element={
+            <ProtectedRoute userRole={userRole} allowedRoles={['Admin']}>
+              <UserManagement />
+            </ProtectedRoute>
+          }
+        />
+      </Route>
+
+      <Route exact path="/security" element={<Outlet />}>
+        <Route
+          exact path="roles-permissions"
+          element={
+            <ProtectedRoute userRole={userRole} allowedRoles={['Admin']}>
+              <RolesAndPermissions />
+            </ProtectedRoute>
+          }
+        />
+      </Route>
+
+      <Route exact path="/supports" element={<Outlet />}>
+        <Route
+          exact path="tickets"
+          element={
+            <ProtectedRoute userRole={userRole} allowedRoles={['Finance', 'Admin', 'Customer Service', 'HR']}>
+              <Tickets />
+            </ProtectedRoute>
+          }
+        />
+      </Route>
+
+      <Route
+        exact path="/payment-revenue-setup"
+        element={
+          <ProtectedRoute userRole={userRole} allowedRoles={['Finance', 'Admin']}>
+            <PaymentRevenueSetup />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route exact path="/reports" element={<Outlet />}>
+        <Route
+          exact path="revenue-overview"
+          element={
+            <ProtectedRoute userRole={userRole} allowedRoles={['Finance', 'Admin']}>
+              <RevenueOverview />
+            </ProtectedRoute>
+          }
+        />
+      </Route>
 
         <Route
           path="*"
@@ -111,6 +191,25 @@ const App = () => {
                 color="danger"
                 onClick={() => {
                   navigate(-1);
+                }}
+              >
+                Go Back
+              </Button>
+            </section>
+          }
+        />
+        <Route
+          path="/unauthorized"
+          element={
+            <section className="h-screen w-screen flex items-center justify-center flex-col gap-4">
+              <p className="text-6xl text-danger font-bold">403</p>
+
+              <p>Unauthorised Access</p>
+
+              <Button
+                color="danger"
+                onClick={() => {
+                  navigate('/dashboard');
                 }}
               >
                 Go Back

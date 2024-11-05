@@ -270,15 +270,32 @@ class Dashboard extends Component {
     return (
       <AuthLayout title="Dashboard">
         <div className="w-full p-3">
-          <div className="grid grid-cols-2 xl:grid-cols-4 gap-8">
-            <div className="col-span-3 flex items-center xl:space-x-8 space-x-4">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="col-span-3 flex items-center lg:space-x-8 space-x-4">
               <div className="">
-                <p className="font-semibold text-lg">
-                  {timeOfDay} {loggedInUser.first_name}!
-                </p>
-                <p className="text-gray-500 text-sm">
-                  Let's do something great today!
-                </p>
+                <div className="flex items-center space-x-2 font-semibold text-lg">
+                <img
+                  className="w-12 h-12"
+                  src={
+                    timeOfDay === 'Good Morning'
+                      ? "/images/morning.png"
+                      : timeOfDay === 'Good Afternoon'
+                      ? "/images/afternoon.png"
+                      : "/images/evening.png"
+                  }
+                  alt={timeOfDay}
+                />
+                <div className="">
+                  <div className="flex space-x-1">
+                    <p>{timeOfDay}</p>
+                    <p>{loggedInUser.first_name}</p>
+                  </div>
+                  <p className="text-gray-500 text-sm">
+                    Let's do something great today!
+                  </p>
+                </div>
+                </div>
+                
               </div>
               
             </div>

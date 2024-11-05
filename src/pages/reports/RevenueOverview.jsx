@@ -30,7 +30,7 @@ export default function RevenueOverview() {
     error,
     isLoading,
   } = useSWR(
-    `/institution/reports/total-income?institution_id=${institution_id}`,
+    `/institution/reports/institution-income?institution_id=${institution_id}`,
     (url) => axios.get(url).then((res) => res.data)
   );
 
