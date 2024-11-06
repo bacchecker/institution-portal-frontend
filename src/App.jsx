@@ -23,7 +23,7 @@ import DepartmentManagement from "./pages/accountSettingsComponents/DepartmentMa
 import UserManagement from "./pages/accountSettingsComponents/UserManagement";
 import Tickets from "./pages/support/Tickets";
 import ChangePassword from "./pages/auth/ChangePassword";
-import ProtectedRoute from './ProtectedROute';
+import ProtectedRoute from './ProtectedRoute';
 import axios from "@utils/axiosConfig";
 
 const App = () => {
