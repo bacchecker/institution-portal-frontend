@@ -92,18 +92,18 @@ export default function AuthLayout({ children, title = "Page Title" }) {
     (async () => {
       const response = await axios.get("/institution/institution-data");
       const responseData = response.data.institutionData;
-      setResponseInstitution(response.data.institutionData);
+      setResponseInstitution(response.data.institutionData.institution);
       setUserRole(response.data.userRole)
-      if (responseData.status == "active") {
+      if (responseData.institution.status == "active") {
         updateInstitution(responseData);
       }
 
-      if (responseData?.setup_done === 0) {
+      if (responseData?.institution.setup_done === 0) {
         if (!url.startsWith("/account-setup")) {
           return <Navigate to="/account-setup" replace />;
         }
       }
-      if (responseData?.status === "inactive") {
+      if (responseData?.institution.status === "inactive") {
         return <Navigate to="/account-inactive" replace />;
       }
       // else {
