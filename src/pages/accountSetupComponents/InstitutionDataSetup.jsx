@@ -28,7 +28,7 @@ function InstitutionDataSetup({ setActiveStep }) {
 
   useEffect(() => {
     if (institutionData) {
-      setUserInput(institutionData?.institutionData);
+      setUserInput(institutionData?.institutionData.institution);
     }
   }, [institutionData]);
 

@@ -30,6 +30,12 @@ const VerifyOTP = () => {
         return
       }
 
+      // Check if the institution is inactive
+      if (responseData.institution.status === "inactive") {
+        navigate("/account-inactive");
+        return;
+      }
+
       if (responseData.institution.setup_done) {
         navigate("/dashboard", {
           state: { institutionData: responseData.institution },

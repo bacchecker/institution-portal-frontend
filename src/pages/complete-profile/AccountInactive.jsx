@@ -72,10 +72,9 @@ const AccountInactive = () => {
   const fetchInstitution = async () => {
     try {
       const response = await axios.get("/institution/institution-data");
-      const institutionData = response.data.institutionData;
-      const { status } = institutionData;
+      const institutionData = response.data.institutionData.institution;
 
-      setInstitutionStatus(status !== "inactive");
+      setInstitutionStatus(institutionData.status);
     } catch (error) {
       toast.error(error.response.data.message);
     }
@@ -135,22 +134,24 @@ const AccountInactive = () => {
             </svg>
             <span className="sr-only">Loading...</span>
           </div>
-        ) : institutionStatus ? (
-          <div className="flex flex-col justify-center items-center">
-            <div className="">
+        ) : institutionStatus !== "inactive" ? (
+          <div className="relative w-full md:w-1/2 lg:w-1/2 xl:w-1/3 flex flex-col justify-center items-center rounded-2xl h-full md:shadow-md shadow-gray-400 overflow-clip">
+            <div className="bg-white shadow-2xl w-[500px] h-60 rounded-b-full">
+              
               <img
-                src="/images/confetti2.gif"
+                src="/images/confetti.gif"
                 alt="account active gif"
-                className="w-auto h-44"
+                className="w-auto ml-20 absolute h-80"
               />
+              <img src="/images/award.png" alt="" className="w-32 h-auto mx-auto mt-16"/>
             </div>
             <div className="">
               <div className="text-center my-2">
-                <p className="text-xl font-semibold text-[#ff0404]">
-                  Your institution profile has been activated
+                <p className="text-xl font-semibold text-[#ff0404] mt-16 uppercase  ">
+                  Congratulations
                 </p>
               </div>
-              <div className="w-full lg:w-[500px] px-2">
+              <div className="w-full px-4">
                 <p className="text-justify text-gray-700 text-base">
                   You can now proceed to set up your institution account and
                   access all available features. We recommend completing the
@@ -163,10 +164,10 @@ const AccountInactive = () => {
               </div>
             </div>
 
-            <div className="my-4 flex items-center justify-center">
+            <div className="my-4 flex items-center justify-center z-50">
               <button
                 onClick={() => navigate("/account-setup")}
-                className="flex items-center w-fit space-x-2 bg-[#ff0404] hover:bg-[#f84848] text-white px-4 py-1.5 rounded-md"
+                className="flex items-center w-fit space-x-2 hover:bg-[#ff0404] text-[#ff0404] hover:text-white border border-[#ff0404] px-8 py-2 rounded-full"
               >
                 <FaUser /> <p>Continue to set up account</p>
               </button>
