@@ -28,7 +28,7 @@ function EditLetterTemplate({ setCurrentScreen }) {
 
   const institution = secureLocalStorage.getItem("institution");
   const selectedTemplate = secureLocalStorage.getItem("selectedTemplate");
-
+  
   useEffect(() => {
     if (selectedTemplate) {
       setUserInput(selectedTemplate);

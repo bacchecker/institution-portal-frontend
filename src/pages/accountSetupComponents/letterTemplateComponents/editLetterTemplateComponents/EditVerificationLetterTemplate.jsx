@@ -31,7 +31,7 @@ function EditVerificationLetterTemplate({
   const templateScreen = JSON.parse(institution?.template_screens);
 
   const selectedTemplate = secureLocalStorage.getItem("selectedTemplate");
-
+  
   const handleTabClick = (e) => {
     const target = e.target;
     setLineStyle({
