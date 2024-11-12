@@ -274,7 +274,7 @@ export default function AuthLayout({ children, title = "Page Title" }) {
                             to={child.path}
                             className={`block px-4 py-2 pl-9 text-sm ${
                               new RegExp(`^${child.path}`).test(currentPath)
-                                ? "bg-red-500 text-white"
+                                ? "bg-bChkRed text-white"
                                 : "text-gray-700 hover:bg-gray-200 dark:text-gray-300 dark:hover:bg-gray-700"
                             }`}
                           >

@@ -270,8 +270,8 @@ class Dashboard extends Component {
     return (
       <AuthLayout title="Dashboard">
         <div className="w-full p-3">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
-            <div className="col-span-3 flex items-center lg:space-x-8 space-x-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-8">
+            <div className="col-span-2 lg:col-span-3 flex items-center">
               <div className="">
                 <div className="flex items-center space-x-2 font-semibold text-lg">
                 <img
@@ -297,10 +297,9 @@ class Dashboard extends Component {
                 </div>
                 
               </div>
-              
             </div>
             {constRole === "Admin" &&
-              <label className="inline-flex items-center justify-center cursor-pointer bg-white shadow-md shadow-gray-300 rounded-2xl">
+              <div className="inline-flex items-center justify-center cursor-pointer bg-white shadow-md shadow-gray-300 rounded-2xl py-1.5">
                 <input
                   type="checkbox"
                   value=""
@@ -309,13 +308,13 @@ class Dashboard extends Component {
                 />
                 <div className="relative w-14 h-7 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-bChkRed"></div>
                 <span className="ms-3 text-sm font-medium text-bChkRed ">Switch Dashboard</span>
-              </label>
+              </div>
             }
             
           </div>
           
 
-          <div className="my-2">
+          <div className="m-2">
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
               <div className="border border-[#ff04043f] rounded-2xl p-4 bg-white">
                 {isLoading ? (
