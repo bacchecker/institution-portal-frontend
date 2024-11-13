@@ -3,12 +3,14 @@ import AuthLayout from "../../components/AuthLayout";
 import { BsQuestionCircle } from "react-icons/bs";
 import { CiMenuKebab } from "react-icons/ci";
 import { FaChevronLeft, FaChevronRight, FaPlus } from "react-icons/fa6";
-import { Select, SelectItem, Spinner, TableCell, TableRow, } from "@nextui-org/react";
+import { Select, SelectItem, Spinner, TableCell, TableRow, Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownTrigger, Button } from "@nextui-org/react";
 import CustomTable from "@components/CustomTable";
 import axios from "@utils/axiosConfig";
 import AddTicket from "./AddTicket";
 import moment from 'moment';
-import {Popover, PopoverTrigger, PopoverContent, Button} from "@nextui-org/react";
 import EditTicket from "./EditTicket";
 import Elipsis from "../../assets/icons/elipsis";
 
@@ -173,37 +175,31 @@ export default function Tickets() {
                   </TableCell>
 
                   <TableCell className="relative flex items-center">
-                    <Popover placement="left" showArrow={true} isOpen={isPopoverOpen} onOpenChange={setPopoverOpen}>
-                      <PopoverTrigger className="flex items-center">
-                        <div className="bg-transparent border-2 cursor-pointer rounded-lg p-2 mt-2"><Elipsis size={16} /></div>
-                      </PopoverTrigger>
-                      <PopoverContent>
-                      <ul className="text-gray-700">
-                        <li
-                          className="px-4 rounded-lg py-2 hover:bg-gray-100 cursor-pointer"
-                          onClick={() => {
-                            setPopoverOpen(false);
-                            // Handle view response action here
-                            console.log("View Response clicked for", item.id);
-                          }}
+                    <Dropdown>
+                      <DropdownTrigger>
+                        <Button variant="bordered" size="sm" isIconOnly>
+                          <Elipsis />
+                        </Button>
+                      </DropdownTrigger>
+                      <DropdownMenu aria-label="Static Actions">
+                        <DropdownItem
+                          key="view_response"
+                          
                         >
                           View Response
-                        </li>
-                        <li
-                          className="px-4 py-2 rounded-lg hover:bg-gray-100 cursor-pointer"
+                        </DropdownItem>
+                        <DropdownItem
+                          key="edit"
                           onClick={() => {
                             setPopoverOpen(false);
                             setSelectedData(item);
                             setOpenEditDrawer(true);
-                            // Handle edit ticket action here
-                            console.log("Edit Ticket clicked for", item.id);
                           }}
                         >
                           Edit Ticket
-                        </li>
-                      </ul>
-                      </PopoverContent>
-                    </Popover>
+                        </DropdownItem>
+                      </DropdownMenu>
+                    </Dropdown>
                     
 
                   </TableCell>

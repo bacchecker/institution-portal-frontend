@@ -90,7 +90,7 @@ const Login = () => {
             navigate("/change-password");
             return;
           }
-          navigate("/dashboard");
+          window.location.href = "/dashboard";
         } else {
           navigate("/account-setup");
         }

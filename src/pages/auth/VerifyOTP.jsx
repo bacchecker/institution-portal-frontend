@@ -37,10 +37,11 @@ const VerifyOTP = () => {
       }
 
       if (responseData.institution.setup_done) {
-        navigate("/dashboard", {
-          state: { institutionData: responseData.institution },
-        });
+
+        sessionStorage.setItem("institutionData", JSON.stringify(responseData.institution));
+        window.location.href = "/dashboard";
         setIsLoading(false);
+
       } else {
         navigate("/account-setup", {
           state: { institutionData: responseData.institution },
