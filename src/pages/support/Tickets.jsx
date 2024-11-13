@@ -1,11 +1,17 @@
 import React, {useState, useEffect} from "react";
 import AuthLayout from "../../components/AuthLayout";
 import { BsQuestionCircle } from "react-icons/bs";
+import { CiMenuKebab } from "react-icons/ci";
 import { FaChevronLeft, FaChevronRight, FaPlus } from "react-icons/fa6";
 import { Select, SelectItem, Spinner, TableCell, TableRow, } from "@nextui-org/react";
 import CustomTable from "@components/CustomTable";
 import axios from "@utils/axiosConfig";
 import AddTicket from "./AddTicket";
+import moment from 'moment';
+import {Popover, PopoverTrigger, PopoverContent, Button} from "@nextui-org/react";
+import EditTicket from "./EditTicket";
+import Elipsis from "../../assets/icons/elipsis";
+
 
 export default function Tickets() {
 
@@ -16,6 +22,9 @@ export default function Tickets() {
     const [currentPage, setCurrentPage] = useState(1);
     const [lastPage, setLastPage] = useState(1);
     const [openDrawer, setOpenDrawer] = useState(false);
+    const [openEditDrawer, setOpenEditDrawer] = useState(false);
+    const [isPopoverOpen, setPopoverOpen] = useState(false);
+    const [selectedData, setSelectedData] = useState({});
 
     // Fetch tickets
     const fetchTickets = async () => {
@@ -95,6 +104,12 @@ export default function Tickets() {
             setOpenDrawer={setOpenDrawer}
             openDrawer={openDrawer}
           />
+          <EditTicket
+            fetchTickets={fetchTickets}
+            setOpenEditDrawer={setOpenEditDrawer}
+            openEditDrawer={openEditDrawer}
+            selectedData={selectedData}
+          />
       </div>
       <div className="bg-white px-4 py-3 mt-5 rounded-xl">
         <div className="text-gray-700 flex items-center space-x-4">
@@ -108,17 +123,17 @@ export default function Tickets() {
               <input type="search" onChange={(e) => setSearchQuery(e.target.value)} value={searchQuery} id="default-search" className="block w-full focus:outline-0 px-4 py-2.5 ps-10 text-sm text-gray-900 border border-gray-300 rounded-2xl bg-gray-50 focus:ring-blue-500 focus:border-blue-500" placeholder="Search by ticket description, subject or status" required />
           </div>
           <Select
-                selectedKeys={status}
-                onSelectionChange={(selected) => setStatus(selected)}
-                label="Filter by Status"
-                size="sm"
-                className="w-60"
-            >
-                <SelectItem key="">All Statuses</SelectItem>
-                <SelectItem key="open">Open</SelectItem>
-                <SelectItem key="closed">Closed</SelectItem>
-                {/* Add other status options as needed */}
-            </Select>
+            selectedKeys={status}
+            onSelectionChange={(selected) => setStatus(selected)}
+            label="Filter by Status"
+            size="sm"
+            className="w-60"
+          >
+              <SelectItem key="">All Statuses</SelectItem>
+              <SelectItem key="open">Open</SelectItem>
+              <SelectItem key="closed">Closed</SelectItem>
+              
+          </Select>
         </div>
       </div>
       <section className="md:w-full w-[98vw] min-h-[60vh] mx-auto mt-2">
@@ -129,20 +144,68 @@ export default function Tickets() {
         ) : (
           <>
             <CustomTable
-              columns={["Subject", "Description", "Type", "Category", "Created At", "Status", "Action"]}
+              columns={["Subject", "Description", "Type", "Category", "Status", "Action"]}
             >
               {tickets?.map((item) => (
                 <TableRow key={item?.id}>
-                  <TableCell>{item?.title}</TableCell>
+                  <TableCell className="flex flex-col">
+                    <p className="font-semibold">{item?.title}</p>
+                    <p className="text-xs text-gray-500">{moment(item?.created_at).format('MMM DD, YYYY')}</p>
+                  </TableCell>
 
                   <TableCell>{item?.description}</TableCell>
                   
-                  <TableCell>{item?.type}</TableCell>
-                  <TableCell>{item?.category}</TableCell>
-                  <TableCell>{item?.created_at}</TableCell>
-                  <TableCell>{item?.status}</TableCell>
-                  <TableCell className="flex items-center h-16 gap-3">
-                    Edit
+                  <TableCell>{item?.type.charAt(0).toUpperCase() + item?.type.slice(1)}</TableCell>
+                  <TableCell>{item?.category.charAt(0).toUpperCase() + item?.category.slice(1)}</TableCell>
+                  
+                  <TableCell className="px-4 py-2">
+                    <span
+                      className={`px-4 py-2 font-light rounded-full border ${
+                        item?.status === 'open'
+                          ? 'bg-gray-200 text-gray-700 border-gray-400'
+                          : item?.status === 'in progress'
+                          ? 'bg-yellow-100 text-yellow-700 border-yellow-400'
+                          : 'bg-green-100 text-green-700 border-green-400'
+                      }`}
+                    >
+                      {item?.status.charAt(0).toUpperCase() + item?.status.slice(1)}
+                    </span>
+                  </TableCell>
+
+                  <TableCell className="relative flex items-center">
+                    <Popover placement="left" showArrow={true} isOpen={isPopoverOpen} onOpenChange={setPopoverOpen}>
+                      <PopoverTrigger className="flex items-center">
+                        <div className="bg-transparent border-2 cursor-pointer rounded-lg p-2 mt-2"><Elipsis size={16} /></div>
+                      </PopoverTrigger>
+                      <PopoverContent>
+                      <ul className="text-gray-700">
+                        <li
+                          className="px-4 rounded-lg py-2 hover:bg-gray-100 cursor-pointer"
+                          onClick={() => {
+                            setPopoverOpen(false);
+                            // Handle view response action here
+                            console.log("View Response clicked for", item.id);
+                          }}
+                        >
+                          View Response
+                        </li>
+                        <li
+                          className="px-4 py-2 rounded-lg hover:bg-gray-100 cursor-pointer"
+                          onClick={() => {
+                            setPopoverOpen(false);
+                            setSelectedData(item);
+                            setOpenEditDrawer(true);
+                            // Handle edit ticket action here
+                            console.log("Edit Ticket clicked for", item.id);
+                          }}
+                        >
+                          Edit Ticket
+                        </li>
+                      </ul>
+                      </PopoverContent>
+                    </Popover>
+                    
+
                   </TableCell>
                 </TableRow>
               ))}

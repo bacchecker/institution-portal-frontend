@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Drawer from "@components/Drawer";
 import {
-  Button,
   Input,
   Select,
   SelectItem,
@@ -18,14 +17,10 @@ function AddTicket({ setOpenDrawer, openDrawer, fetchTickets }) {
     description: "",
     other_name: "",
     type: "",
-    email: "",
-    phone: "",
-    address: "",
     category: "",
   };
     const [userInput, setUserInput] = useState(initialUserInput);
     const [drawerTitle, setDrawerTitle] = useState("Create Ticket");
-    const [institutiontypes, setInstitutiontypes] = useState(null);
     const [selectedImage, setSelectedImage] = useState(null);
     const [isSaving, setIsSaving] = useState(false);
     const categories = [
@@ -115,12 +110,8 @@ function AddTicket({ setOpenDrawer, openDrawer, fetchTickets }) {
         <div className="flex flex-col">
           <Input
             size="sm"
-            label={
-              <>
-                Subject
-                <span className="text-[#ff0404]">*</span>
-              </>
-            }
+            isRequired
+            label="Subject"
             type="text"
             name="title"
             className=""
@@ -129,12 +120,8 @@ function AddTicket({ setOpenDrawer, openDrawer, fetchTickets }) {
           />
           <Textarea
             size="sm"
-            label={
-              <>
-               Description
-                <span className="text-[#ff0404]">*</span>
-              </>
-            }
+            isRequired
+            label="Description"
             type="text"
             name="description"
             className="mt-4"
@@ -143,12 +130,8 @@ function AddTicket({ setOpenDrawer, openDrawer, fetchTickets }) {
           />
           <Select
             size="sm"
-            label={
-              <>
-                Type
-                <span className="text-[#ff0404]">*</span>
-              </>
-            }
+            isRequired
+            label="Type"
             className="w-full mt-4"
             name="type"
             value={userInput?.type}
@@ -160,11 +143,8 @@ function AddTicket({ setOpenDrawer, openDrawer, fetchTickets }) {
           </Select>
           <Select
             size="sm"
-            label={
-              <>
-                Category
-              </>
-            }
+            isRequired
+            label="Category"
             className="w-full mt-4"
             name="category"
             value={userInput?.category}
@@ -175,7 +155,7 @@ function AddTicket({ setOpenDrawer, openDrawer, fetchTickets }) {
             ))}
           </Select>
           
-          <div className="w-[100%] h-[10rem] mt-2">
+          <div className="w-[100%] h-[10rem] mt-4">
             <h4 className="text-[0.9rem] mb-[0.4rem]">Attach File</h4>
             <div className="w-full h-full flex justify-center items-center rounded-[0.6rem] border">
               <label

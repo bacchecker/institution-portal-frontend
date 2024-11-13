@@ -11,6 +11,7 @@ import Spinner from "@components/Spinner";
 import { Navigate, NavLink, useNavigate } from "react-router-dom";
 import { MdClose } from "react-icons/md";
 import { toast } from "sonner";
+import AddTicket from "../support/AddTicket";
 
 const AccountInactive = () => {
   const features = [
@@ -42,7 +43,8 @@ const AccountInactive = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [institutionStatus, setInstitutionStatus] = useState(null);
   const [activeFeature, setActiveFeature] = useState(0);
-
+  const [openDrawer, setOpenDrawer] = useState(false);
+  const [tickets, setTickets] = useState([]);
   useEffect(() => {
     const timer = setInterval(() => {
       setActiveFeature((prev) => (prev + 1) % features.length);
@@ -92,6 +94,25 @@ const AccountInactive = () => {
     setCategory("");
   };
 
+  const fetchTickets = async () => {
+    setLoading(true);
+    try {
+        const response = await axios.get('/tickets', {
+            params: {
+                search_query: searchQuery,
+                status: status,
+                page: currentPage
+            }
+        });
+        setTickets(response.data.tickets.data);
+        setLastPage(response.data.tickets.last_page);
+        setLoading(false);
+    } catch (error) {
+        console.error('Error fetching tickets:', error);
+        setLoading(false);
+    }
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     setIsSaving(true);
@@ -135,8 +156,8 @@ const AccountInactive = () => {
             <span className="sr-only">Loading...</span>
           </div>
         ) : institutionStatus !== "inactive" ? (
-          <div className="relative w-full md:w-1/2 lg:w-1/2 xl:w-1/3 flex flex-col justify-center items-center rounded-2xl h-full md:shadow-md shadow-gray-400 overflow-clip">
-            <div className="bg-white shadow-2xl w-[500px] h-60 rounded-b-full">
+          <div className="relative w-full md:w-1/2 lg:w-1/2 xl:w-1/3 flex flex-col justify-center items-center rounded-2xl h-full border overflow-clip">
+            <div className="bg-white shadow-2xl w-[500px] h-60 rounded-b-full border-b">
               
               <img
                 src="/images/confetti.gif"
@@ -228,7 +249,9 @@ const AccountInactive = () => {
                     Need assistance? Our support team is here to help!
                   </p>
                   <button
-                    onClick={toggleModal}
+                    onClick={() => {
+                      setOpenDrawer(true);
+                    }} 
                     className="flex items-center w-40 space-x-2 bg-[#ff0404] hover:bg-[#f34a4a] text-white px-4 py-1.5 rounded-md"
                   >
                     <BsSend /> <p>Issue Ticket</p>
@@ -254,6 +277,11 @@ const AccountInactive = () => {
           </>
         )}
       </div>
+      <AddTicket
+        fetchTickets={fetchTickets}
+        setOpenDrawer={setOpenDrawer}
+        openDrawer={openDrawer}
+      />
 
       {showModal && (
         <div className="fixed z-50 inset-0 bg-black bg-opacity-60 flex justify-end">

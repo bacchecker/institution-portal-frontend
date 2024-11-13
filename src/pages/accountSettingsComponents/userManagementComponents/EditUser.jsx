@@ -8,7 +8,6 @@ import {
   Spinner,
 } from "@nextui-org/react";
 import { FaAnglesRight } from "react-icons/fa6";
-import useSWR, { mutate } from "swr";
 import axios from "@utils/axiosConfig";
 import Swal from "sweetalert2";
 
