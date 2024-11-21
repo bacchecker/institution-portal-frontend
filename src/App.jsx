@@ -23,6 +23,7 @@ import DepartmentManagement from "./pages/accountSettingsComponents/DepartmentMa
 import UserManagement from "./pages/accountSettingsComponents/UserManagement";
 import Tickets from "./pages/support/Tickets";
 import ChangePassword from "./pages/auth/ChangePassword";
+import ForgotPassword from "./pages/auth/ForgotPassword";
 import ProtectedRoute from './ProtectedRoute';
 import axios from "@utils/axiosConfig";
 
@@ -66,6 +67,7 @@ const App = () => {
         <Route exact path="/user-profile" element={<Profile />} />
         <Route exact path="/verify-otp" element={<VerifyOTP />} />
         <Route exact path="/change-password" element={<ChangePassword />} />
+        <Route exact path="/forgot-password" element={<ForgotPassword />} />
         <Route exact path="/account-setup" element={<AccountSetupPage />} />
 
         <Route exact path="/dashboard" element={<Dashboard />} />

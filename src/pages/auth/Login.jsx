@@ -219,12 +219,12 @@ const Login = () => {
             </p>
             <p className="text-center text-sm text-gray-600 dark:text-white">
               Forgot your Password?
-              <a
-                href="https://backend.baccheck.online/forgot-password"
+              <button
+                onClick={() => navigate("/forgot-password")}
                 className="text-[#ff0404] ml-[0.2rem]"
               >
                 Reset
-              </a>
+              </button>
             </p>
           </form>
         </Card>

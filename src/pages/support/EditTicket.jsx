@@ -43,6 +43,8 @@ function EditTicket({ setOpenEditDrawer, openEditDrawer, selectedData, fetchTick
     useEffect(() => {
         if (selectedData) {
         setUserInput(selectedData);
+        console.log(userInput);
+        
         setTicketId(selectedData.id);
         setUserInitialInput(selectedData);
         }else{setUserInput(userInitialInput);}
