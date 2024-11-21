@@ -41,6 +41,7 @@ const ChangePassword = () => {
         email: email,
         token: token,
         password: password,
+        password_confirmation: password,
       });
 
       Swal.fire({
