@@ -37,7 +37,7 @@ const ChangePassword = () => {
     setIsSaving(true);
 
     try {
-      const response = await axios.post("/auth/change-password", {
+      const response = await axios.post("/auth/reset-password", {
         email: email,
         token: token,
         password: password,

@@ -130,6 +130,7 @@ const Login = () => {
             <Input
               label="Email"
               type="email"
+              size="sm"
               name="email"
               value={formData.email}
               className="mt-1 block w-full"
@@ -147,6 +148,7 @@ const Login = () => {
               type={showPassword ? "text" : "password"}
               id="password"
               name="password"
+              size="sm"
               value={formData.password}
               label="Password"
               className="mt-1 block w-full"
@@ -172,7 +174,7 @@ const Login = () => {
                 )
               }
             />
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col">
               <Switch
                 size="sm"
                 isSelected={isSelected}
@@ -183,7 +185,7 @@ const Login = () => {
               </Switch>
             </div>
 
-            <div className="flex">
+            <div className="flex -mt-2">
               <ReCAPTCHA
                 sitekey="6LeT50QqAAAAAOjlgT3V74eIOT3DwvtemCjWOM-K"
                 onChange={onRecaptchaChange}
