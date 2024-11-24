@@ -3,12 +3,8 @@ import Drawer from "../../../components/Drawer";
 import {
   Button,
   Input,
-  Select,
-  SelectItem,
-  Spinner,
   Textarea,
 } from "@nextui-org/react";
-import { FaAnglesRight } from "react-icons/fa6";
 import { mutate } from "swr";
 import axios from "@utils/axiosConfig";
 import Swal from "sweetalert2";
@@ -18,14 +14,6 @@ function EditDepartment({ setOpenDrawer, openDrawer, selectedData }) {
   const [userInitialInput, setUserInitialInput] = useState({});
   const [drawerTitle, setDrawerTitle] = useState("Department Details");
   const [isSaving, setIsSaving] = useState(false);
-  const roles = [
-    { name: "Admin" },
-    { name: "Finance" },
-    { name: "Customer Service" },
-    { name: "HR" },
-  ];
-
-  console.log(userInput);
 
   useEffect(() => {
     if (selectedData) {
@@ -51,9 +39,9 @@ function EditDepartment({ setOpenDrawer, openDrawer, selectedData }) {
     e.preventDefault();
     setIsSaving(true);
 
-    const { name, description, role, id } = userInput;
+    const { name, description, id } = userInput;
 
-    if (!name || !description || !role) {
+    if (!name || !description) {
       setIsSaving(false);
       Swal.fire({
         title: "Error",
@@ -65,7 +53,6 @@ function EditDepartment({ setOpenDrawer, openDrawer, selectedData }) {
       const data = {
         name: name,
         description: description,
-        role: role,
       };
       try {
         const response = await axios.put(
@@ -111,25 +98,10 @@ function EditDepartment({ setOpenDrawer, openDrawer, selectedData }) {
             label="Name"
             type="text"
             name="name"
-            className="mt-4"
             value={userInput?.name}
             onChange={handleUserInput}
           />
-          <Select
-            isRequired
-            size="sm"
-            label="Role"
-            className="w-full mt-4"
-            name="role"
-            // value={userInput?.role}
-            onChange={handleUserInput}
-            selectedKeys={[userInput?.role]}
-            defaultSelectedKeys={[userInput?.role]}
-          >
-            {roles?.map((item) => (
-              <SelectItem key={item.name}>{item.name}</SelectItem>
-            ))}
-          </Select>
+          
           <Textarea
             label="Description"
             name="description"

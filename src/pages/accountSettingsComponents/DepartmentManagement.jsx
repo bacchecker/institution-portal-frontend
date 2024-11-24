@@ -22,6 +22,7 @@ import EditDepartment from "./departmentManagementComponents/EditDepartment";
 import Elipsis from "../../assets/icons/elipsis";
 import Swal from "sweetalert2";
 import AuthLayout from "../../components/AuthLayout";
+import ManageRoles from "./departmentManagementComponents/manageRoles/ManageRoles";
 
 function DepartmentManagement() {
   const [isSaving, setSaving] = useState(false);
@@ -29,6 +30,7 @@ function DepartmentManagement() {
   const [openDrawer, setOpenDrawer] = useState(false);
   const [selectedData, setSelectedData] = useState({});
   const [openEditDrawer, setOpenEditDrawer] = useState(false);
+  const [openRolesDrawer, setOpenRolesDrawer] = useState(false);
   const [isDeleting, setDeleting] = useState(false);
   const navigate = useNavigate();
   const institution = secureLocalStorage.getItem("institution");
@@ -68,6 +70,11 @@ function DepartmentManagement() {
             openDrawer={openEditDrawer}
             selectedData={selectedData}
           />
+          <ManageRoles
+            setOpenDrawer={setOpenRolesDrawer}
+            openDrawer={openRolesDrawer}
+            selectedData={selectedData}
+          />
         </div>
         <section className="md:w-full w-[98vw] min-h-[60vh] mx-auto">
           {institutionDocsLoading ? (
@@ -77,22 +84,12 @@ function DepartmentManagement() {
           ) : (
             <>
               <CustomTable
-                columns={["Name", "Role", "Description", ""]}
-                // loadingState={resData ? false : true}
-                // page={resData?.current_page}
-                // setPage={(page) =>
-                //   navigate({
-                //     // pathname: "listing",
-                //     search: createSearchParams({ ...filters, page }).toString(),
-                //   })
-                // }
-                // totalPages={Math.ceil(resData?.total / resData?.per_page)}
+                columns={["Name", "Roles", "Description", "Actions"]}
               >
                 {institutionDepartments?.data?.map((item) => (
                   <TableRow key={item?.id}>
                     <TableCell>{item?.name}</TableCell>
-
-                    <TableCell>{item?.role}</TableCell>
+                    <TableCell>{item?.role_count}</TableCell>
                     <TableCell>{item?.description}</TableCell>
 
                     <TableCell className="flex items-center h-16 gap-3">
@@ -103,6 +100,15 @@ function DepartmentManagement() {
                           </Button>
                         </DropdownTrigger>
                         <DropdownMenu aria-label="Static Actions">
+                          <DropdownItem
+                            key="manage_roles"
+                            onClick={() => {
+                              setSelectedData(item);
+                              setOpenRolesDrawer(true);
+                            }}
+                          >
+                            Manage Roles
+                          </DropdownItem>
                           <DropdownItem
                             key="edit"
                             onClick={() => {

@@ -33,9 +33,9 @@ const ForgotPassword = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="bg-white px-8 pb-8 w-full md:w-1/2 lg:w-2/5 pt-4 rounded-lg shadow-lg">
+      <div className="bg-white px-8 pb-8 w-full md:w-1/2 lg:w-2/5 xl:w-1/3 pt-4 rounded-lg shadow-lg">
         <div className="text-center text-yellow-100 mb-4">
-          <div className="flex items-center justify-center mx-auto w-20 h-20">
+          <div className="flex items-center justify-center mx-auto w-24 h-24">
             <img src="/images/bclogo.jpg" alt="BacChecker Logo" />
           </div>
         </div>
@@ -43,15 +43,16 @@ const ForgotPassword = () => {
         <form onSubmit={handleSubmit}>
           <div className="flex justify-center space-x-2 mb-6">
             <Input
-              label="Email Address"
-              type="email"
-              name="email"
-              value={email}
-              className="mt-1 block w-full"
-              autoComplete="email"
-              autoFocus
-              onChange={(e) => setEmail(e.target.value)}
-              startContent={<IoPerson />}
+                isRequired
+                label="Email Address"
+                type="email"
+                name="email"
+                value={email}
+                className="mt-1 block w-full"
+                autoComplete="email"
+                autoFocus
+                onChange={(e) => setEmail(e.target.value)}
+                startContent={<IoPerson />}
             />
           </div>
           <button

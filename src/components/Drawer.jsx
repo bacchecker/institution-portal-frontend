@@ -26,15 +26,6 @@ export default function Drawer({
       }
     }
 
-    // if (isOpen) {
-    //     document.addEventListener("mousedown", handleClickOutside);
-    // } else {
-    //     document.removeEventListener("mousedown", handleClickOutside);
-    // }
-
-    // return () => {
-    //     document.removeEventListener("mousedown", handleClickOutside);
-    // };
   }, [isOpen, setIsOpen]);
 
   const drawerVariants = {

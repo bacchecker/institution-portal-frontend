@@ -17,18 +17,10 @@ function AddNewDepartment({ setOpenDrawer, openDrawer }) {
   const initialUserInput = {
     name: "",
     description: "",
-    role: "",
   };
   const [userInput, setUserInput] = useState(initialUserInput);
   const [drawerTitle, setDrawerTitle] = useState("Department Details");
   const [isSaving, setIsSaving] = useState(false);
-  const roles = [
-    { name: "Admin" },
-    { name: "Finance" },
-    { name: "Customer Service" },
-    { name: "HR" },
-  ];
-
   const handleUserInput = (e) => {
     setUserInput((userInput) => ({
       ...userInput,
@@ -46,9 +38,9 @@ function AddNewDepartment({ setOpenDrawer, openDrawer }) {
     e.preventDefault();
     setIsSaving(true);
 
-    const { name, description, role } = userInput;
+    const { name, description } = userInput;
 
-    if (!name || !description || !role) {
+    if (!name || !description) {
       setIsSaving(false);
       Swal.fire({
         title: "Error",
@@ -60,7 +52,6 @@ function AddNewDepartment({ setOpenDrawer, openDrawer }) {
       const data = {
         name: name,
         description: description,
-        role: role,
       };
       try {
         const response = await axios.post("/institution/departments", data);
@@ -103,24 +94,9 @@ function AddNewDepartment({ setOpenDrawer, openDrawer }) {
             label="Name"
             type="text"
             name="name"
-            className="mt-4"
             value={userInput?.name}
             onChange={handleUserInput}
           />
-          <Select
-            size="sm"
-            isRequired
-            label="Role"
-            className="w-full mt-4"
-            name="role"
-            value={userInput?.role}
-            onChange={handleUserInput}
-            defaultSelectedKeys={[userInput?.role]}
-          >
-            {roles?.map((item) => (
-              <SelectItem key={item.name}>{item.name}</SelectItem>
-            ))}
-          </Select>
           <Textarea
             isRequired
             label="Description"

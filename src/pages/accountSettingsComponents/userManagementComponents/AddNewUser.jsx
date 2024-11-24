@@ -6,12 +6,10 @@ import {
   Select,
   SelectItem,
   Spinner,
-  Textarea,
 } from "@nextui-org/react";
-import useSWR, { mutate } from "swr";
-import { FaAnglesRight } from "react-icons/fa6";
 import axios from "@utils/axiosConfig";
 import Swal from "sweetalert2";
+import { FaAnglesRight } from "react-icons/fa6";
 
 function AddNewUser({ setOpenDrawer, openDrawer, fetchData }) {
   const initialUserInput = {
@@ -19,99 +17,132 @@ function AddNewUser({ setOpenDrawer, openDrawer, fetchData }) {
     last_name: "",
     other_name: "",
     department: "",
+    role: "",
     email: "",
     phone: "",
     address: "",
     gender: "",
   };
-    const [userInput, setUserInput] = useState(initialUserInput);
-    const [drawerTitle, setDrawerTitle] = useState("User Details");
-    const [institutionDepartments, setInstitutionDepartments] = useState(null);
-    const [isSaving, setIsSaving] = useState(false);
-    const genders = [
-        { id: "male", name: "Male" },
-        { id: "female", name: "Female" },
-        { id: "other", name: "Other" },
-    ];
 
-    const handleUserInput = (e) => {
-        setUserInput((userInput) => ({
-        ...userInput,
-        [e.target.name]: e.target.value,
-        }));
+  const [userInput, setUserInput] = useState(initialUserInput);
+  const [drawerTitle, setDrawerTitle] = useState("User Details");
+  const [institutionDepartments, setInstitutionDepartments] = useState(null);
+  const [roles, setRoles] = useState([]); // To store roles for the selected department
+  const [isSaving, setIsSaving] = useState(false);
+  const genders = [
+    { id: "male", name: "Male" },
+    { id: "female", name: "Female" },
+    { id: "other", name: "Other" },
+  ];
+
+  const handleUserInput = (e) => {
+    setUserInput((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+  useEffect(() => {
+    if (!openDrawer) {
+      setUserInput(initialUserInput);
+    }
+  }, [openDrawer]);
+
+  // Fetch departments when the component loads
+  useEffect(() => {
+    const fetchInstitutionDepartments = async () => {
+      try {
+        const response = await axios.get("/institution/departments");
+        setInstitutionDepartments(response.data.data);
+      } catch (error) {
+        console.error(error);
+      }
     };
 
-    useEffect(() => {
-        if (!openDrawer) {
-        setUserInput(initialUserInput);
-        }
-    }, [openDrawer]);
+    fetchInstitutionDepartments();
+  }, []);
 
-    useEffect(() => {
-        const fetchInstitutionDepartments = async () => {
-            try {
-                const response = await axios.get("/institution/departments");
-                setInstitutionDepartments(response.data.data);
-            } catch (error) {
-                console.log(error);
-            }
-        };
+  // Fetch roles when a department is selected
+  useEffect(() => {
+    const fetchRolesForDepartment = async () => {
+      if (!userInput.department) return; // Skip if no department is selected
+      try {
+        const response = await axios.get(
+          `/institution/department-roles/${userInput.department}`
+        );
+        setRoles(response.data.data || []);
+      } catch (error) {
+        console.error("Error fetching roles:", error);
+        setRoles([]); // Reset roles on error
+      }
+    };
 
-        fetchInstitutionDepartments();
-    }, []);
+    fetchRolesForDepartment();
+  }, [userInput.department]);
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setIsSaving(true);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsSaving(true);
 
-        const { first_name, last_name, department, email, phone, address, other_name, gender } = userInput;
+    const {
+      first_name,
+      last_name,
+      department,
+      role,
+      email,
+      phone,
+      address,
+      other_name,
+      gender,
+    } = userInput;
 
-        if (!first_name || !last_name || !department || !email || !phone) {
-        setIsSaving(false);
+    if (!first_name || !last_name || !department || !role || !email || !phone) {
+      setIsSaving(false);
+      Swal.fire({
+        title: "Error",
+        text: "Fill all required fields",
+        icon: "error",
+        button: "OK",
+      });
+    } else {
+      const data = {
+        first_name,
+        last_name,
+        other_name,
+        department_id: department,
+        role_id: role,
+        email,
+        phone,
+        address,
+        gender,
+      };
+      try {
+        const response = await axios.post("/institution/store-users", data);
         Swal.fire({
-            title: "Error",
-            text: "Fill All required fields",
-            icon: "error",
-            button: "OK",
+          title: "Success",
+          text: response.data.message,
+          icon: "success",
+          button: "OK",
+          confirmButtonColor: "#00b17d",
+        }).then((isOkay) => {
+          if (isOkay) {
+            fetchData();
+            setOpenDrawer(!openDrawer);
+            setUserInput(initialUserInput);
+          }
         });
-        } else {
-        const data = {
-            first_name: first_name,
-            last_name: last_name,
-            other_name: other_name,
-            department_id: department,
-            email: email,
-            phone: phone,
-            address: address,
-            gender: gender,
-        };
-        try {
-            const response = await axios.post("/institution/store-users", data);
-            Swal.fire({
-            title: "Success",
-            text: response.data.message,
-            icon: "success",
-            button: "OK",
-            confirmButtonColor: "#00b17d",
-            }).then((isOkay) => {
-            if (isOkay) {
-                fetchData()
-                setOpenDrawer(!openDrawer);
-                setUserInput(initialUserInput);
-            }
-            });
-        } catch (error) {
-            Swal.fire({
-            title: "Error",
-            text: error.response?.data?.message,
-            icon: "error",
-            button: "OK",
-            });
-        } finally {
-            setIsSaving(false);
-        }
-        }
-    };
+      } catch (error) {
+        Swal.fire({
+          title: "Error",
+          text: error.response?.data?.message,
+          icon: "error",
+          button: "OK",
+        });
+      } finally {
+        setIsSaving(false);
+      }
+    }
+  };
 
   return (
     <Drawer title={drawerTitle} isOpen={openDrawer} setIsOpen={setOpenDrawer}>
@@ -120,28 +151,20 @@ function AddNewUser({ setOpenDrawer, openDrawer, fetchData }) {
         className="h-full flex flex-col justify-between"
       >
         <div className="flex flex-col">
+          {/* User Details */}
           <Input
             size="sm"
-            label={
-              <>
-                First Name
-                <span className="text-[#ff0404]">*</span>
-              </>
-            }
+            isRequired
+            label="First Name"
             type="text"
             name="first_name"
-            className=""
             value={userInput?.first_name}
             onChange={handleUserInput}
           />
           <Input
             size="sm"
-            label={
-              <>
-               Last Name
-                <span className="text-[#ff0404]">*</span>
-              </>
-            }
+            isRequired
+            label="Last Name"
             type="text"
             name="last_name"
             className="mt-4"
@@ -150,11 +173,7 @@ function AddNewUser({ setOpenDrawer, openDrawer, fetchData }) {
           />
           <Input
             size="sm"
-            label={
-              <>
-               Other Name
-              </>
-            }
+            label={<>Other Name</>}
             type="text"
             name="other_name"
             className="mt-4"
@@ -163,12 +182,8 @@ function AddNewUser({ setOpenDrawer, openDrawer, fetchData }) {
           />
           <Input
             size="sm"
-            label={
-              <>
-               Email
-                <span className="text-[#ff0404]">*</span>
-              </>
-            }
+            isRequired
+            label="Email"
             type="text"
             name="email"
             className="mt-4"
@@ -177,61 +192,79 @@ function AddNewUser({ setOpenDrawer, openDrawer, fetchData }) {
           />
           <Input
             size="sm"
-            label={
-              <>
-               Phone
-                <span className="text-[#ff0404]">*</span>
-              </>
-            }
+            isRequired
+            label="Phone"
             type="text"
             name="phone"
             className="mt-4"
             value={userInput?.phone}
             onChange={handleUserInput}
           />
+
+          {/* Gender Selection */}
           <Select
             size="sm"
-            label={
-              <>
-                Gender
-              </>
-            }
+            label="Gender"
             className="w-full mt-4"
             name="gender"
             value={userInput?.gender}
-            onChange={handleUserInput}
+            onChange={(e) =>
+              setUserInput((prev) => ({ ...prev, gender: e.target.value }))
+            }
           >
-            {genders?.map((item) => (
-              <SelectItem key={item.id}>{item.name}</SelectItem>
+            {genders.map((item) => (
+              <SelectItem key={item.id} value={item.id}>
+                {item.name}
+              </SelectItem>
             ))}
           </Select>
+
+          {/* Department Selection */}
           <Select
             size="sm"
-            label={
-              <>
-                Department
-                <span className="text-[#ff0404]">*</span>
-              </>
-            }
+            isRequired
+            label="Department"
             className="w-full mt-4"
             name="department"
             value={userInput?.department}
-            onChange={handleUserInput}
+            onChange={(e) =>
+              setUserInput((prev) => ({ ...prev, department: e.target.value }))
+            }
           >
             {institutionDepartments?.map((item) => (
-              <SelectItem key={item.id}>{item.name}</SelectItem>
+              <SelectItem key={item.id} value={item.id}>
+                {item.name}
+              </SelectItem>
             ))}
           </Select>
-          
+
+          {/* Role Selection */}
+          <Select
+            size="sm"
+            label="Role"
+            className="w-full my-4"
+            name="role"
+            value={userInput?.role}
+            onChange={(e) =>
+              setUserInput((prev) => ({ ...prev, role: e.target.value }))
+            }
+          >
+            {roles?.map((item) => (
+              <SelectItem key={item.id} value={item.id}>
+                {item.name}
+              </SelectItem>
+            ))}
+          </Select>
         </div>
 
+        {/* Buttons */}
         <div className="w-full flex items-center justify-between">
           <Button
             className="py-2.5 font-medium rounded-[0.3rem]"
             color="default"
             onClick={() => {
               setOpenDrawer(false);
-              reset();
+              setUserInput(initialUserInput);
             }}
           >
             Close
