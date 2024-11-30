@@ -12,9 +12,9 @@ import {
   TableRow,
   useDisclosure,
 } from "@nextui-org/react";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import CustomTable from "@components/CustomTable";
-import { FaAnglesLeft, FaAnglesRight } from "react-icons/fa6";
+import { FaAnglesLeft, FaAnglesRight, FaChevronLeft, FaChevronRight } from "react-icons/fa6";
 import secureLocalStorage from "react-secure-storage";
 import useSWR, { mutate } from "swr";
 import DeleteModal from "@components/DeleteModal";
@@ -28,11 +28,19 @@ import AuthLayout from "../../components/AuthLayout";
 
 function InstitutionDocumentTypes() {
   const [isSaving, setSaving] = useState(false);
+  const [docLoading, setDocLoading] = useState(false);
+  const [search, setSearch] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [lastPage, setLastPage] = useState(1);
+  const [total, setTotal] = useState(0);
   const [isDeleting, setDeleting] = useState(false);
   const [openDrawer, setOpenDrawer] = useState(false);
   const [openNewDrawer, setOpenNewDrawer] = useState(false);
   const [openEditDrawer, setOpenEditDrawer] = useState(false);
   const [selectedData, setSelectedData] = useState({});
+  const [institutionDocuments, setInstitutionDocuments] = useState([]);
+  const [sortBy, setSortBy] = useState(null);
+  const [sortOrder, setSortOrder] = useState("asc");
   const deleteDisclosure = useDisclosure();
 
   const institution = secureLocalStorage.getItem("institution");
@@ -55,13 +63,60 @@ function InstitutionDocumentTypes() {
     (url) => axios.get(url).then((res) => res.data)
   );
 
-  const {
-    data: institutionDocuments,
-    error: institutionError,
-    isLoading: institutionDocsLoading,
-  } = useSWR("/institution/document-types", (url) =>
-    axios.get(url).then((res) => res.data)
-  );
+  const fetchInstitutionDocuments = async () => {
+    setDocLoading(true)
+    try {
+      const response = await axios.get("/institution/document-types", {
+        params: {
+          search,
+          page: currentPage,
+          sort_by: sortBy,
+          sort_order: sortOrder,
+        },
+      });
+
+      const docTypes = response.data.document_types;
+
+    // Update the states with the received data
+    setInstitutionDocuments(docTypes.data); // Array of document types
+    setCurrentPage(docTypes.current_page); // Current page number
+    setLastPage(docTypes.last_page); // Last page number
+    setTotal(docTypes.total); // Total number of document types
+    setDocLoading(false); // Set loading state to false
+
+    } catch (error) {
+      console.error("Error fetching institution documents:", error);
+      throw error;
+    }
+  };
+
+  useEffect(() => {
+    fetchInstitutionDocuments();
+  }, [search, currentPage, sortBy, sortOrder]);
+
+  const handlePageChange = (page) => {
+    if (page >= 1 && page <= lastPage) {
+      setCurrentPage(page);
+    }
+  };
+
+  const renderPageNumbers = () => {
+    const pages = [];
+    for (let i = 1; i <= lastPage; i++) {
+      pages.push(
+        <button
+          key={i}
+          onClick={() => handlePageChange(i)}
+          className={`py-1.5 px-2.5 border rounded-lg ${
+            currentPage === i ? "bg-bChkRed text-white" : "bg-white text-gray-800"
+          }`}
+        >
+          {i}
+        </button>
+      );
+    }
+    return pages;
+  };
 
   return (
     <AuthLayout title="Document Types">
@@ -142,34 +197,34 @@ function InstitutionDocumentTypes() {
           />
         </div>
         <section className="md:w-full w-[98vw] min-h-[60vh] mx-auto">
-          {institutionDocsLoading ? (
-            <div className="w-full h-[5rem] flex justify-center items-center">
-              <Spinner size="sm" color="danger" />
-            </div>
-          ) : (
+          
             <>
               <CustomTable
+                loadingState={docLoading}
                 columns={[
                   "Name",
-                  "Document Format(s)",
+                  "Document Format",
                   "Document Fee",
                   "Printing Fee",
                   "Validation Fee",
                   "Verification Fee",
-                  "",
+                  "Actions",
                 ]}
-                // loadingState={resData ? false : true}
-                // page={resData?.current_page}
-                // setPage={(page) =>
-                //   navigate({
-                //     // pathname: "listing",
-                //     search: createSearchParams({ ...filters, page }).toString(),
-                //   })
-                // }
-                // totalPages={Math.ceil(resData?.total / resData?.per_page)}
+                columnSortKeys={{
+                  Name: "document.name",
+                  "Document Fee": "base_fee",
+                  "Printing Fee": "printing_fee",
+                  "Validation Fee": "validation_fee",
+                  "Verification Fee": "verification_fee",
+                 
+                }}
+                sortBy={sortBy}
+                sortOrder={sortOrder}
+                setSortBy={setSortBy}
+                setSortOrder={setSortOrder}
               >
-                {institutionDocuments?.data?.types?.map((item) => (
-                  <TableRow key={item?.id}>
+                {institutionDocuments?.map((item) => (
+                  <TableRow key={item?.id} className="odd:bg-gray-100 even:bg-white border-b dark:text-slate-700">
                     <TableCell>{item?.document_type?.name}</TableCell>
                     <TableCell>
                       {item?.soft_copy && item?.hard_copy
@@ -182,10 +237,10 @@ function InstitutionDocumentTypes() {
                     <TableCell>GH¢ {item?.printing_fee}</TableCell>
                     <TableCell>GH¢ {item?.validation_fee}</TableCell>
                     <TableCell> GH¢ {item?.verification_fee}</TableCell>
-                    <TableCell className="flex items-center h-16 gap-3">
+                    <TableCell className="flex items-center h-12 gap-3">
                       <Dropdown>
                         <DropdownTrigger>
-                          <Button variant="bordered" size="sm" isIconOnly>
+                          <Button variant="bordered" size="sm" isIconOnly  className="dark:border-slate-400 dark:text-slate-600">
                             <Elipsis />
                           </Button>
                         </DropdownTrigger>
@@ -214,8 +269,35 @@ function InstitutionDocumentTypes() {
                   </TableRow>
                 ))}
               </CustomTable>
+              <section>
+                <div className="flex justify-between items-center mt-1">
+                  <div>
+                    <span className="text-gray-600 font-medium text-sm">
+                      Page {currentPage} of {lastPage} - ({total} entries)
+                    </span>
+                  </div>
+                  <div className="flex space-x-2">
+                    <button
+                      disabled={currentPage === 1}
+                      onClick={() => handlePageChange(currentPage - 1)}
+                      className="px-2 bg-white text-gray-800 border rounded-lg disabled:bg-gray-300 disabled:text-white"
+                    >
+                      <FaChevronLeft size={12} />
+                    </button>
+
+                    {renderPageNumbers()}
+
+                    <button
+                      disabled={currentPage === lastPage}
+                      onClick={() => handlePageChange(currentPage + 1)}
+                      className="px-2 bg-white text-gray-800 border rounded-lg disabled:bg-gray-300 disabled:text-white disabled:border-0"
+                    >
+                      <FaChevronRight size={12} />
+                    </button>
+                  </div>
+                </div>
+              </section>
             </>
-          )}
         </section>
         <DeleteModal
           disclosure={deleteDisclosure}

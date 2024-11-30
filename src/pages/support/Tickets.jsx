@@ -19,7 +19,7 @@ export default function Tickets() {
 
     const [tickets, setTickets] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [searchQuery, setSearchQuery] = useState('');
+    const [search, setSearch] = useState('');
     const [status, setStatus] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [lastPage, setLastPage] = useState(1);
@@ -27,20 +27,28 @@ export default function Tickets() {
     const [openEditDrawer, setOpenEditDrawer] = useState(false);
     const [isPopoverOpen, setPopoverOpen] = useState(false);
     const [selectedData, setSelectedData] = useState({});
+    const [sortBy, setSortBy] = useState(null);
+    const [sortOrder, setSortOrder] = useState("asc");
 
     // Fetch tickets
     const fetchTickets = async () => {
       setLoading(true);
       try {
           const response = await axios.get('/tickets', {
-              params: {
-                  search_query: searchQuery,
-                  status: status,
-                  page: currentPage
-              }
+            params: {
+              search,
+              status,
+              page: currentPage,
+              ...(sortBy && { sort_by: sortBy }),
+              ...(sortOrder && { sort_order: sortOrder }),
+            },
           });
-          setTickets(response.data.tickets.data);
-          setLastPage(response.data.tickets.last_page);
+          const ticketsData = response.data.tickets
+
+          setTickets(ticketsData.data);
+          setCurrentPage(ticketsData.current_page);
+          setLastPage(ticketsData.last_page);
+          setTotal(ticketsData.total);
           setLoading(false);
       } catch (error) {
           console.error('Error fetching tickets:', error);
@@ -50,7 +58,7 @@ export default function Tickets() {
 
     useEffect(() => {
         fetchTickets();
-    }, [searchQuery, status, currentPage]);
+    }, [search, status, currentPage, sortBy, sortOrder]);
 
     // Handle page change
     const handlePageChange = (page) => {
@@ -122,14 +130,14 @@ export default function Tickets() {
                       <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
                   </svg>
               </div>
-              <input type="search" onChange={(e) => setSearchQuery(e.target.value)} value={searchQuery} id="default-search" className="block w-full focus:outline-0 px-4 py-2.5 ps-10 text-sm text-gray-900 border border-gray-300 rounded-2xl bg-gray-50 focus:ring-blue-500 focus:border-blue-500" placeholder="Search by ticket description, subject or status" required />
+              <input type="search" onChange={(e) => setSearch(e.target.value)} value={search} id="default-search" className="block w-full focus:outline-0 px-4 py-2.5 ps-10 text-sm text-gray-900 border border-gray-300 rounded-2xl bg-gray-50 focus:ring-blue-500 focus:border-blue-500" placeholder="Search by ticket description, subject or status" required />
           </div>
           <Select
             selectedKeys={status}
             onSelectionChange={(selected) => setStatus(selected)}
             label="Filter by Status"
             size="sm"
-            className="w-60"
+            className="max-w-[180px] min-w-[180px]"
           >
               <SelectItem key="">All Statuses</SelectItem>
               <SelectItem key="open">Open</SelectItem>
@@ -139,17 +147,24 @@ export default function Tickets() {
         </div>
       </div>
       <section className="md:w-full w-[98vw] min-h-[60vh] mx-auto mt-2">
-        {loading ? (
-          <div className="w-full h-[5rem] flex justify-center items-center">
-            <Spinner size="sm" color="danger" />
-          </div>
-        ) : (
-          <>
+       
             <CustomTable
-              columns={["Subject", "Description", "Type", "Category", "Status", "Action"]}
+              loadingState={loading}
+              columns={["Subject", "Description", "Type", "Category", "Status", "Actions"]}
+              columnSortKeys={{
+                Subject: "title",
+                Description: "description",
+                Type: "type",
+                Category: "category",
+                Status: "status",
+              }}
+              sortBy={sortBy}
+              sortOrder={sortOrder}
+              setSortBy={setSortBy}
+              setSortOrder={setSortOrder}
             >
               {tickets?.map((item) => (
-                <TableRow key={item?.id}>
+                <TableRow key={item?.id} className="odd:bg-gray-100 even:bg-white border-b dark:text-slate-700">
                   <TableCell className="flex flex-col">
                     <p className="font-semibold">{item?.title}</p>
                     <p className="text-xs text-gray-500">{moment(item?.created_at).format('MMM DD, YYYY')}</p>
@@ -236,8 +251,6 @@ export default function Tickets() {
                 </div>
               </div>
             </section>
-          </>
-        )}
       </section>
       
     </div>

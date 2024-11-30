@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 import CustomTable from "@components/CustomTable";
 import { Spinner, TableCell, TableRow } from "@nextui-org/react";
 import secureLocalStorage from "react-secure-storage";
@@ -18,15 +18,12 @@ function LetterTemplatesTable({
       behavior: "smooth",
     });
   };
+  const [sortBy, setSortBy] = useState(null);
+  const [sortOrder, setSortOrder] = useState("asc");
 
   return (
     <section className="md:w-full w-[98vw] min-h-[60vh] mx-auto">
-      {letterTemplatesLoading ? (
-        <div className="w-full h-[5rem] flex justify-center items-center">
-          <Spinner size="sm" color="danger" />
-        </div>
-      ) : (
-        <>
+      
           <CustomTable
             columns={[
               "Name",
@@ -36,15 +33,15 @@ function LetterTemplatesTable({
               "Unsuccessful Verification Letter",
               "",
             ]}
-            // loadingState={resData ? false : true}
-            // page={resData?.current_page}
-            // setPage={(page) =>
-            //   navigate({
-            //     // pathname: "listing",
-            //     search: createSearchParams({ ...filters, page }).toString(),
-            //   })
-            // }
-            // totalPages={Math.ceil(resData?.total / resData?.per_page)}
+            loadingState={letterTemplatesLoading}
+            columnSortKeys={{
+              "Name": "name",
+             
+            }}
+            sortBy={sortBy}
+            sortOrder={sortOrder}
+            setSortBy={setSortBy}
+            setSortOrder={setSortOrder}
           >
             {letterTemplates?.data?.map((item) => (
               <TableRow key={item?.id}>
@@ -103,8 +100,6 @@ function LetterTemplatesTable({
               </TableRow>
             ))}
           </CustomTable>
-        </>
-      )}
     </section>
   );
 }

@@ -47,7 +47,7 @@ function EditUser({ setOpenDrawer, openDrawer, selectedData, fetchData }) {
     const fetchInstitutionDepartments = async () => {
       try {
         const response = await axios.get("/institution/departments");
-        setInstitutionDepartments(response.data.data);
+        setInstitutionDepartments(response.data.departments.data);
       } catch (error) {
         console.error(error);
       }
@@ -68,7 +68,13 @@ function EditUser({ setOpenDrawer, openDrawer, selectedData, fetchData }) {
       const response = await axios.get(
         `/institution/department-roles/${departmentId}`
       );
-      setRoles(response.data.data || []);
+      const fetchedRoles = response.data.data || [];
+      setRoles(fetchedRoles);
+
+      // Ensure the current role_id exists in the fetched roles
+      if (!fetchedRoles.some((role) => role.id === userInput.role_id)) {
+        setUserInput((prev) => ({ ...prev, role_id: "" }));
+      }
     } catch (error) {
       console.error("Error fetching roles:", error);
       setRoles([]);
@@ -155,7 +161,7 @@ function EditUser({ setOpenDrawer, openDrawer, selectedData, fetchData }) {
   const handleReset = () => {
     setUserInput(userInitialInput);
   };
-
+  
   return (
     <Drawer title={drawerTitle} isOpen={openDrawer} setIsOpen={setOpenDrawer}>
       <form
@@ -256,7 +262,7 @@ function EditUser({ setOpenDrawer, openDrawer, selectedData, fetchData }) {
             label="Role"
             className="w-full mt-4"
             name="role_id"
-            selectedKeys={[userInput?.role_id]}
+            selectedKeys={[userInput?.role?.role_id]}
             onChange={(e) =>
               setUserInput((prev) => ({ ...prev, role_id: e.target.value }))
             }

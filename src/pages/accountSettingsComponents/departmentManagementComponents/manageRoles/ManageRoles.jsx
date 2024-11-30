@@ -20,6 +20,7 @@ import Elipsis from "../../../../assets/icons/elipsis";
 import EditRole from "./EditRole";
 import DeleteModal from "@components/DeleteModal";
 import { FaPlus } from "react-icons/fa6";
+import DepartmentManagement from "../../DepartmentManagement";
 
 function ManageRoles({ setOpenDrawer, openDrawer, selectedData }) {
   const initialUserInput = {
@@ -35,20 +36,13 @@ function ManageRoles({ setOpenDrawer, openDrawer, selectedData }) {
   const [openEditRoleDrawer, setOpenEditRoleDrawer] = useState(false);
   const [departmentRoles, setDepartmentRoles] = useState([]);
   const [selectedRoleData, setSelectedRoleData] = useState({});
+  const [refreshDepartments, setRefreshDepartments] = useState(false);
   const deleteDisclosure = useDisclosure();
-
-  const handleUserInput = (e) => {
-    setUserInput((userInput) => ({
-      ...userInput,
-      [e.target.name]: e.target.value,
-    }));
-  };
 
   useEffect(() => {
     if (selectedData) {
       setUserInput(selectedData);
     }
-    
     
   }, [selectedData]);
     
@@ -73,58 +67,11 @@ function ManageRoles({ setOpenDrawer, openDrawer, selectedData }) {
     }
   }, [openDrawer]);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsSaving(true);
-
-    const { name, description } = userInput;
-
-    if (!name || !description) {
-      setIsSaving(false);
-      Swal.fire({
-        title: "Error",
-        text: "Fill all required fields",
-        icon: "error",
-        button: "OK",
-      });
-    } else {
-      const data = {
-        name: name,
-        description: description,
-      };
-      try {
-        const response = await axios.post("/institution/departments", data);
-        Swal.fire({
-          title: "Success",
-          text: response.data.message,
-          icon: "success",
-          button: "OK",
-          confirmButtonColor: "#00b17d",
-        }).then((isOkay) => {
-          if (isOkay) {
-            mutate("/institution/departments");
-            setOpenDrawer(!openDrawer);
-            setUserInput(initialUserInput);
-          }
-        });
-      } catch (error) {
-        Swal.fire({
-          title: "Error",
-          text: error.response?.data?.message,
-          icon: "error",
-          button: "OK",
-        });
-      } finally {
-        setIsSaving(false);
-      }
-    }
-  };
-
   return (
     <Drawer title={drawerTitle} isOpen={openDrawer} setIsOpen={setOpenDrawer} classNames="w-[600px]">
         <div className="relative">
-            <div className="bg-gray-200 h-14 -mt-4 rounded-md text-right px-4 pt-1">
-                <p className="font-medium text-base">{selectedData.name}</p>
+            <div className="bg-gray-200 -mt-4 rounded-md text-right px-4 py-2">
+                <p className="font-semibold text-sm uppercase">{selectedData.name}</p>
                 <p className="text-sm text-gray-600">{selectedData.description}</p>
             </div>
             <div className="absolute top-4 left-4 bg-white shadow-md rounded-full w-14 h-14 text-3xl text-bChkRed font-semibold flex items-center justify-center">{selectedData.name?.charAt(0)}</div>
@@ -153,9 +100,13 @@ function ManageRoles({ setOpenDrawer, openDrawer, selectedData }) {
                 selectedData={selectedRoleData}
                 fetchRoles={fetchRoles}
             />
+            {refreshDepartments && (
+              <DepartmentManagement />
+            )}
+            
         </div>
 
-        <section className="md:w-full w-[100vw] min-h-[60vh] shadow-md">
+        <section className="md:w-full w-[100vw] min-h-[60vh] shadow-md border mt-2 rounded-lg">
             
           {isLoading ? (
             <div className="w-full h-[5rem] flex justify-center items-center">
@@ -170,10 +121,15 @@ function ManageRoles({ setOpenDrawer, openDrawer, selectedData }) {
                   <TableRow key={item?.id}>
                     <TableCell>{item?.name}</TableCell>
                     <TableCell>
-                        {item?.permissions
-                            ?.map((perm) => perm.permission?.name)
-                            .join(", ") || "No Permissions"}
-                    </TableCell>
+                      {item?.permissions
+                          ?.map(
+                              (perm) =>
+                                  perm.permission?.name.charAt(0).toUpperCase() +
+                                  perm.permission?.name.slice(1).toLowerCase()
+                          )
+                          .join(", ") || "No Permissions"}
+                  </TableCell>
+
 
                     <TableCell className="flex items-center h-16 gap-3">
                       <Dropdown>

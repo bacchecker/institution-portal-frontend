@@ -22,6 +22,32 @@ function LetterTemplates() {
     axios.get(url).then((res) => res.data)
   );
 
+  const fetchInstitutionDocuments = async () => {
+    setDocLoading(true)
+    try {
+      const response = await axios.get("/institution/document-types", {
+        params: {
+          search,
+          page: currentPage,
+          sort_by: sortBy,
+          sort_order: sortOrder,
+        },
+      });
+
+      const docTypes = response.data.document_types;
+
+    // Update the states with the received data
+    setInstitutionDocuments(docTypes.data); // Array of document types
+    setCurrentPage(docTypes.current_page); // Current page number
+    setLastPage(docTypes.last_page); // Last page number
+    setTotal(docTypes.total); // Total number of document types
+    setDocLoading(false); // Set loading state to false
+
+    } catch (error) {
+      console.error("Error fetching institution documents:", error);
+      throw error;
+    }
+  };
   const handleCreateLetterTemplates = () => {
     setCurrentScreen(2);
     window.scrollTo({

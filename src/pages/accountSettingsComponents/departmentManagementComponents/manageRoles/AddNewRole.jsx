@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import Drawer from "../../../../components/Drawer";
 import { Button, Input, Spinner, Checkbox } from "@nextui-org/react";
-import { mutate } from "swr";
 import axios from "@utils/axiosConfig";
 import Swal from "sweetalert2";
+import ManageRoles from "./ManageRoles";
 
 function AddNewRole({ setOpenDrawer, openDrawer, departmentId, fetchRoles }) {
   const initialUserInput = {
@@ -21,6 +21,7 @@ function AddNewRole({ setOpenDrawer, openDrawer, departmentId, fetchRoles }) {
   useEffect(() => {
     if (!openDrawer) {
       setUserInput(initialUserInput); // Reset user input when drawer is closed
+      setSelectedPermissions([])
     }
 
     if (openDrawer && availablePermissions.length === 0) {
@@ -87,6 +88,7 @@ function AddNewRole({ setOpenDrawer, openDrawer, departmentId, fetchRoles }) {
           fetchRoles()
           setOpenDrawer(false);
           setUserInput(initialUserInput);
+          setSelectedPermissions([]);
         }
       });
     } catch (error) {

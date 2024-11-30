@@ -6,10 +6,16 @@ import {
   TableColumn,
   TableHeader,
 } from "@nextui-org/react";
+import { FaSort, FaSortDown, FaSortUp } from "react-icons/fa6";
 // import noDataIllustration from "@/Assets/illustrations/no-data.svg";
 
 const CustomTable = ({
   columns,
+  columnSortKeys,
+  sortBy,
+  sortOrder,
+  setSortBy,
+  setSortOrder,
   loadingState,
   children,
   page,
@@ -17,6 +23,12 @@ const CustomTable = ({
   totalPages,
   customHeightClass,
 }) => {
+  const getSortIcon = (column) => {
+    const sortKey = columnSortKeys[column];
+    if (sortBy !== sortKey) return <FaSort />; // Default sort icon
+    if (sortOrder === "asc") return <FaSortUp />; // Ascending sort icon
+    if (sortOrder === "desc") return <FaSortDown />; // Descending sort icon
+  };
   return (
     <div className="flex flex-col gap-1">
       <Table
@@ -24,38 +36,58 @@ const CustomTable = ({
         classNames={{
           base: `${
             customHeightClass && customHeightClass
-          } md:!max-h-[78vh] font-nunito text-xs overflow-y-auto w-[98vw] md:!w-full overflow-x-auto shadow-none`,
+          } md:!max-h-[78vh] font-nunito text-xs overflow-y-auto w-[100vw] md:!w-full overflow-x-auto shadow-none`,
           wrapper:
-            "dark:bg-slate-900 vertical-scrollbar horizontal-scrollbar shadow-none bg-white rounded-2xl dark:border border-white/5",
+            "dark:bg-slate-800 vertical-scrollbar horizontal-scrollbar shadow-none bg-white dark:border border-white/5",
           th: "dark:bg-slate-800",
           td: "text-sm",
         }}
       >
         <TableHeader>
-          {columns.map((column, index) => (
-            <TableColumn
+          {columns.map((column, index) => {
+            const isFilterable = column !== "Actions";
+            return(
+              <TableColumn
               key={index}
-              className={`font-montserrat text-text-sm dark:text-white`}
-            >
-              {column}
-            </TableColumn>
-          ))}
-        </TableHeader>
+              onClick={() => {
+                if (!isFilterable) return;
+                const sortKey = columnSortKeys[column]; // Map column to sort_by
+                if (!sortKey) return; // Skip if column is not sortable
 
+                const newSortOrder =
+                  sortBy === sortKey && sortOrder === "asc" ? "desc" : "asc";
+
+                setSortBy(sortKey);
+                setSortOrder(newSortOrder);
+              }}
+              className={`font-montserrat text-text-sm text-gray-700 dark:text-white bg-white rounded-none text-sm ${
+                isFilterable ? "cursor-pointer" : ""
+              }`}
+            >
+              <div className="flex items-center space-x-2"><span>{column}</span><span className={`${isFilterable ? 'flex' : 'hidden'}`}>{getSortIcon(column)}</span></div>
+            </TableColumn>
+            )
+            
+          })}
+        </TableHeader>
         <TableBody
-          loadingState={loadingState ? "loading" : "idle"}
-          loadingContent={<Spinner color="danger" />}
+          className="dark:text-slate-700"
+          isLoading={loadingState}
+          loadingContent={<Spinner color="danger" label="Loading...."/>}
           emptyContent={
             <div className="md:!h-[65vh] h-[60vh] flex flex-col gap-8 items-center justify-center">
-              {/* <img src={noDataIllustration} alt="No data" className="w-1/3" /> */}
-              <p className="text-center text-slate-500 dark:text-slate-400 font-montserrat font-semibold text-lg">
+              <img src="/images/nodata.png" alt="No data" className="w-1/4 h-auto" />
+              <p className="text-center text-slate-500 dark:text-slate-400 font-montserrat font-semibold text-lg -mt-16">
                 No data available
               </p>
             </div>
           }
         >
           {children}
-        </TableBody>
+        
+      </TableBody>
+          
+        
       </Table>
 
       <div className="flex w-full items-center justify-between">
@@ -81,3 +113,5 @@ const CustomTable = ({
 };
 
 export default CustomTable;
+
+

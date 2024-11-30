@@ -53,7 +53,7 @@ function AddNewUser({ setOpenDrawer, openDrawer, fetchData }) {
     const fetchInstitutionDepartments = async () => {
       try {
         const response = await axios.get("/institution/departments");
-        setInstitutionDepartments(response.data.data);
+        setInstitutionDepartments(response.data.departments.data);
       } catch (error) {
         console.error(error);
       }

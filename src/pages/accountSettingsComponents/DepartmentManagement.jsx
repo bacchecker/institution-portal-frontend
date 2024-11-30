@@ -9,12 +9,9 @@ import {
   TableRow,
   useDisclosure,
 } from "@nextui-org/react";
-import React, { useState } from "react";
-import { FaAnglesLeft, FaAnglesRight } from "react-icons/fa6";
-import secureLocalStorage from "react-secure-storage";
+import React, { useState, useEffect } from "react";
+import {FaChevronLeft, FaChevronRight } from "react-icons/fa6";
 import axios from "@utils/axiosConfig";
-import useSWR, { mutate } from "swr";
-import { useNavigate } from "react-router-dom";
 import CustomTable from "@components/CustomTable";
 import DeleteModal from "@components/DeleteModal";
 import AddNewDepartment from "./departmentManagementComponents/AddNewDepartment";
@@ -25,26 +22,82 @@ import AuthLayout from "../../components/AuthLayout";
 import ManageRoles from "./departmentManagementComponents/manageRoles/ManageRoles";
 
 function DepartmentManagement() {
-  const [isSaving, setSaving] = useState(false);
   const deleteDisclosure = useDisclosure();
+  const [search, setSearch] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [lastPage, setLastPage] = useState(1);
+  const [total, setTotal] = useState(0);
   const [openDrawer, setOpenDrawer] = useState(false);
   const [selectedData, setSelectedData] = useState({});
   const [openEditDrawer, setOpenEditDrawer] = useState(false);
   const [openRolesDrawer, setOpenRolesDrawer] = useState(false);
   const [isDeleting, setDeleting] = useState(false);
-  const navigate = useNavigate();
-  const institution = secureLocalStorage.getItem("institution");
-  const setInstitution = (newInstitution) => {
-    secureLocalStorage.setItem("institution", newInstitution);
+  const [institutionDepartments, setInstitutionDepartments] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [sortBy, setSortBy] = useState(null);
+  const [sortOrder, setSortOrder] = useState("asc");
+
+
+  const fetchDepartments = async () => {
+    setIsLoading(true); // Set loading state
+    try {
+      const response = await axios.get("/institution/departments", {
+        params: {
+          search,
+          page: currentPage,
+          ...(sortBy && { sort_by: sortBy }),
+          ...(sortOrder && { sort_order: sortOrder }),
+        },
+      });
+  
+      const deptData = response.data.departments;
+  
+      setInstitutionDepartments(deptData.data);
+      setCurrentPage(deptData.current_page);
+      setLastPage(deptData.last_page);
+      setTotal(deptData.total);
+    } catch (error) {
+      console.error("Error fetching departments:", error);
+    } finally {
+      setIsLoading(false); // Reset loading state
+    }
+  };
+  
+
+  const handlePageChange = (page) => {
+    if (page >= 1 && page <= lastPage) {
+      setCurrentPage(page);
+    }
   };
 
-  const {
-    data: institutionDepartments,
-    error: institutionError,
-    isLoading: institutionDocsLoading,
-  } = useSWR("/institution/departments", (url) =>
-    axios.get(url).then((res) => res.data)
-  );
+  const renderPageNumbers = () => {
+    const pages = [];
+    for (let i = 1; i <= lastPage; i++) {
+      pages.push(
+        <button
+          key={i}
+          onClick={() => handlePageChange(i)}
+          className={`py-2 px-2.5 border rounded-lg ${
+            currentPage === i ? "bg-bChkRed text-white" : "bg-white text-gray-800"
+          }`}
+        >
+          {i}
+        </button>
+      );
+    }
+    return pages;
+  };
+
+  useEffect(() => {
+    if(!openRolesDrawer){
+        fetchDepartments();
+    }
+  }, [openRolesDrawer]);
+
+  useEffect(() => {
+    fetchDepartments();
+  }, [search, currentPage, sortBy, sortOrder]);
+  
 
   return (
     <AuthLayout title="Department Management">
@@ -76,66 +129,112 @@ function DepartmentManagement() {
             selectedData={selectedData}
           />
         </div>
-        <section className="md:w-full w-[98vw] min-h-[60vh] mx-auto">
-          {institutionDocsLoading ? (
-            <div className="w-full h-[5rem] flex justify-center items-center">
-              <Spinner size="sm" color="danger" />
-            </div>
-          ) : (
-            <>
-              <CustomTable
-                columns={["Name", "Roles", "Description", "Actions"]}
-              >
-                {institutionDepartments?.data?.map((item) => (
-                  <TableRow key={item?.id}>
-                    <TableCell>{item?.name}</TableCell>
-                    <TableCell>{item?.role_count}</TableCell>
-                    <TableCell>{item?.description}</TableCell>
-
-                    <TableCell className="flex items-center h-16 gap-3">
-                      <Dropdown>
-                        <DropdownTrigger>
-                          <Button variant="bordered" size="sm" isIconOnly>
-                            <Elipsis />
-                          </Button>
-                        </DropdownTrigger>
-                        <DropdownMenu aria-label="Static Actions">
-                          <DropdownItem
-                            key="manage_roles"
-                            onClick={() => {
-                              setSelectedData(item);
-                              setOpenRolesDrawer(true);
-                            }}
-                          >
-                            Manage Roles
-                          </DropdownItem>
-                          <DropdownItem
-                            key="edit"
-                            onClick={() => {
-                              setSelectedData(item);
-                              setOpenEditDrawer(true);
-                            }}
-                          >
-                            Update
-                          </DropdownItem>
-                          <DropdownItem
-                            key="delete"
-                            onClick={() => {
-                              deleteDisclosure.onOpen();
-                              setSelectedData(item);
-                            }}
-                          >
-                            Delete
-                          </DropdownItem>
-                        </DropdownMenu>
-                      </Dropdown>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </CustomTable>
-            </>
-          )}
+        <section>
+          <div className="mb-4 flex space-x-4 bg-white p-4 rounded-xl">
+              <div className="relative w-full lg:w-2/3">
+                  <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                      <svg className="w-4 h-4 text-gray-500 " aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                          <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
+                      </svg>
+                  </div>
+                  <input type="search" onChange={(e) => setSearch(e.target.value)} value={search} id="default-search" className="block w-full focus:outline-0 px-4 py-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-2xl bg-gray-50 focus:ring-blue-500 focus:border-blue-500" placeholder="Search by department name or description" required />
+              </div>
+          </div>
         </section>
+        
+        <section className="md:w-full w-[98vw] min-h-[60vh] mx-auto">
+          
+          <CustomTable
+            loadingState={isLoading}
+            columns={["Department Name", "Roles", "Description", "Actions"]}
+            columnSortKeys={{
+              "Department Name": "name",
+              Roles: "role_count",
+              Description: "description",
+            }}
+            sortBy={sortBy}
+            sortOrder={sortOrder}
+            setSortBy={setSortBy}
+            setSortOrder={setSortOrder}
+          >
+
+            {institutionDepartments?.map((item) => (
+              <TableRow key={item?.id} className="odd:bg-gray-100 even:bg-white border-b dark:text-slate-700">
+                <TableCell className="pl-4">{item?.name}</TableCell>
+                <TableCell className="pl-4">{item?.role_count}</TableCell>
+                <TableCell className="pl-4">{item?.description}</TableCell>
+
+                <TableCell className="flex items-center justify-center h-12 gap-3">
+                  <Dropdown>
+                    <DropdownTrigger>
+                      <Button variant="bordered" size="sm" isIconOnly className="dark:border-slate-400 dark:text-slate-600">
+                        <Elipsis />
+                      </Button>
+                    </DropdownTrigger>
+                    <DropdownMenu aria-label="Static Actions">
+                      <DropdownItem
+                        key="manage_roles"
+                        onClick={() => {
+                          setSelectedData(item);
+                          setOpenRolesDrawer(true);
+                        }}
+                      >
+                        Manage Roles
+                      </DropdownItem>
+                      <DropdownItem
+                        key="edit"
+                        onClick={() => {
+                          setSelectedData(item);
+                          setOpenEditDrawer(true);
+                        }}
+                      >
+                        Update
+                      </DropdownItem>
+                      <DropdownItem
+                        key="delete"
+                        onClick={() => {
+                          deleteDisclosure.onOpen();
+                          setSelectedData(item);
+                        }}
+                      >
+                        Delete
+                      </DropdownItem>
+                    </DropdownMenu>
+                  </Dropdown>
+                </TableCell>
+              </TableRow>
+            ))}
+          </CustomTable>
+          <section>
+            <div className="flex justify-between items-center mt-4">
+              <div>
+                <span className="text-gray-600 font-medium text-sm">
+                  Page {currentPage} of {lastPage} - ({total} entries)
+                </span>
+              </div>
+              <div className="flex space-x-2">
+                <button
+                  disabled={currentPage === 1}
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  className="p-2 bg-white text-gray-800 border rounded-lg disabled:bg-gray-300 disabled:text-white"
+                >
+                  <FaChevronLeft size={12} />
+                </button>
+
+                {renderPageNumbers()}
+
+                <button
+                  disabled={currentPage === lastPage}
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  className="p-2 bg-white text-gray-800 border rounded-lg disabled:bg-gray-300 disabled:text-white disabled:border-0"
+                >
+                  <FaChevronRight size={12} />
+                </button>
+              </div>
+            </div>
+          </section>
+        </section>
+        
         <DeleteModal
           disclosure={deleteDisclosure}
           title="Delete Department"
@@ -155,13 +254,12 @@ function DepartmentManagement() {
                 confirmButtonColor: "#00b17d",
               }).then((isOkay) => {
                 if (isOkay) {
-                  mutate("/institution/departments");
+                  fetchDepartments()
                   setDeleting(false);
                 }
               });
             } catch (error) {
               console.log(error);
-              setErrors(error.response.data.message);
               setDeleting(false);
             }
           }}

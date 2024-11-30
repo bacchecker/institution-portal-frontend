@@ -38,6 +38,7 @@ const App = () => {
 
         setUserRole(response.data.userRole);
       } catch (error) {
+        navigate('/login')
         console.error('Failed to fetch user role:', error);
       } finally {
         setLoading(false);

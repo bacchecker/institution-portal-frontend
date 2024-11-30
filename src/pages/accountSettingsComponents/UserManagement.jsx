@@ -36,34 +36,36 @@ function UserManagement() {
   const [selectedData, setSelectedData] = useState({});
   const [openEditDrawer, setOpenEditDrawer] = useState(false);
   const [isDeleting, setDeleting] = useState(false);
-  const navigate = useNavigate();
-  const institution = secureLocalStorage.getItem("institution");
-  const setInstitution = (newInstitution) => {
-    secureLocalStorage.setItem("institution", newInstitution);
-  };
+  const [sortBy, setSortBy] = useState(null);
+  const [sortOrder, setSortOrder] = useState("asc");
+  
 
 
   const fetchData = async () => {
-    setLoading(true)
+    setLoading(true);
     try {
       const response = await axios.get("/institution/users", {
         params: {
           search,
-          page: currentPage
-        }
+          page: currentPage,
+          sort_by: sortBy,
+          sort_order: sortOrder,
+        },
       });
-
+  
       const usersData = response.data.institutionUsers;
-
+  
       setInstitutionUsers(usersData.data);
       setCurrentPage(usersData.current_page);
       setLastPage(usersData.last_page);
       setTotal(usersData.total);
-      setLoading(false)
+      setLoading(false);
     } catch (error) {
       console.error("Error fetching data:", error);
+      setLoading(false);
     }
   };
+  
 
   const handlePageChange = (page) => {
     if (page >= 1 && page <= lastPage) {
@@ -78,7 +80,7 @@ function UserManagement() {
         <button
           key={i}
           onClick={() => handlePageChange(i)}
-          className={`py-2 px-2.5 border rounded-lg ${
+          className={`py-1.5 px-2.5 border rounded-lg ${
             currentPage === i ? "bg-bChkRed text-white" : "bg-white text-gray-800"
           }`}
         >
@@ -91,7 +93,7 @@ function UserManagement() {
 
   useEffect(() => {
     fetchData();
-  }, [search, currentPage]);
+  }, [search, currentPage, sortBy, sortOrder]);
   
   return (
     <AuthLayout title="User Management">
@@ -130,101 +132,97 @@ function UserManagement() {
                         <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
                     </svg>
                 </div>
-                <input type="search" onChange={(e) => setSearch(e.target.value)} value={search} id="default-search" className="block w-full focus:outline-0 px-4 py-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-2xl bg-gray-50 focus:ring-blue-500 focus:border-blue-500" placeholder="Search by Full name, email, phone number or department" required />
+                <input type="search" onChange={(e) => setSearch(e.target.value)} value={search} id="default-search" className="block w-full focus:outline-0 px-4 py-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-2xl bg-gray-50 focus:ring-blue-500 focus:border-blue-500" placeholder="Search by full name, email, phone number or department" required />
             </div>
         </div>
 
         </section>
         <section className="md:w-full w-[98vw] min-h-[60vh] mx-auto">
-          {isLoading ? (
-            <div className="w-full h-[5rem] flex justify-center items-center">
-              <Spinner size="sm" color="danger" />
-            </div>
-          ) : (
-            <>
-              <CustomTable
-                columns={["Full Name", "Phone", "Email", "Department", "Actions"]}
-                // loadingState={resData ? false : true}
-                // page={resData?.current_page}
-                // setPage={(page) =>
-                //   navigate({
-                //     // pathname: "listing",
-                //     search: createSearchParams({ ...filters, page }).toString(),
-                //   })
-                // }
-                // totalPages={Math.ceil(resData?.total / resData?.per_page)}
-              >
-                {institutionUsers?.map((item) => (
-                  <TableRow key={item?.id}>
-                    <TableCell>{item?.first_name} {item?.last_name}</TableCell>
+          <CustomTable
+            loadingState={isLoading}
+            columns={["Full Name", "Phone", "Email", "Department", "Role", "Actions"]}
+            columnSortKeys={{
+              "Full Name": "first_name",
+              Phone: "phone",
+              Email: "email",
+              Department: "department.name",
+              Role: "role_name",
+            }}
+            sortBy={sortBy}
+            sortOrder={sortOrder}
+            setSortBy={setSortBy}
+            setSortOrder={setSortOrder}
+          >
+            {institutionUsers?.map((item) => (
+              <TableRow key={item?.id} className="odd:bg-gray-100 even:bg-white border-b dark:text-slate-700">
+                <TableCell>{item?.first_name} {item?.last_name}</TableCell>
 
-                    <TableCell>{item?.phone}</TableCell>
-                    <TableCell>{item?.email}</TableCell>
-                    <TableCell>{item?.department.name}</TableCell>
+                <TableCell>{item?.phone}</TableCell>
+                <TableCell>{item?.email}</TableCell>
+                <TableCell>{item?.department.name}</TableCell>
+                <TableCell>{item?.role.role_name}</TableCell>
 
-                    <TableCell className="flex items-center h-16 gap-3">
-                      <Dropdown>
-                        <DropdownTrigger>
-                          <Button variant="bordered" size="sm" isIconOnly>
-                            <Elipsis />
-                          </Button>
-                        </DropdownTrigger>
-                        <DropdownMenu aria-label="Static Actions">
-                          <DropdownItem
-                            key="edit"
-                            onClick={() => {
-                              setSelectedData(item);
-                              setOpenEditDrawer(true);
-                            }}
-                          >
-                            Update
-                          </DropdownItem>
-                          <DropdownItem
-                            key="delete"
-                            onClick={() => {
-                              deleteDisclosure.onOpen();
-                              setSelectedData(item);
-                            }}
-                          >
-                            Delete
-                          </DropdownItem>
-                        </DropdownMenu>
-                      </Dropdown>
-                    </TableCell>
-                  </TableRow>
-                ))}
-                
-              </CustomTable>
-              <section>
-              <div className="flex justify-between items-center mt-4">
-                <div>
-                  <span className="text-gray-600 font-medium text-sm">
-                    Page {currentPage} of {lastPage} - ({total} entries)
-                  </span>
-                </div>
-                <div className="flex space-x-2">
-                  <button
-                    disabled={currentPage === 1}
-                    onClick={() => handlePageChange(currentPage - 1)}
-                    className="p-2 bg-white text-gray-800 border rounded-lg disabled:bg-gray-300 disabled:text-white"
-                  >
-                    <FaChevronLeft size={12} />
-                  </button>
-
-                  {renderPageNumbers()}
-
-                  <button
-                    disabled={currentPage === lastPage}
-                    onClick={() => handlePageChange(currentPage + 1)}
-                    className="p-2 bg-white text-gray-800 border rounded-lg disabled:bg-gray-300 disabled:text-white disabled:border-0"
-                  >
-                    <FaChevronRight size={12} />
-                  </button>
-                </div>
+                <TableCell className="flex items-center h-12 gap-3">
+                  <Dropdown>
+                    <DropdownTrigger>
+                      <Button variant="bordered" size="sm" isIconOnly className="dark:border-slate-400 dark:text-slate-600">
+                        <Elipsis />
+                      </Button>
+                    </DropdownTrigger>
+                    <DropdownMenu aria-label="Static Actions">
+                      <DropdownItem
+                        key="edit"
+                        onClick={() => {
+                          setSelectedData(item);
+                          setOpenEditDrawer(true);
+                        }}
+                      >
+                        Update
+                      </DropdownItem>
+                      <DropdownItem
+                        key="delete"
+                        onClick={() => {
+                          deleteDisclosure.onOpen();
+                          setSelectedData(item);
+                        }}
+                      >
+                        Delete
+                      </DropdownItem>
+                    </DropdownMenu>
+                  </Dropdown>
+                </TableCell>
+              </TableRow>
+            ))}
+            
+          </CustomTable>
+          <section>
+            <div className="flex justify-between items-center mt-1">
+              <div>
+                <span className="text-gray-600 font-medium text-sm">
+                  Page {currentPage} of {lastPage} - ({total} entries)
+                </span>
               </div>
-              </section>
-            </>
-          )}
+              <div className="flex space-x-2">
+                <button
+                  disabled={currentPage === 1}
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  className="px-2 bg-white text-gray-800 border rounded-lg disabled:bg-gray-300 disabled:text-white"
+                >
+                  <FaChevronLeft size={12} />
+                </button>
+
+                {renderPageNumbers()}
+
+                <button
+                  disabled={currentPage === lastPage}
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  className="px-2 bg-white text-gray-800 border rounded-lg disabled:bg-gray-300 disabled:text-white disabled:border-0"
+                >
+                  <FaChevronRight size={12} />
+                </button>
+              </div>
+            </div>
+          </section>
         </section>
         <DeleteModal
           disclosure={deleteDisclosure}

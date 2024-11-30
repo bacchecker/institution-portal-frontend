@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useState, useEffect } from "react";
 import AuthLayout from "@components/AuthLayout";
 import {
   Button,
@@ -39,6 +39,7 @@ import ExcelIcon from "../../../assets/icons/excel";
 import Elipsis from "../../../assets/icons/elipsis";
 import ConfirmModal from "../../../components/confirm-modal";
 import toast from "react-hot-toast";
+import { FaChevronLeft, FaChevronRight } from "react-icons/fa6";
 
 const ItemCard = ({ title, value }) => (
   <div className="flex gap-4 items-center">
@@ -50,23 +51,81 @@ const ItemCard = ({ title, value }) => (
 export default function DocumentRequest() {
   const navigate = useNavigate();
   const [data, setData] = useState(null);
+  const [search, setSearch] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [lastPage, setLastPage] = useState(1);
+  const [total, setTotal] = useState(0);
   const fileUploadDisclosure = useDisclosure();
   const changeStatusDisclosure = useDisclosure();
   const [dateRange, setDateRange] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
   const [openDrawer, setOpenDrawer] = useState(false);
   const [bulkDownloadLoading, setBulkDownloadLoading] = useState(false);
   const [processing, setProcessing] = useState(false);
   const [dragActive, setDragActive] = useState(false);
+  const [documentRequests, setDocumentRequests] = useState([]);
+  const [sortBy, setSortBy] = useState(null);
+  const [sortOrder, setSortOrder] = useState("asc");
   const [filters, setFilters] = useState({
     search_query: "",
     status: "",
   });
   const { mutate } = useSWRConfig();
 
-  const { data: resData, error } = useSWR(
-    "/institution/requests/document-requests",
-    (url) => axios.get(url).then((res) => res.data)
-  );
+  const institutionDocumentRequests = async () => {
+    setIsLoading(true)
+    try {
+      const response = await axios.get("/institution/requests/document-requests", {
+        params: {
+          search,
+          page: currentPage,
+          sort_by: sortBy,
+          sort_order: sortOrder,
+        },
+      });
+
+      const docRequest = response.data.paginatedRequests;
+
+    setDocumentRequests(docRequest.data);
+    setCurrentPage(docRequest.current_page); // Current page number
+    setLastPage(docRequest.last_page); // Last page number
+    setTotal(docRequest.total); // Total number of document types
+    setIsLoading(false); // Set loading state to false
+
+    } catch (error) {
+      console.error("Error fetching institution documents:", error);
+      throw error;
+    }
+  };
+
+  useEffect(() => {
+    institutionDocumentRequests();
+  }, [search, currentPage, sortBy, sortOrder]);
+
+  const handlePageChange = (page) => {
+    if (page >= 1 && page <= lastPage) {
+      setCurrentPage(page);
+    }
+  };
+
+  const renderPageNumbers = () => {
+    const pages = [];
+    for (let i = 1; i <= lastPage; i++) {
+      pages.push(
+        <button
+          key={i}
+          onClick={() => handlePageChange(i)}
+          className={`py-1.5 px-2.5 border rounded-lg ${
+            currentPage === i ? "bg-bChkRed text-white" : "bg-white text-gray-800"
+          }`}
+        >
+          {i}
+        </button>
+      );
+    }
+    return pages;
+  };
+
 
   const handleBulkDownload = async (filePaths) => {
     try {
@@ -99,7 +158,7 @@ export default function DocumentRequest() {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = "bulk_download.zip"; // You can set a dynamic name if needed
+      a.download = "bulk_download.zip";
       document.body.appendChild(a);
       a.click();
       a.remove();
@@ -272,32 +331,38 @@ export default function DocumentRequest() {
       <section className="md:px-3 md:w-full w-[98vw] mx-auto">
         <CustomTable
           columns={[
-            "ID",
+            /* "ID", */
             "Requested By",
             "Delivery Address",
             "Date",
             "Document",
             "Format",
             "Status",
-            "Total Amount",
-            "",
+            "Amount",
+            "Actions",
           ]}
-          loadingState={resData ? false : true}
-          page={resData?.current_page}
-          setPage={(page) =>
-            navigate(
-              `?region=${filters.region || ""}&search_query=${
-                filters.search_query || ""
-              }&status=${filters.status || ""}&page=${page}`
-            )
-          }
-          totalPages={Math.ceil(resData?.total / resData?.per_page)}
+          loadingState={isLoading}
+          columnSortKeys={{
+            ID: "unique_code",
+            "Requested By": "user_full_name",
+            "Delivery Address": "delivery_address",
+            Date: "created_at",
+            Document: "document_type_name",
+            Format: "document_format",
+            Status: "status",
+            Amount: "total_amount",
+           
+          }}
+          sortBy={sortBy}
+          sortOrder={sortOrder}
+          setSortBy={setSortBy}
+          setSortOrder={setSortOrder}
         >
-          {resData?.data?.map((item) => (
-            <TableRow key={item?.id}>
-              <TableCell className="font-semibold">
+          {documentRequests?.map((item) => (
+            <TableRow key={item?.id} className="odd:bg-gray-100 even:bg-white border-b dark:text-slate-700">
+              {/* <TableCell className="font-semibold">
                 {item?.unique_code}
-              </TableCell>
+              </TableCell> */}
               <TableCell className="font-semibold">
                 <CustomUser
                   avatarSrc={`${
@@ -337,6 +402,34 @@ export default function DocumentRequest() {
             </TableRow>
           ))}
         </CustomTable>
+        <section>
+          <div className="flex justify-between items-center my-1">
+            <div>
+              <span className="text-gray-600 font-medium text-sm">
+                Page {currentPage} of {lastPage} - ({total} entries)
+              </span>
+            </div>
+            <div className="flex space-x-2">
+              <button
+                disabled={currentPage === 1}
+                onClick={() => handlePageChange(currentPage - 1)}
+                className="px-2 bg-white text-gray-800 border rounded-lg disabled:bg-gray-300 disabled:text-white"
+              >
+                <FaChevronLeft size={12} />
+              </button>
+
+              {renderPageNumbers()}
+
+              <button
+                disabled={currentPage === lastPage}
+                onClick={() => handlePageChange(currentPage + 1)}
+                className="px-2 bg-white text-gray-800 border rounded-lg disabled:bg-gray-300 disabled:text-white disabled:border-0"
+              >
+                <FaChevronRight size={12} />
+              </button>
+            </div>
+          </div>
+        </section>
       </section>
 
       <Drawer

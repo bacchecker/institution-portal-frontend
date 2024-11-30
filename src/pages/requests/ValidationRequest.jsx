@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import AuthLayout from "@components/AuthLayout";
 import {
   Button,
@@ -8,9 +8,6 @@ import {
   Chip,
   DateRangePicker,
   Input,
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
   Select,
   SelectItem,
   TableCell,
@@ -37,6 +34,7 @@ import ConfirmModal from "../../components/confirm-modal";
 import DeleteModal from "../../components/DeleteModal";
 import toast from "react-hot-toast";
 import { parseDate } from "@internationalized/date";
+import { FaChevronLeft, FaChevronRight } from "react-icons/fa6";
 
 const ItemCard = ({ title, value }) => (
   <div className="flex gap-4 items-center">
@@ -56,9 +54,16 @@ export default function ValidationRequest() {
   const [openDrawer, setOpenDrawer] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
   const [processing, setProcessing] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [data, setData] = useState(null);
-
+  const [search, setSearch] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [lastPage, setLastPage] = useState(1);
+  const [total, setTotal] = useState(0);
   const [dateRange, setDateRange] = useState({});
+  const [validationRequests, setValidationRequests] = useState([]);
+  const [sortBy, setSortBy] = useState(null);
+  const [sortOrder, setSortOrder] = useState("asc");
   const [filters, setFilters] = useState({
     search_query: searchParams.get("search_query") || "",
     status: searchParams.get("status") || "",
@@ -70,6 +75,60 @@ export default function ValidationRequest() {
     `/institution/requests/validation-requests?${createSearchParams(filters)}`,
     (url) => axios.get(url).then((res) => res.data)
   );
+
+  const institutionValidationRequests = async () => {
+    setIsLoading(true)
+    try {
+      const response = await axios.get("/institution/requests/validation-requests", {
+        params: {
+          search,
+          page: currentPage,
+          sort_by: sortBy,
+          sort_order: sortOrder,
+        },
+      });
+
+      const valRequest = response.data.paginatedRequests;
+
+    setValidationRequests(valRequest.data);
+    setCurrentPage(valRequest.current_page);
+    setLastPage(valRequest.last_page);
+    setTotal(valRequest.total);
+    setIsLoading(false);
+
+    } catch (error) {
+      console.error("Error fetching institution documents:", error);
+      throw error;
+    }
+  };
+
+  useEffect(() => {
+    institutionValidationRequests();
+  }, [search, currentPage, sortBy, sortOrder]);
+
+  const handlePageChange = (page) => {
+    if (page >= 1 && page <= lastPage) {
+      setCurrentPage(page);
+    }
+  };
+
+  const renderPageNumbers = () => {
+    const pages = [];
+    for (let i = 1; i <= lastPage; i++) {
+      pages.push(
+        <button
+          key={i}
+          onClick={() => handlePageChange(i)}
+          className={`py-1.5 px-2.5 border rounded-lg ${
+            currentPage === i ? "bg-bChkRed text-white" : "bg-white text-gray-800"
+          }`}
+        >
+          {i}
+        </button>
+      );
+    }
+    return pages;
+  };
 
   const handleBulkDownload = async (filePaths) => {
     try {
@@ -248,19 +307,24 @@ export default function ValidationRequest() {
             "Documents",
             "Status",
             "Total Amount",
-            "",
+            "Actions",
           ]}
-          loadingState={resData ? false : true}
-          page={resData?.current_page}
-          setPage={(page) =>
-            navigate({
-              search: createSearchParams({ ...filters, page }).toString(),
-            })
-          }
-          totalPages={Math.ceil(resData?.total / resData?.per_page)}
+          loadingState={isLoading}
+          columnSortKeys={{
+            ID: "unique_code",
+            "Requested By": "user_full_name",
+            Date: "created_at",
+            Document: "document_type_name",
+            Status: "status",
+            Amount: "total_amount",
+          }}
+          sortBy={sortBy}
+          sortOrder={sortOrder}
+          setSortBy={setSortBy}
+          setSortOrder={setSortOrder}
         >
-          {resData?.data?.map((item) => (
-            <TableRow key={item?.id}>
+          {validationRequests?.map((item) => (
+            <TableRow key={item?.id} className="odd:bg-gray-100 even:bg-white border-b dark:text-slate-700">
               <TableCell className="font-semibold">
                 {item?.unique_code}
               </TableCell>
@@ -298,6 +362,34 @@ export default function ValidationRequest() {
             </TableRow>
           ))}
         </CustomTable>
+        <section>
+          <div className="flex justify-between items-center my-1">
+            <div>
+              <span className="text-gray-600 font-medium text-sm">
+                Page {currentPage} of {lastPage} - ({total} entries)
+              </span>
+            </div>
+            <div className="flex space-x-2">
+              <button
+                disabled={currentPage === 1}
+                onClick={() => handlePageChange(currentPage - 1)}
+                className="px-2 bg-white text-gray-800 border rounded-lg disabled:bg-gray-300 disabled:text-white"
+              >
+                <FaChevronLeft size={12} />
+              </button>
+
+              {renderPageNumbers()}
+
+              <button
+                disabled={currentPage === lastPage}
+                onClick={() => handlePageChange(currentPage + 1)}
+                className="px-2 bg-white text-gray-800 border rounded-lg disabled:bg-gray-300 disabled:text-white disabled:border-0"
+              >
+                <FaChevronRight size={12} />
+              </button>
+            </div>
+          </div>
+        </section>
       </section>
 
       <Drawer
