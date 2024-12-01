@@ -1,9 +1,11 @@
 import {
   Button,
+  Chip,
   Dropdown,
   DropdownItem,
   DropdownMenu,
   DropdownTrigger,
+  Input,
   Spinner,
   TableCell,
   TableRow,
@@ -22,6 +24,8 @@ import EditUser from "./userManagementComponents/EditUser";
 import Elipsis from "../../assets/icons/elipsis";
 import Swal from "sweetalert2";
 import AuthLayout from "../../components/AuthLayout";
+import { IoLockOpen } from "react-icons/io5";
+import toast from "react-hot-toast";
 
 function UserManagement() {
   const [isSaving, setSaving] = useState(false);
@@ -32,12 +36,17 @@ function UserManagement() {
   const [total, setTotal] = useState(0);
   const [institutionUsers, setInstitutionUsers] = useState([]);
   const deleteDisclosure = useDisclosure();
+  const suspendDisclosure = useDisclosure();
+  const restoreDisclosure = useDisclosure();
   const [openDrawer, setOpenDrawer] = useState(false);
   const [selectedData, setSelectedData] = useState({});
   const [openEditDrawer, setOpenEditDrawer] = useState(false);
   const [isDeleting, setDeleting] = useState(false);
+  const [isSuspending, setSuspending] = useState(false);
+  const [isRestoring, setRestoring] = useState(false);
   const [sortBy, setSortBy] = useState(null);
   const [sortOrder, setSortOrder] = useState("asc");
+  const [password, setPassword] = useState("");
   
 
 
@@ -66,6 +75,11 @@ function UserManagement() {
     }
   };
   
+  const statusColorMap = {
+    active: "success",
+    paused: "danger",
+    vacation: "warning",
+  };
 
   const handlePageChange = (page) => {
     if (page >= 1 && page <= lastPage) {
@@ -140,13 +154,14 @@ function UserManagement() {
         <section className="md:w-full w-[98vw] min-h-[60vh] mx-auto">
           <CustomTable
             loadingState={isLoading}
-            columns={["Full Name", "Phone", "Email", "Department", "Role", "Actions"]}
+            columns={["Full Name", "Phone", "Email", "Department", "Role", "Status", "Actions"]}
             columnSortKeys={{
               "Full Name": "first_name",
               Phone: "phone",
               Email: "email",
               Department: "department.name",
               Role: "role_name",
+              Status: "status",
             }}
             sortBy={sortBy}
             sortOrder={sortOrder}
@@ -154,13 +169,17 @@ function UserManagement() {
             setSortOrder={setSortOrder}
           >
             {institutionUsers?.map((item) => (
-              <TableRow key={item?.id} className="odd:bg-gray-100 even:bg-white border-b dark:text-slate-700">
+              <TableRow key={item?.id} className={`odd:bg-gray-100 even:bg-white border-b dark:text-slate-700`}>
                 <TableCell>{item?.first_name} {item?.last_name}</TableCell>
 
                 <TableCell>{item?.phone}</TableCell>
                 <TableCell>{item?.email}</TableCell>
                 <TableCell>{item?.department.name}</TableCell>
                 <TableCell>{item?.role.role_name}</TableCell>
+                <TableCell>
+                  <Chip className="capitalize" color={statusColorMap[item.status]} size="sm" variant="flat">
+                  {item.status}
+                </Chip></TableCell>
 
                 <TableCell className="flex items-center h-12 gap-3">
                   <Dropdown>
@@ -188,6 +207,30 @@ function UserManagement() {
                       >
                         Delete
                       </DropdownItem>
+                      {item.status == 'active' ? (
+                        <DropdownItem
+                       
+                        key="suspend"
+                        onClick={() => {
+                          suspendDisclosure.onOpen();
+                          setSelectedData(item);
+                        }}
+                      >
+                        <p className="text-red-600 hover:text-red-600">Suspend Account</p>
+                      </DropdownItem>
+                      ):(
+                        <DropdownItem
+                       
+                          key="restore"
+                          onClick={() => {
+                            restoreDisclosure.onOpen();
+                            setSelectedData(item);
+                          }}
+                        >
+                          <p className="text-green-600 hover:text-green-600">Restore Account</p>
+                        </DropdownItem>
+                      )}
+                      
                     </DropdownMenu>
                   </Dropdown>
                 </TableCell>
@@ -260,6 +303,104 @@ function UserManagement() {
               {selectedData?.document_type?.name}
             </span>
           </p>
+        </DeleteModal>
+
+        <DeleteModal
+          disclosure={suspendDisclosure}
+          title="Suspend User Account"
+          processing={isSuspending}
+          onButtonClick={async () => {
+            setSuspending(true);
+            const payload = {
+              password: password,
+            };
+            try {
+              const response = await axios.post(
+                `/institution/suspend-user/${selectedData?.id}`, payload
+              );
+              suspendDisclosure.onClose();
+              Swal.fire({
+                title: "Success",
+                text: response.data.message,
+                icon: "success",
+                button: "OK",
+                confirmButtonColor: "#00b17d",
+              }).then((isOkay) => {
+                if (isOkay) {
+                  fetchData()
+                  setSuspending(false);
+                }
+              });
+            } catch (error) {
+              console.log(error);
+              toast.error(error.response.data.message);
+              setSuspending(false);
+            }
+          }}
+        >
+          <form action="">
+            <Input
+              type="password"
+              id="password"
+              name="password"
+              size="sm"
+              value={password}
+              label="Password"
+              className="mt-1 block w-full"
+              onChange={(e) => setPassword(e.target.value)}
+              startContent={<IoLockOpen />}
+            />
+          </form>
+          
+        </DeleteModal>
+
+        <DeleteModal
+          disclosure={restoreDisclosure}
+          title="Restore User Account"
+          processing={isRestoring}
+          onButtonClick={async () => {
+            setRestoring(true);
+            const payload = {
+              password: password,
+            };
+            try {
+              const response = await axios.post(
+                `/institution/restore-user/${selectedData?.id}`, payload
+              );
+              restoreDisclosure.onClose();
+              Swal.fire({
+                title: "Success",
+                text: response.data.message,
+                icon: "success",
+                button: "OK",
+                confirmButtonColor: "#00b17d",
+              }).then((isOkay) => {
+                if (isOkay) {
+                  fetchData()
+                  setRestoring(false);
+                }
+              });
+            } catch (error) {
+              console.log(error);
+              toast.error(error.response.data.message);
+              setRestoring(false);
+            }
+          }}
+        >
+          <form action="">
+            <Input
+              type="password"
+              id="password"
+              name="password"
+              size="sm"
+              value={password}
+              label="Password"
+              className="mt-1 block w-full"
+              onChange={(e) => setPassword(e.target.value)}
+              startContent={<IoLockOpen />}
+            />
+          </form>
+          
         </DeleteModal>
       </div>
     </AuthLayout>

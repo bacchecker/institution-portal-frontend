@@ -169,6 +169,11 @@ export const navLinks = [
         path: "/account-settings/users",
         acl: ["view users"],
       },
+      {
+        label: "Account Management",
+        path: "/account-settings/account",
+        acl: ["view account"],
+      },
       
       // {
       //   label: "Activity Logs",

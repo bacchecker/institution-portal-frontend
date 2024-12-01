@@ -26,6 +26,7 @@ import ChangePassword from "./pages/auth/ChangePassword";
 import ForgotPassword from "./pages/auth/ForgotPassword";
 import ProtectedRoute from './ProtectedRoute';
 import axios from "@utils/axiosConfig";
+import AccountManagement from './pages/accountSettingsComponents/AccountManagement';
 
 const App = () => {
   const navigate = useNavigate();
@@ -135,6 +136,14 @@ const App = () => {
           element={
             <ProtectedRoute userRole={userRole} allowedRoles={['Admin']}>
               <UserManagement />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          exact path="account"
+          element={
+            <ProtectedRoute userRole={userRole} allowedRoles={['Admin']}>
+              <AccountManagement />
             </ProtectedRoute>
           }
         />

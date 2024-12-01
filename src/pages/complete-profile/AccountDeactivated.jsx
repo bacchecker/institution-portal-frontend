@@ -13,7 +13,7 @@ import { MdClose } from "react-icons/md";
 import { toast } from "sonner";
 import AddTicket from "../support/AddTicket";
 
-const AccountInactive = () => {
+const AccountDeactivated = () => {
   const features = [
     {
       icon: FileText,
@@ -157,7 +157,7 @@ const AccountInactive = () => {
             </svg>
             <span className="sr-only">Loading...</span>
           </div>
-        ) : institutionStatus !== "inactive" ? (
+        ) : institutionStatus !== "inactive" && institutionSetup !== "1" ? (
           <div className="relative w-full md:w-1/2 lg:w-1/2 xl:w-1/3 flex flex-col justify-center items-center rounded-2xl h-full border overflow-clip">
             <div className="bg-white shadow-2xl w-[500px] h-60 rounded-b-full border-b">
               
@@ -201,23 +201,13 @@ const AccountInactive = () => {
             <div className="min-h-screen bg-white text-[#000000] overflow-hidden w-[60%]">
               <header className="relative z-10 pt-16 pb-4 text-center">
                 <h1 className="text-4xl font-bold mb-2 animate-fade-in-down">
-                  {institutionStatus == "inactive" && institutionSetup == "1" ? <span>Account Deactivated</span> : <span>Account Under Review</span>}
-                </h1> 
+                  Account Under Review
+                </h1>
                 <p className="animate-fade-in-up">
-                {institutionStatus == "inactive" && institutionSetup == "1" ? 
-                  <span>
-                    You no longer have access to any BacChecker institution services associated with this account.
-                    If this deactivation was unintentional or you wish to restore your account,
-                    please don't hesitate to reach out to our support team via the media below
-                  </span> : 
-                  <span>
-                    {institutionSetup}
-                    Your institution’s account is currently under review. This
-                    should be over between 24-48 hours, during this period,
-                    certain features may be restricted. We’ll notify you once the
-                    review process is complete.
-                  </span>}
-                  
+                  Your institution's account is currently under review. This
+                  should be over between 24-48 hours, during this period,
+                  certain features may be restricted. We’ll notify you once the
+                  review process is complete.
                 </p>
               </header>
 
@@ -384,4 +374,4 @@ const AccountInactive = () => {
   );
 };
 
-export default AccountInactive;
+export default AccountDeactivated;
