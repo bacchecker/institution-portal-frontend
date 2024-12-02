@@ -327,6 +327,7 @@ function UserManagement() {
                 confirmButtonColor: "#00b17d",
               }).then((isOkay) => {
                 if (isOkay) {
+                  setPassword('')
                   fetchData()
                   setSuspending(false);
                 }
@@ -376,7 +377,8 @@ function UserManagement() {
                 confirmButtonColor: "#00b17d",
               }).then((isOkay) => {
                 if (isOkay) {
-                  fetchData()
+                  setPassword('');
+                  fetchData();
                   setRestoring(false);
                 }
               });
