@@ -13,7 +13,7 @@ import { mutate } from "swr";
 import axios from "@utils/axiosConfig";
 import Swal from "sweetalert2";
 
-function AddNewDepartment({ setOpenDrawer, openDrawer }) {
+function AddNewDepartment({ setOpenDrawer, openDrawer, fetchDepartments }) {
   const initialUserInput = {
     name: "",
     description: "",
@@ -63,7 +63,7 @@ function AddNewDepartment({ setOpenDrawer, openDrawer }) {
           confirmButtonColor: "#00b17d",
         }).then((isOkay) => {
           if (isOkay) {
-            mutate("/institution/departments");
+            fetchDepartments()
             setOpenDrawer(!openDrawer);
             setUserInput(initialUserInput);
           }

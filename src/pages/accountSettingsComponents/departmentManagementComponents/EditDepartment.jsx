@@ -9,7 +9,7 @@ import { mutate } from "swr";
 import axios from "@utils/axiosConfig";
 import Swal from "sweetalert2";
 
-function EditDepartment({ setOpenDrawer, openDrawer, selectedData }) {
+function EditDepartment({ setOpenDrawer, openDrawer, selectedData, fetchDepartments }) {
   const [userInput, setUserInput] = useState({});
   const [userInitialInput, setUserInitialInput] = useState({});
   const [drawerTitle, setDrawerTitle] = useState("Department Details");
@@ -67,7 +67,7 @@ function EditDepartment({ setOpenDrawer, openDrawer, selectedData }) {
           confirmButtonColor: "#00b17d",
         }).then((isOkay) => {
           if (isOkay) {
-            mutate("/institution/departments");
+            fetchDepartments()
             setOpenDrawer(!openDrawer);
             setUserInput(initialUserInput);
           }

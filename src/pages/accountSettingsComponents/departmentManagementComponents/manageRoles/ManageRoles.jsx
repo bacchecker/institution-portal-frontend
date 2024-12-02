@@ -19,7 +19,7 @@ import AddNewRole from "./AddNewRole";
 import Elipsis from "../../../../assets/icons/elipsis";
 import EditRole from "./EditRole";
 import DeleteModal from "@components/DeleteModal";
-import { FaPlus } from "react-icons/fa6";
+import { FaChevronLeft, FaChevronRight, FaPlus } from "react-icons/fa6";
 import DepartmentManagement from "../../DepartmentManagement";
 
 function ManageRoles({ setOpenDrawer, openDrawer, selectedData }) {
@@ -30,6 +30,10 @@ function ManageRoles({ setOpenDrawer, openDrawer, selectedData }) {
   const [userInput, setUserInput] = useState(initialUserInput);
   const [drawerTitle, setDrawerTitle] = useState("Manage Roles");
   const [isSaving, setIsSaving] = useState(false);
+  const [search, setSearch] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [lastPage, setLastPage] = useState(1);
+  const [total, setTotal] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [openAddRoleDrawer, setOpenAddRoleDrawer] = useState(false);
@@ -38,6 +42,8 @@ function ManageRoles({ setOpenDrawer, openDrawer, selectedData }) {
   const [selectedRoleData, setSelectedRoleData] = useState({});
   const [refreshDepartments, setRefreshDepartments] = useState(false);
   const deleteDisclosure = useDisclosure();
+  const [sortBy, setSortBy] = useState(null);
+  const [sortOrder, setSortOrder] = useState("asc");
 
   useEffect(() => {
     if (selectedData) {
@@ -49,11 +55,21 @@ function ManageRoles({ setOpenDrawer, openDrawer, selectedData }) {
   const fetchRoles = async () => {
     setIsLoading(true)
     try {
-      const response = await axios.get(`/institution/department-roles/${selectedData.id}`);
+      const response = await axios.get(`/institution/department-roles/${selectedData.id}`,{
+        params: {
+          search,
+          page: currentPage,
+          ...(sortBy && { sort_by: sortBy }),
+          ...(sortOrder && { sort_order: sortOrder }),
+        },
+      });
 
-      const departmentRoles = response.data
+      const departmentRoles = response.data.data
 
       setDepartmentRoles(departmentRoles.data);
+      setCurrentPage(departmentRoles.current_page);
+      setLastPage(departmentRoles.last_page);
+      setTotal(departmentRoles.total);
       setIsLoading(false)
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -66,6 +82,34 @@ function ManageRoles({ setOpenDrawer, openDrawer, selectedData }) {
         fetchRoles();
     }
   }, [openDrawer]);
+
+  useEffect(() => {
+    fetchRoles();
+  }, [search, currentPage, sortBy, sortOrder]);
+
+  const handlePageChange = (page) => {
+    if (page >= 1 && page <= lastPage) {
+      setCurrentPage(page);
+    }
+  };
+
+  const renderPageNumbers = () => {
+    const pages = [];
+    for (let i = 1; i <= lastPage; i++) {
+      pages.push(
+        <button
+          key={i}
+          onClick={() => handlePageChange(i)}
+          className={`py-1.5 px-2.5 border rounded-lg ${
+            currentPage === i ? "bg-bChkRed text-white" : "bg-white text-gray-800"
+          }`}
+        >
+          {i}
+        </button>
+      );
+    }
+    return pages;
+  };
 
   return (
     <Drawer title={drawerTitle} isOpen={openDrawer} setIsOpen={setOpenDrawer} classNames="w-[600px]">
@@ -107,15 +151,17 @@ function ManageRoles({ setOpenDrawer, openDrawer, selectedData }) {
         </div>
 
         <section className="md:w-full w-[100vw] min-h-[60vh] shadow-md border mt-2 rounded-lg">
-            
-          {isLoading ? (
-            <div className="w-full h-[5rem] flex justify-center items-center">
-              <Spinner size="sm" color="danger" />
-            </div>
-          ) : (
-            <>
+         
               <CustomTable
                 columns={["Name", "Permissions", "Actions"]}
+                loadingState={isLoading}
+                columnSortKeys={{
+                  Name: "name",
+                }}
+                sortBy={sortBy}
+                sortOrder={sortOrder}
+                setSortBy={setSortBy}
+                setSortOrder={setSortOrder}
               >
                 {departmentRoles?.map((item) => (
                   <TableRow key={item?.id}>
@@ -164,8 +210,35 @@ function ManageRoles({ setOpenDrawer, openDrawer, selectedData }) {
                   </TableRow>
                 ))}
               </CustomTable>
-            </>
-          )}
+              <section>
+            <div className="flex justify-between items-center mt-4 mx-2">
+              <div>
+                <span className="text-gray-600 font-medium text-sm">
+                  Page {currentPage} of {lastPage} - ({total} entries)
+                </span>
+              </div>
+              <div className="flex space-x-2">
+                <button
+                  disabled={currentPage === 1}
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  className="p-2 bg-white text-gray-800 border rounded-lg disabled:bg-gray-300 disabled:text-white"
+                >
+                  <FaChevronLeft size={12} />
+                </button>
+
+                {renderPageNumbers()}
+
+                <button
+                  disabled={currentPage === lastPage}
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  className="p-2 bg-white text-gray-800 border rounded-lg disabled:bg-gray-300 disabled:text-white disabled:border-0"
+                >
+                  <FaChevronRight size={12} />
+                </button>
+              </div>
+            </div>
+          </section>
+
          <DeleteModal
             disclosure={deleteDisclosure}
             title="Delete Role"

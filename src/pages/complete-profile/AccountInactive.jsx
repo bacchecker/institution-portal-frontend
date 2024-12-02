@@ -211,7 +211,6 @@ const AccountInactive = () => {
                     please don't hesitate to reach out to our support team via the media below
                   </span> : 
                   <span>
-                    {institutionSetup}
                     Your institution’s account is currently under review. This
                     should be over between 24-48 hours, during this period,
                     certain features may be restricted. We’ll notify you once the

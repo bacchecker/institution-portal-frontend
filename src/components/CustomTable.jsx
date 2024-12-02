@@ -45,7 +45,7 @@ const CustomTable = ({
       >
         <TableHeader>
           {columns.map((column, index) => {
-            const isFilterable = column !== "Actions";
+            const isFilterable = column !== "Actions" && column !== "Permissions";
             return(
               <TableColumn
               key={index}

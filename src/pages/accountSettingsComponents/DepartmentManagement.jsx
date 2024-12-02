@@ -117,11 +117,13 @@ function DepartmentManagement() {
           <AddNewDepartment
             setOpenDrawer={setOpenDrawer}
             openDrawer={openDrawer}
+            fetchDepartments={fetchDepartments}
           />
           <EditDepartment
             setOpenDrawer={setOpenEditDrawer}
             openDrawer={openEditDrawer}
             selectedData={selectedData}
+            fetchDepartments={fetchDepartments}
           />
           <ManageRoles
             setOpenDrawer={setOpenRolesDrawer}

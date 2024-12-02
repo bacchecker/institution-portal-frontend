@@ -12,7 +12,7 @@ import {
   TableRow,
   useDisclosure,
 } from "@nextui-org/react";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import CustomTable from "@components/CustomTable";
 import { FaAnglesLeft, FaAnglesRight } from "react-icons/fa6";
 import secureLocalStorage from "react-secure-storage";
@@ -26,12 +26,20 @@ import EditDocumentType from "./EditDocumentType";
 import Swal from "sweetalert2";
 
 function InstitutionDocumentTypes({ setActiveStep }) {
+  const [docLoading, setDocLoading] = useState(false);
+  const [search, setSearch] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [lastPage, setLastPage] = useState(1);
+  const [total, setTotal] = useState(0);
   const [isSaving, setSaving] = useState(false);
   const [isDeleting, setDeleting] = useState(false);
   const [openDrawer, setOpenDrawer] = useState(false);
   const [openNewDrawer, setOpenNewDrawer] = useState(false);
   const [openEditDrawer, setOpenEditDrawer] = useState(false);
   const [selectedData, setSelectedData] = useState({});
+  const [institutionDocuments, setInstitutionDocuments] = useState([]);
+  const [sortBy, setSortBy] = useState(null);
+  const [sortOrder, setSortOrder] = useState("asc");
   const deleteDisclosure = useDisclosure();
 
   const institution = secureLocalStorage.getItem("institution");
@@ -54,13 +62,36 @@ function InstitutionDocumentTypes({ setActiveStep }) {
     (url) => axios.get(url).then((res) => res.data)
   );
 
-  const {
-    data: institutionDocuments,
-    error: institutionError,
-    isLoading: institutionDocsLoading,
-  } = useSWR("/institution/document-types", (url) =>
-    axios.get(url).then((res) => res.data)
-  );
+  const fetchInstitutionDocuments = async () => {
+    setDocLoading(true)
+    try {
+      const response = await axios.get("/institution/document-types", {
+        params: {
+          search,
+          page: currentPage,
+          sort_by: sortBy,
+          sort_order: sortOrder,
+        },
+      });
+
+      const docTypes = response.data.document_types;
+
+    // Update the states with the received data
+    setInstitutionDocuments(docTypes.data); // Array of document types
+    setCurrentPage(docTypes.current_page); // Current page number
+    setLastPage(docTypes.last_page); // Last page number
+    setTotal(docTypes.total); // Total number of document types
+    setDocLoading(false); // Set loading state to false
+
+    } catch (error) {
+      console.error("Error fetching institution documents:", error);
+      throw error;
+    }
+  };
+
+  useEffect(() => {
+    fetchInstitutionDocuments();
+  }, [search, currentPage, sortBy, sortOrder]);
 
   const handleBackButton = () => {
     const updatedInstitution = {
@@ -106,6 +137,7 @@ function InstitutionDocumentTypes({ setActiveStep }) {
               ...institution,
               current_step: "3",
             };
+            fetchInstitutionDocuments();
             setInstitution(updatedInstitution);
             secureLocalStorage.setItem("institution", updatedInstitution);
             setActiveStep(3);
@@ -207,12 +239,7 @@ function InstitutionDocumentTypes({ setActiveStep }) {
         />
       </div>
       <section className="md:w-full w-[98vw] min-h-[60vh] mx-auto">
-        {institutionDocsLoading ? (
-          <div className="w-full h-[5rem] flex justify-center items-center">
-            <Spinner size="sm" color="danger" />
-          </div>
-        ) : (
-          <>
+        
             <CustomTable
               columns={[
                 "Name",
@@ -221,17 +248,21 @@ function InstitutionDocumentTypes({ setActiveStep }) {
                 "Printing Fee",
                 "Validation Fee",
                 "Verification Fee",
-                "",
+                "Actions",
               ]}
-              // loadingState={resData ? false : true}
-              // page={resData?.current_page}
-              // setPage={(page) =>
-              //   navigate({
-              //     // pathname: "listing",
-              //     search: createSearchParams({ ...filters, page }).toString(),
-              //   })
-              // }
-              // totalPages={Math.ceil(resData?.total / resData?.per_page)}
+              columnSortKeys={{
+                Name: "document.name",
+                "Document Fee": "base_fee",
+                "Printing Fee": "printing_fee",
+                "Validation Fee": "validation_fee",
+                "Verification Fee": "verification_fee",
+               
+              }}
+              sortBy={sortBy}
+              sortOrder={sortOrder}
+              setSortBy={setSortBy}
+              setSortOrder={setSortOrder}
+              loadingStata={docLoading}
             >
               {institutionDocuments?.data?.types?.map((item) => (
                 <TableRow key={item?.id}>
@@ -279,8 +310,7 @@ function InstitutionDocumentTypes({ setActiveStep }) {
                 </TableRow>
               ))}
             </CustomTable>
-          </>
-        )}
+        
       </section>
       <DeleteModal
         disclosure={deleteDisclosure}

@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 import CustomTable from "@components/CustomTable";
 import { Spinner, TableCell, TableRow } from "@nextui-org/react";
 import secureLocalStorage from "react-secure-storage";
@@ -14,7 +14,9 @@ function LetterTemplatesTable({
   };
 
   const templateScreen = JSON.parse(institution?.template_screens);
-
+  const [sortBy, setSortBy] = useState(null);
+  const [sortOrder, setSortOrder] = useState("asc");
+  const [isLoading, selLoading] = useState(false);
   const handleSelectedTemplate = (item) => {
     secureLocalStorage.setItem("selectedTemplate", item);
     setCurrentScreen(3);
@@ -48,15 +50,15 @@ function LetterTemplatesTable({
               "Unsuccessful Verification Letter",
               "",
             ]}
-            // loadingState={resData ? false : true}
-            // page={resData?.current_page}
-            // setPage={(page) =>
-            //   navigate({
-            //     // pathname: "listing",
-            //     search: createSearchParams({ ...filters, page }).toString(),
-            //   })
-            // }
-            // totalPages={Math.ceil(resData?.total / resData?.per_page)}
+            loadingState={isLoading}
+            columnSortKeys={{
+              "Name": "name",
+             
+            }}
+            sortBy={sortBy}
+            sortOrder={sortOrder}
+            setSortBy={setSortBy}
+            setSortOrder={setSortOrder}
           >
             {letterTemplates?.data?.map((item) => (
               <TableRow key={item?.id}>
