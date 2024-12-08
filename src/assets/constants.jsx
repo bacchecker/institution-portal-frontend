@@ -8,6 +8,7 @@ import {
 import { AnalysisIcon } from "./icons/analysis";
 import SupportIcon from "./icons/support";
 import { SecurityIcon } from "./icons/security";
+import { HiClipboardDocumentList } from "react-icons/hi2";
 
 export const navLinks = [
   {
@@ -19,8 +20,17 @@ export const navLinks = [
     showForRoles: ["Admin", "Finance", "Customer Service", "HR"],
     children: [],
   },
-
   {
+    label: "Manage Documents",
+    path: "/manage-requests",
+    icon: <HiClipboardDocumentList />,
+    profile_complete: ["yes"],
+    showOn: ["inactive", "active"],
+    showForRoles: ["Admin", "Finance", "Customer Service", "HR"],
+    children: [],
+  },
+
+  /* {
     label: "Requests",
     path: "/requests",
     icon: <TasksListIcon />,
@@ -41,7 +51,7 @@ export const navLinks = [
       //   path: "/requests/verification-requests",
       // },
     ],
-  },
+  }, */
   {
     label: "Account Setup",
     path: "/account-setup",

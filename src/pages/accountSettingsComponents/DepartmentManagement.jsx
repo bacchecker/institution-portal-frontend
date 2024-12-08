@@ -125,11 +125,7 @@ function DepartmentManagement() {
             selectedData={selectedData}
             fetchDepartments={fetchDepartments}
           />
-          <ManageRoles
-            setOpenDrawer={setOpenRolesDrawer}
-            openDrawer={openRolesDrawer}
-            selectedData={selectedData}
-          />
+          
         </div>
         <section>
           <div className="mb-4 flex space-x-4 bg-white p-4 rounded-xl">
@@ -148,10 +144,10 @@ function DepartmentManagement() {
           
           <CustomTable
             loadingState={isLoading}
-            columns={["Department Name", "Roles", "Description", "Actions"]}
+            columns={["Department Name", "Permissions", "Description", "Actions"]}
             columnSortKeys={{
               "Department Name": "name",
-              Roles: "role_count",
+              Permissions: "permissions_count",
               Description: "description",
             }}
             sortBy={sortBy}
@@ -163,7 +159,7 @@ function DepartmentManagement() {
             {institutionDepartments?.map((item) => (
               <TableRow key={item?.id} className="odd:bg-gray-100 even:bg-white border-b dark:text-slate-700">
                 <TableCell className="pl-4">{item?.name}</TableCell>
-                <TableCell className="pl-4">{item?.role_count}</TableCell>
+                <TableCell className="pl-4">{item?.permissions_count}</TableCell>
                 <TableCell className="pl-4">{item?.description}</TableCell>
 
                 <TableCell className="flex items-center justify-center h-12 gap-3">
@@ -174,7 +170,7 @@ function DepartmentManagement() {
                       </Button>
                     </DropdownTrigger>
                     <DropdownMenu aria-label="Static Actions">
-                      <DropdownItem
+                      {/* <DropdownItem
                         key="manage_roles"
                         onClick={() => {
                           setSelectedData(item);
@@ -182,7 +178,7 @@ function DepartmentManagement() {
                         }}
                       >
                         Manage Roles
-                      </DropdownItem>
+                      </DropdownItem> */}
                       <DropdownItem
                         key="edit"
                         onClick={() => {

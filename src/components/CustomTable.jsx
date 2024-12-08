@@ -32,48 +32,55 @@ const CustomTable = ({
   return (
     <div className="flex flex-col gap-1">
       <Table
+        radius="none"
         aria-label="data table"
         classNames={{
           base: `${
             customHeightClass && customHeightClass
-          } md:!max-h-[78vh] font-nunito text-xs overflow-y-auto w-[100vw] md:!w-full overflow-x-auto shadow-none`,
+          } md:!max-h-[78vh] font-nunito text-xs overflow-y-auto w-[100vw] rounded-none md:!w-full overflow-x-auto shadow-none`,
           wrapper:
-            "dark:bg-slate-800 vertical-scrollbar horizontal-scrollbar shadow-none bg-white dark:border border-white/5",
-          th: "dark:bg-slate-800",
+            "dark:bg-slate-800 vertical-scrollbar horizontal-scrollbar shadow-none rounded-lg dark:border border-white/5 bg-gray-50",
+          th: "!rounded-none dark:bg-slate-800", // Remove border-radius
           td: "text-sm",
         }}
       >
-        <TableHeader>
+        <TableHeader
+          className="!rounded-none" // Ensure no border-radius on the header
+        >
           {columns.map((column, index) => {
             const isFilterable = column !== "Actions" && column !== "Permissions";
-            return(
+            return (
               <TableColumn
-              key={index}
-              onClick={() => {
-                if (!isFilterable) return;
-                const sortKey = columnSortKeys[column]; // Map column to sort_by
-                if (!sortKey) return; // Skip if column is not sortable
+                key={index}
+                onClick={() => {
+                  if (!isFilterable) return;
+                  const sortKey = columnSortKeys[column]; // Map column to sort_by
+                  if (!sortKey) return; // Skip if column is not sortable
 
-                const newSortOrder =
-                  sortBy === sortKey && sortOrder === "asc" ? "desc" : "asc";
+                  const newSortOrder =
+                    sortBy === sortKey && sortOrder === "asc" ? "desc" : "asc";
 
-                setSortBy(sortKey);
-                setSortOrder(newSortOrder);
-              }}
-              className={`font-montserrat text-text-sm text-gray-700 dark:text-white bg-white rounded-none text-sm ${
-                isFilterable ? "cursor-pointer" : ""
-              }`}
-            >
-              <div className="flex items-center space-x-2"><span>{column}</span><span className={`${isFilterable ? 'flex' : 'hidden'}`}>{getSortIcon(column)}</span></div>
-            </TableColumn>
-            )
-            
+                  setSortBy(sortKey);
+                  setSortOrder(newSortOrder);
+                }}
+                className={`text-text-sm text-gray-700 dark:text-white bg-white text-sm py-4 ${
+                  isFilterable ? "cursor-pointer" : ""
+                }`}
+              >
+                <div className="flex items-center space-x-2">
+                  <span>{column}</span>
+                  <span className={`${isFilterable ? "flex" : "hidden"}`}>
+                    {getSortIcon(column)}
+                  </span>
+                </div>
+              </TableColumn>
+            );
           })}
         </TableHeader>
         <TableBody
           className="dark:text-slate-700"
           isLoading={loadingState}
-          loadingContent={<Spinner color="danger" label="Loading...."/>}
+          loadingContent={<Spinner color="danger" label="Loading...." />}
           emptyContent={
             <div className="md:!h-[65vh] h-[60vh] flex flex-col gap-8 items-center justify-center">
               <img src="/images/nodata.png" alt="No data" className="w-1/4 h-auto" />
@@ -84,11 +91,9 @@ const CustomTable = ({
           }
         >
           {children}
-        
-      </TableBody>
-          
-        
+        </TableBody>
       </Table>
+
 
       <div className="flex w-full items-center justify-between">
         {totalPages > 1 && (

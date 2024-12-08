@@ -6,7 +6,6 @@ import {
   DropdownMenu,
   DropdownTrigger,
   Input,
-  Spinner,
   TableCell,
   TableRow,
   useDisclosure,
@@ -154,13 +153,12 @@ function UserManagement() {
         <section className="md:w-full w-[98vw] min-h-[60vh] mx-auto">
           <CustomTable
             loadingState={isLoading}
-            columns={["Full Name", "Phone", "Email", "Department", "Role", "Status", "Actions"]}
+            columns={["Full Name", "Phone", "Email", "Department", "Status", "Actions"]}
             columnSortKeys={{
               "Full Name": "first_name",
               Phone: "phone",
               Email: "email",
               Department: "department.name",
-              Role: "role_name",
               Status: "status",
             }}
             sortBy={sortBy}
@@ -175,11 +173,11 @@ function UserManagement() {
                 <TableCell>{item?.phone}</TableCell>
                 <TableCell>{item?.email}</TableCell>
                 <TableCell>{item?.department.name}</TableCell>
-                <TableCell>{item?.role.role_name}</TableCell>
                 <TableCell>
                   <Chip className="capitalize" color={statusColorMap[item.status]} size="sm" variant="flat">
-                  {item.status}
-                </Chip></TableCell>
+                    {item.status}
+                  </Chip>
+                </TableCell>
 
                 <TableCell className="flex items-center h-12 gap-3">
                   <Dropdown>

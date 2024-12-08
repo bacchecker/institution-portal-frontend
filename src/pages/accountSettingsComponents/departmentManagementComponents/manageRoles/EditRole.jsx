@@ -16,7 +16,7 @@ function EditRole({ setOpenDrawer, openDrawer, selectedData, fetchRoles }) {
     if (openDrawer && selectedData) {
       // Pre-fill permissions from the selectedData
       const existingPermissions = selectedData.permissions.map(
-        (perm) => perm.permission.uuid // Extract uuid from nested permission object
+        (perm) => perm.permission.id // Extract id from nested permission object
       );
 
       setSelectedPermissions(existingPermissions);
@@ -140,18 +140,18 @@ function EditRole({ setOpenDrawer, openDrawer, selectedData, fetchRoles }) {
             ) : (
               availablePermissions.map((request) => (
                 <label
-                  key={request.uuid}
+                  key={request.id}
                   className={`cursor-pointer flex items-center rounded-full px-4 py-2 transition-all duration-200 mb-1 ${
-                    selectedPermissions.includes(request.uuid)
+                    selectedPermissions.includes(request.id)
                       ? "bg-green-600 text-white"
                       : "bg-gray-300 text-gray-600"
                   }`}
                 >
                   <input
                     type="checkbox"
-                    value={request.uuid}
-                    checked={selectedPermissions.includes(request.uuid)}
-                    onChange={() => handleCheckboxChange(request.uuid)}
+                    value={request.id}
+                    checked={selectedPermissions.includes(request.id)}
+                    onChange={() => handleCheckboxChange(request.id)}
                     className="mr-2 accent-green-600"
                   />
                   {request.name}

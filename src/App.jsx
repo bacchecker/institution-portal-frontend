@@ -12,7 +12,8 @@ import PaymentRevenueSetup from "./pages/PaymentRevenueSetup";
 import RevenueOverview from "./pages/reports/RevenueOverview";
 import { Button } from "@nextui-org/react";
 import ValidationRequest from "./pages/requests/ValidationRequest";
-import DocumentRequest from "./pages/requests/document-request/DocumentRequest";
+import ManageRequest from "./pages/requests/ManageRequest";
+import DocumentRequest from "./pages/requests/DocumentRequest";
 import DocumentDetails from "./pages/requests/document-request/DocumentDetails";
 import InstitutionDocumentTypes from "./pages/accountSettingsComponents/InstitutionDocumentTypes";
 import RolesAndPermissions from "./pages/security/RolesAndPermissions";
@@ -73,7 +74,15 @@ const App = () => {
         <Route exact path="/account-setup" element={<AccountSetupPage />} />
 
         <Route exact path="/dashboard" element={<Dashboard />} />
-
+        <Route
+          exact
+          path="manage-requests"
+          element={
+            <ProtectedRoute userRole={userRole} allowedRoles={['Admin', 'Customer Service']}>
+              <ManageRequest />
+            </ProtectedRoute>
+          }
+        />
         {/* Requests Routes */}
         <Route exact path="/requests" element={<Outlet />}>
         <Route
@@ -85,6 +94,7 @@ const App = () => {
             </ProtectedRoute>
           }
         />
+        
         <Route
           exact
           path="document-requests/:documentId"

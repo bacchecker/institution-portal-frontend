@@ -31,15 +31,18 @@ import CustomUser from "@components/custom-user";
 import { useNavigate } from "react-router-dom";
 import ClipIcon from "@assets/icons/clip";
 import DownloadIcon from "@assets/icons/download";
-import PdfIcon from "../../../assets/icons/pdf";
-import WordIcon from "../../../assets/icons/word";
+import PdfIcon from "../../assets/icons/pdf";
+import WordIcon from "../../assets/icons/word";
 import { filesize } from "filesize";
-import { PlusIcon } from "../../../assets/icons/plus";
-import ExcelIcon from "../../../assets/icons/excel";
-import Elipsis from "../../../assets/icons/elipsis";
-import ConfirmModal from "../../../components/confirm-modal";
+import { PlusIcon } from "../../assets/icons/plus";
+import ExcelIcon from "../../assets/icons/excel";
+import Elipsis from "../../assets/icons/elipsis";
+import ConfirmModal from "../../components/confirm-modal";
 import toast from "react-hot-toast";
-import { FaChevronLeft, FaChevronRight } from "react-icons/fa6";
+import { FaChevronLeft, FaChevronRight, FaHeart } from "react-icons/fa6";
+import { IoDocuments } from "react-icons/io5";
+import { PiQueueFill } from "react-icons/pi";
+import { FcCancel } from "react-icons/fc";
 
 const ItemCard = ({ title, value }) => (
   <div className="flex gap-4 items-center">
@@ -71,6 +74,9 @@ export default function DocumentRequest() {
     status: "",
   });
   const { mutate } = useSWRConfig();
+  const [pending, setPending] = useState(0);
+  const [rejected, setRejected] = useState(0);
+  const [approved, setApproved] = useState(0);
 
   const institutionDocumentRequests = async () => {
     setIsLoading(true)
@@ -86,11 +92,14 @@ export default function DocumentRequest() {
 
       const docRequest = response.data.paginatedRequests;
 
+    setPending(response.data.pending)
+    setApproved(response.data.approved)
+    setRejected(response.data.rejected)
     setDocumentRequests(docRequest.data);
-    setCurrentPage(docRequest.current_page); // Current page number
-    setLastPage(docRequest.last_page); // Last page number
-    setTotal(docRequest.total); // Total number of document types
-    setIsLoading(false); // Set loading state to false
+    setCurrentPage(docRequest.current_page);
+    setLastPage(docRequest.last_page);
+    setTotal(docRequest.total);
+    setIsLoading(false);
 
     } catch (error) {
       console.error("Error fetching institution documents:", error);
@@ -238,9 +247,9 @@ export default function DocumentRequest() {
   };
 
   return (
-    <AuthLayout title="Document Request">
-      <section className="md:px-3">
-        <Card className="my-3 md:w-full w-[98vw] mx-auto dark:bg-slate-900">
+    <div title="Document Request">
+      <section className="px-2">
+        <Card className="md:w-full w-[98vw] mx-auto rounded-none dark:bg-slate-900">
           <CardBody className="w-full">
             <form method="get" className="flex flex-row gap-3 items-center">
               <input type="hidden" name="start_date" value={dateRange.start} />
@@ -326,6 +335,46 @@ export default function DocumentRequest() {
             </form>
           </CardBody>
         </Card>
+        <Card className="my-3 md:w-full w-[98vw] mx-auto border-none shadow-none rounded-lg dark:bg-slate-900">
+          <CardBody className="grid w-full grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="rounded-md bg-gray-100 p-4 flex space-x-4">
+                <div className="flex items-center justify-center bg-purple-200 text-purple-800 rounded-full w-10 h-10">
+                  <IoDocuments size={18}/>
+                </div>
+                <div className="">
+                  <p className="font-medium">Total Documents</p>
+                  <p className="text-gray-500">{total}</p>
+                </div>
+            </div>
+            <div className="rounded-md bg-gray-100 p-4 flex space-x-4">
+                <div className="flex items-center justify-center bg-yellow-200 text-yellow-500 rounded-full w-10 h-10">
+                  <PiQueueFill size={18}/>
+                </div>
+                <div className="">
+                  <p className="font-medium">Pending</p>
+                  <p className="text-gray-500">{pending}</p>
+                </div>
+            </div>
+            <div className="rounded-md bg-gray-100 p-4 flex space-x-4">
+                <div className="flex items-center justify-center bg-green-200 text-green-600 rounded-full w-10 h-10">
+                  <FaHeart size={18}/>
+                </div>
+                <div className="">
+                  <p className="font-medium">Approved</p>
+                  <p className="text-gray-500">{approved}</p>
+                </div>
+            </div>
+            <div className="rounded-md bg-gray-100 p-4 flex space-x-4">
+                <div className="flex items-center justify-center bg-red-200 text-red-600 rounded-full w-10 h-10">
+                  <FcCancel size={18}/>
+                </div>
+                <div className="">
+                  <p className="font-medium">Not Approved</p>
+                  <p className="text-gray-500">{rejected}</p>
+                </div>
+            </div>
+          </CardBody>
+        </Card>
       </section>
 
       <section className="md:px-3 md:w-full w-[98vw] mx-auto">
@@ -359,7 +408,7 @@ export default function DocumentRequest() {
           setSortOrder={setSortOrder}
         >
           {documentRequests?.map((item) => (
-            <TableRow key={item?.id} className="odd:bg-gray-100 even:bg-white border-b dark:text-slate-700">
+            <TableRow key={item?.id} className="odd:bg-gray-100 even:bg-gray-50 border-b dark:text-slate-700">
               {/* <TableCell className="font-semibold">
                 {item?.unique_code}
               </TableCell> */}
@@ -374,7 +423,7 @@ export default function DocumentRequest() {
               </TableCell>
               <TableCell>{item?.delivery_address ?? "N/A"}</TableCell>
               <TableCell>
-                {moment(item?.created_at).format("Do MMMM, YYYY")}
+                {moment(item?.created_at).format("MMM D, YYYY")}
               </TableCell>
               <TableCell>{item?.document_type?.name}</TableCell>
               <TableCell>
@@ -828,6 +877,6 @@ export default function DocumentRequest() {
           </span>
         </p>
       </ConfirmModal>
-    </AuthLayout>
+    </div>
   );
 }

@@ -27,7 +27,8 @@ function AddNewUser({ setOpenDrawer, openDrawer, fetchData }) {
   const [userInput, setUserInput] = useState(initialUserInput);
   const [drawerTitle, setDrawerTitle] = useState("User Details");
   const [institutionDepartments, setInstitutionDepartments] = useState(null);
-  const [roles, setRoles] = useState([]); // To store roles for the selected department
+  const [permissions, setPermissions] = useState([]);
+  const [selectedPermissions, setSelectedPermissions] = useState([]);
   const [isSaving, setIsSaving] = useState(false);
   const genders = [
     { id: "male", name: "Male" },
@@ -45,6 +46,7 @@ function AddNewUser({ setOpenDrawer, openDrawer, fetchData }) {
   useEffect(() => {
     if (!openDrawer) {
       setUserInput(initialUserInput);
+      setSelectedPermissions([])
     }
   }, [openDrawer]);
 
@@ -62,41 +64,40 @@ function AddNewUser({ setOpenDrawer, openDrawer, fetchData }) {
     fetchInstitutionDepartments();
   }, []);
 
-  // Fetch roles when a department is selected
+  // Fetch permissions when a department is selected
   useEffect(() => {
-    const fetchRolesForDepartment = async () => {
+    const fetchPermissionsForDepartment = async () => {
       if (!userInput.department) return; // Skip if no department is selected
       try {
         const response = await axios.get(
-          `/institution/department-roles/${userInput.department}`
+          `/institution/department-permissions/${userInput.department}`
         );
-        setRoles(response.data.data || []);
+        setPermissions(response.data.permissions || []);
       } catch (error) {
-        console.error("Error fetching roles:", error);
-        setRoles([]); // Reset roles on error
+        console.error("Error fetching permissions:", error);
+        setPermissions([]); // Reset permissions on error
       }
     };
 
-    fetchRolesForDepartment();
+    fetchPermissionsForDepartment();
   }, [userInput.department]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSaving(true);
-
+  
     const {
       first_name,
       last_name,
       department,
-      role,
       email,
       phone,
       address,
       other_name,
       gender,
     } = userInput;
-
-    if (!first_name || !last_name || !department || !role || !email || !phone) {
+  
+    if (!first_name || !last_name || !department || !email || !phone) {
       setIsSaving(false);
       Swal.fire({
         title: "Error",
@@ -104,53 +105,68 @@ function AddNewUser({ setOpenDrawer, openDrawer, fetchData }) {
         icon: "error",
         button: "OK",
       });
-    } else {
-      const data = {
-        first_name,
-        last_name,
-        other_name,
-        department_id: department,
-        role_id: role,
-        email,
-        phone,
-        address,
-        gender,
-      };
-      try {
-        const response = await axios.post("/institution/store-users", data);
-        Swal.fire({
-          title: "Success",
-          text: response.data.message,
-          icon: "success",
-          button: "OK",
-          confirmButtonColor: "#00b17d",
-        }).then((isOkay) => {
-          if (isOkay) {
-            fetchData();
-            setOpenDrawer(!openDrawer);
-            setUserInput(initialUserInput);
-          }
-        });
-      } catch (error) {
-        Swal.fire({
-          title: "Error",
-          text: error.response?.data?.message,
-          icon: "error",
-          button: "OK",
-        });
-      } finally {
-        setIsSaving(false);
-      }
+      return;
+    }
+  
+    if (selectedPermissions.length === 0) {
+      setIsSaving(false);
+      Swal.fire({
+        title: "Error",
+        text: "Please select at least one permission",
+        icon: "error",
+        button: "OK",
+      });
+      return;
+    }
+  
+    const data = {
+      first_name,
+      last_name,
+      other_name,
+      department_id: department,
+      email,
+      phone,
+      address,
+      gender,
+      permissions: selectedPermissions,
+    };
+  
+    try {
+      const response = await axios.post("/institution/store-users", data);
+      Swal.fire({
+        title: "Success",
+        text: response.data.message,
+        icon: "success",
+        button: "OK",
+        confirmButtonColor: "#00b17d",
+      }).then((isOkay) => {
+        if (isOkay) {
+          fetchData();
+          setOpenDrawer(!openDrawer);
+          setUserInput(initialUserInput);
+          setSelectedPermissions([])
+        }
+      });
+    } catch (error) {
+      Swal.fire({
+        title: "Error",
+        text: error.response?.data?.message || "An error occurred.",
+        icon: "error",
+        button: "OK",
+      });
+    } finally {
+      setIsSaving(false);
     }
   };
+  
 
   return (
-    <Drawer title={drawerTitle} isOpen={openDrawer} setIsOpen={setOpenDrawer}>
+    <Drawer title={drawerTitle} isOpen={openDrawer} setIsOpen={setOpenDrawer} classNames="w-[500px]">
       <form
         onSubmit={handleSubmit}
         className="h-full flex flex-col justify-between"
       >
-        <div className="flex flex-col">
+        <div className="flex flex-col -mt-4">
           {/* User Details */}
           <Input
             size="sm"
@@ -237,24 +253,37 @@ function AddNewUser({ setOpenDrawer, openDrawer, fetchData }) {
               </SelectItem>
             ))}
           </Select>
+          <div className="my-4 px-2">
+            <h4 className="text-md font-semibold mb-2">Select User's Permissions</h4>
+            {permissions.length > 0 ? (
+              <div className="grid grid-cols-2 gap-4">
+                {permissions.map((permission) => (
+                  <label key={permission.id} className="flex items-center">
+                    <input
+                      type="checkbox"
+                      value={permission.id}
+                      checked={selectedPermissions.includes(permission.id)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setSelectedPermissions((prev) => [...prev, permission.id]);
+                        } else {
+                          setSelectedPermissions((prev) =>
+                            prev.filter((id) => id !== permission.id)
+                          );
+                        }
+                      }}
+                      className="mr-2"
+                    />
+                    {permission.name.replace(/\./g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}
+                  </label>
+                ))}
+              </div>
+            ) : (
+              <p className="text-gray-500">No permissions available for the selected department.</p>
+            )}
+          </div>
 
-          {/* Role Selection */}
-          <Select
-            size="sm"
-            label="Role"
-            className="w-full my-4"
-            name="role"
-            value={userInput?.role}
-            onChange={(e) =>
-              setUserInput((prev) => ({ ...prev, role: e.target.value }))
-            }
-          >
-            {roles?.map((item) => (
-              <SelectItem key={item.id} value={item.id}>
-                {item.name}
-              </SelectItem>
-            ))}
-          </Select>
+
         </div>
 
         {/* Buttons */}

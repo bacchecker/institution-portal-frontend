@@ -34,7 +34,10 @@ import ConfirmModal from "../../components/confirm-modal";
 import DeleteModal from "../../components/DeleteModal";
 import toast from "react-hot-toast";
 import { parseDate } from "@internationalized/date";
-import { FaChevronLeft, FaChevronRight } from "react-icons/fa6";
+import { FaChevronLeft, FaChevronRight, FaHeart } from "react-icons/fa6";
+import { IoDocuments } from "react-icons/io5";
+import { PiQueueFill } from "react-icons/pi";
+import { FcCancel } from "react-icons/fc";
 
 const ItemCard = ({ title, value }) => (
   <div className="flex gap-4 items-center">
@@ -71,6 +74,9 @@ export default function ValidationRequest() {
     end_date: searchParams.get("end_date") || "",
   });
 
+  const [pending, setPending] = useState(0);
+  const [rejected, setRejected] = useState(0);
+  const [approved, setApproved] = useState(0);
   const { data: resData, error } = useSWR(
     `/institution/requests/validation-requests?${createSearchParams(filters)}`,
     (url) => axios.get(url).then((res) => res.data)
@@ -90,6 +96,9 @@ export default function ValidationRequest() {
 
       const valRequest = response.data.paginatedRequests;
 
+    setPending(response.data.pending)
+    setApproved(response.data.approved)
+    setRejected(response.data.rejected)
     setValidationRequests(valRequest.data);
     setCurrentPage(valRequest.current_page);
     setLastPage(valRequest.last_page);
@@ -175,9 +184,9 @@ export default function ValidationRequest() {
   console.log(data);
 
   return (
-    <AuthLayout title="Validation Request">
-      <section className="md:px-3">
-        <Card className="my-3 md:w-full w-[98vw] mx-auto dark:bg-slate-900">
+    <div title="Validation Request">
+      <section className="px-2">
+        <Card className="md:w-full w-[98vw] mx-auto rounded-none dark:bg-slate-900">
           <CardBody className="w-full">
             <form
               method="get"
@@ -294,6 +303,47 @@ export default function ValidationRequest() {
                 Filter
               </Button>
             </form>
+          </CardBody>
+        </Card>
+        
+        <Card className="my-3 md:w-full w-[98vw] mx-auto border-none shadow-none rounded-lg dark:bg-slate-900">
+          <CardBody className="grid w-full grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="rounded-md bg-gray-100 p-4 flex space-x-4">
+                <div className="flex items-center justify-center bg-purple-200 text-purple-800 rounded-full w-10 h-10">
+                  <IoDocuments size={18}/>
+                </div>
+                <div className="">
+                  <p className="font-medium">Total Documents</p>
+                  <p className="text-gray-500">{total}</p>
+                </div>
+            </div>
+            <div className="rounded-md bg-gray-100 p-4 flex space-x-4">
+                <div className="flex items-center justify-center bg-yellow-200 text-yellow-500 rounded-full w-10 h-10">
+                  <PiQueueFill size={18}/>
+                </div>
+                <div className="">
+                  <p className="font-medium">Pending</p>
+                  <p className="text-gray-500">{pending}</p>
+                </div>
+            </div>
+            <div className="rounded-md bg-gray-100 p-4 flex space-x-4">
+                <div className="flex items-center justify-center bg-green-200 text-green-600 rounded-full w-10 h-10">
+                  <FaHeart size={18}/>
+                </div>
+                <div className="">
+                  <p className="font-medium">Approved</p>
+                  <p className="text-gray-500">{approved}</p>
+                </div>
+            </div>
+            <div className="rounded-md bg-gray-100 p-4 flex space-x-4">
+                <div className="flex items-center justify-center bg-red-200 text-red-600 rounded-full w-10 h-10">
+                  <FcCancel size={18}/>
+                </div>
+                <div className="">
+                  <p className="font-medium">Not Approved</p>
+                  <p className="text-gray-500">{rejected}</p>
+                </div>
+            </div>
           </CardBody>
         </Card>
       </section>
@@ -676,6 +726,6 @@ export default function ValidationRequest() {
           }
         />
       </DeleteModal>
-    </AuthLayout>
+    </div>
   );
 }
