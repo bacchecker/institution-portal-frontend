@@ -222,6 +222,28 @@
     transform: translate(-50%, -50%) rotateZ(40deg);
   }
 
+  .checkbox-design1 {
+    appearance: none;
+    -webkit-appearance: none;
+    height: 1vw;
+    width: 1vw;
+    border: 0.1vw solid #c4c4c4 !important;
+    border-radius: 0.25vw;
+    position: relative;
+    cursor: pointer;
+  }
+  .checkbox-design1::after {
+    content: "";
+    position: absolute;
+    width: 0.5vw;
+    height: 1vw;
+    border-right: 0.2vw solid #fff;
+    border-bottom: 0.2vw solid #fff;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotateZ(40deg);
+  }
+
   .dropdown-cover {
     display: flex;
     justify-content: center;

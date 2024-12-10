@@ -12,7 +12,7 @@ const SideModal = ({ title, children, setOpenModal, openModal }) => {
   }, [openModal]);
   return (
     <div
-      className={`fixed right-[-100%] top-0 bottom-0 md:w-[32vw] w-full bg-white overflow-auto add-div pb-[2vw] z-[1001]  ${
+      className={`fixed right-[-100%] top-0 bottom-0 md:w-[34vw] w-full bg-white overflow-auto add-div pb-[2vw] z-[1001]  ${
         openModal && "open"
       }`}
     >

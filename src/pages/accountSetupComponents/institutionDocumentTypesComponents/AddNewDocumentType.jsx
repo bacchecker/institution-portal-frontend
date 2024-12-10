@@ -13,7 +13,6 @@ function AddNewDocumentType({
   isExistingDocTypesFetching,
   isExistingDocTypesLoading,
 }) {
-  const [selectedDocumentType, setSelectedDocumentType] = useState({});
   const [items, setItems] = useState([
     {
       document_type_id: "",
@@ -243,13 +242,13 @@ function AddNewDocumentType({
                       <input
                         type="checkbox"
                         name="soft_copy"
-                        id="soft_copy"
+                        id={`${i}soft_copy`}
                         className="checkbox-design"
                         isChecked={item.soft_copy}
                         onChange={(e) => handleItemChange(e, i)}
                       />
                       <label
-                        htmlFor="soft_copy"
+                        htmlFor={`${i}soft_copy`}
                         className="text-[0.9vw] cursor-pointer"
                       >
                         Soft Copy
@@ -259,13 +258,13 @@ function AddNewDocumentType({
                       <input
                         type="checkbox"
                         name="hard_copy"
-                        id="hard_copy"
+                        id={`${i}hard_copy`}
                         className="checkbox-design"
                         isChecked={item.hard_copy}
                         onChange={(e) => handleItemChange(e, i)}
                       />
                       <label
-                        htmlFor="hard_copy"
+                        htmlFor={`${i}hard_copy`}
                         className="text-[0.9vw] cursor-pointer"
                       >
                         Hard Copy
@@ -354,7 +353,7 @@ function AddNewDocumentType({
                   </div>
                   <h6 className="text-[#2e2e2e] md:text-[0.7vw] text-[2.7vw] font-[600] mt-[0.3vw]">
                     <span className="text-[#ff0404]">Note</span>: This can only
-                    be add when document format includes hard copy
+                    be added when document format includes hard copy
                   </h6>
                 </div>
                 <h6 className="text-[#2e2e2e] md:text-[0.7vw] text-[2.7vw] font-[600] mt-[0.3vw]">

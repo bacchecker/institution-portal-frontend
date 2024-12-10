@@ -33,7 +33,14 @@ export const baccheckerApi = createApi({
   keepUnusedDataFor: 5,
   refetchOnFocus: true,
   refetchOnReconnect: true,
-  tagTypes: ["User", "Log", "Institution", "Ticket", "DocumentType"],
+  tagTypes: [
+    "User",
+    "Log",
+    "Institution",
+    "Ticket",
+    "DocumentType",
+    "Department",
+  ],
   endpoints: (builder) => ({
     loginUser: builder.mutation({
       query: (body) => ({
@@ -46,6 +53,17 @@ export const baccheckerApi = createApi({
     getInstitutionDetails: builder.query({
       query: () => "/institution/institution-data",
       providesTags: ["Institution"],
+    }),
+    getAllPermissions: builder.query({
+      query: () => "/institution/institution-permissions",
+    }),
+
+    getInstitutionDepartments: builder.query({
+      query: ({ page }) => {
+        let queryString = `/institution/departments?page=${page}`;
+        return queryString;
+      },
+      providesTags: ["Department"],
     }),
     getInstitutionDocumentTypes: builder.query({
       query: () => "",
@@ -193,6 +211,14 @@ export const baccheckerApi = createApi({
       }),
       invalidatesTags: ["DocumentType"],
     }),
+    updateDocumentType: builder.mutation({
+      query: ({ id, body }) => ({
+        url: `/institution/document-types/${id}`,
+        method: "PUT",
+        body,
+      }),
+      invalidatesTags: ["DocumentType"],
+    }),
   }),
 });
 
@@ -214,4 +240,7 @@ export const {
   useCreateInstitutionDocumentTypeMutation,
   useCreateNextScreenMutation,
   useDeleteDomentTypeMutation,
+  useUpdateDocumentTypeMutation,
+  useGetInstitutionDepartmentsQuery,
+  useGetAllPermissionsQuery,
 } = baccheckerApi;

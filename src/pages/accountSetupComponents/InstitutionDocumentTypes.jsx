@@ -14,15 +14,16 @@ import { useDispatch } from "react-redux";
 import { setUser } from "../../redux/authSlice";
 import Swal from "sweetalert2";
 import LoadingPage from "../../components/LoadingPage";
+import EditDocumentType from "./institutionDocumentTypesComponents/EditDocumentType";
 
 function InstitutionDocumentTypes({ setActiveStep }) {
   const [pageNumber, setPageNumber] = useState(1);
   const dispatch = useDispatch();
   const [openModal, setOpenModal] = useState(false);
+  const [openEditModal, setOpenEditModal] = useState(false);
+  const [selectedDocumentType, setSelectedDocumentType] = useState({});
 
   const user = JSON.parse(secureLocalStorage.getItem("user"));
-
-  console.log("user", user);
 
   const {
     data: institutionDocumentTypes,
@@ -42,6 +43,11 @@ function InstitutionDocumentTypes({ setActiveStep }) {
       institution_type: "non-academic",
     }),
   });
+
+  const handleDocumentType = (documentType) => {
+    setOpenEditModal(true);
+    setSelectedDocumentType(documentType);
+  };
 
   const handleBackButton = () => {
     const updatedInstitution = {
@@ -88,6 +94,38 @@ function InstitutionDocumentTypes({ setActiveStep }) {
       console.error("Error moving to next page:", error);
     }
   };
+
+  useEffect(() => {
+    if (isSuccess) {
+      Swal.fire({
+        title: "Success",
+        text: "Institution Document Type(s) created successfully",
+        icon: "success",
+        button: "OK",
+        confirmButtonColor: "#00b17d",
+      }).then((isOkay) => {
+        if (isOkay) {
+          const updatedInstitution = {
+            ...user?.institution,
+            current_step: "3",
+          };
+          window.scrollTo({
+            top: 0,
+            behavior: "smooth",
+          });
+          dispatch(
+            setUser({
+              user: user?.user,
+              two_factor: user.two_factor,
+              institution: updatedInstitution,
+              selectedTemplate: user.selectedTemplate,
+            })
+          );
+          setActiveStep(3);
+        }
+      });
+    }
+  }, [isSuccess]);
 
   const [
     deleteDomentType,
@@ -346,7 +384,12 @@ function InstitutionDocumentTypes({ setActiveStep }) {
                                       dropdownClass="action-dropdown-class"
                                     >
                                       <div className="action-dropdown-content">
-                                        <button className="dropdown-item flex justify-between disabled:cursor-not-allowed">
+                                        <button
+                                          onClick={() =>
+                                            handleDocumentType(documentType)
+                                          }
+                                          className="dropdown-item flex justify-between disabled:cursor-not-allowed"
+                                        >
                                           Edit
                                         </button>
                                         <button
@@ -455,6 +498,11 @@ function InstitutionDocumentTypes({ setActiveStep }) {
             existingDocumentTypes={existingDocumentTypes}
             isExistingDocTypesFetching={isExistingDocTypesFetching}
             isExistingDocTypesLoading={isExistingDocTypesLoading}
+          />
+          <EditDocumentType
+            setOpenModal={setOpenEditModal}
+            openModal={openEditModal}
+            selectedDocumentType={selectedDocumentType}
           />
         </div>
       </div>
