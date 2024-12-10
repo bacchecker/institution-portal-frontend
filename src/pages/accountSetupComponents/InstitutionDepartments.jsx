@@ -19,14 +19,14 @@ import Swal from "sweetalert2";
 import LoadingPage from "../../components/LoadingPage";
 import EditDocumentType from "./institutionDocumentTypesComponents/EditDocumentType";
 import AddNewDepartment from "./institutionDepartmentComponents/AddNewDepartment";
+import EditDepartment from "./institutionDepartmentComponents/EditDepartment";
 
 function InstitutionDepartments({ setActiveStep }) {
   const [pageNumber, setPageNumber] = useState(1);
   const dispatch = useDispatch();
   const [openModal, setOpenModal] = useState(false);
   const [openEditModal, setOpenEditModal] = useState(false);
-  const [selectedDocumentType, setSelectedDocumentType] = useState({});
-  const [groupedPermissions, setGroupedPermissions] = useState({});
+  const [selectedDepartment, setSelectedDepartment] = useState({});
   const [deletingIndex, setDeletingIndex] = useState(null);
 
   const user = JSON.parse(secureLocalStorage.getItem("user"));
@@ -43,11 +43,9 @@ function InstitutionDepartments({ setActiveStep }) {
     isFetching,
   } = useGetInstitutionDepartmentsQuery({ page: pageNumber });
 
-  console.log("groupedPermissions", groupedPermissions);
-
-  const handleDocumentType = (documentType) => {
+  const handleDepartment = (department) => {
     setOpenEditModal(true);
-    setSelectedDocumentType(documentType);
+    setSelectedDepartment(department);
   };
 
   const handleBackButton = () => {
@@ -285,6 +283,7 @@ function InstitutionDepartments({ setActiveStep }) {
                               <div className="absolute right-[1vw] bottom-[1vw] flex gap-[1vw] items-center">
                                 <button
                                   type="button"
+                                  onClick={() => handleDepartment(department)}
                                   className=" border border-[#D6D6D6] w-fit text-[0.8vw] flex justify-center items-center md:py-[0.3vw] py-[2vw] md:px-[1vw] h-[fit-content] md:rounded-[0.3vw] rounded-[2vw] gap-[0.5vw] hover:bg-[#D6D6D6] transition-all duration-300 disabled:bg-[#fa6767]"
                                 >
                                   Edit
@@ -410,10 +409,11 @@ function InstitutionDepartments({ setActiveStep }) {
             openModal={openModal}
             allPermissions={allPermissions}
           />
-          <EditDocumentType
+          <EditDepartment
             setOpenModal={setOpenEditModal}
             openModal={openEditModal}
-            selectedDocumentType={selectedDocumentType}
+            selectedDepartment={selectedDepartment}
+            allPermissions={allPermissions}
           />
         </div>
       </div>
