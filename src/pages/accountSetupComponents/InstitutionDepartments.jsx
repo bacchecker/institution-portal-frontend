@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import {
   useCreateNextScreenMutation,
+  useDeleteDepartmentMutation,
   useDeleteDomentTypeMutation,
   useGetAllExistingDocumentTypesQuery,
   useGetAllPermissionsQuery,
@@ -25,14 +26,10 @@ function InstitutionDepartments({ setActiveStep }) {
   const [openModal, setOpenModal] = useState(false);
   const [openEditModal, setOpenEditModal] = useState(false);
   const [selectedDocumentType, setSelectedDocumentType] = useState({});
+  const [groupedPermissions, setGroupedPermissions] = useState({});
+  const [deletingIndex, setDeletingIndex] = useState(null);
 
   const user = JSON.parse(secureLocalStorage.getItem("user"));
-
-  const {
-    data: institutionDocumentTypes,
-    isLoading,
-    isFetching,
-  } = useGetInstitutionDocumentTypesQuery({ page: pageNumber });
 
   const {
     data: allPermissions,
@@ -42,24 +39,11 @@ function InstitutionDepartments({ setActiveStep }) {
 
   const {
     data: institutionDepartments,
-    // isLoading,
-    // isFetching,
+    isLoading,
+    isFetching,
   } = useGetInstitutionDepartmentsQuery({ page: pageNumber });
 
-  console.log("instit", allPermissions);
-
-  const {
-    data: existingDocumentTypes,
-    isLoading: isExistingDocTypesLoading,
-    isFetching: isExistingDocTypesFetching,
-  } = useGetAllExistingDocumentTypesQuery({
-    ...(user?.institution?.type === "bacchecker-academic" && {
-      selectedAcademicLevel: user?.institution?.academic_level,
-    }),
-    ...(user?.institution?.type !== "bacchecker-academic" && {
-      institution_type: "non-academic",
-    }),
-  });
+  console.log("groupedPermissions", groupedPermissions);
 
   const handleDocumentType = (documentType) => {
     setOpenEditModal(true);
@@ -93,10 +77,10 @@ function InstitutionDepartments({ setActiveStep }) {
   ] = useCreateNextScreenMutation();
 
   const handleSubmit = async () => {
-    if (institutionDocumentTypes?.document_types?.data?.length === 0) {
+    if (institutionDepartments?.departments?.data?.length === 0) {
       Swal.fire({
         title: "Error",
-        text: "Add at least One document type",
+        text: "Add at least One department",
         icon: "error",
         button: "OK",
       });
@@ -105,7 +89,7 @@ function InstitutionDepartments({ setActiveStep }) {
 
     try {
       await createNextScreen({
-        step: 3,
+        step: 4,
       });
     } catch (error) {
       console.error("Error moving to next page:", error);
@@ -124,7 +108,7 @@ function InstitutionDepartments({ setActiveStep }) {
         if (isOkay) {
           const updatedInstitution = {
             ...user?.institution,
-            current_step: "3",
+            current_step: "4",
           };
           window.scrollTo({
             top: 0,
@@ -138,24 +122,26 @@ function InstitutionDepartments({ setActiveStep }) {
               selectedTemplate: user.selectedTemplate,
             })
           );
-          setActiveStep(3);
+          setActiveStep(4);
         }
       });
     }
   }, [isSuccess]);
 
   const [
-    deleteDomentType,
+    deleteDepartment,
     {
-      data: documentTypeData,
-      isSuccess: isDeleteDomentTypeSuccess,
-      isLoading: isDeleteDomentTypeLoading,
+      data: departmentData,
+      isSuccess: isDeleteDepartmentSuccess,
+      isLoading: isDeleteDepartmentLoading,
     },
-  ] = useDeleteDomentTypeMutation();
+  ] = useDeleteDepartmentMutation();
 
-  const handleClickDelete = async (documentType) => {
+  const handleClickDelete = async (department, i) => {
+    setDeletingIndex(i);
+
     const result = await Swal.fire({
-      title: "Are you sure you want to delete this document type?",
+      title: "Are you sure you want to delete this department?",
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#febf4c",
@@ -165,24 +151,23 @@ function InstitutionDepartments({ setActiveStep }) {
     });
 
     if (result.isConfirmed) {
-      await deleteDomentType({ id: documentType?.id });
+      await deleteDepartment({ id: department?.id });
     }
   };
 
   useEffect(() => {
-    if (isDeleteDomentTypeSuccess) {
+    if (isDeleteDepartmentSuccess) {
       Swal.fire({
         title: "Success",
-        text: "Document Type deleted successfully",
+        text: "Department deleted successfully",
         icon: "success",
         button: "OK",
       });
     }
-  }, [isDeleteDomentTypeSuccess]);
+  }, [isDeleteDepartmentSuccess]);
 
   return (
     <>
-      {isDeleteDomentTypeLoading && <LoadingPage />}
       <div className="flex flex-col w-full">
         <div className="flex w-full relative">
           <div className="w-[75%] px-[4vw] py-[2vw] mt-[3.5vw]">
@@ -208,13 +193,154 @@ function InstitutionDepartments({ setActiveStep }) {
               </h4>
             </button>
           </div>
+
           <div className="content">
+            {!isFetching && !isLoading ? (
+              <>
+                {institutionDepartments?.departments?.data?.length > 0 ? (
+                  <>
+                    <div className="flex flex-wrap w-full gap-[1vw]">
+                      {institutionDepartments?.departments?.data?.map(
+                        (department, i) => {
+                          if (!department.permissions) return null;
+
+                          const groupedPermissions =
+                            department.permissions.reduce((acc, permission) => {
+                              const parts = permission.name.split(".");
+                              const category = parts[0];
+                              const subcategory =
+                                parts.length === 3 ? parts[1] : null;
+                              const action =
+                                parts.length === 3 ? parts[2] : parts[1];
+
+                              if (!acc[category]) acc[category] = {};
+                              if (subcategory) {
+                                if (!acc[category][subcategory])
+                                  acc[category][subcategory] = [];
+                                acc[category][subcategory].push({
+                                  id: permission.id,
+                                  action,
+                                });
+                              } else {
+                                if (!acc[category].actions)
+                                  acc[category].actions = [];
+                                acc[category].actions.push({
+                                  id: permission.id,
+                                  action,
+                                });
+                              }
+
+                              return acc;
+                            }, {});
+
+                          return (
+                            <div
+                              key={i}
+                              className="w-[49%] min-h-[20vw] border border-[#ff040449] p-[1vw] rounded-[0.2vw] relative pb-[6vw]"
+                            >
+                              <div className="text-[1vw] font-[400] mb-[1vw]">
+                                Department:{" "}
+                                <span className="font-[700]">
+                                  {department.name}
+                                </span>
+                              </div>
+                              <div className="flex flex-wrap gap-[2vw]">
+                                {Object?.entries(groupedPermissions)?.map(
+                                  ([category, subcategories]) => (
+                                    <div key={category} className="mb-[0.2vw]">
+                                      <h2 className="text-[0.9vw] capitalize font-[600]">{`Manage ${category.replace(
+                                        "-",
+                                        " "
+                                      )}`}</h2>
+                                      {Object?.entries(subcategories)?.map(
+                                        ([subcategory, actions]) => (
+                                          <div
+                                            key={subcategory}
+                                            className="ml-[0.5vw]"
+                                          >
+                                            <h3 className="text-[0.9vw] capitalize">
+                                              {subcategory.replace("-", " ")}
+                                            </h3>
+                                            {actions.map(({ id, action }) => (
+                                              <div
+                                                key={id}
+                                                className="ml-[0.5vw]"
+                                              >
+                                                <div className="flex items-center gap-[0.3vw] text-[0.9vw] cursor-pointer">
+                                                  <div className="w-[0.4vw] h-[0.2vw] bg-[#ff0404]"></div>
+                                                  {`Can ${action.replace(
+                                                    "-",
+                                                    " "
+                                                  )}`}
+                                                </div>
+                                              </div>
+                                            ))}
+                                          </div>
+                                        )
+                                      )}
+                                    </div>
+                                  )
+                                )}
+                              </div>
+                              <div className="absolute right-[1vw] bottom-[1vw] flex gap-[1vw] items-center">
+                                <button
+                                  type="button"
+                                  className=" border border-[#D6D6D6] w-fit text-[0.8vw] flex justify-center items-center md:py-[0.3vw] py-[2vw] md:px-[1vw] h-[fit-content] md:rounded-[0.3vw] rounded-[2vw] gap-[0.5vw] hover:bg-[#D6D6D6] transition-all duration-300 disabled:bg-[#fa6767]"
+                                >
+                                  Edit
+                                </button>
+                                <button
+                                  type="button"
+                                  disabled={
+                                    isDeleteDepartmentLoading &&
+                                    deletingIndex === i
+                                  }
+                                  onClick={() =>
+                                    handleClickDelete(department, i)
+                                  }
+                                  className=" border bg-[#D6D6D6] w-fit text-[0.8vw] flex justify-center items-center md:py-[0.3vw] py-[2vw] md:px-[1vw] h-[fit-content] md:rounded-[0.3vw] rounded-[2vw] gap-[0.5vw] hover:bg-[#D6D6D6] transition-all duration-300 disabled:bg-[#9b9a9a]"
+                                >
+                                  {isDeleteDepartmentLoading &&
+                                  deletingIndex === i ? (
+                                    <div className="flex items-center justify-center gap-2">
+                                      <LoadItems color={"#3f4254"} size={12} />
+                                      <h4 className="text-[0.8vw]">
+                                        Deleting...
+                                      </h4>
+                                    </div>
+                                  ) : (
+                                    <h4 className="text-[0.8vw]">Delete</h4>
+                                  )}
+                                </button>
+                              </div>
+                            </div>
+                          );
+                        }
+                      )}
+                    </div>
+                  </>
+                ) : (
+                  <div className="w-full h-[30vw] flex flex-col justify-center items-center">
+                    <img
+                      src="/assets/img/no-data.svg"
+                      alt=""
+                      className="w-[10vw]"
+                    />
+                    <h4 className="md:text-[1vw] text-[3.5vw] font-[600]">
+                      No Department Available
+                    </h4>
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="w-full h-[25vw] flex items-center justify-center">
+                <LoadItems color={"#000000"} />
+              </div>
+            )}
             <div className="w-full flex justify-end items-center md:gap-[1vw] gap-[3vw] md:mt-[1vw] mt-[4vw]">
               <h4 className="md:text-[1vw] text-[3.5vw]">
                 Page <span>{pageNumber}</span> of{" "}
-                <span>
-                  {institutionDocumentTypes?.document_types?.last_page}
-                </span>
+                <span>{institutionDepartments?.departments?.last_page}</span>
               </h4>
               <div className="flex md:gap-[1vw] gap-[3vw]">
                 <button
@@ -236,7 +362,7 @@ function InstitutionDepartments({ setActiveStep }) {
                     setPageNumber((prev) =>
                       Math.min(
                         prev + 1,
-                        institutionDocumentTypes?.document_types?.last_page
+                        institutionDepartments?.departments?.last_page
                       )
                     );
                   }}

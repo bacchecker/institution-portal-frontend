@@ -60,8 +60,6 @@ function AddNewDepartment({ setOpenModal, openModal, allPermissions }) {
     );
   };
 
-  console.log("grou", groupedPermissions);
-
   const [createDepartment, { data, isSuccess, isLoading, isError, error }] =
     useCreateDepartmentMutation();
 

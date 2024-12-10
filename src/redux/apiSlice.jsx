@@ -219,6 +219,14 @@ export const baccheckerApi = createApi({
       }),
       invalidatesTags: ["DocumentType"],
     }),
+    deleteDepartment: builder.mutation({
+      query: ({ id }) => ({
+        url: `/institution/departments/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Department"],
+    }),
+
     updateDocumentType: builder.mutation({
       query: ({ id, body }) => ({
         url: `/institution/document-types/${id}`,
@@ -252,4 +260,5 @@ export const {
   useGetInstitutionDepartmentsQuery,
   useGetAllPermissionsQuery,
   useCreateDepartmentMutation,
+  useDeleteDepartmentMutation,
 } = baccheckerApi;
