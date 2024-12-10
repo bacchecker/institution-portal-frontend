@@ -97,7 +97,7 @@
   }
   .open .overlay {
     opacity: 1 !important;
-    right: 32vw !important;
+    right: 34vw !important;
     background: rgba(0, 0, 0, 0.6) !important;
     pointer-events: auto !important;
   }
@@ -235,8 +235,8 @@
   .checkbox-design1::after {
     content: "";
     position: absolute;
-    width: 0.5vw;
-    height: 1vw;
+    width: 0.4vw;
+    height: 0.65vw;
     border-right: 0.2vw solid #fff;
     border-bottom: 0.2vw solid #fff;
     top: 40%;

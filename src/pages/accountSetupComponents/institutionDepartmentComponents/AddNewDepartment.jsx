@@ -184,21 +184,21 @@ function AddNewDepartment({ setOpenModal, openModal, allPermissions }) {
             <h4 className="md:text-[1vw] text-[4vw] mb-1">
               Permissions<span className="text-[#f1416c]">*</span>
             </h4>
-            <div className="flex gap-[2vw] flex-wrap">
+            <div className="flex gap-[3vw] flex-wrap">
               {Object?.entries(groupedPermissions)?.map(
                 ([category, subcategories]) => (
                   <div key={category} className="mb-[0.2vw]">
-                    <h2 className="text-[1vw] capitalize">{`Manage ${category.replace(
+                    <h2 className="text-[0.9vw] capitalize font-[600]">{`Manage ${category.replace(
                       "-",
                       " "
                     )}`}</h2>
                     {Object?.entries(subcategories)?.map(
                       ([subcategory, actions]) => (
-                        <div key={subcategory} style={{ marginLeft: "1rem" }}>
+                        <div key={subcategory} className="ml-[0.5vw]">
                           <h3 className="text-[0.9vw] capitalize">{subcategory.replace("-", " ")}</h3>
                           {actions.map(({ id, action }) => (
-                            <div key={id} style={{ marginLeft: "1.5rem" }}>
-                              <label className="flex items-center">
+                            <div key={id} className="ml-[0.5vw]">
+                              <label className="flex items-center gap-[0.3vw] text-[0.9vw] cursor-pointer">
                                 <input
                                   type="checkbox"
                                   className="checkbox-design1"
