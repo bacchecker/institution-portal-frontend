@@ -29,7 +29,7 @@ export function AccordianItem({ children, value, trigger, ...props }) {
       <header
         role="button"
         onClick={() => setSelected(open ? null : value)}
-        className={`flex justify-between items-center p-4 font-medium bg-white ${open ? "md:rounded-tl-[0.5vw] md:rounded-tr-[0.5vw] rounded-tl-[1.5vw] rounded-tr-[1.5vw]": "md:rounded-[0.5vw] rounded-[1.5vw]"}`}
+        className={`flex justify-between items-center p-4 font-medium bg-white ${open ? "md:rounded-tl-[0.5vw] md:rounded-tr-[0.5vw] rounded-tl-[1.5vw] rounded-tr-[1.5vw]": "md:rounded-[0.3vw] rounded-[1.5vw]"}`}
       >
         {trigger}
         <i className="bx bx-plus md:text-[1.5vw] text-[3vw]"></i>

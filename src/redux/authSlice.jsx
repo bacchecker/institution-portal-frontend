@@ -18,17 +18,25 @@ export const authSlice = createSlice({
         "user",
         JSON.stringify({
           user: action.payload.user,
-          token: action.payload.token,
           two_factor: action.payload.two_factor,
           institution: action.payload.institution,
           selectedTemplate: action.payload.selectedTemplate,
         })
       );
       state.user = action.payload.user;
-      state.token = action.payload.token;
       state.two_factor = action.payload.two_factor;
       state.institution = action.payload.institution;
       state.selectedTemplate = action.payload.selectedTemplate;
+    },
+    setUserToken: (state, action) => {
+      secureLocalStorage.setItem(
+        "userToken",
+        JSON.stringify({
+          token: action.payload.token,
+        })
+      );
+
+      state.token = action.payload.token;
     },
     logout: (state) => {
       secureLocalStorage.clear();
@@ -41,6 +49,6 @@ export const authSlice = createSlice({
   },
 });
 
-export const { setUser, logout } = authSlice.actions;
+export const { setUser, logout, setUserToken } = authSlice.actions;
 
 export default authSlice.reducer;

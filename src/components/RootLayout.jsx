@@ -1,15 +1,17 @@
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import secureLocalStorage from "react-secure-storage";
 import { useDispatch } from "react-redux";
 import { useGetInstitutionDetailsQuery } from "../redux/apiSlice";
 import { useEffect } from "react";
-import { setUser } from "../redux/authSlice";
+import { setUser, setUserToken } from "../redux/authSlice";
 
 function RootLayout({ children }) {
   const { pathname } = useLocation();
   const dispatch = useDispatch();
-  const user = JSON?.parse(secureLocalStorage?.getItem("user"));
+  const navigate = useNavigate();
+
+  const user = JSON.parse(secureLocalStorage.getItem("user"));
 
   const {
     data: institutionDetails,
@@ -18,36 +20,34 @@ function RootLayout({ children }) {
   } = useGetInstitutionDetailsQuery();
 
   useEffect(() => {
-    if (institutionDetails) {
+    if (institutionDetails && user) {
       dispatch(
         setUser({
-          user: institutionDetails?.institutionData?.user,
-          token: user?.token,
-          two_factor: user?.two_factor,
-          institution: institutionDetails?.institutionData?.institution,
-          selectedTemplate: user?.selectedTemplate,
+          user: institutionDetails.institutionData?.user,
+          two_factor: user.two_factor,
+          institution: institutionDetails.institutionData?.institution,
+          selectedTemplate: user.selectedTemplate,
         })
       );
     }
-  }, [institutionDetails]);
+  }, [institutionDetails, user, dispatch]);
 
   useEffect(() => {
-    if (isError) {
-      if (error?.data?.message === "Unauthenticated.") {
-        navigate("/");
-      }
+    if (isError && error?.data?.message === "Unauthenticated.") {
+      navigate("/");
     }
-  }, [isError]);
+  }, [isError, error, navigate]);
+
   return (
     <>
       {pathname === "/2fa-authentication" ||
-      pathname === "/2fa-authentication-success" ||
-      user?.two_factor ||
-      !user?.institution?.setup_done ? (
+      pathname === "/2fa-authentication-success" ? (
         <div className="flex flex-col p-[5vw] items-center">{children}</div>
       ) : pathname === "/account-under-review" ||
         pathname === "/account-setup" ? (
-        <div className="flex flex-col  items-center">{children}</div>
+        <div className="flex flex-col items-center">{children}</div>
+      ) : !user?.institution?.setup_done ? (
+        <div className="flex flex-col items-center">{children}</div>
       ) : (
         <div className="flex w-full relative">
           <Sidebar />

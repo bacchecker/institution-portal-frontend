@@ -5,26 +5,12 @@ import { useNavigate } from "react-router-dom";
 
 function AccountUnderReview() {
   const [openModal, setOpenModal] = useState(false);
-  const [currentScreen, setCurrentScreen] = useState();
   const navigate = useNavigate();
   const user = JSON?.parse(secureLocalStorage?.getItem("user"));
-  useEffect(() => {
-    if (user?.institution?.status === "active") {
-      navigate(-1);
-    }
-  }, [user?.institution?.status, navigate]);
-
-  useEffect(() => {
-    if (user && user?.institution?.status === "inactive") {
-      setCurrentScreen(1);
-    } else {
-      setCurrentScreen(2);
-    }
-  }, [user]);
 
   return (
     <>
-      {currentScreen === 1 && (
+      {user.institution.status === "inactive" ? (
         <>
           <div className="w-full h-[8vw] bg-[#ff0404] relative">
             <div className="bg-[#D9D9D9] absolute-pos-justify-center w-[10vw] h-[10vw] rounded-[50%] mt-[5vw]"></div>
@@ -107,7 +93,7 @@ function AccountUnderReview() {
             <button
               type="button"
               onClick={() => setOpenModal(true)}
-              className=" bg-[#FF0404] w-fit md:mt-0 mt-[3vw] flex justify-center items-center md:py-[0.6vw] py-[2vw] md:px-[1.5vw] px-[2vw] h-[fit-content] md:rounded-[0.5vw] rounded-[2vw] gap-[0.5vw] hover:bg-[#ef4545] transition-all duration-300"
+              className=" bg-[#FF0404] w-fit md:mt-0 mt-[3vw] flex justify-center items-center md:py-[0.6vw] py-[2vw] md:px-[1.5vw] px-[2vw] h-[fit-content] md:rounded-[0.3vw] rounded-[2vw] gap-[0.5vw] hover:bg-[#ef4545] transition-all duration-300"
             >
               <img src="/assets/img/tickets.svg" alt="" />
               <h4 className="md:text-[0.9vw] text-[3.5vw] text-[#ffffff]">
@@ -140,8 +126,7 @@ function AccountUnderReview() {
           </div>
           <IssueTicket setOpenModal={setOpenModal} openModal={openModal} />
         </>
-      )}
-      {currentScreen === 2 && (
+      ) : (
         <div className="flex flex-col justify-center items-center w-full h-[100vh]">
           <div className="">
             <img src="/assets/img/success.svg" alt="" className="w-[25vw]" />
@@ -168,7 +153,7 @@ function AccountUnderReview() {
             <button
               type="button"
               onClick={() => navigate("/account-setup")}
-              className=" bg-[#FF0404] w-fit md:mt-0 mt-[3vw] flex justify-center items-center md:py-[0.6vw] py-[2vw] md:px-[1.5vw] px-[2vw] h-[fit-content] md:rounded-[0.5vw] rounded-[2vw] gap-[0.5vw] hover:bg-[#ef4545] transition-all duration-300"
+              className=" bg-[#FF0404] w-fit md:mt-0 mt-[3vw] flex justify-center items-center md:py-[0.6vw] py-[2vw] md:px-[1.5vw] px-[2vw] h-[fit-content] md:rounded-[0.3vw] rounded-[2vw] gap-[0.5vw] hover:bg-[#ef4545] transition-all duration-300"
             >
               {/* <img src="/assets/img/tickets.svg" alt="" /> */}
               <h4 className="md:text-[0.9vw] text-[3.5vw] text-[#ffffff]">

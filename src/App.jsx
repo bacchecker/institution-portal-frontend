@@ -13,6 +13,7 @@ import AccountSetup from "./pages/AccountSetup";
 import Dashboard from "./pages/Dashboard";
 import AccountSetupProtectedRoute from "./components/AccountSetupProtectedRoute";
 import AccountUnderReviewProtection from "./components/AccountUnderReviewProtection";
+import AccountSetupProtection from "./components/AccountSetupProtection";
 
 function App() {
   return (
@@ -33,9 +34,9 @@ function App() {
                     path="/account-under-review"
                     element={
                       <AuthenticatedSuccessProtectedRoute>
-                        <AccountUnderReviewProtection>
+                        {/* <AccountUnderReviewProtection> */}
                           <AccountUnderReview />
-                        </AccountUnderReviewProtection>
+                        {/* </AccountUnderReviewProtection> */}
                       </AuthenticatedSuccessProtectedRoute>
                     }
                   />
@@ -43,7 +44,9 @@ function App() {
                     path="/account-setup"
                     element={
                       <AuthenticatedSuccessProtectedRoute>
-                        <AccountSetup />
+                        <AccountSetupProtection>
+                          <AccountSetup />
+                        </AccountSetupProtection>
                       </AuthenticatedSuccessProtectedRoute>
                     }
                   />

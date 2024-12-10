@@ -15,7 +15,7 @@ function Sidebar() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = JSON?.parse(secureLocalStorage?.getItem("user"))?.user;
-  const token = JSON?.parse(secureLocalStorage?.getItem("user"))?.token;
+  const token = JSON?.parse(secureLocalStorage?.getItem("userToken"))?.token;
 
   const handleDropdownToggle = (dropdownId) => {
     setActiveDropdown(activeDropdown === dropdownId ? null : dropdownId);
@@ -48,8 +48,6 @@ function Sidebar() {
   const [logoutUser, { data, isSuccess, isLoading, isError, error }] =
     useLogoutUserMutation();
 
-  console.log("activeDropdown", activeDropdown);
-
   const handleLogout = async () => {
     await logoutUser({ token });
   };
@@ -73,10 +71,10 @@ function Sidebar() {
   }, [isSuccess, data]);
 
   useEffect(() => {
-    if (error) {
+    if (isError) {
       toast.error(error?.data?.message);
     }
-  }, [error]);
+  }, [isError]);
 
   return (
     <>
@@ -133,7 +131,7 @@ function Sidebar() {
                   <Link
                     to="/overview"
                     onClick={() => handleDropdownToggle("close")}
-                    className={`flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[10vw] md:rounded-[0.5vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] ${
+                    className={`flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[10vw] md:rounded-[0.3vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] ${
                       pathname === "/overview" && "active"
                     }`}
                   >
@@ -146,7 +144,7 @@ function Sidebar() {
                 <li className="dropdown-side">
                   <button
                     onClick={() => handleDropdownToggle("service")}
-                    className="flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[15vw] md:rounded-[0.5vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] relative"
+                    className="flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[15vw] md:rounded-[0.3vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] relative"
                   >
                     <i className="bx bx-file-blank md:text-[1.3vw] text-[5vw]"></i>
                     <span className="md:text-[1.1vw] text-[4vw]">Service</span>
@@ -214,7 +212,7 @@ function Sidebar() {
                   <Link
                     to="/payment"
                     onClick={() => handleDropdownToggle("close")}
-                    className={`flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[15vw] md:rounded-[0.5vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] ${
+                    className={`flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[15vw] md:rounded-[0.3vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] ${
                       pathname === "/payment" && "active"
                     }`}
                   >
@@ -228,7 +226,7 @@ function Sidebar() {
                   <Link
                     to="/notification"
                     onClick={() => handleDropdownToggle("close")}
-                    className={`flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[15vw] md:rounded-[0.5vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] ${
+                    className={`flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[15vw] md:rounded-[0.3vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] ${
                       pathname === "/notification" && "active"
                     }`}
                   >
@@ -241,7 +239,7 @@ function Sidebar() {
                 <li className="dropdown-side">
                   <button
                     onClick={() => handleDropdownToggle("support")}
-                    className="flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[15vw] md:rounded-[0.5vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] relative"
+                    className="flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[15vw] md:rounded-[0.3vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] relative"
                   >
                     <i className="bx bx-wrench md:text-[1.3vw] text-[5vw]"></i>
                     <span className="md:text-[1.1vw] text-[4vw]">
@@ -309,7 +307,7 @@ function Sidebar() {
                   <Link
                     to="account-settings"
                     onClick={() => handleDropdownToggle("close")}
-                    className={`flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[15vw] md:rounded-[0.5vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] ${
+                    className={`flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[15vw] md:rounded-[0.3vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] ${
                       pathname === "/account-settings" && "active"
                     }`}
                   >
@@ -323,7 +321,7 @@ function Sidebar() {
                   <Link
                     to="system-logs"
                     onClick={() => handleDropdownToggle("close")}
-                    className={`flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[15vw] md:rounded-[0.5vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] ${
+                    className={`flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[15vw] md:rounded-[0.3vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] ${
                       pathname === "/system-logs" && "active"
                     }`}
                   >
@@ -337,7 +335,7 @@ function Sidebar() {
                   <Link
                     to="/profile"
                     onClick={() => handleDropdownToggle("close")}
-                    className={`flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[15vw] md:rounded-[0.5vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] ${
+                    className={`flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[15vw] md:rounded-[0.3vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] ${
                       pathname === "/profile" && "active"
                     }`}
                   >

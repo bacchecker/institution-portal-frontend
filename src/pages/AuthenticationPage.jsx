@@ -6,14 +6,14 @@ import { useResendOTPMutation, useVerifyOTPMutation } from "../redux/apiSlice";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { setUser } from "../redux/authSlice";
+import { setUser, setUserToken } from "../redux/authSlice";
 import Swal from "sweetalert2";
 
 function AuthenticationPage() {
   const [otpCode, setOTPCode] = useState("");
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const token = JSON?.parse(secureLocalStorage?.getItem("user"))?.token;
+  const token = JSON?.parse(secureLocalStorage?.getItem("userToken"))?.token;
 
   const [verifyOTP, { data, isSuccess, isLoading, isError, error }] =
     useVerifyOTPMutation();
@@ -38,22 +38,24 @@ function AuthenticationPage() {
 
   useEffect(() => {
     if (isSuccess && data) {
-      console.log("data", data);
-
       if (data?.data) {
         dispatch(
           setUser({
             user: data?.data?.user,
-            token: data?.data?.token,
             two_factor: false,
             institution: data?.data?.institution,
             selectedTemplate: data?.data?.selectedTemplate,
           })
         );
+        dispatch(
+          setUserToken({
+            token: data?.data?.token,
+          })
+        );
         Swal.fire({
           title: "Success",
           text: "2fa authentication done successfully",
-          // icon: "success",
+          icon: "success",
           button: "OK",
           confirmButtonColor: "#ff0404",
         }).then((isOkay) => {
@@ -176,7 +178,7 @@ function AuthenticationPage() {
             isTypeNumber
             inputProps={{
               className:
-                "otp-input text-[#ff0000] text-center md:w-[3vw] w-[10vw] md:h-[3vw] h-[10vw] md:text-[1.1vw] text-[5vw] focus:outline-none border-2 bg-[#E9E9E9] border-[#E5E5E5] md:rounded-[0.5vw] rounded-[1vw]",
+                "otp-input text-[#ff0000] text-center md:w-[3vw] w-[10vw] md:h-[3vw] h-[10vw] md:text-[1.1vw] text-[5vw] focus:outline-none border-2 bg-[#E9E9E9] border-[#E5E5E5] md:rounded-[0.3vw] rounded-[1vw]",
               disabled: false,
             }}
           />

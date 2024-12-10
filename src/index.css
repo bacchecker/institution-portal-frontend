@@ -72,3 +72,67 @@ input[type="number"] {
 .green {
   background-color: #00780c;
 }
+
+.action-button-class {
+  display: flex;
+  font-size: 0.8rem;
+  width: fit-content;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.25rem;
+  background: #f9f9f9;
+  color: #7e8299;
+  align-items: center;
+}
+.action-dropdown-class {
+  width: 10rem;
+  position: absolute;
+  display: flex;
+  border-radius: 0.25rem;
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+  box-shadow: 0px 1px 2px -1px rgba(0, 0, 0, 0.1),
+    0px 1px 3px 0px rgba(0, 0, 0, 0.1);
+  border: 1px solid #ddd;
+  background: #fff;
+  z-index: 60 !important;
+}
+.action-dropdown-content {
+  width: 100%;
+}
+.action-dropdown-content .dropdown-item {
+  text-align: left;
+  width: 100%;
+  padding: 0.3rem;
+  font-size: 0.8rem;
+  transition: all 0.2s;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+.action-dropdown-content .dropdown-item:hover {
+  background: #ddd;
+}
+
+.loading-div-active {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  background: #0000006d;
+  z-index: 100000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+div:where(.swal2-container) h2:where(.swal2-title) {
+  font-size: 1vw !important;
+}
+
+div:where(.swal2-container) button:where(.swal2-styled):where(.swal2-cancel) {
+  border: 1px solid #ff0404 !important;
+  font-size: 1vw !important;
+  color: #ff0404;
+  background: transparent !important;
+}
