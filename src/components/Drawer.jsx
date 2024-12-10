@@ -84,7 +84,7 @@ export default function Drawer({
                     }
                   />
                 )}
-                <h3 className="font-montserrat font-bold text-gray-900 dark:text-white text-lg">
+                <h3 className="font-montserrat font-semibold text-gray-900 dark:text-white text-lg">
                   {title}
                 </h3>
               </div>

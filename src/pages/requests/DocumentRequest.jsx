@@ -43,6 +43,8 @@ import { FaChevronLeft, FaChevronRight, FaHeart } from "react-icons/fa6";
 import { IoDocuments } from "react-icons/io5";
 import { PiQueueFill } from "react-icons/pi";
 import { FcCancel } from "react-icons/fc";
+import { MdOutlineFileDownload, MdOutlineFilterAlt } from "react-icons/md";
+import { MdOutlineFilterAltOff } from "react-icons/md";
 
 const ItemCard = ({ title, value }) => (
   <div className="flex gap-4 items-center">
@@ -67,24 +69,33 @@ export default function DocumentRequest() {
   const [processing, setProcessing] = useState(false);
   const [dragActive, setDragActive] = useState(false);
   const [documentRequests, setDocumentRequests] = useState([]);
+  const [documentTypes, setDocumentTypes] = useState([]);
   const [sortBy, setSortBy] = useState(null);
+  const [status, setStatus] = useState(null);
   const [sortOrder, setSortOrder] = useState("asc");
-  const [filters, setFilters] = useState({
-    search_query: "",
-    status: "",
-  });
+ 
   const { mutate } = useSWRConfig();
+  const [allRequests, setAllRequests] = useState(0);
   const [pending, setPending] = useState(0);
   const [rejected, setRejected] = useState(0);
   const [approved, setApproved] = useState(0);
+  const [filters, setFilters] = useState({
+    search_query: "",
+    document_type: null,
+    start_date: null,
+    end_date: null,
+  });
+
+const [submittedFilters, setSubmittedFilters] = useState({});
 
   const institutionDocumentRequests = async () => {
     setIsLoading(true)
     try {
       const response = await axios.get("/institution/requests/document-requests", {
         params: {
-          search,
+          ...submittedFilters,
           page: currentPage,
+          status: status,
           sort_by: sortBy,
           sort_order: sortOrder,
         },
@@ -92,14 +103,15 @@ export default function DocumentRequest() {
 
       const docRequest = response.data.paginatedRequests;
 
-    setPending(response.data.pending)
-    setApproved(response.data.approved)
-    setRejected(response.data.rejected)
-    setDocumentRequests(docRequest.data);
-    setCurrentPage(docRequest.current_page);
-    setLastPage(docRequest.last_page);
-    setTotal(docRequest.total);
-    setIsLoading(false);
+      setAllRequests(response.data.allRequests)
+      setPending(response.data.pending)
+      setApproved(response.data.approved)
+      setRejected(response.data.rejected)
+      setDocumentRequests(docRequest.data);
+      setCurrentPage(docRequest.current_page);
+      setLastPage(docRequest.last_page);
+      setTotal(docRequest.total);
+      setIsLoading(false);
 
     } catch (error) {
       console.error("Error fetching institution documents:", error);
@@ -108,8 +120,29 @@ export default function DocumentRequest() {
   };
 
   useEffect(() => {
+    const fetchInstitutionDocs = async () => {
+      try {
+        const response = await axios.get("/institution/document_types");
+        const uniqueDocumentTypes = [
+          ...new Map(
+            response.data.documents.map((doc) => [
+              doc.document_type.id,
+              { key: doc.document_type.id, name: doc.document_type.name },
+            ])
+          ).values(),
+        ];
+        setDocumentTypes(uniqueDocumentTypes);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchInstitutionDocs();
+  }, []);
+
+  useEffect(() => {
     institutionDocumentRequests();
-  }, [search, currentPage, sortBy, sortOrder]);
+  }, [submittedFilters, currentPage, sortBy, sortOrder, status]);
 
   const handlePageChange = (page) => {
     if (page >= 1 && page <= lastPage) {
@@ -135,6 +168,12 @@ export default function DocumentRequest() {
     return pages;
   };
 
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    setSubmittedFilters({ ...filters });
+    setCurrentPage(1); // Reset to first page on filter submit
+  };
+
 
   const handleBulkDownload = async (filePaths) => {
     try {
@@ -145,7 +184,6 @@ export default function DocumentRequest() {
         "Content-Type": "application/json",
       };
 
-      // Only add X-CSRF-TOKEN if the token exists
       if (csrfToken) {
         headers["X-CSRF-TOKEN"] = csrfToken;
       }
@@ -246,107 +284,121 @@ export default function DocumentRequest() {
     }
   };
 
+  const handleDocumentTypeChange = (event) => {
+    setFilters({ ...filters, document_type: event.target.value });
+  };
+
   return (
     <div title="Document Request">
       <section className="px-2">
-        <Card className="md:w-full w-[98vw] mx-auto rounded-none dark:bg-slate-900">
+        <Card className="md:w-full w-[98vw] mx-auto rounded-none shadow-none border-none dark:bg-slate-900">
           <CardBody className="w-full">
-            <form method="get" className="flex flex-row gap-3 items-center">
-              <input type="hidden" name="start_date" value={dateRange.start} />
-              <input type="hidden" name="end_date" value={dateRange.end} />
-
+            <form onSubmit={handleSubmit} className="flex flex-row gap-3 items-center">
               <Input
+                radius="none"
                 name="search_query"
                 placeholder="Search unique code, user name, user phone number"
-                defaultValue={filters.search_query}
-                // startContent={<SearchIconDuotone />}
-                size="sm"
-                className="max-w-xs min-w-[200px]"
+                value={filters.search_query}
+                onChange={(e) => setFilters({ ...filters, search_query: e.target.value })}
+                size="md"
+                className="max-w-xs min-w-[200px] rounded-sm"
               />
-              {/* 
+
               <Select
-                size="sm"
+                aria-label="Document Type"
+                radius="none"
+                size="md"
                 placeholder="Document Type"
-                className="max-w-xs"
+                className="max-w-[230px] min-w-[230px] rounded-sm"
                 name="document_type"
-                defaultSelectedKeys={[filters?.document_type]}
+                value={filters.document_type || ""}
+                onChange={handleDocumentTypeChange}
               >
                 {documentTypes.map((item) => (
-                  <SelectItem key={item.key}>{item.label}</SelectItem>
-                ))}
-              </Select> */}
-
-              <Select
-                size="sm"
-                placeholder="Status"
-                className="max-w-[130px] min-w-[130px]"
-                name="status"
-                defaultSelectedKeys={[filters?.status]}
-              >
-                {[
-                  {
-                    key: "active",
-                    label: "Active",
-                  },
-                  {
-                    key: "inactive",
-                    label: "Inactive",
-                  },
-                ].map((item) => (
-                  <SelectItem key={item.key}>{item.label}</SelectItem>
+                  <SelectItem key={item.key} value={item.key}>
+                    {item.name}
+                  </SelectItem>
                 ))}
               </Select>
+
               <DateRangePicker
+                radius="none"
                 visibleMonths={2}
-                className="w-[30%]"
+                className="w-[30%] rounded-sm"
                 onChange={(date) => {
-                  let newStartDate;
                   if (date) {
-                    newStartDate = new Date(
-                      date.start.year,
-                      date.start.month - 1, // month is 0-based
-                      date.start.day
-                    ).toDateString();
-                  }
+                    const newStartDate = new Date(date.start.year, date.start.month - 1, date.start.day)
+                      .toISOString()
+                      .split("T")[0];
+                    const newEndDate = new Date(date.end.year, date.end.month - 1, date.end.day)
+                      .toISOString()
+                      .split("T")[0];
 
-                  let newEndDate;
-                  if (date) {
-                    newEndDate = new Date(
-                      date.end.year,
-                      date.end.month - 1, // month is 0-based
-                      date.end.day
-                    ).toDateString();
+                    setFilters({ ...filters, start_date: newStartDate, end_date: newEndDate });
                   }
-
-                  setDateRange({
-                    start: moment(newStartDate, "ddd MMM DD YYYY")
-                      .format("YYYY-MM-DD")
-                      .toString(),
-                    end: moment(newEndDate, "ddd MMM DD YYYY")
-                      .format("YYYY-MM-DD")
-                      .toString(),
-                  });
                 }}
               />
-
-              <Button size="sm" type="submit" color="danger">
-                Filter
-              </Button>
+              <div className="flex space-x-2">
+                
+                <Button
+                  startContent={<MdOutlineFilterAlt size={17}/>}
+                  radius="none"
+                  size="sm"
+                  type="submit"
+                  className="rounded-sm bg-bChkRed text-white"
+                >
+                  Filter
+                </Button>
+                <Button
+                  startContent={<MdOutlineFilterAltOff size={17}/>}
+                  radius="none"
+                  size="sm"
+                  type="button"
+                  className="rounded-sm bg-black text-white"
+                  onClick={() => {
+                    setFilters({
+                      search_query: "",
+                      document_type: null,
+                      start_date: null,
+                      end_date: null,
+                    });
+              
+                    setSubmittedFilters({
+                      search_query: "",
+                      document_type: null,
+                      start_date: null,
+                      end_date: null,
+                    });
+              
+                  }}
+                >
+                  Delete
+                </Button>
+              </div>
+              
             </form>
           </CardBody>
         </Card>
         <Card className="my-3 md:w-full w-[98vw] mx-auto border-none shadow-none rounded-lg dark:bg-slate-900">
           <CardBody className="grid w-full grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="rounded-md bg-gray-100 p-4 flex space-x-4">
+            <div
+              onClick={() => {
+                setStatus('allRequests')
+              }}
+              className="rounded-md bg-gray-100 p-4 flex space-x-4 cursor-pointer">
                 <div className="flex items-center justify-center bg-purple-200 text-purple-800 rounded-full w-10 h-10">
                   <IoDocuments size={18}/>
                 </div>
                 <div className="">
                   <p className="font-medium">Total Documents</p>
-                  <p className="text-gray-500">{total}</p>
+                  <p className="text-gray-500">{allRequests}</p>
                 </div>
             </div>
-            <div className="rounded-md bg-gray-100 p-4 flex space-x-4">
+            <div
+              onClick={() => {
+                setStatus('pending')
+              }}
+              className="rounded-md bg-gray-100 p-4 flex space-x-4 cursor-pointer">
                 <div className="flex items-center justify-center bg-yellow-200 text-yellow-500 rounded-full w-10 h-10">
                   <PiQueueFill size={18}/>
                 </div>
@@ -355,7 +407,11 @@ export default function DocumentRequest() {
                   <p className="text-gray-500">{pending}</p>
                 </div>
             </div>
-            <div className="rounded-md bg-gray-100 p-4 flex space-x-4">
+            <div
+              onClick={() => {
+                setStatus('approved')
+              }}
+              className="rounded-md bg-gray-100 p-4 flex space-x-4 cursor-pointer">
                 <div className="flex items-center justify-center bg-green-200 text-green-600 rounded-full w-10 h-10">
                   <FaHeart size={18}/>
                 </div>
@@ -364,7 +420,11 @@ export default function DocumentRequest() {
                   <p className="text-gray-500">{approved}</p>
                 </div>
             </div>
-            <div className="rounded-md bg-gray-100 p-4 flex space-x-4">
+            <div
+              onClick={() => {
+                setStatus('rejected')
+              }}
+              className="rounded-md bg-gray-100 p-4 flex space-x-4 cursor-pointer">
                 <div className="flex items-center justify-center bg-red-200 text-red-600 rounded-full w-10 h-10">
                   <FcCancel size={18}/>
                 </div>
@@ -488,94 +548,122 @@ export default function DocumentRequest() {
         classNames="w-[100vw] md:w-[40vw]"
       >
         <div className="h-full flex flex-col justify-between">
-          <div className="flex flex-col gap-2 mb-6">
-            <div className="flex flex-col gap-1">
-              <ItemCard title="Request ID" value={data?.unique_code} />
-              <ItemCard
-                title="Requested On"
-                value={moment(data?.created_at).format("Do MMMM, YYYY")}
-              />
-
-              <ItemCard
-                title="Delivery Address"
-                value={data?.delivery_address}
-              />
-              <ItemCard title="Total Cost (GH¢)" value={data?.total_amount} />
+          <div className="flex flex-col -mt-2 xl:pl-2 font-semibold">
+            <div className="grid grid-cols-3 gap-y-4 gap-x-2 border-b pb-4">
+              <div className="text-gray-500">
+                Request ID
+              </div>
+              <div className="col-span-2">
+                #{data?.unique_code}
+              </div>
+              <div className="text-gray-500">
+                Requested Date
+              </div>
+              <div className="col-span-2">
+                {moment(data?.created_at).format("Do MMMM, YYYY")}
+              </div>
+              <div className="text-gray-500">
+                Delivery Address
+              </div>
+              <div className="col-span-2">
+                {data?.delivery_address}
+              </div>
+              <div className="text-gray-500">
+                Total Cash
+              </div>
+              <div className="col-span-2">
+              GH¢ {data?.total_amount}
+              </div>
             </div>
-
-            <Card className="dark:bg-slate-950">
-              <CardHeader>
-                <p className="font-bold">Applicant Info</p>
-              </CardHeader>
-              <CardBody>
-                <div className="flex gap-3">
-                  <CustomUser
-                    avatarSrc={data?.user?.profile_photo_url}
-                    name={`${data?.user?.first_name} ${data?.user?.last_name}`}
-                    email={`${data?.user?.email}`}
-                  />
-
-                  <div className="grid grid-cols-5 gap-1">
-                    <p className="font-semibold">Phone:</p>
-                    <p className="col-span-4">{data?.user?.phone}</p>
-                  </div>
+            <div className="py-4">
+              <p className="font-semibold mb-4 text-base">Applicant Details</p>
+              <div className="grid grid-cols-3 gap-y-4 border-b pb-4">
+                <div className="text-gray-500">
+                  Applicant Name
                 </div>
-              </CardBody>
-            </Card>
+                <div className="col-span-2">
+                  {data?.user?.first_name} {data?.user?.other_name} {data?.user?.last_name}
+                </div>
+                <div className="text-gray-500">
+                  Applicant Email
+                </div>
+                <div className="col-span-2">
+                  {data?.user?.email}
+                </div>
+                <div className="text-gray-500">
+                  Phone Number
+                </div>
+                <div className="col-span-2">
+                  {data?.user?.phone}
+                </div>
+                <div className="text-gray-500 mt-2">
+                  Applicant Picture
+                </div>
+                <div className="col-span-2 w-10 h-10 rounded-full bg-gray-200">
+                  <img src={data?.user?.profile_photo_url} alt="" />
+                </div>
+              </div>
+            </div>
+            <div className="pb-2">
+              <p className="font-semibold mb-4 text-base">Document Request Summary</p>
+              <div className="grid grid-cols-3 gap-y-4 border-b pb-4">
+                <div className="text-gray-500">
+                  {data?.document_type.name}
+                </div>
+                <div className="col-span-2">
+                  {data?.document_type.description}
+                </div>
+                <div className="text-gray-500">
+                  Status
+                </div>
+                <div
+                  className={`col-span-2 flex items-center justify-center py-1 space-x-2 w-28 
+                    ${
+                      data?.status === 'cancelled' || data?.status === 'rejected'
+                        ? 'text-red-600 bg-red-200'
+                        : data?.status === 'completed'
+                        ? 'text-green-600 bg-green-200'
+                        : data?.status === 'processing' || data?.status === 'received'
+                        ? 'text-yellow-600 bg-yellow-200'
+                        : 'text-gray-600 bg-gray-200'
+                    }`}
+                >
+                  <div
+                    className={`h-2 w-2 rounded-full ${
+                      data?.status === 'cancelled' || data?.status === 'rejected'
+                        ? 'bg-red-600'
+                        : data?.status === 'completed'
+                        ? 'bg-green-600'
+                        : data?.status === 'processing' || data?.status === 'received'
+                        ? 'bg-yellow-600'
+                        : 'bg-gray-600'
+                    }`}
+                  ></div>
+                  <p>{data?.status.charAt(0).toUpperCase() + data?.status.slice(1)}</p>
+                </div>
 
-            <Card className="dark:bg-slate-950">
-              <CardHeader className="flex justify-between">
-                <p className="font-bold">Document Request Summary</p>
-
-                <ItemCard
-                  title="Status"
-                  value={<StatusChip status={data?.status} />}
-                />
-              </CardHeader>
-
-              <CardBody className="flex flex-col gap-3 px-2">
-                <div className="w-full grid grid-cols-2 xl:grid-cols-3 gap-2">
-                  {/* Document type and description */}
-                  <div className="col-span-2 flex items-center space-x-4 w-full">
-                    <div>
-                      <p className="font-medium text-gray-700">
-                        {data?.document_type.name}
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        {data?.document_type?.description}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Copies, Format, and Total Amount */}
-                  <div className="text-sm font-semibold text-gray-700">
-                    <div className="grid grid-cols-2 gap-2">
-                      <p className="">Copies:</p>
-                      <p className="">{data?.number_of_copies}</p>
-                    </div>
-                    <div className="grid grid-cols-2 gap-2">
-                      <p className="">Format:</p>
-                      <p className="">
-                        {data?.document_format === "soft_copy"
+                <div className="text-gray-500">
+                  Format
+                </div>
+                <div className="col-span-2">
+                  {data?.document_format === "soft_copy"
                           ? "Soft Copy"
                           : "Hard Copy"}
-                      </p>
-                    </div>
-                    <div className="grid grid-cols-2 gap-2">
-                      <p className="">Total Amt:</p>
-                      <p>GH¢ {Math.floor(data?.total_amount).toFixed(2)}</p>
-                    </div>
-                  </div>
                 </div>
-              </CardBody>
-            </Card>
+                <div className="text-gray-500">
+                  Copies
+                </div>
+                <div className="col-span-2">
+                  {data?.number_of_copies} Copies
+                </div>
+              </div>
+            </div>
 
             {data?.document_format == "soft_copy" ? (
-              <div className="mt-11">
+              <div className="mb-4">
                 <section className="mb-3 flex items-center justify-between">
                   <div className="flex gap-2 items-center">
-                    <ClipIcon />
-                    <p className="font-semibold ">Attachmets</p>
+                    <p className="font-semibold text-base">Attachments</p>
                   </div>
 
                   {data?.files.length >= 1 && (
@@ -596,7 +684,7 @@ export default function DocumentRequest() {
                   )}
                 </section>
 
-                <section className="grid grid-cols-2 gap-3">
+                <section className="w-full grid grid-cols-2 gap-3">
                   {data?.files.length >= 1 ? (
                     data?.files?.map((item) => (
                       <div
@@ -616,7 +704,7 @@ export default function DocumentRequest() {
                           <div className="flex justify-between items-center mt-auto">
                             <p>{filesize(item.size)}</p>
                             <p
-                              className="cursor-pointer p-1 rounded-lg bg-primary text-white text-xs"
+                              className="cursor-pointer px-2 py-1 rounded-md bg-primary text-white text-xs"
                               onClick={() => {
                                 window.location.href =
                                   "https://backend.baccheck.online/api/document/download" +
@@ -624,14 +712,14 @@ export default function DocumentRequest() {
                                   encodeURIComponent(item.path);
                               }}
                             >
-                              Download
+                              <MdOutlineFileDownload size={20} />
                             </p>
                           </div>
                         </div>
                       </div>
                     ))
                   ) : (
-                    <p>Nothing here</p>
+                    <p className="border rounded-md py-1.5 pl-4">No file attached</p>
                   )}
 
                   {data?.status == "processing" && (
@@ -653,23 +741,24 @@ export default function DocumentRequest() {
             ) : null}
           </div>
 
-          <div className="flex items-center gap-3 justify-end">
+          <div className="w-full flex items-center space-x-2 justify-center border-t pt-2">
             <Button
-              size="sm"
-              color="default"
+              radius="none"
+              size="md"
+              className="w-1/2 bg-gray-300 text-gray-800 font-medium !rounded-md"
               onClick={() => {
                 setOpenDrawer(false);
                 setData(null);
               }}
             >
-              Close
+              Deny Request
             </Button>
 
             {data?.status !== "created" && data?.status !== "completed" && (
               <Button
-                color="danger"
-                className="font-montserrat font-semibold w-1/2"
-                size="sm"
+                radius="none"
+                className="bg-bChkRed text-white font-medium w-1/2 !rounded-md"
+                size="md"
                 onClick={() => changeStatusDisclosure.onOpen()}
               >
                 {data?.status === "submitted"

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import AuthLayout from "@components/AuthLayout";
 import {
   Button,
   Card,
@@ -23,7 +22,6 @@ import StatusChip from "@components/status-chip";
 import Drawer from "@components/Drawer";
 import CustomUser from "@components/custom-user";
 import {
-  createSearchParams,
   useNavigate,
   useSearchParams,
 } from "react-router-dom";
@@ -33,11 +31,11 @@ import DownloadIcon from "@assets/icons/download";
 import ConfirmModal from "../../components/confirm-modal";
 import DeleteModal from "../../components/DeleteModal";
 import toast from "react-hot-toast";
-import { parseDate } from "@internationalized/date";
 import { FaChevronLeft, FaChevronRight, FaHeart } from "react-icons/fa6";
 import { IoDocuments } from "react-icons/io5";
 import { PiQueueFill } from "react-icons/pi";
 import { FcCancel } from "react-icons/fc";
+import { MdOutlineFilterAlt, MdOutlineFilterAltOff } from "react-icons/md";
 
 const ItemCard = ({ title, value }) => (
   <div className="flex gap-4 items-center">
@@ -55,11 +53,9 @@ export default function ValidationRequest() {
 
   const [bulkDownloadLoading, setBulkDownloadLoading] = useState(false);
   const [openDrawer, setOpenDrawer] = useState(false);
-  const [searchParams, setSearchParams] = useSearchParams();
   const [processing, setProcessing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [data, setData] = useState(null);
-  const [search, setSearch] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [lastPage, setLastPage] = useState(1);
   const [total, setTotal] = useState(0);
@@ -67,28 +63,29 @@ export default function ValidationRequest() {
   const [validationRequests, setValidationRequests] = useState([]);
   const [sortBy, setSortBy] = useState(null);
   const [sortOrder, setSortOrder] = useState("asc");
-  const [filters, setFilters] = useState({
-    search_query: searchParams.get("search_query") || "",
-    status: searchParams.get("status") || "",
-    start_date: searchParams.get("start_date") || "",
-    end_date: searchParams.get("end_date") || "",
-  });
 
+  const [documentTypes, setDocumentTypes] = useState([]);
+  const [allRequests, setAllRequests] = useState(0);
   const [pending, setPending] = useState(0);
   const [rejected, setRejected] = useState(0);
   const [approved, setApproved] = useState(0);
-  const { data: resData, error } = useSWR(
-    `/institution/requests/validation-requests?${createSearchParams(filters)}`,
-    (url) => axios.get(url).then((res) => res.data)
-  );
+  const [status, setStatus] = useState(null);
+  const [filters, setFilters] = useState({
+    search_query: "",
+    document_type: null,
+    start_date: null,
+    end_date: null,
+  });
+  const [submittedFilters, setSubmittedFilters] = useState({});
 
   const institutionValidationRequests = async () => {
     setIsLoading(true)
     try {
       const response = await axios.get("/institution/requests/validation-requests", {
         params: {
-          search,
+          ...submittedFilters,
           page: currentPage,
+          status: status,
           sort_by: sortBy,
           sort_order: sortOrder,
         },
@@ -96,14 +93,15 @@ export default function ValidationRequest() {
 
       const valRequest = response.data.paginatedRequests;
 
-    setPending(response.data.pending)
-    setApproved(response.data.approved)
-    setRejected(response.data.rejected)
-    setValidationRequests(valRequest.data);
-    setCurrentPage(valRequest.current_page);
-    setLastPage(valRequest.last_page);
-    setTotal(valRequest.total);
-    setIsLoading(false);
+      setAllRequests(response.data.allRequests)
+      setPending(response.data.pending)
+      setApproved(response.data.approved)
+      setRejected(response.data.rejected)
+      setValidationRequests(valRequest.data);
+      setCurrentPage(valRequest.current_page);
+      setLastPage(valRequest.last_page);
+      setTotal(valRequest.total);
+      setIsLoading(false);
 
     } catch (error) {
       console.error("Error fetching institution documents:", error);
@@ -112,8 +110,29 @@ export default function ValidationRequest() {
   };
 
   useEffect(() => {
+    const fetchInstitutionDocs = async () => {
+      try {
+        const response = await axios.get("/institution/document_types");
+        const uniqueDocumentTypes = [
+          ...new Map(
+            response.data.documents.map((doc) => [
+              doc.document_type.id,
+              { key: doc.document_type.id, name: doc.document_type.name },
+            ])
+          ).values(),
+        ];
+        setDocumentTypes(uniqueDocumentTypes);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchInstitutionDocs();
+  }, []);
+  
+  useEffect(() => {
     institutionValidationRequests();
-  }, [search, currentPage, sortBy, sortOrder]);
+  }, [submittedFilters, status, currentPage, sortBy, sortOrder]);
 
   const handlePageChange = (page) => {
     if (page >= 1 && page <= lastPage) {
@@ -170,7 +189,7 @@ export default function ValidationRequest() {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = "bulk_download.zip"; // You can set a dynamic name if needed
+      a.download = "bulk_download.zip";
       document.body.appendChild(a);
       a.click();
       a.remove();
@@ -181,143 +200,128 @@ export default function ValidationRequest() {
     }
   };
 
-  console.log(data);
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    setSubmittedFilters({ ...filters });
+    setCurrentPage(1); 
+  };
+
+  const handleDocumentTypeChange = (event) => {
+    setFilters({ ...filters, document_type: event.target.value });
+  };
 
   return (
     <div title="Validation Request">
       <section className="px-2">
         <Card className="md:w-full w-[98vw] mx-auto rounded-none dark:bg-slate-900">
           <CardBody className="w-full">
-            <form
-              method="get"
-              className="flex flex-row gap-3 items-center"
-              onSubmit={(e) => {
-                e.preventDefault();
-                navigate({
-                  // pathname: "listing",
-                  search: createSearchParams(filters).toString(),
-                });
-              }}
-            >
+            <form onSubmit={handleSubmit} className="flex flex-row gap-3 items-center">
               <Input
+                radius="none"
                 name="search_query"
                 placeholder="Search unique code, user name, user phone number"
-                defaultValue={filters.search_query}
-                // startContent={<SearchIconDuotone />}
-                size="sm"
-                className="max-w-xs min-w-[200px]"
-                onChange={(e) =>
-                  setFilters({ ...filters, search_query: e.target.value })
-                }
+                value={filters.search_query}
+                onChange={(e) => setFilters({ ...filters, search_query: e.target.value })}
+                size="md"
+                className="max-w-xs min-w-[200px] rounded-sm"
               />
-              {/* 
-              <Select
-                size="sm"
-                placeholder="Document Type"
-                className="max-w-xs"
-                name="document_type"
-                defaultSelectedKeys={[filters?.document_type]}
-              >
-                {documentTypes.map((item) => (
-                  <SelectItem key={item.key}>{item.label}</SelectItem>
-                ))}
-              </Select> */}
 
               <Select
-                size="sm"
-                placeholder="Status"
-                className="max-w-[130px] min-w-[130px]"
-                name="status"
-                defaultSelectedKeys={[filters?.status]}
-                onChange={(e) =>
-                  setFilters({ ...filters, status: e.target.value })
-                }
+                aria-label="Document Type"
+                radius="none"
+                size="md"
+                placeholder="Document Type"
+                className="max-w-[230px] min-w-[230px] rounded-sm"
+                name="document_type"
+                value={filters.document_type || ""}
+                onChange={handleDocumentTypeChange}
               >
-                {[
-                  {
-                    key: "submitted",
-                    label: "submitted",
-                  },
-                  {
-                    key: "received",
-                    label: "received",
-                  },
-                  {
-                    key: "processing",
-                    label: "processing",
-                  },
-                  {
-                    key: "completed",
-                    label: "completed",
-                  },
-                  {
-                    key: "cancelled",
-                    label: "cancelled",
-                  },
-                ].map((item) => (
-                  <SelectItem key={item.key}>{item.label}</SelectItem>
+                {documentTypes.map((item) => (
+                  <SelectItem key={item.key} value={item.key}>
+                    {item.name}
+                  </SelectItem>
                 ))}
               </Select>
 
               <DateRangePicker
+                radius="none"
                 visibleMonths={2}
-                className="w-[30%]"
-                value={{
-                  start: filters.start_date
-                    ? parseDate(filters.start_date)
-                    : null,
-                  end: filters.end_date ? parseDate(filters.end_date) : null,
-                }}
+                className="w-[30%] rounded-sm"
                 onChange={(date) => {
-                  let newStartDate;
                   if (date) {
-                    newStartDate = new Date(
-                      date.start.year,
-                      date.start.month - 1, // month is 0-based
-                      date.start.day
-                    ).toDateString();
-                  }
+                    const newStartDate = new Date(date.start.year, date.start.month - 1, date.start.day)
+                      .toISOString()
+                      .split("T")[0];
+                    const newEndDate = new Date(date.end.year, date.end.month - 1, date.end.day)
+                      .toISOString()
+                      .split("T")[0];
 
-                  let newEndDate;
-                  if (date) {
-                    newEndDate = new Date(
-                      date.end.year,
-                      date.end.month - 1, // month is 0-based
-                      date.end.day
-                    ).toDateString();
+                    setFilters({ ...filters, start_date: newStartDate, end_date: newEndDate });
                   }
-
-                  setFilters({
-                    ...filters,
-                    start_date: moment(newStartDate, "ddd MMM DD YYYY")
-                      .format("YYYY-MM-DD")
-                      .toString(),
-                    end_date: moment(newEndDate, "ddd MMM DD YYYY")
-                      .format("YYYY-MM-DD")
-                      .toString(),
-                  });
                 }}
               />
-
-              <Button size="sm" type="submit" color="danger">
-                Filter
-              </Button>
+              <div className="flex space-x-2">
+                
+                <Button
+                  startContent={<MdOutlineFilterAlt size={17}/>}
+                  radius="none"
+                  size="sm"
+                  type="submit"
+                  className="rounded-sm bg-bChkRed text-white"
+                >
+                  Filter
+                </Button>
+                <Button
+                  startContent={<MdOutlineFilterAltOff size={17}/>}
+                  radius="none"
+                  size="sm"
+                  type="button"
+                  className="rounded-sm bg-black text-white"
+                  onClick={() => {
+                    setFilters({
+                      search_query: "",
+                      document_type: null,
+                      start_date: null,
+                      end_date: null,
+                    });
+              
+                    setSubmittedFilters({
+                      search_query: "",
+                      document_type: null,
+                      start_date: null,
+                      end_date: null,
+                    });
+              
+                  }}
+                >
+                  Delete
+                </Button>
+              </div>
+              
             </form>
           </CardBody>
         </Card>
         
         <Card className="my-3 md:w-full w-[98vw] mx-auto border-none shadow-none rounded-lg dark:bg-slate-900">
           <CardBody className="grid w-full grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="rounded-md bg-gray-100 p-4 flex space-x-4">
+            <div
+              onClick={() => {
+                setStatus('allRequests')
+              }}
+              className="rounded-md bg-gray-100 p-4 flex space-x-4 cursor-pointer">
                 <div className="flex items-center justify-center bg-purple-200 text-purple-800 rounded-full w-10 h-10">
                   <IoDocuments size={18}/>
                 </div>
                 <div className="">
                   <p className="font-medium">Total Documents</p>
-                  <p className="text-gray-500">{total}</p>
+                  <p className="text-gray-500">{allRequests}</p>
                 </div>
             </div>
-            <div className="rounded-md bg-gray-100 p-4 flex space-x-4">
+            <div
+              onClick={() => {
+                setStatus('pending')
+              }}
+              className="rounded-md bg-gray-100 p-4 flex space-x-4 cursor-pointer">
                 <div className="flex items-center justify-center bg-yellow-200 text-yellow-500 rounded-full w-10 h-10">
                   <PiQueueFill size={18}/>
                 </div>
@@ -326,7 +330,11 @@ export default function ValidationRequest() {
                   <p className="text-gray-500">{pending}</p>
                 </div>
             </div>
-            <div className="rounded-md bg-gray-100 p-4 flex space-x-4">
+            <div
+              onClick={() => {
+                setStatus('approved')
+              }}
+              className="rounded-md bg-gray-100 p-4 flex space-x-4 cursor-pointer">
                 <div className="flex items-center justify-center bg-green-200 text-green-600 rounded-full w-10 h-10">
                   <FaHeart size={18}/>
                 </div>
@@ -335,7 +343,11 @@ export default function ValidationRequest() {
                   <p className="text-gray-500">{approved}</p>
                 </div>
             </div>
-            <div className="rounded-md bg-gray-100 p-4 flex space-x-4">
+            <div
+              onClick={() => {
+                setStatus('rejected')
+              }}
+              className="rounded-md bg-gray-100 p-4 flex space-x-4 cursor-pointer">
                 <div className="flex items-center justify-center bg-red-200 text-red-600 rounded-full w-10 h-10">
                   <FcCancel size={18}/>
                 </div>
