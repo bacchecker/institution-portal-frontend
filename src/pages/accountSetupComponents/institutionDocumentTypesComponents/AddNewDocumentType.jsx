@@ -26,7 +26,6 @@ function AddNewDocumentType({
   ]);
 
   const handleDocumentTypeOption = (item, index) => {
-    console.log("ddd", item);
 
     const updatedItems = [...items];
 
