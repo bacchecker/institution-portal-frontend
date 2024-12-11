@@ -745,7 +745,7 @@ const [submittedFilters, setSubmittedFilters] = useState({});
             <Button
               radius="none"
               size="md"
-              className="w-1/2 bg-gray-300 text-gray-800 font-medium !rounded-md"
+              className="w-1/4 bg-black text-white font-medium !rounded-md"
               onClick={() => {
                 setOpenDrawer(false);
                 setData(null);
