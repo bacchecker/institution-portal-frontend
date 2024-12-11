@@ -40,6 +40,7 @@ export const baccheckerApi = createApi({
     "Ticket",
     "DocumentType",
     "Department",
+    "InstitutionUser",
   ],
   endpoints: (builder) => ({
     loginUser: builder.mutation({
@@ -65,10 +66,6 @@ export const baccheckerApi = createApi({
       },
       providesTags: ["Department"],
     }),
-    getInstitutionDocumentTypes: builder.query({
-      query: () => "",
-      providesTags: ["DocumentType"],
-    }),
 
     getInstitutionDocumentTypes: builder.query({
       query: ({ page }) => {
@@ -76,6 +73,13 @@ export const baccheckerApi = createApi({
         return queryString;
       },
       providesTags: ["DocumentType"],
+    }),
+    getInstitutionUsers: builder.query({
+      query: ({ page }) => {
+        let queryString = `/institution/users?page=${page}`;
+        return queryString;
+      },
+      providesTags: ["InstitutionUser"],
     }),
 
     getAllExistingDocumentTypes: builder.query({
@@ -270,4 +274,5 @@ export const {
   useCreateDepartmentMutation,
   useDeleteDepartmentMutation,
   useUpdateDepartmentMutation,
+  useGetInstitutionUsersQuery,
 } = baccheckerApi;

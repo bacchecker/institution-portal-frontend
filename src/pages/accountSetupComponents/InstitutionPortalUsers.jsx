@@ -4,6 +4,7 @@ import {
   useDeleteDomentTypeMutation,
   useGetAllExistingDocumentTypesQuery,
   useGetInstitutionDocumentTypesQuery,
+  useGetInstitutionUsersQuery,
 } from "../../redux/apiSlice";
 import formatText from "../../components/FormatText";
 import LoadItems from "../../components/LoadItems";
@@ -15,8 +16,9 @@ import { setUser } from "../../redux/authSlice";
 import Swal from "sweetalert2";
 import LoadingPage from "../../components/LoadingPage";
 import EditDocumentType from "./institutionDocumentTypesComponents/EditDocumentType";
+import AddNewUser from "./institutionPortalUsersComponents/AddNewUser";
 
-function InstitutionDocumentTypes({ setActiveStep }) {
+function InstitutionPortalUsers({ setActiveStep }) {
   const [pageNumber, setPageNumber] = useState(1);
   const dispatch = useDispatch();
   const [openModal, setOpenModal] = useState(false);
@@ -26,10 +28,12 @@ function InstitutionDocumentTypes({ setActiveStep }) {
   const user = JSON.parse(secureLocalStorage.getItem("user"));
 
   const {
-    data: institutionDocumentTypes,
+    data: institutionUsers,
     isLoading,
     isFetching,
-  } = useGetInstitutionDocumentTypesQuery({ page: pageNumber });
+  } = useGetInstitutionUsersQuery({ page: pageNumber });
+
+  console.log("institution", institutionUsers);
 
   const {
     data: existingDocumentTypes,
@@ -52,7 +56,7 @@ function InstitutionDocumentTypes({ setActiveStep }) {
   const handleBackButton = () => {
     const updatedInstitution = {
       ...user?.institution,
-      current_step: "1",
+      current_step: "3",
     };
     window.scrollTo({
       top: 0,
@@ -67,7 +71,7 @@ function InstitutionDocumentTypes({ setActiveStep }) {
         selectedTemplate: user.selectedTemplate,
       })
     );
-    setActiveStep(1);
+    setActiveStep(3);
   };
 
   const [
@@ -76,10 +80,10 @@ function InstitutionDocumentTypes({ setActiveStep }) {
   ] = useCreateNextScreenMutation();
 
   const handleSubmit = async () => {
-    if (institutionDocumentTypes?.document_types?.data?.length === 0) {
+    if (institutionUsers?.institutionUsers?.data?.length === 0) {
       Swal.fire({
         title: "Error",
-        text: "Add at least One document type",
+        text: "Add at least One user",
         icon: "error",
         button: "OK",
       });
@@ -88,7 +92,7 @@ function InstitutionDocumentTypes({ setActiveStep }) {
 
     try {
       await createNextScreen({
-        step: 3,
+        step: 5,
       });
     } catch (error) {
       console.error("Error moving to next page:", error);
@@ -107,7 +111,7 @@ function InstitutionDocumentTypes({ setActiveStep }) {
         if (isOkay) {
           const updatedInstitution = {
             ...user?.institution,
-            current_step: "3",
+            current_step: "5",
           };
           window.scrollTo({
             top: 0,
@@ -170,12 +174,12 @@ function InstitutionDocumentTypes({ setActiveStep }) {
         <div className="flex w-full relative">
           <div className="w-[75%] px-[4vw] py-[2vw] mt-[3.5vw]">
             <h1 className="text-[1.5vw] font-[600] text-[#000]">
-              Institution Document Types
+              Institution Portal Users
             </h1>
             <h4 className="text-[0.9vw] mt-[0.5vw]">
-              To set up your account, add the document types accepted by your
-              school.
-              <br /> Choose from the list of common documents
+              Use this page to create a new user account within the institution
+              portal. <br /> Users can be assigned a department with different
+              roles, permissions, and access based on their responsibilities.
             </h4>
           </div>
         </div>
@@ -187,7 +191,7 @@ function InstitutionDocumentTypes({ setActiveStep }) {
               className="bg-[#000000] md:my-[2vw!important] my-[4vw!important] w-fit flex justify-center items-center md:py-[0.7vw] py-[2vw] md:px-[2vw] h-[fit-content] md:rounded-[0.3vw] rounded-[2vw] gap-[0.5vw] hover:bg-[#282727] transition-all duration-300 disabled:bg-[#282727]"
             >
               <h4 className="md:text-[1vw] text-[3.5vw] text-[#ffffff]">
-                Add Doucment Type
+                Add New User
               </h4>
             </button>
           </div>
@@ -314,8 +318,8 @@ function InstitutionDocumentTypes({ setActiveStep }) {
                 <tbody className="">
                   {!isFetching && !isLoading ? (
                     <>
-                      {institutionDocumentTypes?.document_types?.data
-                        ?.length === 0 ? (
+                      {institutionUsers?.institutionUsers?.data?.length ===
+                      0 ? (
                         <tr>
                           <td colSpan={7} rowSpan={5}>
                             <div className="w-full h-[35vw] flex flex-col justify-center items-center">
@@ -325,14 +329,14 @@ function InstitutionDocumentTypes({ setActiveStep }) {
                                 className="w-[10vw]"
                               />
                               <h4 className="md:text-[1vw] text-[3.5vw] font-[600]">
-                                No DocumentType Available
+                                No User Available
                               </h4>
                             </div>
                           </td>
                         </tr>
                       ) : (
                         <>
-                          {institutionDocumentTypes?.document_types?.data?.map(
+                          {institutionUsers?.institutionUsers?.data?.map(
                             (documentType, i) => {
                               return (
                                 <tr key={i}>
@@ -425,9 +429,7 @@ function InstitutionDocumentTypes({ setActiveStep }) {
             <div className="w-full flex justify-end items-center md:gap-[1vw] gap-[3vw] md:mt-[1vw] mt-[4vw]">
               <h4 className="md:text-[1vw] text-[3.5vw]">
                 Page <span>{pageNumber}</span> of{" "}
-                <span>
-                  {institutionDocumentTypes?.document_types?.last_page}
-                </span>
+                <span>{institutionUsers?.institutionUsers?.last_page}</span>
               </h4>
               <div className="flex md:gap-[1vw] gap-[3vw]">
                 <button
@@ -449,7 +451,7 @@ function InstitutionDocumentTypes({ setActiveStep }) {
                     setPageNumber((prev) =>
                       Math.min(
                         prev + 1,
-                        institutionDocumentTypes?.document_types?.last_page
+                        institutionUsers?.institutionUsers?.last_page
                       )
                     );
                   }}
@@ -492,13 +494,7 @@ function InstitutionDocumentTypes({ setActiveStep }) {
               )}
             </button>
           </div>
-          <AddNewDocumentType
-            setOpenModal={setOpenModal}
-            openModal={openModal}
-            existingDocumentTypes={existingDocumentTypes}
-            isExistingDocTypesFetching={isExistingDocTypesFetching}
-            isExistingDocTypesLoading={isExistingDocTypesLoading}
-          />
+          <AddNewUser setOpenModal={setOpenModal} openModal={openModal} />
           <EditDocumentType
             setOpenModal={setOpenEditModal}
             openModal={openEditModal}
@@ -510,4 +506,4 @@ function InstitutionDocumentTypes({ setActiveStep }) {
   );
 }
 
-export default InstitutionDocumentTypes;
+export default InstitutionPortalUsers;

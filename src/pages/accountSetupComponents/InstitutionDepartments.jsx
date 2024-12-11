@@ -41,7 +41,7 @@ function InstitutionDepartments({ setActiveStep }) {
     data: institutionDepartments,
     isLoading,
     isFetching,
-  } = useGetInstitutionDepartmentsQuery({ page: pageNumber });
+  } = useGetInstitutionDepartmentsQuery({ page: pageNumber, perPage: 1 });
 
   const handleDepartment = (department) => {
     setOpenEditModal(true);
@@ -98,7 +98,7 @@ function InstitutionDepartments({ setActiveStep }) {
     if (isSuccess) {
       Swal.fire({
         title: "Success",
-        text: "Institution Document Type(s) created successfully",
+        text: "Institution Department(s) created successfully",
         icon: "success",
         button: "OK",
         confirmButtonColor: "#00b17d",
@@ -173,9 +173,9 @@ function InstitutionDepartments({ setActiveStep }) {
               Institution Departments
             </h1>
             <h4 className="text-[0.9vw] mt-[0.5vw]">
-              To set up your account, add the document types accepted by your
-              school.
-              <br /> Choose from the list of common tertiary documents
+              Use this page to create a new department within the institution. <br /> A
+              department represents a specific functional unit or academic
+              division that manages its operations and resources.
             </h4>
           </div>
         </div>
@@ -234,7 +234,7 @@ function InstitutionDepartments({ setActiveStep }) {
                           return (
                             <div
                               key={i}
-                              className="w-[49%] min-h-[20vw] border border-[#ff040449] p-[1vw] rounded-[0.2vw] relative pb-[6vw]"
+                              className="w-[49%] min-h-[20vw] border border-[#ff040449] p-[1vw] rounded-[0.3vw] relative pb-[6vw]"
                             >
                               <div className="text-[1vw] font-[400] mb-[1vw]">
                                 Department:{" "}

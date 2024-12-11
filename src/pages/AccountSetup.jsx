@@ -3,6 +3,7 @@ import secureLocalStorage from "react-secure-storage";
 import InstitutionDataSetup from "./accountSetupComponents/InstitutionDataSetup";
 import InstitutionDocumentTypes from "./accountSetupComponents/InstitutionDocumentTypes";
 import InstitutionDepartments from "./accountSetupComponents/InstitutionDepartments";
+import InstitutionPortalUsers from "./accountSetupComponents/InstitutionPortalUsers";
 
 function AccountSetup() {
   const [activeStep, setActiveStep] = useState();
@@ -234,6 +235,9 @@ function AccountSetup() {
       )}
       {(parseInt(current_step) === 3 || activeStep === 3) && (
         <InstitutionDepartments setActiveStep={(e) => setActiveStep(e)} />
+      )}
+       {(parseInt(current_step) === 4 || activeStep === 4) && (
+        <InstitutionPortalUsers setActiveStep={(e) => setActiveStep(e)} />
       )}
     </>
   );
