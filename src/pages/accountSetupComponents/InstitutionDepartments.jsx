@@ -41,7 +41,7 @@ function InstitutionDepartments({ setActiveStep }) {
     data: institutionDepartments,
     isLoading,
     isFetching,
-  } = useGetInstitutionDepartmentsQuery({ page: pageNumber, perPage: 1 });
+  } = useGetInstitutionDepartmentsQuery({ page: pageNumber });
 
   const handleDepartment = (department) => {
     setOpenEditModal(true);
@@ -173,9 +173,9 @@ function InstitutionDepartments({ setActiveStep }) {
               Institution Departments
             </h1>
             <h4 className="text-[0.9vw] mt-[0.5vw]">
-              Use this page to create a new department within the institution. <br /> A
-              department represents a specific functional unit or academic
-              division that manages its operations and resources.
+              Use this page to create a new department within the institution.{" "}
+              <br /> A department represents a specific functional unit or
+              academic division that manages its operations and resources.
             </h4>
           </div>
         </div>

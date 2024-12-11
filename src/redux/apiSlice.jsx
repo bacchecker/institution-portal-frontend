@@ -60,8 +60,12 @@ export const baccheckerApi = createApi({
     }),
 
     getInstitutionDepartments: builder.query({
-      query: ({ page }) => {
+      query: ({ page, perPage }) => {
         let queryString = `/institution/departments?page=${page}`;
+        if (perPage) {
+          queryString += `&per_page=${perPage}`;
+        }
+
         return queryString;
       },
       providesTags: ["Department"],
@@ -183,6 +187,15 @@ export const baccheckerApi = createApi({
       }),
       // invalidatesTags: ["User", "Log"],
     }),
+    createInstitutionUser: builder.mutation({
+      query: (body) => ({
+        url: "/institution/store-users",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["InstitutionUser"],
+    }),
+
     createDepartment: builder.mutation({
       query: (body) => ({
         url: "/institution/departments",
@@ -275,4 +288,5 @@ export const {
   useDeleteDepartmentMutation,
   useUpdateDepartmentMutation,
   useGetInstitutionUsersQuery,
+  useCreateInstitutionUserMutation,
 } = baccheckerApi;

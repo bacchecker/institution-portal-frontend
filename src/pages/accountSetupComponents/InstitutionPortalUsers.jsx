@@ -3,6 +3,7 @@ import {
   useCreateNextScreenMutation,
   useDeleteDomentTypeMutation,
   useGetAllExistingDocumentTypesQuery,
+  useGetInstitutionDepartmentsQuery,
   useGetInstitutionDocumentTypesQuery,
   useGetInstitutionUsersQuery,
 } from "../../redux/apiSlice";
@@ -33,20 +34,13 @@ function InstitutionPortalUsers({ setActiveStep }) {
     isFetching,
   } = useGetInstitutionUsersQuery({ page: pageNumber });
 
-  console.log("institution", institutionUsers);
-
   const {
-    data: existingDocumentTypes,
-    isLoading: isExistingDocTypesLoading,
-    isFetching: isExistingDocTypesFetching,
-  } = useGetAllExistingDocumentTypesQuery({
-    ...(user?.institution?.type === "bacchecker-academic" && {
-      selectedAcademicLevel: user?.institution?.academic_level,
-    }),
-    ...(user?.institution?.type !== "bacchecker-academic" && {
-      institution_type: "non-academic",
-    }),
-  });
+    data: institutionDepartments,
+    isLoading: isDepartmentsLoading,
+    isFetching: isDepartmentsFetching,
+  } = useGetInstitutionDepartmentsQuery({ page: 1, perPage: 100 });
+
+  console.log("insti", institutionDepartments);
 
   const handleDocumentType = (documentType) => {
     setOpenEditModal(true);
@@ -231,9 +225,7 @@ function InstitutionPortalUsers({ setActiveStep }) {
                             className="md:w-[0.5vw] w-[2vw]"
                           />
                         </div>
-                        <h4 className="md:text-[0.9vw] text-[3.5vw]">
-                          Document Format(s)
-                        </h4>
+                        <h4 className="md:text-[0.9vw] text-[3.5vw]">Email</h4>
                       </div>
                     </th>
                     <th className="md:py-[1vw] py-[3vw] md:px-[1vw] px-[3vw] border-b max-w-[13%]">
@@ -250,8 +242,25 @@ function InstitutionPortalUsers({ setActiveStep }) {
                             className="md:w-[0.5vw] w-[2vw]"
                           />
                         </div>
+                        <h4 className="md:text-[0.9vw] text-[3.5vw]">Phone</h4>
+                      </div>
+                    </th>
+                    <th className="md:py-[1vw] py-[3vw] md:px-[1vw] px-[3vw] border-b max-w-[15%]">
+                      <div className="flex gap-[1vw]">
+                        <div className="flex flex-col items-center justify-center md:gap-[0.1vw] gap-[0.3vw]">
+                          <img
+                            src="/assets/img/top-arr.svg"
+                            alt=""
+                            className="md:w-[0.5vw] w-[2vw]"
+                          />
+                          <img
+                            src="/assets/img/down-arr.svg"
+                            alt=""
+                            className="md:w-[0.5vw] w-[2vw]"
+                          />
+                        </div>
                         <h4 className="md:text-[0.9vw] text-[3.5vw]">
-                          Document Fee
+                          Department
                         </h4>
                       </div>
                     </th>
@@ -270,45 +279,7 @@ function InstitutionPortalUsers({ setActiveStep }) {
                           />
                         </div>
                         <h4 className="md:text-[0.9vw] text-[3.5vw]">
-                          Printing Fee
-                        </h4>
-                      </div>
-                    </th>
-                    <th className="md:py-[1vw] py-[3vw] md:px-[1vw] px-[3vw] border-b max-w-[15%]">
-                      <div className="flex gap-[1vw]">
-                        <div className="flex flex-col items-center justify-center md:gap-[0.1vw] gap-[0.3vw]">
-                          <img
-                            src="/assets/img/top-arr.svg"
-                            alt=""
-                            className="md:w-[0.5vw] w-[2vw]"
-                          />
-                          <img
-                            src="/assets/img/down-arr.svg"
-                            alt=""
-                            className="md:w-[0.5vw] w-[2vw]"
-                          />
-                        </div>
-                        <h4 className="md:text-[0.9vw] text-[3.5vw]">
-                          Validation Fee
-                        </h4>
-                      </div>
-                    </th>
-                    <th className="md:py-[1vw] py-[3vw] md:px-[1vw] px-[3vw] border-b max-w-[10%]">
-                      <div className="flex gap-[1vw]">
-                        <div className="flex flex-col items-center justify-center md:gap-[0.1vw] gap-[0.3vw]">
-                          <img
-                            src="/assets/img/top-arr.svg"
-                            alt=""
-                            className="md:w-[0.5vw] w-[2vw]"
-                          />
-                          <img
-                            src="/assets/img/down-arr.svg"
-                            alt=""
-                            className="md:w-[0.5vw] w-[2vw]"
-                          />
-                        </div>
-                        <h4 className="md:text-[0.9vw] text-[3.5vw]">
-                          Verification Fee
+                          Residential Address
                         </h4>
                       </div>
                     </th>
@@ -337,45 +308,24 @@ function InstitutionPortalUsers({ setActiveStep }) {
                       ) : (
                         <>
                           {institutionUsers?.institutionUsers?.data?.map(
-                            (documentType, i) => {
+                            (user, i) => {
                               return (
                                 <tr key={i}>
                                   <td className="py-[1vw] px-[1vw] border-b max-w-[15%]">
-                                    {documentType?.document_type?.name}
-                                  </td>
-                                  <td className="py-[1vw] px-[2.5vw] border-b max-w-[13%]">
-                                    {documentType?.soft_copy &&
-                                    documentType?.hard_copy ? (
-                                      <>
-                                        <span className="text-[#FFA52D]">
-                                          soft copy
-                                        </span>
-                                        <span className="text-[#000000]">
-                                          , hard copy
-                                        </span>
-                                      </>
-                                    ) : documentType?.soft_copy ? (
-                                      <span className="text-[#FFA52D]">
-                                        soft copy
-                                      </span>
-                                    ) : documentType?.hard_copy ? (
-                                      <span className="text-[#000000]">
-                                        hard copy
-                                      </span>
-                                    ) : null}
-                                  </td>
-
-                                  <td className="py-[1vw] px-[1vw] border-b max-w-[15%]">
-                                    GH¢ {documentType?.base_fee}
+                                    {user?.first_name} {user?.other_name}{" "}
+                                    {user?.last_name}
                                   </td>
                                   <td className="py-[1vw] px-[1vw] border-b max-w-[15%]">
-                                    GH¢ {documentType?.printing_fee}
+                                    {user?.email}
                                   </td>
                                   <td className="py-[1vw] px-[1vw] border-b max-w-[15%]">
-                                    GH¢ {documentType?.validation_fee}
+                                    {user?.phone}
                                   </td>
                                   <td className="py-[1vw] px-[1vw] border-b max-w-[15%]">
-                                    GH¢ {documentType?.verification_fee}
+                                    {user?.department?.name}
+                                  </td>
+                                  <td className="py-[1vw] px-[1vw] border-b max-w-[15%]">
+                                    {user?.address}
                                   </td>
                                   <td className="text-end border-b">
                                     <Dropdown
@@ -494,7 +444,13 @@ function InstitutionPortalUsers({ setActiveStep }) {
               )}
             </button>
           </div>
-          <AddNewUser setOpenModal={setOpenModal} openModal={openModal} />
+          <AddNewUser
+            setOpenModal={setOpenModal}
+            openModal={openModal}
+            institutionDepartments={institutionDepartments}
+            isDepartmentsFetching={isDepartmentsFetching}
+            isDepartmentsLoading={isDepartmentsLoading}
+          />
           <EditDocumentType
             setOpenModal={setOpenEditModal}
             openModal={openEditModal}

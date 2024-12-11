@@ -2,11 +2,20 @@ import React, { useEffect, useState } from "react";
 import SideModal from "../../../components/SideModal";
 import SelectInput from "../../../components/SelectInput";
 import Swal from "sweetalert2";
-import { useCreateInstitutionDocumentTypeMutation } from "../../../redux/apiSlice";
+import {
+  useCreateInstitutionDocumentTypeMutation,
+  useCreateInstitutionUserMutation,
+} from "../../../redux/apiSlice";
 import LoadItems from "../../../components/LoadItems";
 import { toast } from "sonner";
 
-function AddNewUser({ setOpenModal, openModal }) {
+function AddNewUser({
+  setOpenModal,
+  openModal,
+  institutionDepartments,
+  isDepartmentsFetching,
+  isDepartmentsLoading,
+}) {
   const initialUserInput = {
     first_name: "",
     last_name: "",
@@ -14,17 +23,25 @@ function AddNewUser({ setOpenModal, openModal }) {
     email: "",
     phone: "",
     address: "",
-    gender: "",
   };
   const [userInput, setUserInput] = useState(initialUserInput);
   const [selectedGender, setSelectedGender] = useState("");
+  const [selectedDepartment, setSelectedDepartment] = useState({});
+  const [groupedPermissions, setGroupedPermissions] = useState({});
+  const [selectedPermissions, setSelectedPermissions] = useState([]);
   const data = [
     { title: "Male", value: "male" },
     { title: "Female", value: "female" },
   ];
 
+  console.log("depa", institutionDepartments);
+
   const handleSeletedGender = (item) => {
     setSelectedGender(item);
+  };
+
+  const handleSeletedDepartment = (item) => {
+    setSelectedDepartment(item);
   };
 
   const handleUserInput = (e) => {
@@ -34,97 +51,135 @@ function AddNewUser({ setOpenModal, openModal }) {
     }));
   };
 
+  const handleCheckboxChange = (id) => {
+    setSelectedPermissions((prev) =>
+      prev.includes(id) ? prev.filter((permId) => permId !== id) : [...prev, id]
+    );
+  };
+
   useEffect(() => {
     if (!openModal) {
       setUserInput(initialUserInput);
     }
   }, [openModal]);
 
-  //   const [
-  //     createInstitutionDocumentType,
-  //     { data, isSuccess, isLoading, isError, error },
-  //   ] = useCreateInstitutionDocumentTypeMutation();
+  console.log("selected", selectedDepartment);
 
-  //   const handleSubmit = async (e) => {
-  //     e.preventDefault();
-  //     const hasErrors = items.some((item) => {
-  //       if (
-  //         item.document_type_id === "" ||
-  //         item.base_fee === "" ||
-  //         (item.hard_copy && item.printing_fee === "") ||
-  //         item.validation_fee === "" ||
-  //         item.verification_fee === "" ||
-  //         (!item?.hard_copy && !item?.soft_copy)
-  //       ) {
-  //         Swal.fire({
-  //           title: "Error",
-  //           text: "Fill All required fields",
-  //           icon: "error",
-  //           button: "OK",
-  //         });
+  useEffect(() => {
+    if (selectedDepartment?.permissions) {
+      const groups = selectedDepartment?.permissions?.reduce(
+        (acc, permission) => {
+          const parts = permission.name.split(".");
 
-  //         return true;
-  //       }
-  //       return false;
-  //     });
+          const category = parts[0];
+          const subcategory = parts.length === 3 ? parts[1] : null;
+          const action = parts.length === 3 ? parts[2] : parts[1];
 
-  //     if (hasErrors) {
-  //       return;
-  //     }
+          if (!acc[category]) acc[category] = {};
+          if (subcategory) {
+            if (!acc[category][subcategory]) acc[category][subcategory] = [];
+            acc[category][subcategory].push({ id: permission.id, action });
+          } else {
+            if (!acc[category].actions) acc[category].actions = [];
+            acc[category].actions.push({ id: permission.id, action });
+          }
 
-  //     const data = {
-  //       document_types: newItems,
-  //     };
+          return acc;
+        },
+        {}
+      );
 
-  //     try {
-  //       await createInstitutionDocumentType(data);
-  //     } catch (error) {
-  //       toast.error("Failed to submit documents", {
-  //         position: "top-right",
-  //         autoClose: 1202,
-  //         hideProgressBar: false,
-  //         closeOnClick: true,
-  //         pauseOnHover: true,
-  //         draggable: true,
-  //         progress: undefined,
-  //         theme: "light",
-  //       });
-  //     }
-  //   };
+      setGroupedPermissions(groups);
+    }
+  }, [selectedDepartment]);
 
-  //   useEffect(() => {
-  //     if (isSuccess && data) {
-  //       Swal.fire({
-  //         title: "Success",
-  //         text: "Document Type(s) created successfully",
-  //         icon: "success",
-  //         button: "OK",
-  //         confirmButtonColor: "#00b17d",
-  //       }).then((isOkay) => {
-  //         if (isOkay) {
-  //           setOpenModal(!openModal);
-  //           setItems([
-  //             {
-  //               document_type_id: "",
-  //               base_fee: "",
-  //               printing_fee: "",
-  //               validation_fee: "",
-  //               verification_fee: "",
-  //               soft_copy: false,
-  //               hard_copy: false,
-  //             },
-  //           ]);
-  //         }
-  //       });
-  //     }
-  //   }, [isSuccess, data]);
+  console.log("user", selectedPermissions);
+  console.log("user", selectedDepartment?.id);
+  console.log("user", userInput);
+  console.log("user", selectedGender?.value);
 
-  //   useEffect(() => {
-  //     if (isError) {
-  //       toast.error(error?.data?.message);
-  //     }
-  //   }, [isError]);
-  const isLoading = false;
+
+  const [
+    createInstitutionUser,
+    { data: userData, isSuccess, isLoading, isError, error },
+  ] = useCreateInstitutionUserMutation();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const { first_name, last_name, other_name, email, phone, address } =
+      userInput;
+
+    if (
+      !first_name ||
+      !last_name ||
+      !email ||
+      !phone ||
+      !address ||
+      !selectedGender?.value ||
+      !selectedDepartment?.id
+    ) {
+      Swal.fire({
+        title: "Error",
+        text: "Fill All Required Fields",
+        icon: "error",
+        button: "OK",
+      });
+    } else if (selectedPermissions?.length === 0) {
+      Swal.fire({
+        title: "Error",
+        text: "Select at least one permssion",
+        icon: "error",
+        button: "OK",
+      });
+    } else {
+      try {
+        await createInstitutionUser({
+          first_name,
+          last_name,
+          other_name,
+          email,
+          phone,
+          address,
+          department_id: selectedDepartment?.id,
+          gender: selectedGender?.value,
+          permissions: selectedPermissions,
+        });
+      } catch (error) {
+        toast.error("Failed to create user", {
+          position: "top-right",
+          autoClose: 1202,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (isSuccess && userData) {
+      Swal.fire({
+        title: "Success",
+        text: "User created successfully",
+        icon: "success",
+        button: "OK",
+        confirmButtonColor: "#00b17d",
+      }).then((isOkay) => {
+        if (isOkay) {
+          setOpenModal(!openModal);
+        }
+      });
+    }
+  }, [isSuccess, userData]);
+
+  useEffect(() => {
+    if (isError) {
+      toast.error(error?.data?.message);
+    }
+  }, [isError]);
   return (
     <SideModal
       title={"User Details"}
@@ -132,7 +187,7 @@ function AddNewUser({ setOpenModal, openModal }) {
       openModal={openModal}
     >
       <form
-        // onSubmit={handleSubmit}
+        onSubmit={handleSubmit}
         className="md:px-[1vw] px-[5vw] w-full overflow-auto pt-[1vw]"
       >
         <div className="flex flex-col">
@@ -235,6 +290,60 @@ function AddNewUser({ setOpenModal, openModal }) {
               className="custom-dropdown-class display-md-none"
             />
           </div>
+          <div className="md:mt-[2vw] mt-[8vw]">
+            <h4 className="md:text-[1vw] text-[4vw] mb-1">
+              Department<span className="text-[#f1416c]">*</span>
+            </h4>
+            <SelectInput
+              placeholder={"Select Option"}
+              data={institutionDepartments?.departments?.data}
+              inputValue={selectedDepartment?.name}
+              onItemSelect={handleSeletedDepartment}
+              isLoading={isDepartmentsFetching || isDepartmentsLoading}
+              className="custom-dropdown-class display-md-none"
+            />
+          </div>
+          {selectedDepartment?.permissions && (
+            <div className="mt-4">
+              <h4 className="md:text-[1vw] text-[4vw] mb-1">
+                Permissions<span className="text-[#f1416c]">*</span>
+              </h4>
+              <div className="flex gap-[3vw] flex-wrap">
+                {Object?.entries(groupedPermissions)?.map(
+                  ([category, subcategories]) => (
+                    <div key={category} className="mb-[0.2vw]">
+                      <h2 className="text-[0.9vw] capitalize font-[600]">{`Manage ${category.replace(
+                        "-",
+                        " "
+                      )}`}</h2>
+                      {Object?.entries(subcategories)?.map(
+                        ([subcategory, actions]) => (
+                          <div key={subcategory} className="ml-[0.5vw]">
+                            <h3 className="text-[0.9vw] capitalize">
+                              {subcategory.replace("-", " ")}
+                            </h3>
+                            {actions.map(({ id, action }) => (
+                              <div key={id} className="ml-[0.5vw]">
+                                <label className="flex items-center gap-[0.3vw] text-[0.9vw] cursor-pointer">
+                                  <input
+                                    type="checkbox"
+                                    className="checkbox-design1"
+                                    checked={selectedPermissions.includes(id)}
+                                    onChange={() => handleCheckboxChange(id)}
+                                  />
+                                  {`Can ${action.replace("-", " ")}`}
+                                </label>
+                              </div>
+                            ))}
+                          </div>
+                        )
+                      )}
+                    </div>
+                  )
+                )}
+              </div>
+            </div>
+          )}
         </div>
 
         <button
