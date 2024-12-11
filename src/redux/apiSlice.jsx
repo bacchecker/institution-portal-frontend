@@ -8,8 +8,8 @@ export const baccheckerApi = createApi({
     const token = JSON?.parse(secureLocalStorage?.getItem("userToken"))?.token;
 
     const result = await fetchBaseQuery({
-      baseUrl: "https://backend.baccheck.online/api",
-      // baseUrl: "http://aw8kkg8ck48040oc4cgo44so.67.205.158.15.sslip.io/api",
+      // baseUrl: "https://backend.baccheck.online/api",
+      baseUrl: "http://aw8kkg8ck48040oc4cgo44so.67.205.158.15.sslip.io/api",
 
       prepareHeaders: (headers) => {
         if (token) {
