@@ -5,6 +5,7 @@ import Swal from "sweetalert2";
 import {
   useCreateDepartmentMutation,
   useCreateInstitutionDocumentTypeMutation,
+  useUpdateDepartmentMutation,
 } from "../../../redux/apiSlice";
 import LoadItems from "../../../components/LoadItems";
 import { toast } from "sonner";
@@ -19,7 +20,6 @@ function EditDepartment({
   const [userInitialInput, setUserInitialInput] = useState([]);
   const [groupedPermissions, setGroupedPermissions] = useState({});
   const [selectedPermissions, setSelectedPermissions] = useState([]);
-  console.log("sele", selectedDepartment);
 
   useEffect(() => {
     if (selectedDepartment) {
@@ -73,12 +73,12 @@ function EditDepartment({
     );
   };
 
-  const [createDepartment, { data, isSuccess, isLoading, isError, error }] =
-    useCreateDepartmentMutation();
+  const [updateDepartment, { data, isSuccess, isLoading, isError, error }] =
+    useUpdateDepartmentMutation();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const { name, description } = userInput;
+    const { name, description, id } = userInput;
 
     if (!name || !description) {
       Swal.fire({
@@ -95,23 +95,38 @@ function EditDepartment({
         button: "OK",
       });
     } else {
-      try {
-        await createDepartment({
-          name,
-          description,
-          permissions: selectedPermissions,
-        });
-      } catch (error) {
-        toast.error("Failed create department", {
-          position: "top-right",
-          autoClose: 1202,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        });
+      const result = await Swal.fire({
+        title: "Are you sure you want to update this department?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#febf4c",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, I'm sure",
+        cancelButtonText: "No, cancel",
+      });
+
+      if (result.isConfirmed) {
+        try {
+          await updateDepartment({
+            id,
+            body: {
+              name,
+              description,
+              permissions: selectedPermissions,
+            },
+          });
+        } catch (error) {
+          toast.error("Failed to update department", {
+            position: "top-right",
+            autoClose: 1202,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+          });
+        }
       }
     }
   };
@@ -120,7 +135,7 @@ function EditDepartment({
     if (isSuccess && data) {
       Swal.fire({
         title: "Success",
-        text: "Department created successfully",
+        text: "Department updated successfully",
         icon: "success",
         button: "OK",
         confirmButtonColor: "#00b17d",
@@ -197,13 +212,13 @@ function EditDepartment({
                           <h3 className="text-[0.9vw] capitalize">
                             {subcategory.replace("-", " ")}
                           </h3>
-                          {actions.map(({ id, action }) => (
+                          {actions?.map(({ id, action }) => (
                             <div key={id} className="ml-[0.5vw]">
                               <label className="flex items-center gap-[0.3vw] text-[0.9vw] cursor-pointer">
                                 <input
                                   type="checkbox"
                                   className="checkbox-design1"
-                                  checked={selectedPermissions.includes(id)}
+                                  checked={selectedPermissions?.includes(id)}
                                   onChange={() => handleCheckboxChange(id)}
                                 />
                                 {`Can ${action.replace("-", " ")}`}
@@ -229,12 +244,12 @@ function EditDepartment({
             <div className="flex items-center justify-center gap-2">
               <LoadItems color={"#ffffff"} size={15} />
               <h4 className="md:text-[1vw] text-[3.5vw] text-[#ffffff]">
-                Submitting...
+                Updating...
               </h4>
             </div>
           ) : (
             <h4 className="md:text-[1vw] text-[3.5vw] text-[#ffffff]">
-              Submit
+              Update
             </h4>
           )}
         </button>
