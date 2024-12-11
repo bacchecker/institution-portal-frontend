@@ -1,0 +1,138 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.poppins-regular {
+  font-family: "Poppins", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+@layer base {
+  html {
+    @apply poppins-regular;
+  }
+  body {
+    background: #ffffff;
+    color: #3f4254;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  h1 {
+    @apply text-xl font-medium capitalize;
+  }
+}
+
+.filter_back {
+  backdrop-filter: blur(30px) !important;
+}
+
+.radio__input {
+  display: none;
+}
+.item-abs-center {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+.no-scroll::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+.color-1 {
+  background-color: rgba(255, 0, 0, 0.15);
+}
+.color-2 {
+  background-color: rgba(255, 0, 0, 0.3);
+}
+.color-3 {
+  background-color: rgba(255, 0, 0, 0.45);
+}
+.color-4 {
+  background-color: rgba(255, 0, 0, 0.6);
+}
+.color-5 {
+  background-color: rgba(255, 0, 0, 0.75);
+}
+.color-6 {
+  background-color: rgba(255, 0, 0, 0.9);
+}
+.green {
+  background-color: #00780c;
+}
+
+.action-button-class {
+  display: flex;
+  font-size: 0.8rem;
+  width: fit-content;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.25rem;
+  background: #f9f9f9;
+  color: #7e8299;
+  align-items: center;
+}
+.action-dropdown-class {
+  width: 10rem;
+  position: absolute;
+  display: flex;
+  border-radius: 0.25rem;
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+  box-shadow: 0px 1px 2px -1px rgba(0, 0, 0, 0.1),
+    0px 1px 3px 0px rgba(0, 0, 0, 0.1);
+  border: 1px solid #ddd;
+  background: #fff;
+  z-index: 60 !important;
+}
+.action-dropdown-content {
+  width: 100%;
+}
+.action-dropdown-content .dropdown-item {
+  text-align: left;
+  width: 100%;
+  padding: 0.3rem;
+  font-size: 0.8rem;
+  transition: all 0.2s;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+.action-dropdown-content .dropdown-item:hover {
+  background: #ddd;
+}
+
+.loading-div-active {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  background: #0000006d;
+  z-index: 100000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+div:where(.swal2-container) h2:where(.swal2-title) {
+  font-size: 1vw !important;
+}
+
+div:where(.swal2-container) button:where(.swal2-styled):where(.swal2-cancel) {
+  border: 1px solid #ff0404 !important;
+  font-size: 1vw !important;
+  color: #ff0404;
+  background: transparent !important;
+}
