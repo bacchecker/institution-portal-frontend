@@ -19,8 +19,6 @@ function EditDocumentType({ setOpenModal, openModal, selectedDocumentType }) {
     }
   }, [selectedDocumentType]);
 
-  console.log("sye", userInput);
-
   const handleUserInput = (e) => {
     const { name, type, checked, value } = e.target;
 
@@ -40,9 +38,6 @@ function EditDocumentType({ setOpenModal, openModal, selectedDocumentType }) {
     updateDocumentType,
     { documentData, isSuccess, isError, error, isLoading },
   ] = useUpdateDocumentTypeMutation();
-
-  console.log("user", userInput);
-  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -297,7 +292,9 @@ function EditDocumentType({ setOpenModal, openModal, selectedDocumentType }) {
               </h4>
             </div>
           ) : (
-            <h4 className="md:text-[1vw] text-[3.5vw] text-[#ffffff]">Update</h4>
+            <h4 className="md:text-[1vw] text-[3.5vw] text-[#ffffff]">
+              Update
+            </h4>
           )}
         </button>
       </form>

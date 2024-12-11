@@ -9,22 +9,16 @@ import {
 import LoadItems from "../../../components/LoadItems";
 import { toast } from "sonner";
 
-function AddNewUser({
+function EditUser({
   setOpenModal,
   openModal,
   institutionDepartments,
   isDepartmentsFetching,
   isDepartmentsLoading,
+  selectedUser,
 }) {
-  const initialUserInput = {
-    first_name: "",
-    last_name: "",
-    other_name: "",
-    email: "",
-    phone: "",
-    address: "",
-  };
-  const [userInput, setUserInput] = useState(initialUserInput);
+  const [userInput, setUserInput] = useState([]);
+  const [userInitialInput, setUserInitialInput] = useState([]);
   const [selectedGender, setSelectedGender] = useState("");
   const [selectedDepartment, setSelectedDepartment] = useState({});
   const [groupedPermissions, setGroupedPermissions] = useState({});
@@ -33,6 +27,19 @@ function AddNewUser({
     { title: "Male", value: "male" },
     { title: "Female", value: "female" },
   ];
+
+  useEffect(() => {
+    if (selectedUser) {
+      setUserInput(selectedUser);
+      setUserInitialInput(selectedUser);
+      const gender = data?.find((item) => item?.value === selectedUser?.gender);
+      const department = institutionDepartments?.departments?.data?.find(
+        (item) => item?.id === selectedUser?.department_id
+      );
+      setSelectedGender(gender);
+      setSelectedDepartment(department);
+    }
+  }, [selectedUser]);
 
   const handleSeletedGender = (item) => {
     setSelectedGender(item);
@@ -57,8 +64,16 @@ function AddNewUser({
 
   useEffect(() => {
     if (!openModal) {
-      setUserInput(initialUserInput);
-      setSelectedPermissions([]);
+      setUserInput(userInitialInput);
+      const gender = data?.find(
+        (item) => item?.value === userInitialInput?.gender
+      );
+
+      const department = institutionDepartments?.departments?.data?.find(
+        (item) => item?.id === userInitialInput?.department_id
+      );
+      setSelectedDepartment(department);
+      setSelectedGender(gender);
     }
   }, [openModal]);
 
@@ -89,6 +104,11 @@ function AddNewUser({
       setGroupedPermissions(groups);
     }
   }, [selectedDepartment]);
+
+  console.log("user", selectedPermissions);
+  console.log("user", selectedDepartment?.id);
+  console.log("user", userInput);
+  console.log("user", selectedGender?.value);
 
   const [
     createInstitutionUser,
@@ -346,12 +366,12 @@ function AddNewUser({
             <div className="flex items-center justify-center gap-2">
               <LoadItems color={"#ffffff"} size={15} />
               <h4 className="md:text-[1vw] text-[3.5vw] text-[#ffffff]">
-                Submitting...
+                Updating...
               </h4>
             </div>
           ) : (
             <h4 className="md:text-[1vw] text-[3.5vw] text-[#ffffff]">
-              Submit
+              Update
             </h4>
           )}
         </button>
@@ -360,4 +380,4 @@ function AddNewUser({
   );
 }
 
-export default AddNewUser;
+export default EditUser;

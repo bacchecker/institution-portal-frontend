@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import {
   useCreateNextScreenMutation,
   useDeleteDomentTypeMutation,
+  useDeleteInstitutionUserMutation,
   useGetAllExistingDocumentTypesQuery,
   useGetInstitutionDepartmentsQuery,
   useGetInstitutionDocumentTypesQuery,
@@ -18,13 +19,14 @@ import Swal from "sweetalert2";
 import LoadingPage from "../../components/LoadingPage";
 import EditDocumentType from "./institutionDocumentTypesComponents/EditDocumentType";
 import AddNewUser from "./institutionPortalUsersComponents/AddNewUser";
+import EditUser from "./institutionPortalUsersComponents/EditUser";
 
 function InstitutionPortalUsers({ setActiveStep }) {
   const [pageNumber, setPageNumber] = useState(1);
   const dispatch = useDispatch();
   const [openModal, setOpenModal] = useState(false);
   const [openEditModal, setOpenEditModal] = useState(false);
-  const [selectedDocumentType, setSelectedDocumentType] = useState({});
+  const [selectedUser, setSelectedUser] = useState({});
 
   const user = JSON.parse(secureLocalStorage.getItem("user"));
 
@@ -40,11 +42,9 @@ function InstitutionPortalUsers({ setActiveStep }) {
     isFetching: isDepartmentsFetching,
   } = useGetInstitutionDepartmentsQuery({ page: 1, perPage: 100 });
 
-  console.log("insti", institutionDepartments);
-
-  const handleDocumentType = (documentType) => {
+  const handleSelectedUser = (user) => {
     setOpenEditModal(true);
-    setSelectedDocumentType(documentType);
+    setSelectedUser(user);
   };
 
   const handleBackButton = () => {
@@ -119,24 +119,24 @@ function InstitutionPortalUsers({ setActiveStep }) {
               selectedTemplate: user.selectedTemplate,
             })
           );
-          setActiveStep(3);
+          setActiveStep(5);
         }
       });
     }
   }, [isSuccess]);
 
   const [
-    deleteDomentType,
+    deleteInstitutionUser,
     {
-      data: documentTypeData,
-      isSuccess: isDeleteDomentTypeSuccess,
-      isLoading: isDeleteDomentTypeLoading,
+      data: institutionUserData,
+      isSuccess: isDeleteInstitutionUserSuccess,
+      isLoading: isDeleteInstitutionUserLoading,
     },
-  ] = useDeleteDomentTypeMutation();
+  ] = useDeleteInstitutionUserMutation();
 
-  const handleClickDelete = async (documentType) => {
+  const handleClickDelete = async (user) => {
     const result = await Swal.fire({
-      title: "Are you sure you want to delete this document type?",
+      title: "Are you sure you want to delete this user?",
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#febf4c",
@@ -146,24 +146,24 @@ function InstitutionPortalUsers({ setActiveStep }) {
     });
 
     if (result.isConfirmed) {
-      await deleteDomentType({ id: documentType?.id });
+      await deleteInstitutionUser({ id: user?.id });
     }
   };
 
   useEffect(() => {
-    if (isDeleteDomentTypeSuccess) {
+    if (isDeleteInstitutionUserSuccess) {
       Swal.fire({
         title: "Success",
-        text: "Document Type deleted successfully",
+        text: "User deleted successfully",
         icon: "success",
         button: "OK",
       });
     }
-  }, [isDeleteDomentTypeSuccess]);
+  }, [isDeleteInstitutionUserSuccess]);
 
   return (
     <>
-      {isDeleteDomentTypeLoading && <LoadingPage />}
+      {isDeleteInstitutionUserLoading && <LoadingPage />}
       <div className="flex flex-col w-full">
         <div className="flex w-full relative">
           <div className="w-[75%] px-[4vw] py-[2vw] mt-[3.5vw]">
@@ -340,7 +340,7 @@ function InstitutionPortalUsers({ setActiveStep }) {
                                       <div className="action-dropdown-content">
                                         <button
                                           onClick={() =>
-                                            handleDocumentType(documentType)
+                                            handleSelectedUser(user)
                                           }
                                           className="dropdown-item flex justify-between disabled:cursor-not-allowed"
                                         >
@@ -348,7 +348,7 @@ function InstitutionPortalUsers({ setActiveStep }) {
                                         </button>
                                         <button
                                           onClick={() =>
-                                            handleClickDelete(documentType)
+                                            handleClickDelete(user)
                                           }
                                           className="dropdown-item flex justify-between disabled:cursor-not-allowed"
                                         >
@@ -451,10 +451,13 @@ function InstitutionPortalUsers({ setActiveStep }) {
             isDepartmentsFetching={isDepartmentsFetching}
             isDepartmentsLoading={isDepartmentsLoading}
           />
-          <EditDocumentType
+          <EditUser
             setOpenModal={setOpenEditModal}
             openModal={openEditModal}
-            selectedDocumentType={selectedDocumentType}
+            selectedUser={selectedUser}
+            institutionDepartments={institutionDepartments}
+            isDepartmentsFetching={isDepartmentsFetching}
+            isDepartmentsLoading={isDepartmentsLoading}
           />
         </div>
       </div>
