@@ -95,33 +95,24 @@ function InstitutionPortalUsers({ setActiveStep }) {
 
   useEffect(() => {
     if (isSuccess) {
-      Swal.fire({
-        title: "Success",
-        text: "Institution Document Type(s) created successfully",
-        icon: "success",
-        button: "OK",
-        confirmButtonColor: "#00b17d",
-      }).then((isOkay) => {
-        if (isOkay) {
-          const updatedInstitution = {
-            ...user?.institution,
-            current_step: "5",
-          };
-          window.scrollTo({
-            top: 0,
-            behavior: "smooth",
-          });
-          dispatch(
-            setUser({
-              user: user?.user,
-              two_factor: user.two_factor,
-              institution: updatedInstitution,
-              selectedTemplate: user.selectedTemplate,
-            })
-          );
-          setActiveStep(5);
-        }
+      const updatedInstitution = {
+        ...user?.institution,
+        current_step: "5",
+        setup_done: 1,
+      };
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
       });
+      dispatch(
+        setUser({
+          user: user?.user,
+          two_factor: user.two_factor,
+          institution: updatedInstitution,
+          selectedTemplate: user.selectedTemplate,
+        })
+      );
+      setActiveStep(5);
     }
   }, [isSuccess]);
 

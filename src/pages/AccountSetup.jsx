@@ -4,9 +4,11 @@ import InstitutionDataSetup from "./accountSetupComponents/InstitutionDataSetup"
 import InstitutionDocumentTypes from "./accountSetupComponents/InstitutionDocumentTypes";
 import InstitutionDepartments from "./accountSetupComponents/InstitutionDepartments";
 import InstitutionPortalUsers from "./accountSetupComponents/InstitutionPortalUsers";
+import { useNavigate } from "react-router-dom";
 
 function AccountSetup() {
   const [activeStep, setActiveStep] = useState();
+  const navigate = useNavigate();
   const current_step = JSON?.parse(secureLocalStorage?.getItem("user"))
     ?.institution?.current_step;
 
@@ -236,9 +238,45 @@ function AccountSetup() {
       {(parseInt(current_step) === 3 || activeStep === 3) && (
         <InstitutionDepartments setActiveStep={(e) => setActiveStep(e)} />
       )}
-       {(parseInt(current_step) === 4 || activeStep === 4) && (
+      {(parseInt(current_step) === 4 || activeStep === 4) && (
         <InstitutionPortalUsers setActiveStep={(e) => setActiveStep(e)} />
       )}
+
+      <div
+        className={`fixed  bg-[#000000dd] z-[30] flex items-center justify-center transition-all duration-300 w-[100vw] h-[100vh] ${
+          parseInt(current_step) === 5 || activeStep === 5
+            ? "top-0 left-0 right-0 bottom-0"
+            : "top-0 left-[100vw] right-0"
+        }`}
+      >
+        <div className="w-[40vw] bg-[#ffffff] rounded-[0.2vw]">
+          <div className="w-full h-[20vw]">
+            <img
+              src="/assets/img/success.svg"
+              alt=""
+              className="w-full h-full object-cover"
+            />
+          </div>
+          <h4 className="text-[1.6vw] font-[700] text-center">
+            Congratulations!
+          </h4>
+          <h4 className="text-[1vw] text-center">
+            Your account is all set up and ready to go. <br />
+            <span className="font-[600]">Welcome aboard!</span>
+          </h4>
+          <div className="w-full border-t px-[4vw]">
+            <button
+              type="button"
+              onClick={() => navigate("/dashboard")}
+              className="bg-[#FF0404] md:my-[2vw!important] my-[4vw!important] w-full flex justify-center items-center md:py-[0.7vw] py-[2vw] h-[fit-content] md:rounded-[0.3vw] rounded-[2vw] gap-[0.5vw] hover:bg-[#ef4545] transition-all duration-300 disabled:bg-[#fa6767]"
+            >
+              <h4 className="md:text-[1vw] text-[3.5vw] text-[#ffffff]">
+                Continue
+              </h4>
+            </button>
+          </div>
+        </div>
+      </div>
     </>
   );
 }
