@@ -751,6 +751,17 @@ const [submittedFilters, setSubmittedFilters] = useState({});
                 setData(null);
               }}
             >
+              Close
+            </Button>
+            <Button
+              radius="none"
+              size="md"
+              className="w-1/2 bg-gray-300 text-gray-800 font-medium !rounded-md"
+              onClick={() => {
+                setOpenDrawer(false);
+                setData(null);
+              }}
+            >
               Deny Request
             </Button>
 
