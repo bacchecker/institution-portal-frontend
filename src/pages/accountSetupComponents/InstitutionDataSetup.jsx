@@ -102,6 +102,8 @@ function InstitutionDataSetup({ setActiveStep }) {
 
   useEffect(() => {
     if (isSuccess && data) {
+      console.log("data", data);
+
       Swal.fire({
         title: "Success",
         text: data?.message,
@@ -110,11 +112,15 @@ function InstitutionDataSetup({ setActiveStep }) {
         confirmButtonColor: "#00b17d",
       }).then((isOkay) => {
         if (isOkay) {
+          const updatedInstitution = {
+            ...data.institution,
+            current_step: "2",
+          };
           dispatch(
             setUser({
               user: user.user,
               two_factor: user.two_factor,
-              institution: data.institution,
+              institution: updatedInstitution,
               selectedTemplate: user.selectedTemplate,
             })
           );

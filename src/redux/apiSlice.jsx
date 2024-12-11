@@ -8,7 +8,9 @@ export const baccheckerApi = createApi({
     const token = JSON?.parse(secureLocalStorage?.getItem("userToken"))?.token;
 
     const result = await fetchBaseQuery({
-      baseUrl: "https://backend.baccheck.online/api",
+      // baseUrl: "https://backend.baccheck.online/api",
+      baseUrl: "http://aw8kkg8ck48040oc4cgo44so.67.205.158.15.sslip.io/api",
+
       prepareHeaders: (headers) => {
         if (token) {
           headers.set("Authorization", `Bearer ${token}`);
@@ -267,6 +269,15 @@ export const baccheckerApi = createApi({
       }),
       invalidatesTags: ["Department"],
     }),
+
+    updateUser: builder.mutation({
+      query: ({ id, body }) => ({
+        url: `/institution/update-user/${id}`,
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["InstitutionUser"],
+    }),
   }),
 });
 
@@ -297,4 +308,5 @@ export const {
   useGetInstitutionUsersQuery,
   useCreateInstitutionUserMutation,
   useDeleteInstitutionUserMutation,
+  useUpdateUserMutation,
 } = baccheckerApi;

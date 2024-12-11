@@ -7,13 +7,26 @@ function AccountUnderReview() {
   const [openModal, setOpenModal] = useState(false);
   const navigate = useNavigate();
   const user = JSON?.parse(secureLocalStorage?.getItem("user"));
+  const [activeFeature, setActiveFeature] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setActiveFeature((prev) => (prev + 1) % 3);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, []);
+
+  console.log("stts", activeFeature);
+  
 
   return (
     <>
       {user.institution.status === "inactive" ? (
         <>
           <div className="w-full h-[8vw] bg-[#ff0404] relative">
-            <div className="bg-[#D9D9D9] absolute-pos-justify-center w-[10vw] h-[10vw] rounded-[50%] mt-[5vw]"></div>
+            <div className="bg-[#e3e3e3] absolute-pos-justify-center w-[10vw] h-[10vw] rounded-[50%] mt-[5vw] flex justify-center items-center">
+            <i class='bx bx-file-find text-[4vw] text-[#ff0404]'></i>
+            </div>
           </div>
           <div className="w-full flex flex-col justify-center mt-[8vw]">
             <h1 className="text-[2vw] font-[600] text-center">
@@ -33,7 +46,13 @@ function AccountUnderReview() {
             </h4>
           </div>
           <div className="w-full flex justify-center gap-[1vw] mt-[1vw]">
-            <div className="w-[20vw] bg-[#FBFBFB] h-[9vw] rounded-[0.5vw] p-[1vw]">
+            <div
+              className={`w-[20vw] bg-[#FBFBFB] h-[9vw] rounded-[0.5vw] p-[1vw] ${
+                activeFeature === 0
+                  ? "scale-105 shadow-lg shadow-[#ff0404]/20 border border-[#ff04044c]"
+                  : "scale-100"
+              }`}
+            >
               <div className="flex items-center gap-[0.5vw]">
                 <div className="w-[2.5vw] h-[2.5vw] rounded-[50%] bg-[#ff0404] flex items-center justify-center">
                   <img
@@ -51,7 +70,13 @@ function AccountUnderReview() {
                 preferred format (soft copy or hard copy).
               </h4>
             </div>
-            <div className="w-[20vw] bg-[#FBFBFB] h-[9vw] rounded-[0.5vw] p-[1vw]">
+            <div
+              className={`w-[20vw] bg-[#FBFBFB] h-[9vw] rounded-[0.5vw] p-[1vw] ${
+                activeFeature === 1
+                  ? "scale-105 shadow-lg shadow-[#ff0404]/20 border border-[#ff04044c]"
+                  : "scale-100"
+              }`}
+            >
               <div className="flex items-center gap-[0.5vw]">
                 <div className="w-[2.5vw] h-[2.5vw] rounded-[50%] bg-[#ff0404] flex items-center justify-center">
                   <img
@@ -67,7 +92,13 @@ function AccountUnderReview() {
                 authenticity and completeness
               </h4>
             </div>
-            <div className="w-[20vw] bg-[#FBFBFB] h-[9vw] rounded-[0.5vw] p-[1vw]">
+            <div
+              className={`w-[20vw] bg-[#FBFBFB] h-[9vw] rounded-[0.5vw] p-[1vw] ${
+                activeFeature === 2
+                  ? "scale-105 shadow-lg shadow-[#ff0404]/20 border border-[#ff04044c]"
+                  : "scale-100"
+              }`}
+            >
               <div className="flex items-center gap-[0.5vw]">
                 <div className="w-[2.5vw] h-[2.5vw] rounded-[50%] bg-[#ff0404] flex items-center justify-center">
                   <img

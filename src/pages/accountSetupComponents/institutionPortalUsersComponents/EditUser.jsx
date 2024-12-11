@@ -3,8 +3,7 @@ import SideModal from "../../../components/SideModal";
 import SelectInput from "../../../components/SelectInput";
 import Swal from "sweetalert2";
 import {
-  useCreateInstitutionDocumentTypeMutation,
-  useCreateInstitutionUserMutation,
+  useUpdateUserMutation,
 } from "../../../redux/apiSlice";
 import LoadItems from "../../../components/LoadItems";
 import { toast } from "sonner";
@@ -36,6 +35,8 @@ function EditUser({
       const department = institutionDepartments?.departments?.data?.find(
         (item) => item?.id === selectedUser?.department_id
       );
+      const perms = selectedUser?.permissions?.map((item) => item.id);
+      setSelectedPermissions(perms);
       setSelectedGender(gender);
       setSelectedDepartment(department);
     }
@@ -72,6 +73,8 @@ function EditUser({
       const department = institutionDepartments?.departments?.data?.find(
         (item) => item?.id === userInitialInput?.department_id
       );
+      const perms = institutionDepartments?.permissions?.map((item) => item.id);
+      setSelectedPermissions(perms);
       setSelectedDepartment(department);
       setSelectedGender(gender);
     }
@@ -105,19 +108,12 @@ function EditUser({
     }
   }, [selectedDepartment]);
 
-  console.log("user", selectedPermissions);
-  console.log("user", selectedDepartment?.id);
-  console.log("user", userInput);
-  console.log("user", selectedGender?.value);
-
-  const [
-    createInstitutionUser,
-    { data: userData, isSuccess, isLoading, isError, error },
-  ] = useCreateInstitutionUserMutation();
+  const [updateUser, { data: userData, isSuccess, isLoading, isError, error }] =
+    useUpdateUserMutation();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const { first_name, last_name, other_name, email, phone, address } =
+    const { first_name, last_name, other_name, email, phone, address, id } =
       userInput;
 
     if (
@@ -143,29 +139,44 @@ function EditUser({
         button: "OK",
       });
     } else {
-      try {
-        await createInstitutionUser({
-          first_name,
-          last_name,
-          other_name,
-          email,
-          phone,
-          address,
-          department_id: selectedDepartment?.id,
-          gender: selectedGender?.value,
-          permissions: selectedPermissions,
-        });
-      } catch (error) {
-        toast.error("Failed to create user", {
-          position: "top-right",
-          autoClose: 1202,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        });
+      const result = await Swal.fire({
+        title: "Are you sure you want to update this user?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#febf4c",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, I'm sure",
+        cancelButtonText: "No, cancel",
+      });
+
+      if (result.isConfirmed) {
+        try {
+          await updateUser({
+            id,
+            body: {
+              first_name,
+              last_name,
+              other_name,
+              email,
+              phone,
+              address,
+              department_id: selectedDepartment?.id,
+              gender: selectedGender?.value,
+              permissions: selectedPermissions,
+            },
+          });
+        } catch (error) {
+          toast.error("Failed to create user", {
+            position: "top-right",
+            autoClose: 1202,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+          });
+        }
       }
     }
   };
@@ -174,7 +185,7 @@ function EditUser({
     if (isSuccess && userData) {
       Swal.fire({
         title: "Success",
-        text: "User created successfully",
+        text: "User Updated successfully",
         icon: "success",
         button: "OK",
         confirmButtonColor: "#00b17d",
@@ -339,7 +350,7 @@ function EditUser({
                                   <input
                                     type="checkbox"
                                     className="checkbox-design1"
-                                    checked={selectedPermissions.includes(id)}
+                                    checked={selectedPermissions?.includes(id)}
                                     onChange={() => handleCheckboxChange(id)}
                                   />
                                   {`Can ${action.replace("-", " ")}`}
