@@ -19,6 +19,7 @@ import {
   SelectItem,
   TableCell,
   TableRow,
+  Textarea,
   useDisclosure,
 } from "@nextui-org/react";
 import CustomTable from "@components/CustomTable";
@@ -45,6 +46,7 @@ import { PiQueueFill } from "react-icons/pi";
 import { FcCancel } from "react-icons/fc";
 import { MdOutlineFileDownload, MdOutlineFilterAlt } from "react-icons/md";
 import { MdOutlineFilterAltOff } from "react-icons/md";
+import DeleteModal from "../../components/DeleteModal";
 
 const ItemCard = ({ title, value }) => (
   <div className="flex gap-4 items-center">
@@ -73,7 +75,7 @@ export default function DocumentRequest() {
   const [sortBy, setSortBy] = useState(null);
   const [status, setStatus] = useState(null);
   const [sortOrder, setSortOrder] = useState("asc");
- 
+  const declineDisclosure = useDisclosure();
   const { mutate } = useSWRConfig();
   const [allRequests, setAllRequests] = useState(0);
   const [pending, setPending] = useState(0);
@@ -719,8 +721,10 @@ const [submittedFilters, setSubmittedFilters] = useState({});
                       </div>
                     ))
                   ) : (
-                    <p className="border rounded-md py-1.5 pl-4">No file attached</p>
+                    data?.status != "rejected" &&(<p className="border rounded-md py-1.5 pl-4">No file attached</p>)
                   )}
+
+                 
 
                   {data?.status == "processing" && (
                     <div className="flex items-center">
@@ -740,6 +744,42 @@ const [submittedFilters, setSubmittedFilters] = useState({});
               </div>
             ) : null}
           </div>
+          <div className="w-full mb-2 -mt-4">
+            {data?.status == "rejected" && (
+              <div className="w-full">
+                <div className="dark:bg-slate-950 border rounded-md bg-white p-2 shadow-md">
+                  
+                    <div className="flex-row">
+                      <div className="flex-1 mb-2">
+                        <div>
+                          <p className="font-semibold text-bChkRed">Rejection Reason</p>
+                        </div>
+                        <div>
+                          <p>{data?.rejection_reason}</p>
+                        </div>
+                      </div>
+                      <div className="flex-1 mb-2">
+                        <p className="font-semibold text-bChkRed">Rejected By:</p>
+                        <p className="col-span-4">
+                          {data?.rejected_by
+                            ? `${data.rejected_by.first_name} ${data.rejected_by.last_name}`
+                            : 'N/A'}
+                        </p>
+                      </div>
+
+                      <div className="flex-1 mb-2">
+                        <p className="font-semibold text-bChkRed">Rejection Date</p>
+                        <p>
+                          {moment(data?.updated_at).format("Do MMMM, YYYY")}
+                        </p>
+                      </div>
+                    </div>
+                </div>
+
+                
+              </div>
+            )}
+          </div>
 
           <div className="w-full flex items-center space-x-2 justify-center border-t pt-2">
             <Button
@@ -753,17 +793,18 @@ const [submittedFilters, setSubmittedFilters] = useState({});
             >
               Close
             </Button>
-            <Button
+
+            {(data?.status == "received" || data?.status == "submitted") && (
+              <Button
               radius="none"
               size="md"
               className="w-1/2 bg-gray-300 text-gray-800 font-medium !rounded-md"
-              onClick={() => {
-                setOpenDrawer(false);
-                setData(null);
-              }}
-            >
-              Deny Request
-            </Button>
+                onClick={() => declineDisclosure.onOpen()}
+              >
+                Deny Request
+              </Button>
+            )}
+           
 
             {data?.status !== "created" && data?.status !== "completed" && (
               <Button
@@ -778,6 +819,8 @@ const [submittedFilters, setSubmittedFilters] = useState({});
                   ? "Process Request"
                   : data?.status == "processing"
                   ? "Complete Request"
+                  : data?.status == "rejected"
+                  ? "Revert Rejection"
                   : "Acknowledge Request"}
               </Button>
             )}
@@ -948,6 +991,8 @@ const [submittedFilters, setSubmittedFilters] = useState({});
                   ? "received"
                   : data?.status == "received"
                   ? "processing"
+                  : data?.status == "rejected"
+                  ? "received"
                   : "completed",
             }
           );
@@ -973,10 +1018,62 @@ const [submittedFilters, setSubmittedFilters] = useState({});
               ? "Received"
               : data?.status == "received"
               ? "Processing"
+              : data?.status == "rejected"
+              ? "Received"
               : "Complete Request"}
           </span>
         </p>
       </ConfirmModal>
+
+      <DeleteModal
+        disclosure={declineDisclosure}
+        processing={processing}
+        title="Decline Request"
+        onButtonClick={async () => {
+          setProcessing(true);
+          await axios
+            .post(
+              `/institution/requests/document-requests/${data?.id}/status`,
+              {
+                id: data?.id,
+                institution_id: data?.institution_id,
+                user_id: data?.user_id,
+                unique_code: data?.unique_code,
+                status: "rejected",
+                rejection_reason: data?.rejection_reason,
+              }
+            )
+            .then((res) => {
+              console.log(res);
+
+              setData(res?.data);
+              setProcessing(false);
+              toast.success("Request declined successfully");
+              mutate("/institution/requests/document-requests");
+              declineDisclosure.onClose();
+            })
+            .catch((err) => {
+              console.log(err);
+              toast.error(err.response.data.message);
+              setProcessing(false);
+              declineDisclosure.onClose();
+              return;
+            });
+        }}
+      >
+        <p className="">
+          Are you sure to change status to{" "}
+          <span className="font-semibold">Decline Request</span>?
+        </p>
+
+        <Textarea
+          name="rejection_reason"
+          label="Reason"
+          onChange={(e) =>
+            setData((prev) => ({ ...prev, rejection_reason: e.target.value }))
+          }
+        />
+      </DeleteModal>
     </div>
   );
 }

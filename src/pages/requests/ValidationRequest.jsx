@@ -31,10 +31,11 @@ import DownloadIcon from "@assets/icons/download";
 import ConfirmModal from "../../components/confirm-modal";
 import DeleteModal from "../../components/DeleteModal";
 import toast from "react-hot-toast";
-import { FaChevronLeft, FaChevronRight, FaHeart } from "react-icons/fa6";
+import { FaChevronLeft, FaChevronRight, FaHeart, FaRegCircleCheck } from "react-icons/fa6";
 import { IoDocuments } from "react-icons/io5";
 import { PiQueueFill } from "react-icons/pi";
 import { FcCancel } from "react-icons/fc";
+import { GiCancel } from "react-icons/gi";
 import { MdOutlineFilterAlt, MdOutlineFilterAltOff } from "react-icons/md";
 
 const ItemCard = ({ title, value }) => (
@@ -77,6 +78,19 @@ export default function ValidationRequest() {
     end_date: null,
   });
   const [submittedFilters, setSubmittedFilters] = useState({});
+  const [answers, setAnswers] = useState({});
+
+  const handleAnswerChange = (questionId, answer) => {
+    setAnswers((prev) => ({
+      ...prev,
+      [questionId]: answer
+    }));
+  };
+  const questions = [
+    { id: "question1", text: "Is the sky blue?" },
+    { id: "question2", text: "Do you like coffee?" },
+    { id: "question3", text: "Is React a library?" }
+  ];
 
   const institutionValidationRequests = async () => {
     setIsLoading(true)
@@ -461,183 +475,253 @@ export default function ValidationRequest() {
         classNames="w-[100vw] md:w-[45vw]"
       >
         <div className="h-full flex flex-col -mt-2 xl:pl-2 font-semibold justify-between">
-          <div className="flex flex-col gap-2 mb-6">
-            <div className="grid grid-cols-3 gap-y-4 gap-x-2 border-b pb-4">
-              <div className="text-gray-500">
-                Request ID
-              </div>
-              <div className="col-span-2">
-                #{data?.unique_code}
-              </div>
-              <div className="text-gray-500">
-                Requested Date
-              </div>
-              <div className="col-span-2">
-                {moment(data?.created_at).format("Do MMMM, YYYY")}
-              </div>
-              <div className="text-gray-500">
-                Status
-              </div>
-              <div
-                className={`col-span-2 flex items-center justify-center py-1 space-x-2 w-28 
-                  ${
-                    data?.status === 'cancelled' || data?.status === 'rejected'
-                      ? 'text-red-600 bg-red-200'
-                      : data?.status === 'completed'
-                      ? 'text-green-600 bg-green-200'
-                      : data?.status === 'processing' || data?.status === 'received'
-                      ? 'text-yellow-600 bg-yellow-200'
-                      : 'text-gray-600 bg-gray-200'
-                  }`}
-              >
+          {data?.status != "processing" ?
+          (
+            <div className="flex flex-col gap-2 mb-6">
+              <div className="grid grid-cols-3 gap-y-4 gap-x-2 border-b pb-4">
+                <div className="text-gray-500">
+                  Request ID
+                </div>
+                <div className="col-span-2">
+                  #{data?.unique_code}
+                </div>
+                <div className="text-gray-500">
+                  Requested Date
+                </div>
+                <div className="col-span-2">
+                  {moment(data?.created_at).format("Do MMMM, YYYY")}
+                </div>
+                <div className="text-gray-500">
+                  Status
+                </div>
                 <div
-                  className={`h-2 w-2 rounded-full ${
-                    data?.status === 'cancelled' || data?.status === 'rejected'
-                      ? 'bg-red-600'
-                      : data?.status === 'completed'
-                      ? 'bg-green-600'
-                      : data?.status === 'processing' || data?.status === 'received'
-                      ? 'bg-yellow-600'
-                      : 'bg-gray-600'
-                  }`}
-                ></div>
-                <p>{data?.status.charAt(0).toUpperCase() + data?.status.slice(1)}</p>
-              </div>
-              <div className="text-gray-500">
-                Total Cash
-              </div>
-              <div className="col-span-2">
-              GH¢ {data?.total_amount}
-              </div>
-            </div>
-            <div className="py-4">
-              <p className="font-semibold mb-4 text-base">Applicant Details</p>
-              <div className="grid grid-cols-3 gap-y-4 border-b pb-4">
-                <div className="text-gray-500">
-                  Applicant Name
-                </div>
-                <div className="col-span-2">
-                  {data?.user?.first_name} {data?.user?.other_name} {data?.user?.last_name}
-                </div>
-                <div className="text-gray-500">
-                  Applicant Email
-                </div>
-                <div className="col-span-2">
-                  {data?.user?.email}
-                </div>
-                <div className="text-gray-500">
-                  Phone Number
-                </div>
-                <div className="col-span-2">
-                  {data?.user?.phone}
-                </div>
-                <div className="text-gray-500">
-                  Index Number
-                </div>
-                <div className="col-span-2">
-                  {data?.index_number}
-                </div>
-                <div className="text-gray-500 mt-2">
-                  Applicant Picture
-                </div>
-                <div className="col-span-2 w-10 h-10 rounded-full bg-gray-200">
-                  <img src={data?.user?.profile_photo_url} alt="" />
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-2">
-              <section className="mb-3 flex items-center justify-between">
-                <div className="flex gap-2 items-center">
-                  <ClipIcon />
-                  <p className="font-semibold ">Attachments</p>
-                </div>
-
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  color="primary"
-                  isLoading={bulkDownloadLoading}
-                  isDisabled={bulkDownloadLoading}
-                  onClick={() => {
-                    setBulkDownloadLoading(true);
-                    handleBulkDownload(data.files.map((f) => f.path));
-                  }}
-                  startContent={<DownloadIcon />}
+                  className={`col-span-2 flex items-center justify-center py-1 space-x-2 w-28 
+                    ${
+                      data?.status === 'cancelled' || data?.status === 'rejected'
+                        ? 'text-red-600 bg-red-200'
+                        : data?.status === 'completed'
+                        ? 'text-green-600 bg-green-200'
+                        : data?.status === 'processing' || data?.status === 'received'
+                        ? 'text-yellow-600 bg-yellow-200'
+                        : 'text-gray-600 bg-gray-200'
+                    }`}
                 >
-                  Download all
-                </Button>
-              </section>
+                  <div
+                    className={`h-2 w-2 rounded-full ${
+                      data?.status === 'cancelled' || data?.status === 'rejected'
+                        ? 'bg-red-600'
+                        : data?.status === 'completed'
+                        ? 'bg-green-600'
+                        : data?.status === 'processing' || data?.status === 'received'
+                        ? 'bg-yellow-600'
+                        : 'bg-gray-600'
+                    }`}
+                  ></div>
+                  <p>{data?.status.charAt(0).toUpperCase() + data?.status.slice(1)}</p>
+                </div>
+                <div className="text-gray-500">
+                  Total Cash
+                </div>
+                <div className="col-span-2">
+                GH¢ {data?.total_amount}
+                </div>
+              </div>
+              <div className="py-4">
+                <p className="font-semibold mb-4 text-base">Applicant Details</p>
+                <div className="grid grid-cols-3 gap-y-4 border-b pb-4">
+                  <div className="text-gray-500">
+                    Applicant Name
+                  </div>
+                  <div className="col-span-2">
+                    {data?.user?.first_name} {data?.user?.other_name} {data?.user?.last_name}
+                  </div>
+                  <div className="text-gray-500">
+                    Applicant Email
+                  </div>
+                  <div className="col-span-2">
+                    {data?.user?.email}
+                  </div>
+                  <div className="text-gray-500">
+                    Phone Number
+                  </div>
+                  <div className="col-span-2">
+                    {data?.user?.phone}
+                  </div>
+                  <div className="text-gray-500">
+                    Index Number
+                  </div>
+                  <div className="col-span-2">
+                    {data?.index_number}
+                  </div>
+                  <div className="text-gray-500 mt-2">
+                    Applicant Picture
+                  </div>
+                  <div className="col-span-2 w-10 h-10 rounded-full bg-gray-200">
+                    <img src={data?.user?.profile_photo_url} alt="" />
+                  </div>
+                </div>
+              </div>
 
-              <section className="grid grid-cols-2 gap-3">
-                <div className="gap-3 p-2 rounded-lg border dark:border-white/10">
-                  <div className="w-full flex flex-col gap-1">
-                    <p className="font-semibold">{data?.document_type?.name}</p>
-                    <p>GH¢ {data?.total_amount}</p>
+              <div className="-mt-4">
+                <section className="mb-3 flex items-center justify-between">
+                  <div className="flex gap-2 items-center">
+                    <p className="font-semibold ">Attachments</p>
+                  </div>
 
-                    <div className="flex justify-between">
-                      <div className="flex gap-2 items-center">
-                        <Chip size="sm">{data?.file?.extension}</Chip>
-                        <p>{filesize(data?.file?.size ?? 1000)}</p>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    color="primary"
+                    isLoading={bulkDownloadLoading}
+                    isDisabled={bulkDownloadLoading}
+                    onClick={() => {
+                      setBulkDownloadLoading(true);
+                      handleBulkDownload(data.files.map((f) => f.path));
+                    }}
+                    startContent={<DownloadIcon />}
+                  >
+                    Download all
+                  </Button>
+                </section>
+
+                <section className="grid grid-cols-2 gap-3">
+                  <div className="gap-3 p-2 rounded-lg border dark:border-white/10">
+                    <div className="w-full flex flex-col gap-1">
+                      <p className="font-semibold">{data?.document_type?.name}</p>
+                      <p>GH¢ {data?.total_amount}</p>
+
+                      <div className="flex justify-between">
+                        <div className="flex gap-2 items-center">
+                          <Chip size="sm">{data?.file?.extension}</Chip>
+                          <p>{filesize(data?.file?.size ?? 1000)}</p>
+                        </div>
+                        <p
+                          className="cursor-pointer p-1 rounded-lg bg-primary text-white text-xs"
+                          onClick={() => {
+                            window.location.href =
+                              "https://backend.baccheck.online/api/document/download" +
+                              "?path=" +
+                              encodeURIComponent(data?.file?.path);
+                          }}
+                        >
+                          Download
+                        </p>
                       </div>
-                      <p
-                        className="cursor-pointer p-1 rounded-lg bg-primary text-white text-xs"
-                        onClick={() => {
-                          window.location.href =
-                            "https://backend.baccheck.online/api/document/download" +
-                            "?path=" +
-                            encodeURIComponent(data?.file?.path);
-                        }}
-                      >
-                        Download
-                      </p>
                     </div>
                   </div>
-                </div>
-              </section>
-            </div>
+                </section>
+              </div>
 
-            <div>
-              {data?.status == "rejected" && (
-                <div className="mt-3">
-                  <Card className="dark:bg-slate-950">
-                    <CardHeader>
-                      <p className="font-bold">Rejection Reason</p>
-                    </CardHeader>
-                    <CardBody>
-                      <p>{data?.rejection_reason}</p>
-                    </CardBody>
-                  </Card>
-
+              <div>
+                {data?.status == "rejected" && (
                   <div className="mt-3">
                     <Card className="dark:bg-slate-950">
-                      <CardBody className="flex-row">
-                        <div className="flex-1">
-                          <p className="font-semibold">Rejected By:</p>
-                          <p className="col-span-4">
-                            {data?.rejected_by?.first_name}{" "}
-                            {data?.rejected_by?.last_name}
-                          </p>
-                        </div>
-
-                        <div className="flex-1">
-                          <p className="font-bold">Rejection Date</p>
-                          <p>
-                            {moment(data?.updated_at).format("Do MMMM, YYYY")}
-                          </p>
-                        </div>
+                      <CardHeader>
+                        <p className="font-bold">Rejection Reason</p>
+                      </CardHeader>
+                      <CardBody>
+                        <p>{data?.rejection_reason}</p>
                       </CardBody>
                     </Card>
+
+                    <div className="mt-3">
+                      <Card className="dark:bg-slate-950">
+                        <CardBody className="flex-row">
+                          <div className="flex-1">
+                            <p className="font-semibold">Rejected By:</p>
+                            <p className="col-span-4">
+                              {data?.rejected_by?.first_name}{" "}
+                              {data?.rejected_by?.last_name}
+                            </p>
+                          </div>
+
+                          <div className="flex-1">
+                            <p className="font-bold">Rejection Date</p>
+                            <p>
+                              {moment(data?.updated_at).format("Do MMMM, YYYY")}
+                            </p>
+                          </div>
+                        </CardBody>
+                      </Card>
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
+              </div>
             </div>
-          </div>
+          ):(
+            <div className="">
+              <div className="border-b pb-4">
+                <div className="mb-4">
+                  <p className="text-base">Student Information</p>
+                  <p className="font-normal">Student Information or Bio Data</p>
+                </div>
+                <div className="grid grid-cols-2 gap-x-3 gap-y-6">
+                  {questions.map((question) => (
+                    <div key={question.id} className="flex flex-col">
+                      {/* Question Text */}
+                      
+                      <div>
+                      <label for="first_name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{question.text}</label>
+                        <input type="text" id="first_name" value={'Joseph Abban'} class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="John" required />
+                      </div>
+
+                      {/* Yes/No Buttons */}
+                      <div className="flex space-x-4 text-base text-gray-600 font-normal">
+                        {/* Yes Button */}
+                        <div
+                          className={`flex items-center justify-center space-x-2 cursor-pointer ${
+                            answers[question.id] === "yes" ? "text-green-600" : "text-gray-600"
+                          }`}
+                          onClick={() => handleAnswerChange(question.id, "yes")}
+                        >
+                          <input
+                            type="radio"
+                            name={question.id}
+                            value="yes"
+                            checked={answers[question.id] === "yes"}
+                            onChange={() => handleAnswerChange(question.id, "yes")}
+                            className="hidden"
+                          />
+                          <FaRegCircleCheck size={18} />
+                          <p>Yes</p>
+                        </div>
+
+                        {/* No Button */}
+                        <div
+                          className={`flex items-center justify-center space-x-2 cursor-pointer ${
+                            answers[question.id] === "no" ? "text-red-600" : "text-gray-600"
+                          }`}
+                          onClick={() => handleAnswerChange(question.id, "no")}
+                        >
+                          <input
+                            type="radio"
+                            name={question.id}
+                            value="no"
+                            checked={answers[question.id] === "no"}
+                            onChange={() => handleAnswerChange(question.id, "no")}
+                            className="hidden"
+                          />
+                          <GiCancel size={18} />
+                          <p>No</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                  
+                </div>
+              </div>
+              
+              
+            </div>
+          )
+          }
+          
 
           <div className="flex items-center gap-3 justify-end">
             <Button
-              size="sm"
-              color="default"
+              radius="none"
+              size="md"
+              className="w-1/4 bg-black text-white font-medium !rounded-md"
               onClick={() => {
                 setOpenDrawer(false);
                 setData(null);
@@ -648,9 +732,9 @@ export default function ValidationRequest() {
 
             {(data?.status == "received" || data?.status == "submitted") && (
               <Button
-                color="danger"
-                className="font-montserrat font-semibold w-1/2"
-                size="sm"
+                radius="none"
+                size="md"
+                className="w-1/2 bg-gray-300 text-gray-800 font-medium !rounded-md"
                 onClick={() => declineDisclosure.onOpen()}
               >
                 Decline Request
@@ -661,9 +745,9 @@ export default function ValidationRequest() {
               data?.status !== "completed" &&
               data?.status !== "rejected" && (
                 <Button
-                  color="danger"
-                  className="font-montserrat font-semibold w-1/2"
-                  size="sm"
+                  radius="none"
+                  className="bg-bChkRed text-white font-medium w-1/2 !rounded-md"
+                  size="md"
                   onClick={() => changeStatusDisclosure.onOpen()}
                 >
                   {data?.status === "submitted"
