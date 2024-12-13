@@ -66,6 +66,7 @@ export default function ValidationRequest() {
   const [sortOrder, setSortOrder] = useState("asc");
 
   const [documentTypes, setDocumentTypes] = useState([]);
+  const [checkListSections, setCheckListSections] = useState([]);
   const [allRequests, setAllRequests] = useState(0);
   const [pending, setPending] = useState(0);
   const [rejected, setRejected] = useState(0);
@@ -86,6 +87,14 @@ export default function ValidationRequest() {
       [questionId]: answer
     }));
   };
+
+  const handleChange = (itemId, value) => {
+    setAnswers((prev) => ({
+      ...prev,
+      [itemId]: value,
+    }));
+  };
+
   const questions = [
     { id: "question1", text: "Is the sky blue?" },
     { id: "question2", text: "Do you like coffee?" },
@@ -427,7 +436,25 @@ export default function ValidationRequest() {
                 <Button
                   size="sm"
                   color="success"
-                  onClick={() => {
+                  onClick={async () => {
+                    if (item?.status === "processing") {
+                      try {
+                        const url = `/validation-checklist-items/${item?.document_type?.id}`;
+
+                        const response = await axios.get(url);
+
+                        setCheckListSections(response.data.data);
+
+                        // Optionally, set the data to state or process further
+                        setData((prev) => ({
+                          ...prev,
+                          checklistItems: response.data.data, // Example of adding fetched data to state
+                        }));
+                      } catch (error) {
+                        console.error("Error fetching data:", error);
+                      }
+                    }
+
                     setOpenDrawer(true);
                     setData(item);
                   }}
@@ -435,6 +462,7 @@ export default function ValidationRequest() {
                   View
                 </Button>
               </TableCell>
+
             </TableRow>
           ))}
         </CustomTable>
@@ -469,7 +497,7 @@ export default function ValidationRequest() {
       </section>
 
       <Drawer
-        title="Request Details"
+        title={data?.status != 'processing' ? 'Request Details' : 'Validation Questions'}
         isOpen={openDrawer}
         setIsOpen={setOpenDrawer}
         classNames="w-[100vw] md:w-[45vw]"
@@ -649,11 +677,11 @@ export default function ValidationRequest() {
               </div>
             </div>
           ):(
-            <div className="">
+            <div className="-mt-2">
               <div className="border-b pb-4">
                 <div className="mb-4">
                   <p className="text-base">Student Information</p>
-                  <p className="font-normal">Student Information or Bio Data</p>
+                  <p className="font-light text-gray-700 text-xs">Student Information or Bio Data</p>
                 </div>
                 <div className="grid grid-cols-2 gap-x-3 gap-y-6">
                   {questions.map((question) => (
@@ -661,12 +689,12 @@ export default function ValidationRequest() {
                       {/* Question Text */}
                       
                       <div>
-                      <label for="first_name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{question.text}</label>
-                        <input type="text" id="first_name" value={'Joseph Abban'} class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="John" required />
+                        <label for="first_name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{question.text}</label>
+                        <input type="text" id="first_name" value={'Joseph Abban'} class="border bg-white border-gray-300 text-gray-700 font-normal text-sm rounded-sm focus:outline-none block w-full p-2.5" placeholder="John" required />
                       </div>
 
                       {/* Yes/No Buttons */}
-                      <div className="flex space-x-4 text-base text-gray-600 font-normal">
+                      <div className="flex space-x-4 text-base text-gray-600 font-normal mt-1">
                         {/* Yes Button */}
                         <div
                           className={`flex items-center justify-center space-x-2 cursor-pointer ${
@@ -708,6 +736,82 @@ export default function ValidationRequest() {
                     </div>
                   ))}
                   
+                </div>
+                <div className="space-y-2">
+                {checkListSections.sections.map((section) => (
+                  <div key={section.id} className="space-y-4">
+                    {/* Section Header */}
+                    <h2 className="text-base">{section.name}</h2>
+                    {section.description && <p className="font-light text-gray-700 text-xs">{section.description}</p>}
+
+                    {/* Render Items */}
+                    <div className="space-y-4">
+                      {section.items.map((item) => (
+                        <div key={item.id} className="space-y-2 pb-2 border-b">
+                          {/* Question Text */}
+                          <div>
+                          <label for="first_name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{item.question_text}</label>
+                            <input type="text" id="first_name" value={'Joseph Abban'} class="border bg-white border-gray-300 text-gray-700 font-normal text-sm rounded-sm focus:outline-none block w-full p-2.5" placeholder="John" required />
+                          </div>
+                          <p className="text-lg font-medium">{item.question_text}</p>
+
+                          {/* Input Types */}
+                          {item.input_type === "yes_no" && (
+                            <div className="flex space-x-4 text-base text-gray-600">
+                              {/* Yes Option */}
+                              <div
+                                className={`flex items-center justify-center space-x-2 cursor-pointer ${
+                                  answers[item.id] === "yes" ? "text-green-600" : "text-gray-600"
+                                }`}
+                                onClick={() => handleChange(item.id, "yes")}
+                              >
+                                <input
+                                  type="radio"
+                                  name={item.id}
+                                  value="yes"
+                                  checked={answers[item.id] === "yes"}
+                                  onChange={() => handleChange(item.id, "yes")}
+                                  className="hidden"
+                                />
+                                <FaRegCircleCheck size={18} />
+                                <span>Yes</span>
+                              </div>
+
+                              {/* No Option */}
+                              <div
+                                className={`flex items-center justify-center space-x-2 cursor-pointer border rounded-md ${
+                                  answers[item.id] === "no" ? "text-red-600" : "text-gray-600"
+                                }`}
+                                onClick={() => handleChange(item.id, "no")}
+                              >
+                                <input
+                                  type="radio"
+                                  name={item.id}
+                                  value="no"
+                                  checked={answers[item.id] === "no"}
+                                  onChange={() => handleChange(item.id, "no")}
+                                  className="hidden"
+                                />
+                                <GiCancel size={18} />
+                                <span>No</span>
+                              </div>
+                            </div>
+                          )}
+
+                          {item.input_type === "text" && (
+                            <textarea
+                              className="w-full border rounded p-2 text-gray-700"
+                              rows="3"
+                              placeholder="Enter your answer..."
+                              value={answers[item.id] || ""}
+                              onChange={(e) => handleChange(item.id, e.target.value)}
+                            ></textarea>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
                 </div>
               </div>
               

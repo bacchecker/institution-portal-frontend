@@ -49,6 +49,7 @@ const Login = () => {
 
     try {
       const response = await axios.post("/auth/login", {
+        withCredentials: true,
         email: formData.email,
         password: formData.password,
         remember: isSelected,
