@@ -102,8 +102,6 @@ function InstitutionDataSetup({ setActiveStep }) {
 
   useEffect(() => {
     if (isSuccess && data) {
-      console.log("data", data);
-
       Swal.fire({
         title: "Success",
         text: data?.message,
@@ -136,7 +134,13 @@ function InstitutionDataSetup({ setActiveStep }) {
 
   useEffect(() => {
     if (isError) {
-      toast.error(error?.data?.message);
+      toast.error();
+      Swal.fire({
+        title: "Error",
+        text: error?.data?.message,
+        icon: "error",
+        button: "OK",
+      });
     }
   }, [isError]);
 
@@ -147,9 +151,14 @@ function InstitutionDataSetup({ setActiveStep }) {
           <h1 className="text-[1.5vw] font-[600] text-[#000]">
             Institution Account Setup
           </h1>
-          <h4 className="text-[0.9vw] mt-[0.5vw]">
-            Please provide all required details and manage your document types
-            efficiently <br /> to activate your institution's account
+          <h4 className="text-[0.9vw] my-[0.5vw] font-[500]">
+            Welcome to the setup page for your institution account!
+          </h4>
+          <h4 className="text-[0.9vw]">
+            Please provide all required details and configure your account
+            settings to manage your document types effectively. Completing this
+            step will activate your institution’s account and unlock full access
+            to BacChecker’s services.
           </h4>
         </div>
       </div>
@@ -340,8 +349,12 @@ function InstitutionDataSetup({ setActiveStep }) {
               >
                 <img src="/assets/img/uplo.svg" alt="" className="w-[1.5vw]" />
               </label>
-              <h4 className="pl-[1vw] text-[1vw]">
-                {selectedImage ? selectedImage?.name : "Browse to upload image"}{" "}
+              <h4 className="pl-[1vw] text-[1vw] max-w-[29vw] overflow-hidden text-ellipsis">
+                {userInput?.logo
+                  ? userInput?.logo
+                  : selectedImage
+                  ? selectedImage?.name
+                  : "Browse to upload image"}{" "}
               </h4>
             </div>
             <h4 className="text-[0.7rem] text-right">
@@ -367,8 +380,12 @@ function InstitutionDataSetup({ setActiveStep }) {
               >
                 <img src="/assets/img/uplo.svg" alt="" className="w-[1.5vw]" />
               </label>
-              <h4 className="pl-[1vw] text-[1vw]">
-                {selectedCert ? selectedCert?.name : "Browse to upload file"}{" "}
+              <h4 className="pl-[1vw] text-[1vw] max-w-[29vw] overflow-hidden text-ellipsis">
+                {userInput?.operation_certificate
+                  ? userInput?.operation_certificate
+                  : selectedCert
+                  ? selectedCert?.name
+                  : "Browse to upload file"}{" "}
               </h4>
             </div>
             <h4 className="text-[0.7rem] text-right">

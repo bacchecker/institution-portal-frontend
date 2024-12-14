@@ -173,9 +173,10 @@ function InstitutionDepartments({ setActiveStep }) {
               Institution Departments
             </h1>
             <h4 className="text-[0.9vw] mt-[0.5vw]">
-              Use this page to create a new department within the institution.{" "}
-              <br /> A department represents a specific functional unit or
-              academic division that manages its operations and resources.
+              On this page, you can create and manage departments within your
+              institution. <br />
+              Each department represents a distinct functional or academic
+              division that oversees specific operations and resources.
             </h4>
           </div>
         </div>

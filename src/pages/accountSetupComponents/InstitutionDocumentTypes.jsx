@@ -173,9 +173,10 @@ function InstitutionDocumentTypes({ setActiveStep }) {
               Institution Document Types
             </h1>
             <h4 className="text-[0.9vw] mt-[0.5vw]">
-              To set up your account, add the document types accepted by your
-              school.
-              <br /> Choose from the list of common documents
+              Add the document types accepted by your institution to get
+              started. <br /> Select from a predefined list of common documents or
+              create custom types that align with your institution’s specific
+              needs.
             </h4>
           </div>
         </div>

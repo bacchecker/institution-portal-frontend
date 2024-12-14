@@ -3,15 +3,48 @@ import Sidebar from "./Sidebar";
 import secureLocalStorage from "react-secure-storage";
 import { useDispatch } from "react-redux";
 import { useGetInstitutionDetailsQuery } from "../redux/apiSlice";
-import { useEffect } from "react";
-import { setUser, setUserToken } from "../redux/authSlice";
+import { useEffect, useState } from "react";
+import { setUser } from "../redux/authSlice";
+import Echo from "laravel-echo";
+import Pusher from "pusher-js";
 
 function RootLayout({ children }) {
   const { pathname } = useLocation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [message, setMessage] = useState();
 
   const user = JSON.parse(secureLocalStorage.getItem("user"));
+  const token = JSON?.parse(secureLocalStorage?.getItem("userToken"))?.token;
+
+  window.Pusher = Pusher;
+  window.Echo = new Echo({
+    broadcaster: "reverb",
+    key: import.meta.env.VITE_REVERB_APP_KEY,
+    wsHost: import.meta.env.VITE_REVERB_HOST,
+    // wsPort: import.meta.env.VITE_REVERB_PORT ?? 8080,
+    // wssPort: import.meta.env.VITE_REVERB_PORT ?? 8080,
+    forceTLS: false,
+    auth: {
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+    },
+    enabledTransports: ["ws", "wss"],
+  });
+
+  // TO DO Private Implementation Later
+
+  useEffect(() => {
+    if (user?.institution?.id) {
+      window.Echo.channel(`institution.${user?.institution?.id}`).listen(
+        "InstitutionActivatedEvent",
+        (event) => {
+          setMessage(event);
+        }
+      );
+    }
+  }, [user?.institution?.id]);
 
   const {
     data: institutionDetails,
@@ -20,7 +53,16 @@ function RootLayout({ children }) {
   } = useGetInstitutionDetailsQuery();
 
   useEffect(() => {
-    if (institutionDetails && user) {
+    if (message) {
+      dispatch(
+        setUser({
+          user: user?.user,
+          two_factor: user.two_factor,
+          institution: message?.institution,
+          selectedTemplate: user.selectedTemplate,
+        })
+      );
+    } else if (institutionDetails && user) {
       dispatch(
         setUser({
           user: institutionDetails.institutionData?.user,
@@ -30,7 +72,7 @@ function RootLayout({ children }) {
         })
       );
     }
-  }, [institutionDetails, user, dispatch]);
+  }, [institutionDetails, user, dispatch, message]);
 
   useEffect(() => {
     if (isError && error?.data?.message === "Unauthenticated.") {

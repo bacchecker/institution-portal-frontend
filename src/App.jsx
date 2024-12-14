@@ -34,9 +34,9 @@ function App() {
                     path="/account-under-review"
                     element={
                       <AuthenticatedSuccessProtectedRoute>
-                        {/* <AccountUnderReviewProtection> */}
+                        <AccountUnderReviewProtection>
                           <AccountUnderReview />
-                        {/* </AccountUnderReviewProtection> */}
+                        </AccountUnderReviewProtection>
                       </AuthenticatedSuccessProtectedRoute>
                     }
                   />

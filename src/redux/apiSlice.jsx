@@ -173,14 +173,6 @@ export const baccheckerApi = createApi({
       }),
       invalidatesTags: ["User", "Log"],
     }),
-    resetPassword: builder.mutation({
-      query: (body) => ({
-        url: "/auth/reset-password",
-        method: "POST",
-        body,
-      }),
-      invalidatesTags: ["User", "Log"],
-    }),
     createNextScreen: builder.mutation({
       query: (body) => ({
         url: "/institution/account-setup/next-step",

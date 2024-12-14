@@ -122,9 +122,6 @@ function Sidebar() {
             </div>
           </div>
           <div className="w-full h-[100%] overflow-auto">
-            <h4 className="md:ml-[1.5vw] ml-[5vw] mt-[1.5vw] font-[500] md:text-[1.1vw] text-[5vw]">
-              Menu
-            </h4>
             <div className="h-[70%] overflow-auto md:px-[1.5vw] px-[5vw] sidebar-menu">
               <ul className="flex flex-col gap-[0.7vw] mt-[2vw] item-list">
                 <li>
@@ -135,79 +132,27 @@ function Sidebar() {
                       pathname === "/overview" && "active"
                     }`}
                   >
-                    <i className="bx bx-spreadsheet md:text-[1.3vw] text-[5vw] menu-icon"></i>
+                    <i class="bx bxs-dashboard md:text-[1.3vw] text-[5vw] menu-icon"></i>
                     <span className="md:text-[1.1vw] text-[4vw] link">
-                      Overview
+                      Dashboard
                     </span>
                   </Link>
                 </li>
-                <li className="dropdown-side">
-                  <button
-                    onClick={() => handleDropdownToggle("service")}
-                    className="flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[15vw] md:rounded-[0.3vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] relative"
-                  >
-                    <i className="bx bx-file-blank md:text-[1.3vw] text-[5vw]"></i>
-                    <span className="md:text-[1.1vw] text-[4vw]">Service</span>
-                    <i
-                      className={`bx bx-chevron-down absolute right-0 md:text-[1.5vw] text-[6vw]  ${
-                        activeDropdown === "service" ||
-                        pathname === "/request-document" ||
-                        pathname === "/application"
-                          ? "rotate-arrow-active"
-                          : "rotate-arrow"
-                      }`}
-                    ></i>
-                  </button>
-                  <ul
-                    ref={(el) => (dropdownRefs.current["service"] = el)}
-                    className={`md:ml-[2vw] ml-[6vw] ${
-                      activeDropdown === "service" ||
-                      pathname === "/request-document" ||
-                      pathname === "/application"
-                        ? "sidemenu-h"
-                        : "sidemenu-h-active"
+                <li>
+                  <Link
+                    to="/manage-document"
+                    onClick={() => handleDropdownToggle("close")}
+                    className={`flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[10vw] md:rounded-[0.3vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] ${
+                      pathname.includes("manage-document") && "active"
                     }`}
-                    style={{
-                      height:
-                        activeDropdown === "service" ||
-                        pathname === "/request-document" ||
-                        pathname === "/application"
-                          ? `${dropdownHeights["service"] || 0}px`
-                          : "0",
-                      overflow: "hidden",
-                      transition: "height 0.3s ease",
-                    }}
                   >
-                    <li>
-                      <Link
-                        to="/request-document"
-                        onClick={() => handleDropdownToggle("close")}
-                        className={`w-full md:h-[2.2vw] h-[10vw] md:rounded-[3vw] rounded-[6vw] cursor-pointer flex md:gap-[0.7vw] gap-[2vw] items-center md:pl-[1.5vw] pl-[10vw] ${
-                          pathname === "/request-document" && "active"
-                        }`}
-                      >
-                        <i className="bx bx-file md:text-[1.3vw] text-[5vw] menu-icon"></i>
-                        <span className="md:text-[0.9vw] text-[4vw] link">
-                          Document Request
-                        </span>
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        to="/application"
-                        onClick={() => handleDropdownToggle("close")}
-                        className={`w-full md:h-[2.2vw] h-[10vw] md:rounded-[3vw] rounded-[6vw] cursor-pointer flex md:gap-[0.7vw] gap-[2vw] items-center md:pl-[1.5vw] pl-[10vw] ${
-                          pathname === "/application" && "active"
-                        }`}
-                      >
-                        <i className="bx bx-file md:text-[1.3vw] text-[5vw] menu-icon"></i>
-                        <span className="md:text-[0.9vw] text-[4vw] link">
-                          Validation Request
-                        </span>
-                      </Link>
-                    </li>
-                  </ul>
+                    <i class="bx bxs-file md:text-[1.3vw] text-[5vw] menu-icon"></i>
+                    <span className="md:text-[1.1vw] text-[4vw] link">
+                      Manage Document
+                    </span>
+                  </Link>
                 </li>
+
                 <li>
                   <Link
                     to="/payment"
@@ -218,91 +163,11 @@ function Sidebar() {
                   >
                     <i className="bx bx-money md:text-[1.3vw] text-[5vw] menu-icon"></i>
                     <span className="md:text-[1.1vw] text-[4vw] link">
-                      Payments
+                      Payment Settings
                     </span>
                   </Link>
                 </li>
-                {/* <li>
-                  <Link
-                    to="/notification"
-                    onClick={() => handleDropdownToggle("close")}
-                    className={`flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[15vw] md:rounded-[0.3vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] ${
-                      pathname === "/notification" && "active"
-                    }`}
-                  >
-                    <i className="bx bx-bell md:text-[1.3vw] text-[8vw] menu-icon"></i>
-                    <span className="md:text-[1.1vw] text-[5vw] link">
-                      Notification
-                    </span>
-                  </Link>
-                </li> */}
-                <li className="dropdown-side">
-                  <button
-                    onClick={() => handleDropdownToggle("support")}
-                    className="flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[15vw] md:rounded-[0.3vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] relative"
-                  >
-                    <i className="bx bx-wrench md:text-[1.3vw] text-[5vw]"></i>
-                    <span className="md:text-[1.1vw] text-[4vw]">
-                      Customer Support
-                    </span>
-                    <i
-                      className={`bx bx-chevron-down absolute right-0 md:text-[1.5vw] text-[6vw]  ${
-                        activeDropdown === "support" ||
-                        pathname === "/support-ticket" ||
-                        pathname === "/faqs"
-                          ? "rotate-arrow-active"
-                          : "rotate-arrow"
-                      }`}
-                    ></i>
-                  </button>
-                  <ul
-                    ref={(el) => (dropdownRefs.current["support"] = el)}
-                    className={`md:ml-[2vw] ml-[6vw] ${
-                      activeDropdown === "service" ||
-                      pathname === "/support-ticket" ||
-                      pathname === "/faqs"
-                        ? "sidemenu-h"
-                        : "sidemenu-h-active"
-                    }`}
-                    style={{
-                      height:
-                        activeDropdown === "support" ||
-                        pathname === "/support-ticket" ||
-                        pathname === "/faqs"
-                          ? `${dropdownHeights["support"] || 0}px`
-                          : "0",
-                      overflow: "hidden",
-                      transition: "height 0.3s ease",
-                    }}
-                  >
-                    <li className="">
-                      <Link
-                        to="/support-ticket"
-                        onClick={() => handleDropdownToggle("close")}
-                        className={`w-full md:h-[2.2vw] h-[10vw] md:rounded-[3vw] rounded-[6vw] cursor-pointer flex items-center md:pl-[1.5vw] pl-[14vw] ${
-                          pathname === "/support-ticket" && "active"
-                        }`}
-                      >
-                        <span className="md:text-[0.9vw] text-[4vw] link">
-                          Support Ticket
-                        </span>
-                      </Link>
-                    </li>
-                    {/* <li>
-                      <Link
-                        to="/faqs"
-                        onClick={() => handleDropdownToggle("close")}
-                        className={`w-full md:h-[2.2vw] h-[10vw] md:rounded-[3vw] rounded-[6vw] cursor-pointer flex items-center md:pl-[1.5vw] pl-[14vw] ${
-                          pathname === "/faqs" && "active"
-                        }`}
-                      >
-                        <span className="md:text-[0.9vw] text-[4vw] link">
-                          FAQs
-                        </span>
-                      </Link>
-                    </li> */}
-                  </ul>
-                </li>
+
                 <li>
                   <Link
                     to="account-settings"

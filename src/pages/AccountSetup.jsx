@@ -257,13 +257,19 @@ function AccountSetup() {
               className="w-full h-full object-cover"
             />
           </div>
-          <h4 className="text-[1.6vw] font-[700] text-center">
-            Congratulations!
-          </h4>
-          <h4 className="text-[1vw] text-center">
-            Your account is all set up and ready to go. <br />
-            <span className="font-[600]">Welcome aboard!</span>
-          </h4>
+          <div className="px-[2vw]">
+            <h4 className="text-[1.6vw] font-[700] text-center">
+              Congratulations!
+            </h4>
+            <h4 className="text-[1vw] text-center">
+              <span className="font-[500] text-[#ff0404]">
+                Your institution account setup is now complete. <br />
+              </span>
+              Welcome to BacChecker! Your account is ready to use, and you can
+              start managing your institution’s processes seamlessly. Your
+              account is all set up and ready to go.
+            </h4>
+          </div>
           <div className="w-full border-t px-[4vw]">
             <button
               type="button"

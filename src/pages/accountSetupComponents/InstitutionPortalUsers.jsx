@@ -162,9 +162,10 @@ function InstitutionPortalUsers({ setActiveStep }) {
               Institution Portal Users
             </h1>
             <h4 className="text-[0.9vw] mt-[0.5vw]">
-              Use this page to create a new user account within the institution
-              portal. <br /> Users can be assigned a department with different
-              roles, permissions, and access based on their responsibilities.
+              Use this page to create and manage user accounts within your
+              institution portal. <br /> Assign each user to a department and customize
+              their roles, permissions, and access levels based on their
+              responsibilities.
             </h4>
           </div>
         </div>
