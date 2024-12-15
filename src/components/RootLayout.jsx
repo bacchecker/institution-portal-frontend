@@ -94,7 +94,7 @@ function RootLayout({ children }) {
         <div className="flex w-full relative">
           <Sidebar />
           <main
-            className={`md:pl-[20%] px-[5vw] md:pr-[2%] w-full md:pt-[3%] pt-[25%] pb-[3%] ${
+            className={`md:pl-[18vw] w-full ${
               pathname === "/account-settings" ? "bg-white" : "bg-[#d6d6d653]"
             }`}
           >

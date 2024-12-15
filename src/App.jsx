@@ -10,10 +10,13 @@ import PrivateRoute from "./components/PrivateRoute";
 import RootLayout from "./components/RootLayout";
 import AccountUnderReview from "./pages/AccountUnderReview";
 import AccountSetup from "./pages/AccountSetup";
+import ManageRequest from "./pages/requests/ManageRequest";
+import Tickets from "./pages/support/Tickets";
 import Dashboard from "./pages/Dashboard";
 import AccountSetupProtectedRoute from "./components/AccountSetupProtectedRoute";
 import AccountUnderReviewProtection from "./components/AccountUnderReviewProtection";
 import AccountSetupProtection from "./components/AccountSetupProtection";
+import RevenueOverview from "./pages/reports/RevenueOverview";
 
 function App() {
   return (
@@ -64,6 +67,36 @@ function App() {
                       <AuthenticatedSuccessProtectedRoute>
                         <AccountSetupProtectedRoute>
                           <Dashboard />
+                        </AccountSetupProtectedRoute>
+                      </AuthenticatedSuccessProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/manage-document"
+                    element={
+                      <AuthenticatedSuccessProtectedRoute>
+                        <AccountSetupProtectedRoute>
+                          <ManageRequest />
+                        </AccountSetupProtectedRoute>
+                      </AuthenticatedSuccessProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/user-support"
+                    element={
+                      <AuthenticatedSuccessProtectedRoute>
+                        <AccountSetupProtectedRoute>
+                          <Tickets />
+                        </AccountSetupProtectedRoute>
+                      </AuthenticatedSuccessProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/reports"
+                    element={
+                      <AuthenticatedSuccessProtectedRoute>
+                        <AccountSetupProtectedRoute>
+                          <RevenueOverview />
                         </AccountSetupProtectedRoute>
                       </AuthenticatedSuccessProtectedRoute>
                     }
