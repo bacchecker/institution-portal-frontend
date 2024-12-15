@@ -95,7 +95,7 @@ export const baccheckerApi = createApi({
         if (selectedTo) {
           queryString += `&end_date=${selectedTo}`;
         }
-        if (selectedTo) {
+        if (selectedDocumentType) {
           queryString += `&document_type=${selectedDocumentType}`;
         }
         if (sortBy) {

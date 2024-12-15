@@ -16,10 +16,13 @@ function DocumentRequests({
     to: currentDate,
   };
   const [selectedDocumentType, setSelectedDocumentType] = useState({});
+  const [submitButton, setSubmitButton] = useState("");
   const [pageNumber, setPageNumber] = useState(1);
   const [searchValue, setSearchValue] = useState("");
   const [userInput, setUserInput] = useState(initialUserInput);
   const [selectedStatus, setSelectedStatus] = useState("");
+  const [sortBy, setSortBy] = useState("");
+  const [sortOrder, setSortOrder] = useState("");
   const [selectedFrom, setSelectedFrom] = useState("");
   const [selectedTo, setSelectedTo] = useState("");
   const handleUserInput = (e) => {
@@ -39,6 +42,15 @@ function DocumentRequests({
     isFetching,
   } = useGetInstitutionDocumentRequestsQuery({
     page: pageNumber,
+    selectedFrom: selectedFrom != "" ? selectedFrom : currentDate,
+    selectedTo: selectedTo != "" ? selectedTo : currentDate,
+    ...(searchValue !== undefined &&
+      searchValue !== "" &&
+      searchValue !== null && { searchValue }),
+    ...(sortBy !== undefined && sortBy !== "" && sortBy !== null && { sortBy }),
+    ...(sortOrder !== undefined &&
+      sortOrder !== "" &&
+      sortOrder !== null && { sortOrder }),
     ...(selectedStatus !== undefined &&
       selectedStatus !== "" &&
       selectedStatus !== null && {
@@ -46,12 +58,48 @@ function DocumentRequests({
       }),
   });
 
-  console.log("inst", institutionDocumentRequests);
+  const handleSearchTransaction = (e) => {
+    e.preventDefault();
+    const submitterName = e.nativeEvent.submitter?.name;
+    setSubmitButton(submitterName);
+    const { to, from } = userInput;
+    const currentDate = new Date().toISOString().split("T")[0];
+    if (from !== "") {
+      setSelectedFrom(from);
+    }
+    if (to !== "") {
+      setSelectedTo(to ? to : currentDate);
+    }
+  };
+
+  const handleClearFields = () => {
+    setSelectedFrom(currentDate);
+    setSelectedTo(currentDate);
+    setUserInput((userInput) => ({
+      ...userInput,
+      from: currentDate,
+      to: currentDate,
+    }));
+  };
+
+  const handleSortOrder = (name) => {
+    if (!sortBy && !sortOrder) {
+      setSortOrder("asc");
+    } else if (sortOrder === "asc") {
+      setSortOrder("desc");
+    } else {
+      setSortOrder("");
+      setSortBy("");
+    }
+  };
 
   return (
     <>
       <div className="bg-[#f8f8f8] p-[1vw] my-[1vw] rounded-[0.2vw]">
-        <div className="flex justify-between items-center">
+        <form
+          className="flex justify-between items-center"
+          onSubmit={handleSearchTransaction}
+        >
           <div className="flex items-center gap-[1vw]">
             <div className="relative md:w-[15vw] w-[60vw] md:h-[2.3vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1vw!important] overflow-hidden bg-white border border-[#ddd]">
               <i className="z-[1] bx bx-search absolute top-[50%] translate-y-[-50%] md:left-[0.5vw] left-[3vw] md:text-[1vw] text-[5vw]"></i>
@@ -100,7 +148,38 @@ function DocumentRequests({
               </div>
             </div>
           </div>
-        </div>
+          <div className="flex items-center gap-[0.5vw]">
+            <button
+              type="submit"
+              disabled={isFetching && submitButton === "searchTransactionBtn"}
+              name="searchTransactionBtn"
+              className="new-btn bg-[#FF0404] px-[1vw]  md:mt-0 mt-[3vw] flex justify-center items-center md:py-[0.7vw] py-[2vw] md:h-[2.3vw] h-[12vw] md:rounded-[0.3vw] rounded-[1vw] gap-[0.5vw] hover:bg-[#ef4545] transition-all duration-300 disabled:bg-[#f48181]"
+            >
+              {isFetching && submitButton === "searchTransactionBtn" ? (
+                <LoadItems color={"#ffffff"} size={14} />
+              ) : (
+                <>
+                  <i class="bx bxs-filter-alt text-[#ffffff]"></i>
+                  <h4 className="md:text-[1vw] text-[3.5vw] text-[#ffffff]">
+                    filter
+                  </h4>
+                </>
+              )}
+            </button>
+            <button
+              type="button"
+              onClick={handleClearFields}
+              disabled={
+                userInput?.to === currentDate && userInput?.from === currentDate
+              }
+              className="new-btn bg-[#000000] px-[1vw]  md:mt-0 mt-[3vw] flex justify-center items-center md:py-[0.7vw] py-[2vw] md:h-[2.3vw] h-[12vw] md:rounded-[0.3vw] rounded-[1vw] gap-[0.5vw] hover:bg-[#202020] transition-all duration-300 disabled:bg-[#414141] disabled:cursor-not-allowed"
+            >
+              <h4 className="md:text-[1vw] text-[3.5vw] text-[#ffffff]">
+                Clear
+              </h4>
+            </button>
+          </div>
+        </form>
       </div>
       <div className="flex items-center justify-between">
         <div
@@ -174,35 +253,60 @@ function DocumentRequests({
             <thead className="bg-white sticky top-0 z-[20]">
               <tr className="text-left">
                 <th className="md:py-[1vw] py-[3vw] md:px-[1vw] px-[3vw] border-b max-w-[13%]">
-                  <div className="flex gap-[1vw]">
-                    <div className="flex flex-col items-center justify-center md:gap-[0.1vw] gap-[0.3vw]">
-                      <img
-                        src="/assets/img/top-arr.svg"
-                        alt=""
-                        className="md:w-[0.5vw] w-[2vw]"
-                      />
-                      <img
-                        src="/assets/img/down-arr.svg"
-                        alt=""
-                        className="md:w-[0.5vw] w-[2vw]"
-                      />
+                  <div
+                    className="flex gap-[1vw] cursor-pointer"
+                    onClick={() => {
+                      setSortBy("document_type_name");
+                      handleSortOrder("document_type_name");
+                    }}
+                  >
+                    <div className="flex flex-col items-center justify-center md:gap-[0.01vw] gap-[0.3vw]">
+                      <i
+                        className={`bx bxs-up-arrow text-[0.6vw] ${
+                          (!sortOrder || sortOrder === "desc") &&
+                          sortBy === "document_type_name"
+                            ? "text-[#ffffff]"
+                            : ""
+                        }`}
+                      ></i>
+
+                      <i
+                        className={`bx bxs-down-arrow text-[0.6vw] ${
+                          (!sortOrder || sortOrder === "asc") &&
+                          sortBy === "document_type_name"
+                            ? "text-[#ffffff]"
+                            : ""
+                        }`}
+                      ></i>
                     </div>
                     <h4 className="md:text-[0.9vw] text-[3.5vw]">Document</h4>
                   </div>
                 </th>
                 <th className="md:py-[1vw] py-[3vw] md:px-[1vw] px-[3vw] border-b w-[15%]">
-                  <div className="flex gap-[1vw]">
+                  <div
+                    className="flex gap-[1vw] cursor-pointer"
+                    onClick={() => {
+                      setSortBy("user_full_name");
+                      handleSortOrder("user_full_name");
+                    }}
+                  >
                     <div className="flex flex-col items-center justify-center md:gap-[0.1vw] gap-[0.3vw]">
-                      <img
-                        src="/assets/img/top-arr.svg"
-                        alt=""
-                        className="md:w-[0.5vw] w-[2vw]"
-                      />
-                      <img
-                        src="/assets/img/down-arr.svg"
-                        alt=""
-                        className="md:w-[0.5vw] w-[2vw]"
-                      />
+                      <i
+                        className={`bx bxs-up-arrow text-[0.6vw] ${
+                          (!sortOrder || sortOrder === "desc") &&
+                          sortBy === "user_full_name"
+                            ? "text-[#ffffff]"
+                            : ""
+                        }`}
+                      ></i>
+                      <i
+                        className={`bx bxs-down-arrow text-[0.6vw] ${
+                          (!sortOrder || sortOrder === "asc") &&
+                          sortBy === "user_full_name"
+                            ? "text-[#ffffff]"
+                            : ""
+                        }`}
+                      ></i>
                     </div>
                     <h4 className="md:text-[0.9vw] text-[3.5vw]">
                       Requested By
@@ -210,18 +314,30 @@ function DocumentRequests({
                   </div>
                 </th>
                 <th className="md:py-[1vw] py-[3vw] md:px-[1vw] px-[3vw] border-b max-w-[15%]">
-                  <div className="flex gap-[1vw]">
+                  <div
+                    className="flex gap-[1vw] cursor-pointer"
+                    onClick={() => {
+                      setSortBy("delivery_address");
+                      handleSortOrder("delivery_address");
+                    }}
+                  >
                     <div className="flex flex-col items-center justify-center md:gap-[0.1vw] gap-[0.3vw]">
-                      <img
-                        src="/assets/img/top-arr.svg"
-                        alt=""
-                        className="md:w-[0.5vw] w-[2vw]"
-                      />
-                      <img
-                        src="/assets/img/down-arr.svg"
-                        alt=""
-                        className="md:w-[0.5vw] w-[2vw]"
-                      />
+                      <i
+                        className={`bx bxs-up-arrow text-[0.6vw] ${
+                          (!sortOrder || sortOrder === "desc") &&
+                          sortBy === "delivery_address"
+                            ? "text-[#ffffff]"
+                            : ""
+                        }`}
+                      ></i>
+                      <i
+                        className={`bx bxs-down-arrow text-[0.6vw] ${
+                          (!sortOrder || sortOrder === "asc") &&
+                          sortBy === "delivery_address"
+                            ? "text-[#ffffff]"
+                            : ""
+                        }`}
+                      ></i>
                     </div>
                     <h4 className="md:text-[0.9vw] text-[3.5vw]">
                       Delivery Address
@@ -230,87 +346,123 @@ function DocumentRequests({
                 </th>
 
                 <th className="md:py-[1vw] py-[3vw] md:px-[1vw] px-[3vw] border-b max-w-[15%]">
-                  <div className="flex gap-[1vw]">
+                  <div
+                    className="flex gap-[1vw] cursor-pointer"
+                    onClick={() => {
+                      setSortBy("created_at");
+                      handleSortOrder("created_at");
+                    }}
+                  >
                     <div className="flex flex-col items-center justify-center md:gap-[0.1vw] gap-[0.3vw]">
-                      <img
-                        src="/assets/img/top-arr.svg"
-                        alt=""
-                        className="md:w-[0.5vw] w-[2vw]"
-                      />
-                      <img
-                        src="/assets/img/down-arr.svg"
-                        alt=""
-                        className="md:w-[0.5vw] w-[2vw]"
-                      />
+                      <i
+                        className={`bx bxs-up-arrow text-[0.6vw] ${
+                          (!sortOrder || sortOrder === "desc") &&
+                          sortBy === "created_at"
+                            ? "text-[#ffffff]"
+                            : ""
+                        }`}
+                      ></i>
+                      <i
+                        className={`bx bxs-down-arrow text-[0.6vw] ${
+                          (!sortOrder || sortOrder === "asc") &&
+                          sortBy === "created_at"
+                            ? "text-[#ffffff]"
+                            : ""
+                        }`}
+                      ></i>
                     </div>
                     <h4 className="md:text-[0.9vw] text-[3.5vw]">Date</h4>
                   </div>
                 </th>
                 <th className="md:py-[1vw] py-[3vw] md:px-[1vw] px-[3vw] border-b max-w-[15%]">
-                  <div className="flex gap-[1vw]">
+                  <div
+                    className="flex gap-[1vw] cursor-pointer"
+                    onClick={() => {
+                      setSortBy("document_format");
+                      handleSortOrder("document_format");
+                    }}
+                  >
                     <div className="flex flex-col items-center justify-center md:gap-[0.1vw] gap-[0.3vw]">
-                      <img
-                        src="/assets/img/top-arr.svg"
-                        alt=""
-                        className="md:w-[0.5vw] w-[2vw]"
-                      />
-                      <img
-                        src="/assets/img/down-arr.svg"
-                        alt=""
-                        className="md:w-[0.5vw] w-[2vw]"
-                      />
+                      <i
+                        className={`bx bxs-up-arrow text-[0.6vw] ${
+                          (!sortOrder || sortOrder === "desc") &&
+                          sortBy === "document_format"
+                            ? "text-[#ffffff]"
+                            : ""
+                        }`}
+                      ></i>
+                      <i
+                        className={`bx bxs-down-arrow text-[0.6vw] ${
+                          (!sortOrder || sortOrder === "asc") &&
+                          sortBy === "document_format"
+                            ? "text-[#ffffff]"
+                            : ""
+                        }`}
+                      ></i>
                     </div>
                     <h4 className="md:text-[0.9vw] text-[3.5vw]">Format</h4>
                   </div>
                 </th>
                 <th className="md:py-[1vw] py-[3vw] md:px-[1vw] px-[3vw] border-b max-w-[15%]">
-                  <div className="flex gap-[1vw]">
+                  <div
+                    className="flex gap-[1vw] cursor-pointer"
+                    onClick={() => {
+                      setSortBy("total_amount");
+                      handleSortOrder("total_amount");
+                    }}
+                  >
                     <div className="flex flex-col items-center justify-center md:gap-[0.1vw] gap-[0.3vw]">
-                      <img
-                        src="/assets/img/top-arr.svg"
-                        alt=""
-                        className="md:w-[0.5vw] w-[2vw]"
-                      />
-                      <img
-                        src="/assets/img/down-arr.svg"
-                        alt=""
-                        className="md:w-[0.5vw] w-[2vw]"
-                      />
+                      <i
+                        className={`bx bxs-up-arrow text-[0.6vw] ${
+                          (!sortOrder || sortOrder === "desc") &&
+                          sortBy === "total_amount"
+                            ? "text-[#ffffff]"
+                            : ""
+                        }`}
+                      ></i>
+                      <i
+                        className={`bx bxs-down-arrow text-[0.6vw] ${
+                          (!sortOrder || sortOrder === "asc") &&
+                          sortBy === "total_amount"
+                            ? "text-[#ffffff]"
+                            : ""
+                        }`}
+                      ></i>
                     </div>
                     <h4 className="md:text-[0.9vw] text-[3.5vw]">Amount</h4>
                   </div>
                 </th>
                 <th className="md:py-[1vw] py-[3vw] md:px-[1vw] px-[3vw] border-b max-w-[10%]">
-                  <div className="flex gap-[1vw]">
+                  <div
+                    className="flex gap-[1vw] cursor-pointer"
+                    onClick={() => {
+                      setSortBy("status");
+                      handleSortOrder("status");
+                    }}
+                  >
                     <div className="flex flex-col items-center justify-center md:gap-[0.1vw] gap-[0.3vw]">
-                      <img
-                        src="/assets/img/top-arr.svg"
-                        alt=""
-                        className="md:w-[0.5vw] w-[2vw]"
-                      />
-                      <img
-                        src="/assets/img/down-arr.svg"
-                        alt=""
-                        className="md:w-[0.5vw] w-[2vw]"
-                      />
+                      <i
+                        className={`bx bxs-up-arrow text-[0.6vw] ${
+                          (!sortOrder || sortOrder === "desc") &&
+                          sortBy === "status"
+                            ? "text-[#ffffff]"
+                            : ""
+                        }`}
+                      ></i>
+                      <i
+                        className={`bx bxs-down-arrow text-[0.6vw] ${
+                          (!sortOrder || sortOrder === "asc") &&
+                          sortBy === "status"
+                            ? "text-[#ffffff]"
+                            : ""
+                        }`}
+                      ></i>
                     </div>
                     <h4 className="md:text-[0.9vw] text-[3.5vw]">Status</h4>
                   </div>
                 </th>
                 <th className="md:py-[1vw] py-[3vw] md:px-[1vw] px-[3vw] border-b w-[10%]">
                   <div className="flex gap-[1vw]">
-                    <div className="flex flex-col items-center justify-center md:gap-[0.1vw] gap-[0.3vw]">
-                      <img
-                        src="/assets/img/top-arr.svg"
-                        alt=""
-                        className="md:w-[0.5vw] w-[2vw]"
-                      />
-                      <img
-                        src="/assets/img/down-arr.svg"
-                        alt=""
-                        className="md:w-[0.5vw] w-[2vw]"
-                      />
-                    </div>
                     <h4 className="md:text-[0.9vw] text-[3.5vw]">Action</h4>
                   </div>
                 </th>
