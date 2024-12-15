@@ -69,7 +69,6 @@ function AccountUnderReview() {
       );
     }
   }, [user?.institution?.id]);
-  console.log("message", message);
 
   return (
     <>

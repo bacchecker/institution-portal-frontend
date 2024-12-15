@@ -264,7 +264,7 @@
     border: 1px solid #ddd;
     border-radius: 0.25vw;
     color: #262626;
-    font-size: 1vw;
+    font-size: 0.9vw;
     overflow: hidden;
     display: flex;
     align-items: center;
@@ -277,6 +277,10 @@
   .custom-dropdown-class1 {
     background: #ffffff !important;
     width: 10vw !important;
+  }
+  .custom-dropdown-class11 {
+    background: #ffffff !important;
+    width: 13vw !important;
   }
   .dropdown-content-cover {
     width: 10vw;
@@ -299,7 +303,7 @@
   .dropdown .dropdown-content .dropdown-item {
     width: 100%;
     padding: 0.3rem;
-    font-size: 1vw;
+    font-size: 0.9vw;
     transition: all 0.2s;
     overflow: hidden;
     text-overflow: ellipsis;
