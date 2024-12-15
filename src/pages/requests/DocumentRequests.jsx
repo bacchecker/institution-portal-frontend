@@ -36,6 +36,8 @@ function DocumentRequests({
     setSelectedDocumentType(item);
   };
 
+  console.log("institutionDocumentTypes", institutionDocumentTypes);
+
   const {
     data: institutionDocumentRequests,
     isLoading,
@@ -47,6 +49,11 @@ function DocumentRequests({
     ...(searchValue !== undefined &&
       searchValue !== "" &&
       searchValue !== null && { searchValue }),
+    ...(selectedDocumentType?.id !== undefined &&
+      selectedDocumentType?.id !== "" &&
+      selectedDocumentType?.id !== null && {
+        selectedDocumentType: selectedDocumentType?.id,
+      }),
     ...(sortBy !== undefined && sortBy !== "" && sortBy !== null && { sortBy }),
     ...(sortOrder !== undefined &&
       sortOrder !== "" &&
@@ -80,6 +87,7 @@ function DocumentRequests({
       from: currentDate,
       to: currentDate,
     }));
+    setSelectedDocumentType({})
   };
 
   const handleSortOrder = (name) => {
@@ -114,7 +122,7 @@ function DocumentRequests({
             <SelectInput
               placeholder={"Document Types"}
               data={institutionDocumentTypes?.document_types?.data}
-              inputValue={selectedDocumentType?.name}
+              inputValue={selectedDocumentType?.document_type?.name}
               isLoading={isDocTypesFetching || isDocTypesLoading}
               onItemSelect={handleSelectedDocumentType}
               className="custom-dropdown-class11"
