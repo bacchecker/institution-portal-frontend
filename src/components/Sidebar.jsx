@@ -78,7 +78,7 @@ function Sidebar() {
 
   return (
     <>
-      <div className="w-full h-[20vw] bg-white fixed top-0 flex justify-between items-center z-[1000] display-no-md px-[5vw]">
+      <div className="w-full h-[20vw] bg-white fixed top-0 flex justify-between items-center z-0 display-no-md px-[5vw]">
         <button
           onClick={() => handleDropdownToggle("hamburgermenu")}
           className="w-[11vw] h-[11vw] rounded-[50%] flex justify-center items-center border border-[#000]"
@@ -167,7 +167,34 @@ function Sidebar() {
                     </span>
                   </Link>
                 </li>
-
+                <li>
+                  <Link
+                    to="/user-support"
+                    onClick={() => handleDropdownToggle("close")}
+                    className={`flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[10vw] md:rounded-[0.3vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] ${
+                      pathname.includes("user-support") && "active"
+                    }`}
+                  >
+                    <i class="bx bx-support md:text-[1.3vw] text-[5vw] menu-icon"></i>
+                    <span className="md:text-[1.1vw] text-[4vw] link">
+                      Support
+                    </span>
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/reports"
+                    onClick={() => handleDropdownToggle("close")}
+                    className={`flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[10vw] md:rounded-[0.3vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] ${
+                      pathname.includes("reports") && "active"
+                    }`}
+                  >
+                    <i class="bx bxs-pie-chart-alt-2 md:text-[1.3vw] text-[5vw] menu-icon"></i>
+                    <span className="md:text-[1.1vw] text-[4vw] link">
+                      Reports
+                    </span>
+                  </Link>
+                </li>
                 <li>
                   <Link
                     to="account-settings"
