@@ -36,7 +36,7 @@ function DocumentRequests({
     setSelectedDocumentType(item);
   };
 
-  console.log("institutionDocumentTypes", institutionDocumentTypes);
+//   console.log("institutionDocumentTypes", institutionDocumentTypes);
 
   const {
     data: institutionDocumentRequests,
