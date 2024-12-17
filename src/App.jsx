@@ -11,12 +11,12 @@ import RootLayout from "./components/RootLayout";
 import AccountUnderReview from "./pages/AccountUnderReview";
 import AccountSetup from "./pages/AccountSetup";
 import ManageRequest from "./pages/requests/ManageRequest";
-import Tickets from "./pages/support/Tickets";
 import Dashboard from "./pages/Dashboard";
 import AccountSetupProtectedRoute from "./components/AccountSetupProtectedRoute";
 import AccountUnderReviewProtection from "./components/AccountUnderReviewProtection";
 import AccountSetupProtection from "./components/AccountSetupProtection";
 import RevenueOverview from "./pages/reports/RevenueOverview";
+import SupportTicket from "./pages/support/SupportTicket";
 
 function App() {
   return (
@@ -86,7 +86,7 @@ function App() {
                     element={
                       <AuthenticatedSuccessProtectedRoute>
                         <AccountSetupProtectedRoute>
-                          <Tickets />
+                          <SupportTicket />
                         </AccountSetupProtectedRoute>
                       </AuthenticatedSuccessProtectedRoute>
                     }

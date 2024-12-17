@@ -131,6 +131,35 @@ export const baccheckerApi = createApi({
       providesTags: ["InstitutionUser"],
     }),
 
+    getAllTickets: builder.query({
+      query: ({ selectedStatus, searchValue, sortBy, sortOrder, page }) => {
+        let queryString = `/tickets?page=${page}`;
+
+        if (
+          selectedStatus !== undefined &&
+          selectedStatus !== "" &&
+          selectedStatus !== null
+        ) {
+          queryString += `&status=${selectedStatus}`;
+        }
+        if (
+          searchValue !== undefined &&
+          searchValue !== "" &&
+          searchValue !== null
+        ) {
+          queryString += `&search=${searchValue}`;
+        }
+        if (sortBy) {
+          queryString += `&sort_by=${sortBy}`;
+        }
+        if (sortOrder) {
+          queryString += `&sort_order=${sortOrder}`;
+        }
+        return queryString;
+      },
+      providesTags: ["Ticket"],
+    }),
+
     getAllExistingDocumentTypes: builder.query({
       query: ({ selectedAcademicLevel, selectedInstitutionType }) => {
         let queryString = `/institutions/document-types`;
@@ -250,6 +279,7 @@ export const baccheckerApi = createApi({
       }),
       invalidatesTags: ["Ticket"],
     }),
+
     createInstitutionSetup: builder.mutation({
       query: (body) => ({
         url: "/institution/account-setup",
@@ -313,6 +343,24 @@ export const baccheckerApi = createApi({
       }),
       invalidatesTags: ["InstitutionUser"],
     }),
+
+    updateTicket: builder.mutation({
+      query: ({ id, body }) => ({
+        url: `/tickets/${id}`,
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["Ticket"],
+    }),
+
+    changeRequestStatus: builder.mutation({
+      query: ({ id, body }) => ({
+        url: `/institution/requests/document-requests/${id}/status`,
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["DocumentRequest"],
+    }),
   }),
 });
 
@@ -345,4 +393,7 @@ export const {
   useDeleteInstitutionUserMutation,
   useUpdateUserMutation,
   useGetInstitutionDocumentRequestsQuery,
+  useChangeRequestStatusMutation,
+  useGetAllTicketsQuery,
+  useUpdateTicketMutation,
 } = baccheckerApi;

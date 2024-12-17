@@ -4,6 +4,7 @@ import { useGetInstitutionDocumentRequestsQuery } from "../../redux/apiSlice";
 import LoadItems from "../../components/LoadItems";
 import formatText from "../../components/FormatText";
 import moment from "moment";
+import DocumentRequestDetails from "./DocumentRequestDetails";
 
 function DocumentRequests({
   institutionDocumentTypes,
@@ -16,7 +17,9 @@ function DocumentRequests({
     to: currentDate,
   };
   const [selectedDocumentType, setSelectedDocumentType] = useState({});
+  const [selectedRequest, setSelectedRequest] = useState({});
   const [submitButton, setSubmitButton] = useState("");
+  const [openModal, setOpenModal] = useState(false);
   const [pageNumber, setPageNumber] = useState(1);
   const [searchValue, setSearchValue] = useState("");
   const [userInput, setUserInput] = useState(initialUserInput);
@@ -36,7 +39,7 @@ function DocumentRequests({
     setSelectedDocumentType(item);
   };
 
-//   console.log("institutionDocumentTypes", institutionDocumentTypes);
+  //   console.log("institutionDocumentTypes", institutionDocumentTypes);
 
   const {
     data: institutionDocumentRequests,
@@ -87,10 +90,10 @@ function DocumentRequests({
       from: currentDate,
       to: currentDate,
     }));
-    setSelectedDocumentType({})
+    setSelectedDocumentType({});
   };
 
-  const handleSortOrder = (name) => {
+  const handleSortOrder = () => {
     if (!sortBy && !sortOrder) {
       setSortOrder("asc");
     } else if (sortOrder === "asc") {
@@ -99,6 +102,11 @@ function DocumentRequests({
       setSortOrder("");
       setSortBy("");
     }
+  };
+
+  const handleOpenModal = (request) => {
+    setOpenModal(true);
+    setSelectedRequest(request);
   };
 
   return (
@@ -644,6 +652,11 @@ function DocumentRequests({
           </div>
         </div>
       </div>
+      <DocumentRequestDetails
+        setOpenModal={setOpenModal}
+        openModal={openModal}
+        selectedRequest={selectedRequest}
+      />
     </>
   );
 }
