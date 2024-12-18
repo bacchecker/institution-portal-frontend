@@ -112,7 +112,7 @@ function Sidebar() {
             <img
               src="/assets/img/back-logo.png"
               alt=""
-              className="md:w-[12vw] display-no-sm"
+              className="md:w-[165px] display-no-sm"
             />
             <div className="flex flex-col justify-center items-center display-no-md">
               <img src="/assets/img/logo1.svg" alt="" className="w-[13vw]" />
