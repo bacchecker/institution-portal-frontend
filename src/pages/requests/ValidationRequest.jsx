@@ -153,6 +153,29 @@ export default function ValidationRequest() {
     return pages;
   };
 
+  const downloadFile = async (fileName) => {
+    try {
+      const response = await axios.get(
+        `/download-pdf/${fileName}`,
+        {
+          responseType: "blob", // Important for file downloads
+        }
+      );
+
+      // Create a temporary link to download the file
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", fileName); // Set the file name for download
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      console.error("Error downloading the file", error);
+      toast.error("Failed to download file.");
+    }
+  };
+
   const handleBulkDownload = async (filePaths) => {
     try {
       const csrfTokenMeta = document?.querySelector('meta[name="csrf-token"]');
@@ -663,12 +686,13 @@ export default function ValidationRequest() {
                           </div>
                           <div
                             className="flex space-x-1 cursor-pointer py-1 px-2 rounded-md bg-primary text-white text-xs"
-                            onClick={() => {
+                            onClick={() => downloadFile(data?.file?.name)}
+                            /* onClick={() => {
                               window.location.href =
                                 "https://admin-dev.baccheck.online/api/document/download" +
                                 "?path=" +
                                 encodeURIComponent(data?.file?.path);
-                            }}
+                            }} */
                           >
                             <FaDownload />
                             <p>Download</p>
