@@ -8,8 +8,8 @@ export const baccheckerApi = createApi({
     const token = JSON?.parse(secureLocalStorage?.getItem("userToken"))?.token;
 
     const result = await fetchBaseQuery({
-      // baseUrl: "https://backend.baccheck.online/api",
-      baseUrl: "http://aw8kkg8ck48040oc4cgo44so.67.205.158.15.sslip.io/api",
+      baseUrl: "https://admin-dev.baccheck.online/api",
+      // baseUrl: "http://aw8kkg8ck48040oc4cgo44so.67.205.158.15.sslip.io/api",
 
       prepareHeaders: (headers) => {
         if (token) {
@@ -43,6 +43,7 @@ export const baccheckerApi = createApi({
     "DocumentType",
     "Department",
     "InstitutionUser",
+    "DocumentRequest",
   ],
   endpoints: (builder) => ({
     loginUser: builder.mutation({
@@ -73,9 +74,51 @@ export const baccheckerApi = createApi({
       providesTags: ["Department"],
     }),
 
+    getInstitutionDocumentRequests: builder.query({
+      query: ({
+        page,
+        searchValue,
+        selectedFrom,
+        selectedTo,
+        selectedDocumentType,
+        sortBy,
+        sortOrder,
+        selectedStatus,
+      }) => {
+        let queryString = `/institution/requests/document-requests?page=${page}`;
+        if (searchValue) {
+          queryString += `&search_query=${searchValue}`;
+        }
+        if (selectedFrom) {
+          queryString += `&start_date=${selectedFrom}`;
+        }
+        if (selectedTo) {
+          queryString += `&end_date=${selectedTo}`;
+        }
+        if (selectedDocumentType) {
+          queryString += `&document_type=${selectedDocumentType}`;
+        }
+        if (sortBy) {
+          queryString += `&sort_by=${sortBy}`;
+        }
+        if (sortOrder) {
+          queryString += `&sort_order=${sortOrder}`;
+        }
+        if (selectedStatus) {
+          queryString += `&status=${selectedStatus}`;
+        }
+
+        return queryString;
+      },
+      providesTags: ["DocumentRequest"],
+    }),
+
     getInstitutionDocumentTypes: builder.query({
-      query: ({ page }) => {
+      query: ({ page, perPage }) => {
         let queryString = `/institution/document-types?page=${page}`;
+        if (perPage) {
+          queryString += `&per_page=${perPage}`;
+        }
         return queryString;
       },
       providesTags: ["DocumentType"],
@@ -301,4 +344,5 @@ export const {
   useCreateInstitutionUserMutation,
   useDeleteInstitutionUserMutation,
   useUpdateUserMutation,
+  useGetInstitutionDocumentRequestsQuery,
 } = baccheckerApi;

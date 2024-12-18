@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import LeftDivLoginSignup from "./loginComponents/LeftDivLoginSignup";
 import { useResetPasswordMutation } from "../redux/apiSlice";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import hasSpecialCharAndUpperCase from "../components/HasSpecialCharAndUpperCase";
-import LoadItems from "../components/LoadItems";
+import hasSpecialCharAndUpperCase from "@/components/HasSpecialCharAndUpperCase";
+import LoadItems from "@/components/LoadItems";
 import { toast } from "sonner";
 
 function NewPassword() {

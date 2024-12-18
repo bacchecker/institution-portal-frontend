@@ -11,9 +11,9 @@ import {
 } from "@nextui-org/react";
 import React, { useState, useEffect } from "react";
 import axios from "../../utils/axiosConfig";
-import CustomTable from "../../components/CustomTable";
+import CustomTable from "@/components/CustomTable";
 import moment from "moment";
-import StatusChip from "../../components/status-chip";
+import StatusChip from "@/components/status-chip";
 import { createSearchParams, useSearchParams } from "react-router-dom";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa6";
 

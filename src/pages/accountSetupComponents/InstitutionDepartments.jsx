@@ -8,15 +8,15 @@ import {
   useGetInstitutionDepartmentsQuery,
   useGetInstitutionDocumentTypesQuery,
 } from "../../redux/apiSlice";
-import formatText from "../../components/FormatText";
-import LoadItems from "../../components/LoadItems";
+import formatText from "@/components/FormatText";
+import LoadItems from "@/components/LoadItems";
 import AddNewDocumentType from "./institutionDocumentTypesComponents/AddNewDocumentType";
 import secureLocalStorage from "react-secure-storage";
-import Dropdown from "../../components/Dropdown";
+import Dropdown from "@/components/Dropdown";
 import { useDispatch } from "react-redux";
 import { setUser } from "../../redux/authSlice";
 import Swal from "sweetalert2";
-import LoadingPage from "../../components/LoadingPage";
+import LoadingPage from "@/components/LoadingPage";
 import EditDocumentType from "./institutionDocumentTypesComponents/EditDocumentType";
 import AddNewDepartment from "./institutionDepartmentComponents/AddNewDepartment";
 import EditDepartment from "./institutionDepartmentComponents/EditDepartment";

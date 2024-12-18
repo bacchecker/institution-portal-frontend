@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import secureLocalStorage from "react-secure-storage";
 import { useCreateInstitutionSetupMutation } from "../../redux/apiSlice";
 import Swal from "sweetalert2";
-import LoadItems from "../../components/LoadItems";
+import LoadItems from "@/components/LoadItems";
 import { toast } from "sonner";
 import { setUser, setUserToken } from "../../redux/authSlice";
 import { useDispatch } from "react-redux";

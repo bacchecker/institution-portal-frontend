@@ -6,13 +6,13 @@ import { Select, SelectItem, Spinner, TableCell, TableRow, Dropdown,
   DropdownItem,
   DropdownMenu,
   DropdownTrigger, Button } from "@nextui-org/react";
-import CustomTable from "../../components/CustomTable";
+import CustomTable from "@/components/CustomTable";
 import axios from "../../utils/axiosConfig";
 import AddTicket from "./AddTicket";
 import moment from 'moment';
 import EditTicket from "./EditTicket";
 import Elipsis from "../../assets/icons/elipsis";
-
+import Navbar from "@/components/Navbar";
 
 export default function Tickets() {
 
@@ -84,7 +84,8 @@ export default function Tickets() {
     };
   return (
     <div title="Tickets">
-    <div className="px-4 py-8">
+    <Navbar />
+    <div className="p-4">
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         <div className="col-span-2 lg:col-span-3">
           <div className="flex items-center space-x-2 text-gray-700">

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import OtpField from "react-otp-field";
-import LoadItems from "../components/LoadItems";
+import LoadItems from "@/components/LoadItems";
 import secureLocalStorage from "react-secure-storage";
 import { useResendOTPMutation, useVerifyOTPMutation } from "../redux/apiSlice";
 import { toast } from "sonner";

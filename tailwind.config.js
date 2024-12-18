@@ -7,9 +7,9 @@ export default {
     extend: {
       colors: {
         primaryRed: "#FE0000",
-        bChkRed: "#FD0D0E",
+        bChkRed: "#FF0404",
         buttonLog: "#F31260",
-        deepBlue: "#232263",
+        cusPurp: "#CB3CFF",
       },
     },
   },

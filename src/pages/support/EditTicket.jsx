@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import Drawer from "../../components/Drawer";
+import Drawer from "@/components/Drawer";
 import {
     Input,
     Select,

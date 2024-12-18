@@ -1,22 +1,22 @@
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import Login from "./pages/Login";
+import Login from "@/pages/Login";
 import { Toaster } from "sonner";
-import ResetPassword from "./pages/ResetPassword";
-import NewPassword from "./pages/NewPassword";
-import AuthenticationProtectedRoute from "./components/AuthenticationProtectedRoute";
-import AuthenticatedSuccessProtectedRoute from "./components/AuthenticatedSuccessProtectedRoute";
-import AuthenticationPage from "./pages/AuthenticationPage";
-import PrivateRoute from "./components/PrivateRoute";
-import RootLayout from "./components/RootLayout";
-import AccountUnderReview from "./pages/AccountUnderReview";
-import AccountSetup from "./pages/AccountSetup";
-import ManageRequest from "./pages/requests/ManageRequest";
-import Tickets from "./pages/support/Tickets";
-import Dashboard from "./pages/Dashboard";
-import AccountSetupProtectedRoute from "./components/AccountSetupProtectedRoute";
-import AccountUnderReviewProtection from "./components/AccountUnderReviewProtection";
-import AccountSetupProtection from "./components/AccountSetupProtection";
-import RevenueOverview from "./pages/reports/RevenueOverview";
+import ResetPassword from "@/pages/ResetPassword";
+import NewPassword from "@/pages/NewPassword";
+import AuthenticationProtectedRoute from "@/components/AuthenticationProtectedRoute";
+import AuthenticatedSuccessProtectedRoute from "@/components/AuthenticatedSuccessProtectedRoute";
+import AuthenticationPage from "@/pages/AuthenticationPage";
+import PrivateRoute from "@/components/PrivateRoute";
+import RootLayout from "@/components/RootLayout";
+import AccountUnderReview from "@/pages/AccountUnderReview";
+import AccountSetup from "@/pages/AccountSetup";
+import ManageRequest from "@/pages/requests/ManageRequest";
+import Tickets from "@/pages/support/Tickets";
+import Dashboard from "@/pages/Dashboard";
+import AccountSetupProtectedRoute from "@/components/AccountSetupProtectedRoute";
+import AccountUnderReviewProtection from "@/components/AccountUnderReviewProtection";
+import AccountSetupProtection from "@/components/AccountSetupProtection";
+import RevenueOverview from "@/pages/reports/RevenueOverview";
 
 function App() {
   return (

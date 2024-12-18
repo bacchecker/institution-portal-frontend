@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import SideModal from "../../components/SideModal";
-import SelectInput from "../../components/SelectInput";
+import SideModal from "@/components/SideModal";
+import SelectInput from "@/components/SelectInput";
 import { toast } from "sonner";
-import LoadItems from "../../components/LoadItems";
+import LoadItems from "@/components/LoadItems";
 import { useCreateTicketMutation } from "../../redux/apiSlice";
 
 function IssueTicket({ setOpenModal, openModal }) {
