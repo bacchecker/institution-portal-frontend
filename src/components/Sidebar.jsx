@@ -108,11 +108,11 @@ function Sidebar() {
         }`}
       >
         <div className="w-full h-[80%]">
-          <div className="flex w-full justify-center py-[1vw] md:border-b-2 border-[#E5E5E5]">
+          <div className="flex w-full justify-center py-[5px] md:border-b-2 border-[#E5E5E5]">
             <img
               src="/assets/img/back-logo.png"
               alt=""
-              className="md:w-[10vw] display-no-sm"
+              className="md:w-[12vw] display-no-sm"
             />
             <div className="flex flex-col justify-center items-center display-no-md">
               <img src="/assets/img/logo1.svg" alt="" className="w-[13vw]" />
@@ -126,10 +126,10 @@ function Sidebar() {
               <ul className="flex flex-col gap-[0.7vw] mt-[2vw] item-list">
                 <li>
                   <Link
-                    to="/overview"
+                    to="/dashboard"
                     onClick={() => handleDropdownToggle("close")}
                     className={`flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[10vw] md:rounded-[0.3vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] ${
-                      pathname === "/overview" && "active"
+                      pathname === "/dashboard" && "active"
                     }`}
                   >
                     <i class="bx bxs-dashboard md:text-[1.3vw] text-[5vw] menu-icon"></i>

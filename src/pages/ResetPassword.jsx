@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import LeftDivLoginSignup from "./loginComponents/LeftDivLoginSignup";
 import { Link } from "react-router-dom";
 import { useForgotPasswordMutation } from "../redux/apiSlice";
-import LoadItems from "../components/LoadItems";
+import LoadItems from "@/components/LoadItems";
 import { toast } from "sonner";
 
 function ResetPassword() {

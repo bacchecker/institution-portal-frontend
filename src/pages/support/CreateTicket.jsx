@@ -167,7 +167,7 @@ function CreateTicket({ setOpenModal, openModal }) {
             Description
             <span className="text-[#f1416c]">*</span>
           </h4>
-          <div class="relative w-full md:h-[7vw] h-[30vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
+          <div className="relative w-full md:h-[7vw] h-[30vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
             <textarea
               placeholder="Enter ticket desription"
               value={userInput?.description}

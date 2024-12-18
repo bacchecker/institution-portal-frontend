@@ -5,7 +5,7 @@ import secureLocalStorage from "react-secure-storage";
 import { useDispatch } from "react-redux";
 import { useLoginUserMutation } from "../redux/apiSlice";
 import { toast } from "sonner";
-import LoadItems from "../components/LoadItems";
+import LoadItems from "@/components/LoadItems";
 import { setUser, setUserToken } from "../redux/authSlice";
 import ReCAPTCHA from "react-google-recaptcha";
 import {

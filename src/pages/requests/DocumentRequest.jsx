@@ -18,12 +18,12 @@ import {
   Textarea,
   useDisclosure,
 } from "@nextui-org/react";
-import CustomTable from "../../components/CustomTable";
+import CustomTable from "@/components/CustomTable";
 import moment from "moment";
 import axios from "../../utils/axiosConfig";
-import StatusChip from "../../components/status-chip";
-import Drawer from "../../components/Drawer";
-import CustomUser from "../../components/custom-user";
+import StatusChip from "@/components/status-chip";
+import Drawer from "@/components/Drawer";
+import CustomUser from "@/components/custom-user";
 import DownloadIcon from "../../assets/icons/download";
 import PdfIcon from "../../assets/icons/pdf";
 import WordIcon from "../../assets/icons/word";
@@ -31,7 +31,7 @@ import { filesize } from "filesize";
 import { PlusIcon } from "../../assets/icons/plus";
 import ExcelIcon from "../../assets/icons/excel";
 import Elipsis from "../../assets/icons/elipsis";
-import ConfirmModal from "../../components/confirm-modal";
+import ConfirmModal from "@/components/confirm-modal";
 import {toast} from "sonner";
 import { FaChevronLeft, FaChevronRight, FaHeart } from "react-icons/fa6";
 import { IoDocuments } from "react-icons/io5";
@@ -39,7 +39,7 @@ import { PiQueueFill } from "react-icons/pi";
 import { FcCancel } from "react-icons/fc";
 import { MdOutlineFileDownload, MdOutlineFilterAlt } from "react-icons/md";
 import { MdOutlineFilterAltOff } from "react-icons/md";
-import DeleteModal from "../../components/DeleteModal";
+import DeleteModal from "@/components/DeleteModal";
 
 
 export default function DocumentRequest() {
@@ -276,54 +276,79 @@ const [submittedFilters, setSubmittedFilters] = useState({});
 
   return (
     <div title="Document Request">
-      <section className="px-2">
-        <Card className="md:w-full w-[98vw] mx-auto rounded-none shadow-none border-none dark:bg-slate-900">
-          <CardBody className="w-full">
+      <section className="px-3">
+        <Card className="md:w-full w-full mx-auto rounded-none shadow-none border-none">
+          <CardBody className="w-full bg-gray-100 p-6">
             <form onSubmit={handleSubmit} className="flex flex-row gap-3 items-center">
-              <Input
-                radius="none"
-                name="search_query"
-                placeholder="Search unique code, user name, user phone number"
-                value={filters.search_query}
-                onChange={(e) => setFilters({ ...filters, search_query: e.target.value })}
-                size="md"
-                className="max-w-xs min-w-[200px] rounded-sm"
-              />
+            <Input
+              radius="none"
+              name="search_query"
+              placeholder="Search by user name or unique code"
+              value={filters.search_query}
+              onChange={(e) => setFilters({ ...filters, search_query: e.target.value })}
+              size="md"
+              classNames={{
+                label: "text-black/50 dark:text-white/90",
+                input: [
+                  "bg-transparent",
+                  "text-black/90 dark:text-white/90",
+                  "placeholder:text-default-700/50 dark:placeholder:text-white/60",
+                ],
+                innerWrapper: "bg-transparent",
+                inputWrapper: [
+                  "bg-default-white",
+                  "group-data-[focus=true]:bg-default-white",
+                  "!cursor-text",
+                  "no-hover-bg",
+                ],
+              }}
+              className="max-w-[240px] min-w-[240px] rounded-sm bg-white"
+            />
+            <Select
+              aria-label="Document Type"
+              radius="none"
+              size="md"
+              placeholder="Document Type"
+              className="max-w-[200px] min-w-[200px] rounded-sm"
+              style={{
+                backgroundColor: "white",
+                "--select-hover-bg": "transparent",
+              }}
+              name="document_type"
+              value={filters.document_type || ""}
+              onChange={handleDocumentTypeChange}
+            >
+              {documentTypes.map((item) => (
+                <SelectItem key={item.key} value={item.key}>
+                  {item.name}
+                </SelectItem>
+              ))}
+            </Select>
+            <DateRangePicker
+              radius="none"
+              visibleMonths={2}
+              variant="underlined"
+              classNames={{
+                base: "bg-white", // This sets the input background to white
+              }}
+              style={{
+                border: "none", // Removes the border
+              }}
+              className="w-[30%] rounded-sm date-range-picker-input border-none bg-white"
+              onChange={(date) => {
+                if (date) {
+                  const newStartDate = new Date(date.start.year, date.start.month - 1, date.start.day)
+                    .toISOString()
+                    .split("T")[0];
+                  const newEndDate = new Date(date.end.year, date.end.month - 1, date.end.day)
+                    .toISOString()
+                    .split("T")[0];
 
-              <Select
-                aria-label="Document Type"
-                radius="none"
-                size="md"
-                placeholder="Document Type"
-                className="max-w-[230px] min-w-[230px] rounded-sm"
-                name="document_type"
-                value={filters.document_type || ""}
-                onChange={handleDocumentTypeChange}
-              >
-                {documentTypes.map((item) => (
-                  <SelectItem key={item.key} value={item.key}>
-                    {item.name}
-                  </SelectItem>
-                ))}
-              </Select>
+                  setFilters({ ...filters, start_date: newStartDate, end_date: newEndDate });
+                }
+              }}
+            />
 
-              <DateRangePicker
-                radius="none"
-                visibleMonths={2}
-                className="w-[30%] rounded-sm"
-                onChange={(date) => {
-                  if (date) {
-                    const newStartDate = new Date(date.start.year, date.start.month - 1, date.start.day)
-                      .toISOString()
-                      .split("T")[0];
-                    const newEndDate = new Date(date.end.year, date.end.month - 1, date.end.day)
-                      .toISOString()
-                      .split("T")[0];
-
-                    setFilters({ ...filters, start_date: newStartDate, end_date: newEndDate });
-                  }
-                }}
-              />
               <div className="flex space-x-2">
                 
                 <Button
@@ -358,21 +383,21 @@ const [submittedFilters, setSubmittedFilters] = useState({});
               
                   }}
                 >
-                  Delete
+                  Clear
                 </Button>
               </div>
               
             </form>
           </CardBody>
         </Card>
-        <Card className="my-3 md:w-full w-[98vw] mx-auto border-none shadow-none rounded-lg dark:bg-slate-900">
-          <CardBody className="grid w-full grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="my-3 md:w-full w-[98vw] mx-auto border-none shadow-none rounded-lg dark:bg-slate-900">
+          <div className="grid w-full grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div
               onClick={() => {
                 setStatus('allRequests')
               }}
               className="rounded-md bg-gray-100 p-4 flex space-x-4 cursor-pointer">
-                <div className="flex items-center justify-center bg-purple-200 text-purple-800 rounded-full w-10 h-10">
+                <div className="flex items-center justify-center bg-purple-200 text-cusPurp rounded-full w-10 h-10">
                   <IoDocuments size={18}/>
                 </div>
                 <div className="">
@@ -419,8 +444,8 @@ const [submittedFilters, setSubmittedFilters] = useState({});
                   <p className="text-gray-500">{rejected}</p>
                 </div>
             </div>
-          </CardBody>
-        </Card>
+          </div>
+        </div>
       </section>
 
       <section className="md:px-3 md:w-full w-[98vw] mx-auto">

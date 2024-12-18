@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
-import SideModal from "../../../components/SideModal";
-import SelectInput from "../../../components/SelectInput";
+import SideModal from "@/components/SideModal";
+import SelectInput from "@/components/SelectInput";
 import Swal from "sweetalert2";
 import {
   useUpdateUserMutation,
 } from "../../../redux/apiSlice";
-import LoadItems from "../../../components/LoadItems";
+import LoadItems from "@/components/LoadItems";
 import { toast } from "sonner";
 
 function EditUser({

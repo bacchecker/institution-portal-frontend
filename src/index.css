@@ -136,3 +136,25 @@ div:where(.swal2-container) button:where(.swal2-styled):where(.swal2-cancel) {
   color: #ff0404;
   background: transparent !important;
 }
+
+/* No hover */
+.no-hover-bg:hover {
+  background-color: transparent !important;
+}
+.no-hover-bg {
+  background-color: white !important; /* Set background color to white */
+}
+
+.no-hover-bg:hover {
+  background-color: white !important; /* Prevent hover background changes */
+}
+
+.date-range-picker-input {
+  background-color: white !important;
+  border: none !important;
+}
+
+.date-range-picker-input:hover {
+  background-color: white !important;
+  border: none !important;
+}

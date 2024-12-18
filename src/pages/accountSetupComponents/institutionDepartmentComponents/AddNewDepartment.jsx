@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
-import SideModal from "../../../components/SideModal";
-import SelectInput from "../../../components/SelectInput";
+import SideModal from "@/components/SideModal";
+import SelectInput from "@/components/SelectInput";
 import Swal from "sweetalert2";
 import {
   useCreateDepartmentMutation,
   useCreateInstitutionDocumentTypeMutation,
 } from "../../../redux/apiSlice";
-import LoadItems from "../../../components/LoadItems";
+import LoadItems from "@/components/LoadItems";
 import { toast } from "sonner";
 
 function AddNewDepartment({ setOpenModal, openModal, allPermissions }) {
@@ -155,7 +155,7 @@ function AddNewDepartment({ setOpenModal, openModal, allPermissions }) {
               Description
               <span className="text-[#f1416c]">*</span>
             </h4>
-            <div class="relative w-full md:h-[10vw] h-[30vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
+            <div className="relative w-full md:h-[10vw] h-[30vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
               <textarea
                 placeholder="Enter institution desription"
                 value={userInput?.description}

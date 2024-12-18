@@ -4,10 +4,11 @@ import { MdManageHistory } from "react-icons/md";
 import { GrValidate } from "react-icons/gr";
 import { IoDocuments } from "react-icons/io5";
 //import useSWR from "swr";
-import axios from "../../utils/axiosConfig";
+import axios from "@/utils/axiosConfig";
 import DoumentRequestReport from "./DoumentRequestReport";
 import ValidationRequestReport from "./ValidationRequestReport";
 import secureLocalStorage from "react-secure-storage";
+import Navbar from "@/components/Navbar";
 
 export default function RevenueOverview() {
   const lineRef = useRef(null);
@@ -44,6 +45,7 @@ export default function RevenueOverview() {
 
   return (
     <div title="Financial Report Overview">
+      <Navbar />
       <section className="md:px-3 md:w-full w-[98vw] mx-auto">
         <p className="font-bold text-gray-800 text-xl mb-2 mt-6">
           Financial Report

@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import SideModal from "../../components/SideModal";
-import SelectInput from "../../components/SelectInput";
+import SideModal from "@/components/SideModal";
+import SelectInput from "@/components/SelectInput";
 import { toast } from "sonner";
-import LoadItems from "../../components/LoadItems";
+import LoadItems from "@/components/LoadItems";
 import { useCreateTicketMutation } from "../../redux/apiSlice";
 
 function IssueTicket({ setOpenModal, openModal }) {
@@ -165,7 +165,7 @@ function IssueTicket({ setOpenModal, openModal }) {
             Description
             <span className="text-[#f1416c]">*</span>
           </h4>
-          <div class="relative w-full md:h-[7vw] h-[30vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
+          <div className="relative w-full md:h-[7vw] h-[30vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
             <textarea
               placeholder="Enter ticket desription"
               value={userInput?.description}
