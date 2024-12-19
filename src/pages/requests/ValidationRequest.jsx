@@ -31,6 +31,7 @@ import { PiQueueFill } from "react-icons/pi";
 import { FcCancel } from "react-icons/fc";
 import { GiCancel } from "react-icons/gi";
 import { MdOutlineFilterAlt, MdOutlineFilterAltOff } from "react-icons/md";
+import secureLocalStorage from "react-secure-storage";
 
 export default function ValidationRequest() {
   const changeStatusDisclosure = useDisclosure();
@@ -48,7 +49,7 @@ export default function ValidationRequest() {
   const [validationRequests, setValidationRequests] = useState([]);
   const [sortBy, setSortBy] = useState(null);
   const [sortOrder, setSortOrder] = useState("asc");
-
+  const user = JSON?.parse(secureLocalStorage?.getItem("user"))?.user;
   const [documentTypes, setDocumentTypes] = useState([]);
   const [checkListSections, setCheckListSections] = useState([]);
   const [allRequests, setAllRequests] = useState(0);
@@ -56,6 +57,7 @@ export default function ValidationRequest() {
   const [rejected, setRejected] = useState(0);
   const [approved, setApproved] = useState(0);
   const [status, setStatus] = useState(null);
+  const [institutionId, setInstitutionId] = useState(null);
   const [filters, setFilters] = useState({
     search_query: "",
     document_type: null,
@@ -121,7 +123,7 @@ export default function ValidationRequest() {
         console.error(error);
       }
     };
-
+    setInstitutionId(user?.institution_id)
     fetchInstitutionDocs();
   }, []);
 
@@ -156,9 +158,9 @@ export default function ValidationRequest() {
   const downloadFile = async (fileName) => {
     try {
       const response = await axios.get(
-        `/download-pdf/${fileName}`,
+        `/download-pdf/${institutionId}/${fileName}`,
         {
-          responseType: "blob", // Important for file downloads
+          responseType: "blob",
         }
       );
 
@@ -166,13 +168,13 @@ export default function ValidationRequest() {
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement("a");
       link.href = url;
-      link.setAttribute("download", fileName); // Set the file name for download
+      link.setAttribute("download", fileName);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
     } catch (error) {
       console.error("Error downloading the file", error);
-      toast.error("Failed to download file.");
+      toast.error(error.response.data.message);
     }
   };
 
