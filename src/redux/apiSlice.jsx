@@ -44,6 +44,7 @@ export const baccheckerApi = createApi({
     "Department",
     "InstitutionUser",
     "DocumentRequest",
+    "Analytics",
   ],
   endpoints: (builder) => ({
     loginUser: builder.mutation({
@@ -129,6 +130,11 @@ export const baccheckerApi = createApi({
         return queryString;
       },
       providesTags: ["InstitutionUser"],
+    }),
+
+    getDashboardAnalytics: builder.query({
+      query: () => "/institution/dashboard-analytics",
+      providesTags: ["DocumentRequest"],
     }),
 
     getAllTickets: builder.query({
@@ -396,4 +402,5 @@ export const {
   useChangeRequestStatusMutation,
   useGetAllTicketsQuery,
   useUpdateTicketMutation,
+  useGetDashboardAnalyticsQuery,
 } = baccheckerApi;
