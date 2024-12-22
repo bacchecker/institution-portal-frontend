@@ -3,6 +3,7 @@ import DocumentRequestReport from "./DoumentRequestReport";
 import Navbar from "@/components/Navbar";
 import { useGetInstitutionRevenueQuery } from "../../redux/apiSlice";
 import secureLocalStorage from "react-secure-storage";
+import ValidationRequestReport from "./ValidationRequestReport";
 
 function RevenueOverview() {
   const [currentScreen, setCurrentScreen] = useState(1);
@@ -52,7 +53,10 @@ function RevenueOverview() {
               </div>
               <div className="flex flex-col">
                 <h4 className="text-[1.5vw] font-[600]">
-                  GH¢ {parseFloat(institutionRevenue?.total_revenue ?? 0).toFixed(2)}
+                  GH¢{" "}
+                  {parseFloat(institutionRevenue?.total_revenue ?? 0).toFixed(
+                    2
+                  )}
                 </h4>
               </div>
             </div>
@@ -161,6 +165,7 @@ function RevenueOverview() {
             ></div>
           </div>
           {currentScreen === 1 && <DocumentRequestReport />}
+          {currentScreen === 2 && <ValidationRequestReport />}
         </div>
       </div>
     </>

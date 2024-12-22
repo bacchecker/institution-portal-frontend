@@ -174,6 +174,40 @@ export const baccheckerApi = createApi({
       providesTags: ["DocumentRequest"],
     }),
 
+    getInstitutionValidationReports: builder.query({
+      query: ({
+        page,
+        selectedStatus,
+        selectedDateRange,
+        sortBy,
+        sortOrder,
+        selectedFrom,
+        selectedTo,
+      }) => {
+        let queryString = `/institution/reports/institution-validations?page=${page}`;
+        if (selectedStatus) {
+          queryString += `&status=${selectedStatus}`;
+        }
+        if (selectedDateRange) {
+          queryString += `&date_range=${selectedDateRange}`;
+        }
+        if (sortBy) {
+          queryString += `&sort_by=${sortBy}`;
+        }
+        if (sortOrder) {
+          queryString += `&sort_order=${sortOrder}`;
+        }
+        if (selectedFrom) {
+          queryString += `&start_date=${selectedFrom}`;
+        }
+        if (selectedTo) {
+          queryString += `&end_date=${selectedTo}`;
+        }
+        return queryString;
+      },
+      providesTags: ["DocumentRequest"],
+    }),
+
     getDashboardAnalytics: builder.query({
       query: () => "/institution/dashboard-analytics",
       providesTags: ["DocumentRequest"],
@@ -447,4 +481,5 @@ export const {
   useGetDashboardAnalyticsQuery,
   useGetInstitutionRevenueQuery,
   useGetInstitutionReportsQuery,
+  useGetInstitutionValidationReportsQuery,
 } = baccheckerApi;

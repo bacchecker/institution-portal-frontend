@@ -114,8 +114,6 @@ function DocumentRequestReport() {
     setSelectedDocumentType({});
   };
 
-  console.log("infdd", institutionDocumentRequestReports);
-
   return (
     <>
       <div className="bg-[#f8f8f8] p-[1vw] my-[1vw] rounded-[0.2vw]">
