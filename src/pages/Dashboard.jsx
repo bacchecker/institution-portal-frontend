@@ -3,7 +3,11 @@ import secureLocalStorage from "react-secure-storage";
 import Team from "./dashboardComponents/Team";
 import DashboardDocumentRequests from "./dashboardComponents/DashboardDocumentRequests";
 import Navbar from "@/components/Navbar";
-import { useGetDashboardAnalyticsQuery } from "../redux/apiSlice";
+import {
+  useGetDashboardAnalyticsQuery,
+  useGetInstitutionRevenueGraphQuery,
+} from "../redux/apiSlice";
+import RevenueGraph from "./dashboardComponents/RevenueGraph";
 
 function Dashboard() {
   const user = JSON.parse(secureLocalStorage.getItem("user"));
@@ -14,7 +18,13 @@ function Dashboard() {
     isFetching,
   } = useGetDashboardAnalyticsQuery();
 
-  console.log("err", analytics);
+  const {
+    data: revenueGraph,
+    // isLoading,
+    // isFetching,
+  } = useGetInstitutionRevenueGraphQuery();
+
+  console.log("revenueGraph", revenueGraph);
 
   return (
     <>
@@ -111,7 +121,9 @@ function Dashboard() {
           </div>
         </div>
         <div className="flex w-full mt-[2vw] justify-between">
-          <div className="w-[58%] h-[26vw] border rounded-[0.4vw] border-[#0000000f]"></div>
+          <div className="w-[58%] h-[26vw] border rounded-[0.4vw] border-[#0000000f]">
+            <RevenueGraph revenueGraph={revenueGraph}/>
+          </div>
           <div className="w-[40%] h-[26vw] border rounded-[0.4vw] border-[#0000000f overflow-hidden">
             <Team />
           </div>

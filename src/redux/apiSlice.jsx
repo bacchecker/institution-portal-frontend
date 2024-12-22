@@ -59,6 +59,10 @@ export const baccheckerApi = createApi({
       query: () => "/institution/institution-data",
       providesTags: ["Institution"],
     }),
+    getInstitutionRevenueGraph: builder.query({
+      query: () => "/institution/revenue",
+      providesTags: ["DocumentRequest"],
+    }),
     getAllPermissions: builder.query({
       query: () => "/institution/institution-permissions",
     }),
@@ -482,4 +486,5 @@ export const {
   useGetInstitutionRevenueQuery,
   useGetInstitutionReportsQuery,
   useGetInstitutionValidationReportsQuery,
+  useGetInstitutionRevenueGraphQuery,
 } = baccheckerApi;
