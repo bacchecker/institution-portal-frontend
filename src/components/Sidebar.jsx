@@ -100,7 +100,7 @@ function Sidebar() {
         </div>
       </div>
       <div
-        className={`md:w-[18%] fixed md:left-0 left-[-100%] top-0 bottom-0 bg-[#f8f8f8] border-r-2 border-[#E5E5E5] z-[1001] w-full flex md:flex-col flex-col-reverse nav-mobile ${
+        className={`md:w-[18%] fixed md:left-0 left-[-100%] top-0 bottom-0 bg-[#f8f8f8] border-r-2 border-[#E5E5E5] z-0 w-full flex md:flex-col flex-col-reverse nav-mobile ${
           (activeDropdown === "hamburgermenu" ||
             activeDropdown === "support" ||
             activeDropdown === "service") &&

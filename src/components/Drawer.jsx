@@ -55,7 +55,7 @@ export default function Drawer({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ type: "tween" }}
-          className="fixed inset-0 bg-black/60 flex justify-end z-[1001]"
+          className="fixed inset-0 bg-black/60 flex justify-end"
         >
           <motion.div
             ref={bottonDrawerRef}

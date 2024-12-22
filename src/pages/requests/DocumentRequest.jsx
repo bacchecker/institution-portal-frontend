@@ -556,7 +556,7 @@ const [submittedFilters, setSubmittedFilters] = useState({});
         title="Request Details"
         isOpen={openDrawer}
         setIsOpen={setOpenDrawer}
-        classNames="w-[100vw] md:w-[40vw] z-[1001]"
+        classNames="w-[100vw] md:w-[40vw] z-10"
       >
         <div className="h-full flex flex-col justify-between">
           <div className="flex flex-col -mt-2 xl:pl-2 font-semibold">

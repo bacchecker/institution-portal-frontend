@@ -600,7 +600,7 @@ export default function ValidationRequest() {
           }
           isOpen={openDrawer}
           setIsOpen={setOpenDrawer}
-          classNames="w-[100vw] md:w-[45vw]"
+          classNames="w-[100vw] md:w-[45vw] z-10"
         >
           <div className="h-full flex flex-col -mt-2 xl:pl-2 font-semibold justify-between">
             {data?.status != "processing" ? (

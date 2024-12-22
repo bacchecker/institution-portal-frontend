@@ -39,8 +39,8 @@ const CustomTable = ({
             customHeightClass && customHeightClass
           } md:!max-h-[78vh] font-nunito text-xs overflow-y-auto w-[100vw] rounded-none md:!w-full overflow-x-auto shadow-none`,
           wrapper:
-            "dark:bg-slate-800 vertical-scrollbar horizontal-scrollbar shadow-none rounded-lg dark:border border-white/5 bg-gray-50",
-          th: "!rounded-none dark:bg-slate-800", // Remove border-radius
+            "vertical-scrollbar horizontal-scrollbar shadow-none rounded-lg border-white/5 bg-gray-50",
+          th: "!rounded-none", // Remove border-radius
           td: "text-sm",
         }}
       >
@@ -63,7 +63,7 @@ const CustomTable = ({
                   setSortBy(sortKey);
                   setSortOrder(newSortOrder);
                 }}
-                className={`text-text-sm text-gray-700 dark:text-white bg-white text-sm py-4 ${
+                className={`text-text-sm text-gray-700 bg-white text-sm py-4 ${
                   isFilterable ? "cursor-pointer" : ""
                 }`}
               >
@@ -78,13 +78,13 @@ const CustomTable = ({
           })}
         </TableHeader>
         <TableBody
-          className="dark:text-slate-700"
+          className=""
           isLoading={loadingState}
           loadingContent={<Spinner color="danger" label="Loading...." />}
           emptyContent={
             <div className="md:!h-[65vh] h-[60vh] flex flex-col gap-8 items-center justify-center">
               <img src="/assets/img/no-data.svg" alt="No data" className="w-1/4 md:w-1/6 h-auto" />
-              <p className="text-center text-slate-500 dark:text-slate-400 font-montserrat font-medium text-base -mt-6">
+              <p className="text-center text-slate-500 font-montserrat font-medium text-base -mt-6">
                 No data available
               </p>
             </div>
@@ -106,9 +106,9 @@ const CustomTable = ({
             showShadow
             size="sm"
             classNames={{
-              item: "font-montserrat font-semibold bg-white dark:bg-slate-800 dark:text-white",
-              next: "font-montserrat font-semibold bg-white dark:bg-slate-800 dark:text-white",
-              prev: "font-montserrat font-semibold bg-white dark:bg-slate-800 dark:text-white",
+              item: "font-montserrat font-semibold bg-white",
+              next: "font-montserrat font-semibold bg-white",
+              prev: "font-montserrat font-semibold bg-white",
             }}
           />
         )}
