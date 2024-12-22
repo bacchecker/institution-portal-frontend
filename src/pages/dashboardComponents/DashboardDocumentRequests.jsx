@@ -291,7 +291,7 @@ function DashboardDocumentRequests() {
                   ?.length === 0 ? (
                   <tr>
                     <td colSpan={7} rowSpan={5}>
-                      <div className="w-full h-[35vw] flex flex-col justify-center items-center">
+                      <div className="w-full h-[30vw] flex flex-col justify-center items-center">
                         <img
                           src="/assets/img/no-data.svg"
                           alt=""
