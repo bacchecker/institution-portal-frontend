@@ -132,6 +132,48 @@ export const baccheckerApi = createApi({
       providesTags: ["InstitutionUser"],
     }),
 
+    getInstitutionRevenue: builder.query({
+      query: ({ institutionID }) => {
+        let queryString = `/institution/reports/institution-income?institution_id=${institutionID}`;
+        return queryString;
+      },
+      providesTags: ["DocumentRequest"],
+    }),
+
+    getInstitutionReports: builder.query({
+      query: ({
+        page,
+        selectedStatus,
+        selectedDateRange,
+        sortBy,
+        sortOrder,
+        selectedFrom,
+        selectedTo,
+      }) => {
+        let queryString = `/institution/reports/institution-requests?page=${page}`;
+        if (selectedStatus) {
+          queryString += `&status=${selectedStatus}`;
+        }
+        if (selectedDateRange) {
+          queryString += `&date_range=${selectedDateRange}`;
+        }
+        if (sortBy) {
+          queryString += `&sort_by=${sortBy}`;
+        }
+        if (sortOrder) {
+          queryString += `&sort_order=${sortOrder}`;
+        }
+        if (selectedFrom) {
+          queryString += `&start_date=${selectedFrom}`;
+        }
+        if (selectedTo) {
+          queryString += `&end_date=${selectedTo}`;
+        }
+        return queryString;
+      },
+      providesTags: ["DocumentRequest"],
+    }),
+
     getDashboardAnalytics: builder.query({
       query: () => "/institution/dashboard-analytics",
       providesTags: ["DocumentRequest"],
@@ -403,4 +445,6 @@ export const {
   useGetAllTicketsQuery,
   useUpdateTicketMutation,
   useGetDashboardAnalyticsQuery,
+  useGetInstitutionRevenueQuery,
+  useGetInstitutionReportsQuery,
 } = baccheckerApi;
