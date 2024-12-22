@@ -711,7 +711,7 @@ export default function ValidationRequest() {
                             // onClick={() => downloadFile(data?.file?.name)}
                             onClick={() => {
                               window.location.href =
-                                "https://admin-dev.baccheck.online/api?path=" +
+                                "https://admin-dev.baccheck.online/api/download-pdf?path=" +
                                 encodeURIComponent(data?.file?.path);
                             }}
                             /* onClick={() => {
