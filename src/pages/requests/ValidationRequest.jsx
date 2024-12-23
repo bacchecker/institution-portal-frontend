@@ -307,52 +307,31 @@ export default function ValidationRequest() {
                 onSubmit={handleSubmit}
                 className="flex flex-row gap-3 items-center"
               >
-                <Input
-                  radius="none"
+                <input 
+                  type="text" 
+                  className="bg-white text-gray-900 text-sm rounded-[4px] font-[400] focus:outline-none block w-[260px] p-[9.5px] placeholder:text-gray-500"
                   name="search_query"
                   placeholder="Search by user name or unique code"
                   value={filters.search_query}
-                  onChange={(e) =>
-                    setFilters({ ...filters, search_query: e.target.value })
-                  }
-                  size="md"
-                  classNames={{
-                    label: "text-black/50 dark:text-white/90",
-                    input: [
-                      "bg-transparent",
-                      "text-black/90 dark:text-white/90",
-                      "placeholder:text-default-700/50 dark:placeholder:text-white/60",
-                    ],
-                    innerWrapper: "bg-transparent",
-                    inputWrapper: [
-                      "bg-default-white",
-                      "group-data-[focus=true]:bg-default-white",
-                      "!cursor-text",
-                      "no-hover-bg", // Add this custom class
-                    ],
-                  }}
-                  className="max-w-[240px] min-w-[240px] rounded-sm bg-white"
+                  onChange={(e) => setFilters({ ...filters, search_query: e.target.value })}
+
                 />
-                <Select
-                  aria-label="Document Type"
-                  radius="none"
-                  size="md"
-                  placeholder="Document Type"
-                  className="max-w-[200px] min-w-[200px] rounded-sm"
-                  style={{
-                    backgroundColor: "white", // Set background to white
-                    "--select-hover-bg": "transparent", // Remove hover background
-                  }}
+                
+                <select
                   name="document_type"
                   value={filters.document_type || ""}
+                  className={`bg-white text-sm rounded-[4px] focus:outline-none block w-[220px] p-[9px] ${
+                    filters.document_type ? "text-gray-900" : "text-gray-500"
+                  }`}
                   onChange={handleDocumentTypeChange}
                 >
+                  <option value="" className="text-gray-500" disabled selected>Document Type</option>
                   {documentTypes.map((item) => (
-                    <SelectItem key={item.key} value={item.key}>
+                    <option key={item.key} value={item.key}>
                       {item.name}
-                    </SelectItem>
+                    </option>
                   ))}
-                </Select>
+                </select>
                 <DateRangePicker
                   radius="none"
                   visibleMonths={2}
@@ -363,7 +342,7 @@ export default function ValidationRequest() {
                   style={{
                     border: "none", // Removes the border
                   }}
-                  className="w-[30%] rounded-sm date-range-picker-input border-none bg-white"
+                  className="w-[280px] rounded-[4px] date-range-picker-input border-none bg-white"
                   onChange={(date) => {
                     if (date) {
                       const newStartDate = new Date(
@@ -396,7 +375,7 @@ export default function ValidationRequest() {
                     radius="none"
                     size="sm"
                     type="submit"
-                    className="rounded-sm bg-bChkRed text-white"
+                    className="rounded-[4px] bg-bChkRed text-white"
                   >
                     Filter
                   </Button>
@@ -405,7 +384,7 @@ export default function ValidationRequest() {
                     radius="none"
                     size="sm"
                     type="button"
-                    className="rounded-sm bg-black text-white"
+                    className="rounded-[4px] bg-black text-white"
                     onClick={() => {
                       setFilters({
                         search_query: "",
@@ -429,7 +408,7 @@ export default function ValidationRequest() {
             </CardBody>
           </Card>
 
-          <div className="my-3 w-full shadow-none rounded-lg dark:bg-slate-900">
+          <div className="my-3 w-full shadow-none rounded-lg">
             <div className="grid w-full grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4">
               <div
                 onClick={() => {
@@ -519,7 +498,7 @@ export default function ValidationRequest() {
             {validationRequests?.map((item) => (
               <TableRow
                 key={item?.id}
-                className="odd:bg-gray-100 even:bg-white border-b dark:text-slate-700"
+                className="odd:bg-gray-100 even:bg-white border-b"
               >
                 <TableCell className="font-semibold">
                   {item?.unique_code}
@@ -532,7 +511,7 @@ export default function ValidationRequest() {
                   />
                 </TableCell>
                 <TableCell>
-                  {moment(item?.created_at).format("Do MMMM, YYYY")}
+                  {moment(item?.created_at).format("MMM D, YYYY")}
                 </TableCell>
                 <TableCell>
                   {item.institution_document_type
@@ -546,7 +525,9 @@ export default function ValidationRequest() {
                 <TableCell className="flex items-center h-16 gap-3">
                   <Button
                     size="sm"
+                    radius="none"
                     color="success"
+                    className="rounded-[4px] text-white"
                     onClick={async () => {
                       if (item?.status === "processing") {
                         await fetchValidationChecklist(item?.document_type?.id);
@@ -694,7 +675,7 @@ export default function ValidationRequest() {
                   </section>
 
                   <section className="grid grid-cols-2 gap-2">
-                    <div className="gap-3 p-2 rounded-lg border dark:border-white/10">
+                    <div className="gap-3 p-2 rounded-lg border">
                       <div className="w-full flex flex-col gap-1">
                         <p className="font-semibold">
                           {data?.document_type?.name}
@@ -733,7 +714,7 @@ export default function ValidationRequest() {
                 <div>
                   {data?.status == "rejected" && (
                     <div className="mt-3">
-                      <Card className="dark:bg-slate-950">
+                      <Card className="">
                         <CardHeader>
                           <p className="font-bold">Rejection Reason</p>
                         </CardHeader>
@@ -743,7 +724,7 @@ export default function ValidationRequest() {
                       </Card>
 
                       <div className="mt-3">
-                        <Card className="dark:bg-slate-950">
+                        <Card className="">
                           <CardBody className="flex-row">
                             <div className="flex-1">
                               <p className="font-semibold">Rejected By:</p>
@@ -893,7 +874,7 @@ export default function ValidationRequest() {
                           alt="No data"
                           className="w-1/4 h-auto"
                         />
-                        <p className="text-center text-slate-500 dark:text-slate-400 font-montserrat font-medium text-base -mt-6">
+                        <p className="text-center text-slate-500 font-montserrat font-medium text-base -mt-6">
                           No questions available
                         </p>
                       </div>

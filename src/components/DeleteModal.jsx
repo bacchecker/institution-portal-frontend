@@ -14,7 +14,7 @@ const DeleteModal = ({ title, children, disclosure, onButtonClick, processing })
       backdrop={"opaque"}
       isOpen={disclosure.isOpen}
       onClose={disclosure.onClose}
-      className="dark:bg-slate-900 border-[1px] dark:border-slate-700/20 w-full md:w-1/2"
+      className="border-[1px] w-full md:w-1/2"
       size="md"
       motionProps={{
         variants: {

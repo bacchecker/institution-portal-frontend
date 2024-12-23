@@ -170,7 +170,7 @@ export default function Tickets() {
               setSortOrder={setSortOrder}
             >
               {tickets?.map((item) => (
-                <TableRow key={item?.id} className="odd:bg-gray-100 even:bg-white border-b dark:text-slate-700">
+                <TableRow key={item?.id} className="odd:bg-gray-100 even:bg-white border-b">
                   <TableCell className="flex flex-col">
                     <p className="font-semibold">{item?.title}</p>
                     <p className="text-xs text-gray-500">{moment(item?.created_at).format('MMM DD, YYYY')}</p>

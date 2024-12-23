@@ -63,10 +63,10 @@ export default function Drawer({
             initial="closed"
             animate="open"
             exit="closed"
-            className={`${classNames} bg-white dark:bg-gray-900 h-full flex flex-col gap-4 overflow-y-auto vertical-scrollbar`}
+            className={`${classNames} bg-white h-full flex flex-col gap-4 overflow-y-auto vertical-scrollbar`}
           >
             {/* Drawer header */}
-            <div className="border-b dark:border-white/10 py-2 px-4 flex justify-between items-center">
+            <div className="border-b py-2 px-4 flex justify-between items-center">
               <div className="flex gap-3 items-center">
                 {detailedView && (
                   <Button
@@ -84,7 +84,7 @@ export default function Drawer({
                     }
                   />
                 )}
-                <h3 className="font-montserrat font-semibold text-gray-900 dark:text-white text-lg">
+                <h3 className="font-montserrat font-semibold text-gray-900 text-lg">
                   {title}
                 </h3>
               </div>

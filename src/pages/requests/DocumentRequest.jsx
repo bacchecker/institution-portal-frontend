@@ -259,11 +259,11 @@ const [submittedFilters, setSubmittedFilters] = useState({});
       case "application/pdf":
         return <PdfIcon className="size-6 text-danger" />;
       case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
-        return <WordIcon className="size-6 text-blue-600 dark:text-blue-400" />;
+        return <WordIcon className="size-6 text-blue-600" />;
       case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
       case "application/vnd.ms-excel":
         return (
-          <ExcelIcon className="size-6 text-green-500 dark:text-green-400" />
+          <ExcelIcon className="size-6 text-green-500" />
         );
       default:
         return <Elipsis />;
@@ -280,36 +280,38 @@ const [submittedFilters, setSubmittedFilters] = useState({});
         <Card className="md:w-full w-full mx-auto rounded-none shadow-none border-none">
           <CardBody className="w-full bg-gray-100 p-6">
             <form onSubmit={handleSubmit} className="flex flex-row gap-3 items-center">
-            <Input
-              radius="none"
+            <input 
+              type="text" 
+              className={`bg-white text-gray-900 text-sm rounded-[4px] font-[400] focus:outline-none block w-[260px] p-[9.5px] placeholder:text-gray-500`}
               name="search_query"
               placeholder="Search by user name or unique code"
               value={filters.search_query}
               onChange={(e) => setFilters({ ...filters, search_query: e.target.value })}
-              size="md"
-              classNames={{
-                label: "text-black/50 dark:text-white/90",
-                input: [
-                  "bg-transparent",
-                  "text-black/90 dark:text-white/90",
-                  "placeholder:text-default-700/50 dark:placeholder:text-white/60",
-                ],
-                innerWrapper: "bg-transparent",
-                inputWrapper: [
-                  "bg-default-white",
-                  "group-data-[focus=true]:bg-default-white",
-                  "!cursor-text",
-                  "no-hover-bg",
-                ],
-              }}
-              className="max-w-[240px] min-w-[240px] rounded-sm bg-white"
+
             />
-            <Select
+            
+            <select
+              name="document_type"
+              value={filters.document_type || ""}
+              className={`bg-white text-sm rounded-[4px] focus:outline-none block w-[220px] p-[9px] ${
+                filters.document_type ? "text-gray-900" : "text-gray-500"
+              }`}
+              onChange={handleDocumentTypeChange}
+            >
+              <option value="" className="text-gray-500" disabled selected>Document Type</option>
+              {documentTypes.map((item) => (
+                <option key={item.key} value={item.key}>
+                  {item.name}
+                </option>
+              ))}
+            </select>
+
+            {/* <Select
               aria-label="Document Type"
-              radius="none"
+              radius="sm"
               size="md"
               placeholder="Document Type"
-              className="max-w-[200px] min-w-[200px] rounded-sm"
+              className="max-w-[200px] min-w-[200px] rounded-[4px]"
               style={{
                 backgroundColor: "white",
                 "--select-hover-bg": "transparent",
@@ -323,18 +325,14 @@ const [submittedFilters, setSubmittedFilters] = useState({});
                   {item.name}
                 </SelectItem>
               ))}
-            </Select>
+            </Select> */}
             <DateRangePicker
-              radius="none"
               visibleMonths={2}
               variant="underlined"
               classNames={{
-                base: "bg-white", // This sets the input background to white
+                base: "bg-white border border-white", // This sets the input background to white
               }}
-              style={{
-                border: "none", // Removes the border
-              }}
-              className="w-[30%] rounded-sm date-range-picker-input border-none bg-white"
+              className="w-[280px] rounded-[4px] date-range-picker-input border border-white bg-white"
               onChange={(date) => {
                 if (date) {
                   const newStartDate = new Date(date.start.year, date.start.month - 1, date.start.day)
@@ -356,7 +354,7 @@ const [submittedFilters, setSubmittedFilters] = useState({});
                   radius="none"
                   size="sm"
                   type="submit"
-                  className="rounded-sm bg-bChkRed text-white"
+                  className="rounded-[4px] bg-bChkRed text-white"
                 >
                   Filter
                 </Button>
@@ -365,7 +363,7 @@ const [submittedFilters, setSubmittedFilters] = useState({});
                   radius="none"
                   size="sm"
                   type="button"
-                  className="rounded-sm bg-black text-white"
+                  className="rounded-[4px] bg-black text-white"
                   onClick={() => {
                     setFilters({
                       search_query: "",
@@ -390,7 +388,7 @@ const [submittedFilters, setSubmittedFilters] = useState({});
             </form>
           </CardBody>
         </Card>
-        <div className="my-3 md:w-full w-[98vw] mx-auto border-none shadow-none rounded-lg dark:bg-slate-900">
+        <div className="my-3 md:w-full w-[98vw] mx-auto border-none shadow-none rounded-lg">
           <div className="grid w-full grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div
               onClick={() => {
@@ -451,9 +449,9 @@ const [submittedFilters, setSubmittedFilters] = useState({});
       <section className="md:px-3 md:w-full w-[98vw] mx-auto">
         <CustomTable
           columns={[
-            /* "ID", */
+            "ID",
             "Requested By",
-            "Delivery Address",
+            /* "Delivery Address", */
             "Date",
             "Document",
             "Format",
@@ -479,10 +477,10 @@ const [submittedFilters, setSubmittedFilters] = useState({});
           setSortOrder={setSortOrder}
         >
           {documentRequests?.map((item) => (
-            <TableRow key={item?.id} className="odd:bg-gray-100 even:bg-gray-50 border-b dark:text-slate-700">
-              {/* <TableCell className="font-semibold">
+            <TableRow key={item?.id} className="odd:bg-gray-100 even:bg-gray-50 border-b">
+              <TableCell className="font-semibold">
                 {item?.unique_code}
-              </TableCell> */}
+              </TableCell>
               <TableCell className="font-semibold">
                 <CustomUser
                   avatarSrc={`${
@@ -492,7 +490,7 @@ const [submittedFilters, setSubmittedFilters] = useState({});
                   email={`${item?.user?.email}`}
                 />
               </TableCell>
-              <TableCell>{item?.delivery_address ?? "N/A"}</TableCell>
+              {/* <TableCell>{item?.delivery_address ?? "N/A"}</TableCell> */}
               <TableCell>
                 {moment(item?.created_at).format("MMM D, YYYY")}
               </TableCell>
@@ -509,8 +507,10 @@ const [submittedFilters, setSubmittedFilters] = useState({});
 
               <TableCell className="flex items-center h-16 gap-3">
                 <Button
+                  radius="none"
                   size="sm"
                   color="success"
+                  className="rounded-[4px] text-white"
                   onClick={() => {
                     setData(item);
                     setOpenDrawer(true);
@@ -577,7 +577,7 @@ const [submittedFilters, setSubmittedFilters] = useState({});
                 Delivery Address
               </div>
               <div className="col-span-2">
-                {data?.delivery_address}
+                {data?.delivery_address || "N/A"}
               </div>
               <div className="text-gray-500">
                 Total Cash
@@ -700,7 +700,7 @@ const [submittedFilters, setSubmittedFilters] = useState({});
                     data?.files?.map((item) => (
                       <div
                         key={item?.id}
-                        className="flex items-center gap-3 p-2 rounded-lg border dark:border-white/10"
+                        className="flex items-center gap-3 p-2 rounded-lg border"
                       >
                         {item?.extension === "pdf" ? (
                           <PdfIcon className="size-11" color="red" />
@@ -756,7 +756,7 @@ const [submittedFilters, setSubmittedFilters] = useState({});
           <div className="w-full mb-2 -mt-4">
             {data?.status == "rejected" && (
               <div className="w-full">
-                <div className="dark:bg-slate-950 border rounded-md bg-white p-2 shadow-md">
+                <div className="border rounded-md bg-white p-2 shadow-md">
                   
                     <div className="flex-row">
                       <div className="flex-1 mb-2">
@@ -853,8 +853,8 @@ const [submittedFilters, setSubmittedFilters] = useState({});
               </ModalHeader>
               <ModalBody>
                 <div>
-                  <div className="sticky top-0 z-50 bg-white dark:bg-slate-900 pb-5">
-                    <div className="border-2 border-primary shadow-sm rounded-xl p-4 bg-gray-50 dark:bg-slate-900">
+                  <div className="sticky top-0 z-50 bg-white pb-5">
+                    <div className="border-2 border-primary shadow-sm rounded-xl p-4 bg-gray-50">
                       <div
                         className={`p-3 border-2 border-dashed rounded-lg ${
                           dragActive
@@ -880,7 +880,7 @@ const [submittedFilters, setSubmittedFilters] = useState({});
                                 htmlFor="file-upload"
                                 className="flex items-center cursor-pointer mb-2"
                               >
-                                <p className="flex items-center text-base font-semibold text-slate-600 dark:text-slate-200">
+                                <p className="flex items-center text-base font-semibold text-slate-600">
                                   <span className="mr-2">
                                     {getFileIcon(file.type)}
                                   </span>
@@ -909,10 +909,10 @@ const [submittedFilters, setSubmittedFilters] = useState({});
                               ></path>
                             </svg>
                             <div className="text-left">
-                              <p className="text-sm text-slate-600 dark:text-slate-300">
+                              <p className="text-sm text-slate-600">
                                 Click to select or attach documents
                               </p>
-                              <p className="text-xs text-slate-600 dark:text-slate-300">
+                              <p className="text-xs text-slate-600">
                                 (PDF, DOCX, XLSX, or Text files only)
                               </p>
                             </div>

@@ -72,6 +72,7 @@ const CustomTable = ({
                   <span className={`${isFilterable ? "flex" : "hidden"}`}>
                     {getSortIcon(column)}
                   </span>
+                  
                 </div>
               </TableColumn>
             );
