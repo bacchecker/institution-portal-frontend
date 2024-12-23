@@ -56,7 +56,7 @@ function EditDocumentType({ setOpenModal, openModal, selectedDocumentType }) {
       (hard_copy && printing_fee === "") ||
       validation_fee === "" ||
       verification_fee === "" ||
-      (hard_copy && !soft_copy)
+      (!hard_copy && !soft_copy)
     ) {
       toast.error("Fill All required fields", {
         position: "top-right",
