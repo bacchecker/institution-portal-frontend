@@ -175,7 +175,7 @@ function AddTicket({ setOpenDrawer, openDrawer, fetchTickets }) {
                     <img
                       src={
                         userInput?.logo && userInput?.logo !== "default.png"
-                          ? `https://backend.baccheck.online/storage/app/public/${userInput?.logo}`
+                          ? `https://admin-dev.baccheck.online/storage/${userInput?.logo}`
                           : "/images/upload-t.svg"
                       }
                       alt=""

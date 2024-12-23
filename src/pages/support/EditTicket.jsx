@@ -176,7 +176,7 @@ function EditTicket({ setOpenEditDrawer, openEditDrawer, selectedData, fetchTick
                     <img
                       src={
                         userInput?.file && userInput?.file !== "default.png"
-                          ? `https://backend.baccheck.online/storage/app/public/${userInput?.file}`
+                          ? `https://admin-dev.baccheck.online/storage/${userInput?.file}`
                           : "/images/upload-t.svg"
                       }
                       alt=""
