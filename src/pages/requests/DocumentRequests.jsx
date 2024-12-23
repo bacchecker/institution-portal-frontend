@@ -39,8 +39,6 @@ function DocumentRequests({
     setSelectedDocumentType(item);
   };
 
-  //   console.log("institutionDocumentTypes", institutionDocumentTypes);
-
   const {
     data: institutionDocumentRequests,
     isLoading,

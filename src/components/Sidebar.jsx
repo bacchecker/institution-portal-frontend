@@ -197,7 +197,7 @@ function Sidebar() {
                 </li>
                 <li>
                   <Link
-                    to="account-settings"
+                    to="/account-settings"
                     onClick={() => handleDropdownToggle("close")}
                     className={`flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[15vw] md:rounded-[0.3vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] ${
                       pathname === "/account-settings" && "active"
@@ -211,7 +211,7 @@ function Sidebar() {
                 </li>
                 <li>
                   <Link
-                    to="system-logs"
+                    to="/system-logs"
                     onClick={() => handleDropdownToggle("close")}
                     className={`flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[15vw] md:rounded-[0.3vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] ${
                       pathname === "/system-logs" && "active"

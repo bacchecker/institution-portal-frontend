@@ -17,6 +17,7 @@ import AccountSetupProtectedRoute from "@/components/AccountSetupProtectedRoute"
 import AccountUnderReviewProtection from "@/components/AccountUnderReviewProtection";
 import AccountSetupProtection from "@/components/AccountSetupProtection";
 import RevenueOverview from "@/pages/reports/RevenueOverview";
+import SystemLogs from "./pages/SystemLogs";
 
 function App() {
   return (
@@ -97,6 +98,16 @@ function App() {
                       <AuthenticatedSuccessProtectedRoute>
                         <AccountSetupProtectedRoute>
                           <RevenueOverview />
+                        </AccountSetupProtectedRoute>
+                      </AuthenticatedSuccessProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/system-logs"
+                    element={
+                      <AuthenticatedSuccessProtectedRoute>
+                        <AccountSetupProtectedRoute>
+                          <SystemLogs />
                         </AccountSetupProtectedRoute>
                       </AuthenticatedSuccessProtectedRoute>
                     }

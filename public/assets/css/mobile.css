@@ -54,7 +54,7 @@
     transition: 0.2s ease-in-out;
   }
   tbody tr:nth-child(even) {
-    background-color: #fff6f6;
+    background-color: #ffffff;
   }
   .sidemenu-h {
     height: 0;

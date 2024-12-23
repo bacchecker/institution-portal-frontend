@@ -39,7 +39,6 @@ function RevenueOverview() {
     institutionID: user?.institution?.id,
   });
 
-  console.log("inst", institutionRevenue);
 
   return (
     <>

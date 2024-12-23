@@ -45,6 +45,7 @@ export const baccheckerApi = createApi({
     "InstitutionUser",
     "DocumentRequest",
     "Analytics",
+    "Log",
   ],
   endpoints: (builder) => ({
     loginUser: builder.mutation({
@@ -65,6 +66,23 @@ export const baccheckerApi = createApi({
     }),
     getAllPermissions: builder.query({
       query: () => "/institution/institution-permissions",
+    }),
+
+    getUserSystemLogs: builder.query({
+      query: ({ page, searchValue, selectedFrom, selectedTo }) => {
+        let queryString = `institution/system-logs?page=${page}`;
+        if (searchValue) {
+          queryString += `&search_query=${searchValue}`;
+        }
+        if (selectedFrom) {
+          queryString += `&start_date=${selectedFrom}`;
+        }
+        if (selectedTo) {
+          queryString += `&end_date=${selectedTo}`;
+        }
+        return queryString;
+      },
+      providesTags: ["Log"],
     }),
 
     getInstitutionDepartments: builder.query({
@@ -363,7 +381,7 @@ export const baccheckerApi = createApi({
         method: "POST",
         body,
       }),
-      invalidatesTags: ["Ticket"],
+      invalidatesTags: ["Ticket", "Log"],
     }),
 
     createInstitutionSetup: builder.mutation({
@@ -372,7 +390,7 @@ export const baccheckerApi = createApi({
         method: "POST",
         body,
       }),
-      invalidatesTags: ["Institution"],
+      invalidatesTags: ["Institution", "Log"],
     }),
     createInstitutionDocumentType: builder.mutation({
       query: (body) => ({
@@ -380,28 +398,28 @@ export const baccheckerApi = createApi({
         method: "POST",
         body,
       }),
-      invalidatesTags: ["DocumentType"],
+      invalidatesTags: ["DocumentType", "Log"],
     }),
     deleteDomentType: builder.mutation({
       query: ({ id }) => ({
         url: `/institution/document-types/${id}`,
         method: "DELETE",
       }),
-      invalidatesTags: ["DocumentType"],
+      invalidatesTags: ["DocumentType", "Log"],
     }),
     deleteDepartment: builder.mutation({
       query: ({ id }) => ({
         url: `/institution/departments/${id}`,
         method: "DELETE",
       }),
-      invalidatesTags: ["Department"],
+      invalidatesTags: ["Department", "Log"],
     }),
     deleteInstitutionUser: builder.mutation({
       query: ({ id }) => ({
         url: `/institution/users/${id}`,
         method: "DELETE",
       }),
-      invalidatesTags: ["InstitutionUser"],
+      invalidatesTags: ["InstitutionUser", "Log"],
     }),
 
     updateDocumentType: builder.mutation({
@@ -410,7 +428,7 @@ export const baccheckerApi = createApi({
         method: "PUT",
         body,
       }),
-      invalidatesTags: ["DocumentType"],
+      invalidatesTags: ["DocumentType", "Log"],
     }),
     updateDepartment: builder.mutation({
       query: ({ id, body }) => ({
@@ -418,7 +436,7 @@ export const baccheckerApi = createApi({
         method: "POST",
         body,
       }),
-      invalidatesTags: ["Department"],
+      invalidatesTags: ["Department", "Log"],
     }),
 
     updateUser: builder.mutation({
@@ -427,7 +445,7 @@ export const baccheckerApi = createApi({
         method: "POST",
         body,
       }),
-      invalidatesTags: ["InstitutionUser"],
+      invalidatesTags: ["InstitutionUser", "Log"],
     }),
 
     updateTicket: builder.mutation({
@@ -436,7 +454,7 @@ export const baccheckerApi = createApi({
         method: "POST",
         body,
       }),
-      invalidatesTags: ["Ticket"],
+      invalidatesTags: ["Ticket", "Log"],
     }),
 
     changeRequestStatus: builder.mutation({
@@ -445,7 +463,7 @@ export const baccheckerApi = createApi({
         method: "POST",
         body,
       }),
-      invalidatesTags: ["DocumentRequest"],
+      invalidatesTags: ["DocumentRequest", "Log"],
     }),
   }),
 });
@@ -487,4 +505,5 @@ export const {
   useGetInstitutionReportsQuery,
   useGetInstitutionValidationReportsQuery,
   useGetInstitutionRevenueGraphQuery,
+  useGetUserSystemLogsQuery,
 } = baccheckerApi;
