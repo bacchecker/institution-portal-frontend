@@ -6,6 +6,7 @@ import Navbar from "@/components/Navbar";
 import {
   useGetDashboardAnalyticsQuery,
   useGetInstitutionRevenueGraphQuery,
+  useGetRevenuePercentageQuery,
 } from "../redux/apiSlice";
 import RevenueGraph from "./dashboardComponents/RevenueGraph";
 
@@ -19,12 +20,18 @@ function Dashboard() {
   } = useGetDashboardAnalyticsQuery();
 
   const {
+    data: revenuePercentage,
+    isLoading: isRevenuePercentageLoading,
+    isFetching: isRevenuePercentageFetching,
+  } = useGetRevenuePercentageQuery();
+
+  console.log("revenue", revenuePercentage);
+
+  const {
     data: revenueGraph,
     // isLoading,
     // isFetching,
   } = useGetInstitutionRevenueGraphQuery();
-
-  console.log("revenueGraph", revenueGraph);
 
   return (
     <>
@@ -51,11 +58,21 @@ function Dashboard() {
               <div className="flex flex-col">
                 <h4 className="text-[1.5vw] font-[600]">
                   {parseInt(
-                    analytics?.documentRequests?.total ?? 0
+                    revenuePercentage?.document_requests?.current_month_count ??
+                      0
                   ).toLocaleString()}
                 </h4>
-                <h4 className="text-[0.8vw] text-[#ff0404]">
-                  -83.2% Previous week
+                <h4
+                  className={`text-[0.8vw]  ${
+                    revenuePercentage?.document_requests?.percentage_change > 0
+                      ? "text-[#27CA40]"
+                      : "text-[#ff0404]"
+                  }`}
+                >
+                  {parseFloat(
+                    revenuePercentage?.document_requests?.percentage_change ?? 0
+                  ).toFixed(2)}
+                  % Previous week
                 </h4>
               </div>
             </div>
@@ -71,11 +88,22 @@ function Dashboard() {
               <div className="flex flex-col">
                 <h4 className="text-[1.5vw] font-[600]">
                   {parseInt(
-                    analytics?.documentValidations?.total ?? 0
+                    revenuePercentage?.validation_requests
+                      ?.current_month_count ?? 0
                   ).toLocaleString()}
                 </h4>
-                <h4 className="text-[0.8vw] text-[#27CA40]">
-                  -83.2% Previous week
+                <h4
+                  className={`text-[0.8vw]  ${
+                    revenuePercentage?.validation_requests?.percentage_change > 0
+                      ? "text-[#27CA40]"
+                      : "text-[#ff0404]"
+                  }`}
+                >
+                  {parseFloat(
+                    revenuePercentage?.validation_requests?.percentage_change ??
+                      0
+                  ).toFixed(2)}
+                  % Previous week
                 </h4>
               </div>
             </div>
@@ -90,8 +118,8 @@ function Dashboard() {
               </div>
               <div className="flex flex-col">
                 <h4 className="text-[1.5vw] font-[600]">0</h4>
-                <h4 className="text-[0.8vw] text-[#ff0404]">
-                  -83.2% Previous week
+                <h4 className="text-[0.8vw] text-[#27CA40]">
+                  0.00% Previous week
                 </h4>
               </div>
             </div>
@@ -122,7 +150,7 @@ function Dashboard() {
         </div>
         <div className="flex w-full mt-[2vw] justify-between">
           <div className="w-[58%] h-[26vw] border rounded-[0.4vw] border-[#0000000f]">
-            <RevenueGraph revenueGraph={revenueGraph}/>
+            <RevenueGraph revenueGraph={revenueGraph} />
           </div>
           <div className="w-[40%] h-[26vw] border rounded-[0.4vw] border-[#0000000f overflow-hidden">
             <Team />

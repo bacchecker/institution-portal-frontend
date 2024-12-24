@@ -263,6 +263,10 @@ export const baccheckerApi = createApi({
       },
       providesTags: ["Ticket"],
     }),
+    getRevenuePercentage: builder.query({
+      query: () => "/institution/requests/monthly-percentage",
+      providesTags: ["DocumentRequest"],
+    }),
 
     getAllExistingDocumentTypes: builder.query({
       query: ({ selectedAcademicLevel, selectedInstitutionType }) => {
@@ -506,4 +510,5 @@ export const {
   useGetInstitutionValidationReportsQuery,
   useGetInstitutionRevenueGraphQuery,
   useGetUserSystemLogsQuery,
+  useGetRevenuePercentageQuery,
 } = baccheckerApi;
