@@ -50,7 +50,7 @@ function Dashboard() {
           </div>
         </div>
         <div className="flex justify-between items-center mt-[2vw]">
-          <div className="w-[23%] bg-[#f8f8f8] p-[0.2vw] rounded-[0.4vw] border border-[#0000000f]">
+          <div className="w-[32%] bg-[#f8f8f8] p-[0.2vw] rounded-[0.4vw] border border-[#0000000f]">
             <div className="w-full bg-[#ffffff] border border-[#0000000f] rounded-[0.3vw] flex p-[0.5vw] items-center gap-[0.5vw]">
               <div className="w-[3vw] h-[3vw] bg-[#ff0404] rounded-[0.2vw] flex items-center justify-center">
                 <img src="/assets/img/docx.svg" alt="" className="w-[1.5vw]" />
@@ -64,7 +64,7 @@ function Dashboard() {
                 </h4>
                 <h4
                   className={`text-[0.8vw]  ${
-                    revenuePercentage?.document_requests?.percentage_change > 0
+                    revenuePercentage?.document_requests?.percentage_change >= 0
                       ? "text-[#27CA40]"
                       : "text-[#ff0404]"
                   }`}
@@ -80,7 +80,7 @@ function Dashboard() {
               Total Document Request
             </h4>
           </div>
-          <div className="w-[23%] bg-[#f8f8f8] p-[0.2vw] rounded-[0.4vw] border border-[#0000000f]">
+          <div className="w-[32%] bg-[#f8f8f8] p-[0.2vw] rounded-[0.4vw] border border-[#0000000f]">
             <div className="w-full bg-[#ffffff] border border-[#0000000f] rounded-[0.3vw] flex p-[0.5vw] items-center gap-[0.5vw]">
               <div className="w-[3vw] h-[3vw] bg-[#EC7AFF] rounded-[0.2vw] flex items-center justify-center">
                 <img src="/assets/img/docx.svg" alt="" className="w-[1.5vw]" />
@@ -94,7 +94,7 @@ function Dashboard() {
                 </h4>
                 <h4
                   className={`text-[0.8vw]  ${
-                    revenuePercentage?.validation_requests?.percentage_change > 0
+                    revenuePercentage?.validation_requests?.percentage_change >= 0
                       ? "text-[#27CA40]"
                       : "text-[#ff0404]"
                   }`}
@@ -111,7 +111,7 @@ function Dashboard() {
               Total Validation Request
             </h4>
           </div>
-          <div className="w-[23%] bg-[#f8f8f8] p-[0.2vw] rounded-[0.4vw] border border-[#0000000f]">
+          <div className="w-[32%] bg-[#f8f8f8] p-[0.2vw] rounded-[0.4vw] border border-[#0000000f]">
             <div className="w-full bg-[#ffffff] border border-[#0000000f] rounded-[0.3vw] flex p-[0.5vw] items-center gap-[0.5vw]">
               <div className="w-[3vw] h-[3vw] bg-[#FFC130] rounded-[0.2vw] flex items-center justify-center">
                 <img src="/assets/img/docx.svg" alt="" className="w-[1.5vw]" />
@@ -127,7 +127,7 @@ function Dashboard() {
               Total Verification Request
             </h4>
           </div>
-          <div className="w-[23%] bg-[#f8f8f8] p-[0.2vw] rounded-[0.4vw] border border-[#0000000f]">
+          {/* <div className="w-[23%] bg-[#f8f8f8] p-[0.2vw] rounded-[0.4vw] border border-[#0000000f]">
             <div className="w-full bg-[#ffffff] border border-[#0000000f] rounded-[0.3vw] flex p-[0.5vw] items-center gap-[0.5vw]">
               <div className="w-[3vw] h-[3vw] bg-[#ff0404] rounded-[0.2vw] flex items-center justify-center">
                 <img src="/assets/img/docx.svg" alt="" className="w-[1.5vw]" />
@@ -146,7 +146,7 @@ function Dashboard() {
             <h4 className="text-[0.9vw] mt-[0.5vw] mb-[0.3vw]">
               Total Pending Document Request
             </h4>
-          </div>
+          </div> */}
         </div>
         <div className="flex w-full mt-[2vw] justify-between">
           <div className="w-[58%] h-[26vw] border rounded-[0.4vw] border-[#0000000f]">
