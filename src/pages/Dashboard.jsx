@@ -72,7 +72,7 @@ function Dashboard() {
                   {parseFloat(
                     revenuePercentage?.document_requests?.percentage_change ?? 0
                   ).toFixed(2)}
-                  % Previous week
+                  % Previous Month
                 </h4>
               </div>
             </div>
@@ -103,7 +103,7 @@ function Dashboard() {
                     revenuePercentage?.validation_requests?.percentage_change ??
                       0
                   ).toFixed(2)}
-                  % Previous week
+                  % Previous Month
                 </h4>
               </div>
             </div>
@@ -119,7 +119,7 @@ function Dashboard() {
               <div className="flex flex-col">
                 <h4 className="text-[1.5vw] font-[600]">0</h4>
                 <h4 className="text-[0.8vw] text-[#27CA40]">
-                  0.00% Previous week
+                  0.00% Previous Month
                 </h4>
               </div>
             </div>
@@ -139,7 +139,7 @@ function Dashboard() {
                   ).toLocaleString()}
                 </h4>
                 <h4 className="text-[0.8vw] text-[#ff0404]">
-                  -83.2% Previous week
+                  -83.2% Previous Month
                 </h4>
               </div>
             </div>
