@@ -307,7 +307,7 @@ export const baccheckerApi = createApi({
     }),
     changePassword: builder.mutation({
       query: (body) => ({
-        url: "/change-password",
+        url: "/auth/change-password",
         method: "POST",
         body,
       }),
@@ -315,7 +315,7 @@ export const baccheckerApi = createApi({
     }),
     mfaSwitch: builder.mutation({
       query: (body) => ({
-        url: "/mfa-switch",
+        url: "/profile/mfa",
         method: "POST",
         body,
       }),
@@ -323,7 +323,7 @@ export const baccheckerApi = createApi({
     }),
     sendOTPForPasswordChange: builder.mutation({
       query: (body) => ({
-        url: "/send-password-otp",
+        url: "/auth/send-password-otp",
         method: "POST",
         body,
       }),
