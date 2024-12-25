@@ -135,6 +135,18 @@ export default function ValidationRequest() {
     fetchInstitutionDocs();
   }, []);
 
+  /* useEffect(() => {
+    const fetchPercentage = async () => {
+      try {
+        const response = await axios.get("/institution/requests/monthly-percentage");
+        
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchPercentage();
+  }, []); */
+
   useEffect(() => {
     institutionValidationRequests();
   }, [submittedFilters, status, currentPage, sortBy, sortOrder]);
@@ -1044,7 +1056,7 @@ export default function ValidationRequest() {
         >
           <p className="">
             Are you sure to change status to{" "}
-            <span className="font-semibold">Delicne Request</span>?
+            <span className="font-semibold">Decline Request</span>?
           </p>
 
           <Textarea

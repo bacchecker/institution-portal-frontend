@@ -306,26 +306,6 @@ const [submittedFilters, setSubmittedFilters] = useState({});
               ))}
             </select>
 
-            {/* <Select
-              aria-label="Document Type"
-              radius="sm"
-              size="md"
-              placeholder="Document Type"
-              className="max-w-[200px] min-w-[200px] rounded-[4px]"
-              style={{
-                backgroundColor: "white",
-                "--select-hover-bg": "transparent",
-              }}
-              name="document_type"
-              value={filters.document_type || ""}
-              onChange={handleDocumentTypeChange}
-            >
-              {documentTypes.map((item) => (
-                <SelectItem key={item.key} value={item.key}>
-                  {item.name}
-                </SelectItem>
-              ))}
-            </Select> */}
             <DateRangePicker
               visibleMonths={2}
               variant="underlined"

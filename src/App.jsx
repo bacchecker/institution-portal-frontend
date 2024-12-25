@@ -18,6 +18,7 @@ import AccountUnderReviewProtection from "@/components/AccountUnderReviewProtect
 import AccountSetupProtection from "@/components/AccountSetupProtection";
 import RevenueOverview from "@/pages/reports/RevenueOverview";
 import SystemLogs from "./pages/SystemLogs";
+import SearchAll from "./pages/SearchAll";
 
 function App() {
   return (
@@ -78,6 +79,16 @@ function App() {
                       <AuthenticatedSuccessProtectedRoute>
                         <AccountSetupProtectedRoute>
                           <ManageRequest />
+                        </AccountSetupProtectedRoute>
+                      </AuthenticatedSuccessProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/search-all"
+                    element={
+                      <AuthenticatedSuccessProtectedRoute>
+                        <AccountSetupProtectedRoute>
+                          <SearchAll />
                         </AccountSetupProtectedRoute>
                       </AuthenticatedSuccessProtectedRoute>
                     }
