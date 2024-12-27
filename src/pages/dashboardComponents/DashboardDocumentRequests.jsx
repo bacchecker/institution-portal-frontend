@@ -275,11 +275,11 @@ function DashboardDocumentRequests() {
                   <h4 className="md:text-[0.85vw] text-[3.5vw]">Status</h4>
                 </div>
               </th>
-              <th className="md:py-[1vw] py-[3vw] md:px-[1vw] px-[3vw] border-b ">
+              {/* <th className="md:py-[1vw] py-[3vw] md:px-[1vw] px-[3vw] border-b ">
                 <div className="flex gap-[1vw]">
                   <h4 className="md:text-[0.85vw] text-[3.5vw]">Action</h4>
                 </div>
-              </th>
+              </th> */}
             </tr>
           </thead>
           <tbody className="">
@@ -399,7 +399,7 @@ function DashboardDocumentRequests() {
                               </div>
                             </td>
 
-                            <td className="px-[1vw] border-b ">
+                            {/* <td className="px-[1vw] border-b ">
                               <button
                                 type="button"
                                 onClick={() => handleOpenModal(request)}
@@ -407,7 +407,7 @@ function DashboardDocumentRequests() {
                               >
                                 view
                               </button>
-                            </td>
+                            </td> */}
                           </tr>
                         );
                       }
