@@ -132,7 +132,7 @@ export default function DocumentRequest({data}) {
             Format: "document_format",
             Status: "status",
             Amount: "total_amount",
-           
+            
           }}
           sortBy={sortBy}
           sortOrder={sortOrder}
@@ -255,10 +255,10 @@ export default function DocumentRequest({data}) {
               <p className="font-semibold mb-4 text-base">Document Request Summary</p>
               <div className="grid grid-cols-3 gap-y-4 border-b pb-4">
                 <div className="text-gray-500">
-                  {itemData?.document_type.name}
+                  {itemData?.document_type?.name}
                 </div>
                 <div className="col-span-2">
-                  {data?.document_type.description}
+                  {itemData?.document_type?.description}
                 </div>
                 <div className="text-gray-500">
                   Status
@@ -286,7 +286,7 @@ export default function DocumentRequest({data}) {
                         : 'bg-gray-600'
                     }`}
                   ></div>
-                  <p>{itemData?.status.charAt(0).toUpperCase() + itemData?.status.slice(1)}</p>
+                  <p>{itemData?.status ? itemData.status.charAt(0).toUpperCase() + itemData.status.slice(1) : ''}</p>
                 </div>
 
                 <div className="text-gray-500">

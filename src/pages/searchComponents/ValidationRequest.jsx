@@ -211,9 +211,8 @@ export default function ValidationRequest({data}) {
                         : "bg-gray-600"
                     }`}
                 ></div>
-                <p>
-                    {itemData?.status}
-                </p>
+                <p>{itemData?.status ? itemData.status.charAt(0).toUpperCase() + itemData.status.slice(1) : ''}</p>
+
                 </div>
                 <div className="text-gray-500">Total Cash</div>
                 <div className="col-span-2">GH¢ {itemData?.total_amount}</div>
