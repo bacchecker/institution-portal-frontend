@@ -32,7 +32,7 @@ import { PlusIcon } from "../../assets/icons/plus";
 import ExcelIcon from "../../assets/icons/excel";
 import Elipsis from "../../assets/icons/elipsis";
 import ConfirmModal from "@/components/confirm-modal";
-import {toast} from "sonner";
+import { toast } from "sonner";
 import { FaChevronLeft, FaChevronRight, FaHeart } from "react-icons/fa6";
 import { IoDocuments } from "react-icons/io5";
 import { PiQueueFill } from "react-icons/pi";
@@ -40,7 +40,6 @@ import { FcCancel } from "react-icons/fc";
 import { MdOutlineFileDownload, MdOutlineFilterAlt } from "react-icons/md";
 import { MdOutlineFilterAltOff } from "react-icons/md";
 import DeleteModal from "@/components/DeleteModal";
-
 
 export default function DocumentRequest() {
   const [data, setData] = useState(null);
@@ -72,33 +71,35 @@ export default function DocumentRequest() {
     end_date: null,
   });
 
-const [submittedFilters, setSubmittedFilters] = useState({});
+  const [submittedFilters, setSubmittedFilters] = useState({});
 
   const institutionDocumentRequests = async () => {
-    setIsLoading(true)
+    setIsLoading(true);
     try {
-      const response = await axios.get("/institution/requests/document-requests", {
-        params: {
-          ...submittedFilters,
-          page: currentPage,
-          status: status,
-          sort_by: sortBy,
-          sort_order: sortOrder,
-        },
-      });
+      const response = await axios.get(
+        "/institution/requests/document-requests",
+        {
+          params: {
+            ...submittedFilters,
+            page: currentPage,
+            status: status,
+            sort_by: sortBy,
+            sort_order: sortOrder,
+          },
+        }
+      );
 
       const docRequest = response.data.paginatedRequests;
 
-      setAllRequests(response.data.allRequests)
-      setPending(response.data.pending)
-      setApproved(response.data.approved)
-      setRejected(response.data.rejected)
+      setAllRequests(response.data.allRequests);
+      setPending(response.data.pending);
+      setApproved(response.data.approved);
+      setRejected(response.data.rejected);
       setDocumentRequests(docRequest.data);
       setCurrentPage(docRequest.current_page);
       setLastPage(docRequest.last_page);
       setTotal(docRequest.total);
       setIsLoading(false);
-
     } catch (error) {
       console.error("Error fetching institution documents:", error);
       throw error;
@@ -144,7 +145,9 @@ const [submittedFilters, setSubmittedFilters] = useState({});
           key={i}
           onClick={() => handlePageChange(i)}
           className={`py-1.5 px-2.5 border rounded-lg ${
-            currentPage === i ? "bg-bChkRed text-white" : "bg-white text-gray-800"
+            currentPage === i
+              ? "bg-bChkRed text-white"
+              : "bg-white text-gray-800"
           }`}
         >
           {i}
@@ -159,7 +162,6 @@ const [submittedFilters, setSubmittedFilters] = useState({});
     setSubmittedFilters({ ...filters });
     setCurrentPage(1); // Reset to first page on filter submit
   };
-
 
   const handleBulkDownload = async (filePaths) => {
     try {
@@ -262,9 +264,7 @@ const [submittedFilters, setSubmittedFilters] = useState({});
         return <WordIcon className="size-6 text-blue-600" />;
       case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
       case "application/vnd.ms-excel":
-        return (
-          <ExcelIcon className="size-6 text-green-500" />
-        );
+        return <ExcelIcon className="size-6 text-green-500" />;
       default:
         return <Elipsis />;
     }
@@ -279,58 +279,75 @@ const [submittedFilters, setSubmittedFilters] = useState({});
       <section className="px-3">
         <Card className="md:w-full w-full mx-auto rounded-none shadow-none border-none">
           <CardBody className="w-full bg-gray-100 p-6">
-            <form onSubmit={handleSubmit} className="flex flex-row gap-3 items-center">
-            <input 
-              type="text" 
-              className={`bg-white text-gray-900 text-sm rounded-[4px] font-[400] focus:outline-none block w-[260px] p-[9.5px] placeholder:text-gray-500`}
-              name="search_query"
-              placeholder="Search by user name or unique code"
-              value={filters.search_query}
-              onChange={(e) => setFilters({ ...filters, search_query: e.target.value })}
-
-            />
-            
-            <select
-              name="document_type"
-              value={filters.document_type || ""}
-              className={`bg-white text-sm rounded-[4px] focus:outline-none block w-[220px] p-[9px] ${
-                filters.document_type ? "text-gray-900" : "text-gray-500"
-              }`}
-              onChange={handleDocumentTypeChange}
+            <form
+              onSubmit={handleSubmit}
+              className="flex flex-row gap-3 items-center"
             >
-              <option value="" className="text-gray-500" disabled selected>Document Type</option>
-              {documentTypes.map((item) => (
-                <option key={item.key} value={item.key}>
-                  {item.name}
-                </option>
-              ))}
-            </select>
-
-            <DateRangePicker
-              visibleMonths={2}
-              variant="underlined"
-              classNames={{
-                base: "bg-white border border-white", // This sets the input background to white
-              }}
-              className="w-[280px] rounded-[4px] date-range-picker-input border border-white bg-white"
-              onChange={(date) => {
-                if (date) {
-                  const newStartDate = new Date(date.start.year, date.start.month - 1, date.start.day)
-                    .toISOString()
-                    .split("T")[0];
-                  const newEndDate = new Date(date.end.year, date.end.month - 1, date.end.day)
-                    .toISOString()
-                    .split("T")[0];
-
-                  setFilters({ ...filters, start_date: newStartDate, end_date: newEndDate });
+              <input
+                type="text"
+                className={`bg-white text-gray-900 text-sm rounded-[4px] font-[400] focus:outline-none block w-[260px] p-[9.5px] placeholder:text-gray-500`}
+                name="search_query"
+                placeholder="Search by user name or unique code"
+                value={filters.search_query}
+                onChange={(e) =>
+                  setFilters({ ...filters, search_query: e.target.value })
                 }
-              }}
-            />
+              />
+
+              <select
+                name="document_type"
+                value={filters.document_type || ""}
+                className={`bg-white text-sm rounded-[4px] focus:outline-none block w-[220px] p-[9px] ${
+                  filters.document_type ? "text-gray-900" : "text-gray-500"
+                }`}
+                onChange={handleDocumentTypeChange}
+              >
+                <option value="" className="text-gray-500" disabled selected>
+                  Document Type
+                </option>
+                {documentTypes.map((item) => (
+                  <option key={item.key} value={item.key}>
+                    {item.name}
+                  </option>
+                ))}
+              </select>
+
+              <DateRangePicker
+                visibleMonths={2}
+                variant="underlined"
+                classNames={{
+                  base: "bg-white border border-white", // This sets the input background to white
+                }}
+                className="w-[280px] rounded-[4px] date-range-picker-input border border-white bg-white"
+                onChange={(date) => {
+                  if (date) {
+                    const newStartDate = new Date(
+                      date.start.year,
+                      date.start.month - 1,
+                      date.start.day
+                    )
+                      .toISOString()
+                      .split("T")[0];
+                    const newEndDate = new Date(
+                      date.end.year,
+                      date.end.month - 1,
+                      date.end.day
+                    )
+                      .toISOString()
+                      .split("T")[0];
+
+                    setFilters({
+                      ...filters,
+                      start_date: newStartDate,
+                      end_date: newEndDate,
+                    });
+                  }
+                }}
+              />
 
               <div className="flex space-x-2">
-                
                 <Button
-                  startContent={<MdOutlineFilterAlt size={17}/>}
+                  startContent={<MdOutlineFilterAlt size={17} />}
                   radius="none"
                   size="sm"
                   type="submit"
@@ -339,7 +356,7 @@ const [submittedFilters, setSubmittedFilters] = useState({});
                   Filter
                 </Button>
                 <Button
-                  startContent={<MdOutlineFilterAltOff size={17}/>}
+                  startContent={<MdOutlineFilterAltOff size={17} />}
                   radius="none"
                   size="sm"
                   type="button"
@@ -351,20 +368,18 @@ const [submittedFilters, setSubmittedFilters] = useState({});
                       start_date: null,
                       end_date: null,
                     });
-              
+
                     setSubmittedFilters({
                       search_query: "",
                       document_type: null,
                       start_date: null,
                       end_date: null,
                     });
-              
                   }}
                 >
                   Clear
                 </Button>
               </div>
-              
             </form>
           </CardBody>
         </Card>
@@ -372,55 +387,59 @@ const [submittedFilters, setSubmittedFilters] = useState({});
           <div className="grid w-full grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div
               onClick={() => {
-                setStatus('allRequests')
+                setStatus("allRequests");
               }}
-              className="rounded-md bg-gray-100 p-4 flex space-x-4 cursor-pointer">
-                <div className="flex items-center justify-center bg-purple-200 text-cusPurp rounded-full w-10 h-10">
-                  <IoDocuments size={18}/>
-                </div>
-                <div className="">
-                  <p className="font-medium">Total Documents</p>
-                  <p className="text-gray-500">{allRequests}</p>
-                </div>
+              className="rounded-md bg-gray-100 p-4 flex space-x-4 cursor-pointer"
+            >
+              <div className="flex items-center justify-center bg-purple-200 text-cusPurp rounded-full w-10 h-10">
+                <IoDocuments size={18} />
+              </div>
+              <div className="">
+                <p className="font-medium">Total Documents</p>
+                <p className="text-gray-500">{allRequests}</p>
+              </div>
             </div>
             <div
               onClick={() => {
-                setStatus('pending')
+                setStatus("pending");
               }}
-              className="rounded-md bg-gray-100 p-4 flex space-x-4 cursor-pointer">
-                <div className="flex items-center justify-center bg-yellow-200 text-yellow-500 rounded-full w-10 h-10">
-                  <PiQueueFill size={18}/>
-                </div>
-                <div className="">
-                  <p className="font-medium">Pending</p>
-                  <p className="text-gray-500">{pending}</p>
-                </div>
+              className="rounded-md bg-gray-100 p-4 flex space-x-4 cursor-pointer"
+            >
+              <div className="flex items-center justify-center bg-yellow-200 text-yellow-500 rounded-full w-10 h-10">
+                <PiQueueFill size={18} />
+              </div>
+              <div className="">
+                <p className="font-medium">Pending</p>
+                <p className="text-gray-500">{pending}</p>
+              </div>
             </div>
             <div
               onClick={() => {
-                setStatus('approved')
+                setStatus("approved");
               }}
-              className="rounded-md bg-gray-100 p-4 flex space-x-4 cursor-pointer">
-                <div className="flex items-center justify-center bg-green-200 text-green-600 rounded-full w-10 h-10">
-                  <FaHeart size={18}/>
-                </div>
-                <div className="">
-                  <p className="font-medium">Approved</p>
-                  <p className="text-gray-500">{approved}</p>
-                </div>
+              className="rounded-md bg-gray-100 p-4 flex space-x-4 cursor-pointer"
+            >
+              <div className="flex items-center justify-center bg-green-200 text-green-600 rounded-full w-10 h-10">
+                <FaHeart size={18} />
+              </div>
+              <div className="">
+                <p className="font-medium">Approved</p>
+                <p className="text-gray-500">{approved}</p>
+              </div>
             </div>
             <div
               onClick={() => {
-                setStatus('rejected')
+                setStatus("rejected");
               }}
-              className="rounded-md bg-gray-100 p-4 flex space-x-4 cursor-pointer">
-                <div className="flex items-center justify-center bg-red-200 text-red-600 rounded-full w-10 h-10">
-                  <FcCancel size={18}/>
-                </div>
-                <div className="">
-                  <p className="font-medium">Not Approved</p>
-                  <p className="text-gray-500">{rejected}</p>
-                </div>
+              className="rounded-md bg-gray-100 p-4 flex space-x-4 cursor-pointer"
+            >
+              <div className="flex items-center justify-center bg-red-200 text-red-600 rounded-full w-10 h-10">
+                <FcCancel size={18} />
+              </div>
+              <div className="">
+                <p className="font-medium">Not Approved</p>
+                <p className="text-gray-500">{rejected}</p>
+              </div>
             </div>
           </div>
         </div>
@@ -449,7 +468,6 @@ const [submittedFilters, setSubmittedFilters] = useState({});
             Format: "document_format",
             Status: "status",
             Amount: "total_amount",
-           
           }}
           sortBy={sortBy}
           sortOrder={sortOrder}
@@ -457,15 +475,16 @@ const [submittedFilters, setSubmittedFilters] = useState({});
           setSortOrder={setSortOrder}
         >
           {documentRequests?.map((item) => (
-            <TableRow key={item?.id} className="odd:bg-gray-100 even:bg-gray-50 border-b">
+            <TableRow
+              key={item?.id}
+              className="odd:bg-gray-100 even:bg-gray-50 border-b"
+            >
               <TableCell className="font-semibold">
                 {item?.unique_code}
               </TableCell>
               <TableCell className="font-semibold">
                 <CustomUser
-                  avatarSrc={`${
-                    import.meta.env.VITE_BASE_URL
-                  }/storage/app/public/${item?.user?.photo}`}
+                  avatarSrc={`https://admin-dev.baccheck.online/storage/${item?.user?.photo}`}
                   name={`${item?.user?.first_name} ${item?.user?.last_name}`}
                   email={`${item?.user?.email}`}
                 />
@@ -541,109 +560,93 @@ const [submittedFilters, setSubmittedFilters] = useState({});
         <div className="h-full flex flex-col justify-between">
           <div className="flex flex-col -mt-2 xl:pl-2 font-semibold">
             <div className="grid grid-cols-3 gap-y-4 gap-x-2 border-b pb-4">
-              <div className="text-gray-500">
-                Request ID
-              </div>
-              <div className="col-span-2">
-                #{data?.unique_code}
-              </div>
-              <div className="text-gray-500">
-                Requested Date
-              </div>
+              <div className="text-gray-500">Request ID</div>
+              <div className="col-span-2">#{data?.unique_code}</div>
+              <div className="text-gray-500">Requested Date</div>
               <div className="col-span-2">
                 {moment(data?.created_at).format("Do MMMM, YYYY")}
               </div>
-              <div className="text-gray-500">
-                Delivery Address
-              </div>
+              <div className="text-gray-500">Delivery Address</div>
               <div className="col-span-2">
                 {data?.delivery_address || "N/A"}
               </div>
-              <div className="text-gray-500">
-                Total Cash
-              </div>
-              <div className="col-span-2">
-              GH¢ {data?.total_amount}
-              </div>
+              <div className="text-gray-500">Total Cash</div>
+              <div className="col-span-2">GH¢ {data?.total_amount}</div>
             </div>
             <div className="py-4">
               <p className="font-semibold mb-4 text-base">Applicant Details</p>
               <div className="grid grid-cols-3 gap-y-4 border-b pb-4">
-                <div className="text-gray-500">
-                  Applicant Name
-                </div>
+                <div className="text-gray-500">Applicant Name</div>
                 <div className="col-span-2">
-                  {data?.user?.first_name} {data?.user?.other_name} {data?.user?.last_name}
+                  {data?.user?.first_name} {data?.user?.other_name}{" "}
+                  {data?.user?.last_name}
                 </div>
-                <div className="text-gray-500">
-                  Applicant Email
-                </div>
-                <div className="col-span-2">
-                  {data?.user?.email}
-                </div>
-                <div className="text-gray-500">
-                  Phone Number
-                </div>
-                <div className="col-span-2">
-                  {data?.user?.phone}
-                </div>
-                <div className="text-gray-500 mt-2">
-                  Applicant Picture
-                </div>
-                <div className="col-span-2 w-10 h-10 rounded-full bg-gray-200">
-                  <img src={data?.user?.profile_photo_url} alt="" />
+                <div className="text-gray-500">Applicant Email</div>
+                <div className="col-span-2">{data?.user?.email}</div>
+                <div className="text-gray-500">Phone Number</div>
+                <div className="col-span-2">{data?.user?.phone}</div>
+                <div className="text-gray-500 mt-2">Applicant Picture</div>
+                <div className="col-span-2 w-10 h-10 rounded-full bg-gray-200 overflow-hidden">
+                  {data?.user?.photo && (
+                    <img
+                      src={`https://admin-dev.baccheck.online/storage/${data?.user?.photo}`}
+                      alt=""
+                      className="w-full h-full object-cover"
+                    />
+                  )}
                 </div>
               </div>
             </div>
             <div className="pb-2">
-              <p className="font-semibold mb-4 text-base">Document Request Summary</p>
+              <p className="font-semibold mb-4 text-base">
+                Document Request Summary
+              </p>
               <div className="grid grid-cols-3 gap-y-4 border-b pb-4">
-                <div className="text-gray-500">
-                  {data?.document_type.name}
-                </div>
+                <div className="text-gray-500">{data?.document_type.name}</div>
                 <div className="col-span-2">
                   {data?.document_type.description}
                 </div>
-                <div className="text-gray-500">
-                  Status
-                </div>
+                <div className="text-gray-500">Status</div>
                 <div
                   className={`col-span-2 flex items-center justify-center py-1 space-x-2 w-28 
                     ${
-                      data?.status === 'cancelled' || data?.status === 'rejected'
-                        ? 'text-red-600 bg-red-200'
-                        : data?.status === 'completed'
-                        ? 'text-green-600 bg-green-200'
-                        : data?.status === 'processing' || data?.status === 'received'
-                        ? 'text-yellow-600 bg-yellow-200'
-                        : 'text-gray-600 bg-gray-200'
+                      data?.status === "cancelled" ||
+                      data?.status === "rejected"
+                        ? "text-red-600 bg-red-200"
+                        : data?.status === "completed"
+                        ? "text-green-600 bg-green-200"
+                        : data?.status === "processing" ||
+                          data?.status === "received"
+                        ? "text-yellow-600 bg-yellow-200"
+                        : "text-gray-600 bg-gray-200"
                     }`}
                 >
                   <div
                     className={`h-2 w-2 rounded-full ${
-                      data?.status === 'cancelled' || data?.status === 'rejected'
-                        ? 'bg-red-600'
-                        : data?.status === 'completed'
-                        ? 'bg-green-600'
-                        : data?.status === 'processing' || data?.status === 'received'
-                        ? 'bg-yellow-600'
-                        : 'bg-gray-600'
+                      data?.status === "cancelled" ||
+                      data?.status === "rejected"
+                        ? "bg-red-600"
+                        : data?.status === "completed"
+                        ? "bg-green-600"
+                        : data?.status === "processing" ||
+                          data?.status === "received"
+                        ? "bg-yellow-600"
+                        : "bg-gray-600"
                     }`}
                   ></div>
-                  <p>{data?.status.charAt(0).toUpperCase() + data?.status.slice(1)}</p>
+                  <p>
+                    {data?.status.charAt(0).toUpperCase() +
+                      data?.status.slice(1)}
+                  </p>
                 </div>
 
-                <div className="text-gray-500">
-                  Format
-                </div>
+                <div className="text-gray-500">Format</div>
                 <div className="col-span-2">
                   {data?.document_format === "soft_copy"
-                          ? "Soft Copy"
-                          : "Hard Copy"}
+                    ? "Soft Copy"
+                    : "Hard Copy"}
                 </div>
-                <div className="text-gray-500">
-                  Copies
-                </div>
+                <div className="text-gray-500">Copies</div>
                 <div className="col-span-2">
                   {data?.number_of_copies} Copies
                 </div>
@@ -676,44 +679,44 @@ const [submittedFilters, setSubmittedFilters] = useState({});
                 </section>
 
                 <section className="w-full grid grid-cols-2 gap-3">
-                  {data?.files.length >= 1 ? (
-                    data?.files?.map((item) => (
-                      <div
-                        key={item?.id}
-                        className="flex items-center gap-3 p-2 rounded-lg border"
-                      >
-                        {item?.extension === "pdf" ? (
-                          <PdfIcon className="size-11" color="red" />
-                        ) : (
-                          <WordIcon className="size-11" color="blue" />
-                        )}
-                        <div className="w-full flex flex-col h-full">
-                          <p className="font-semibold line-clamp-2">
-                            {item?.name}
-                          </p>
-
-                          <div className="flex justify-between items-center mt-auto">
-                            <p>{filesize(item.size)}</p>
-                            <p
-                              className="cursor-pointer px-2 py-1 rounded-md bg-primary text-white text-xs"
-                              onClick={() => {
-                                window.location.href =
-                                  "https://backend.baccheck.online/api/document/download" +
-                                  "?path=" +
-                                  encodeURIComponent(item.path);
-                              }}
-                            >
-                              <MdOutlineFileDownload size={20} />
+                  {data?.files.length >= 1
+                    ? data?.files?.map((item) => (
+                        <div
+                          key={item?.id}
+                          className="flex items-center gap-3 p-2 rounded-lg border"
+                        >
+                          {item?.extension === "pdf" ? (
+                            <PdfIcon className="size-11" color="red" />
+                          ) : (
+                            <WordIcon className="size-11" color="blue" />
+                          )}
+                          <div className="w-full flex flex-col h-full">
+                            <p className="font-semibold line-clamp-2">
+                              {item?.name}
                             </p>
+
+                            <div className="flex justify-between items-center mt-auto">
+                              <p>{filesize(item.size)}</p>
+                              <p
+                                className="cursor-pointer px-2 py-1 rounded-md bg-primary text-white text-xs"
+                                onClick={() => {
+                                  window.location.href =
+                                    "https://backend.baccheck.online/api/document/download" +
+                                    "?path=" +
+                                    encodeURIComponent(item.path);
+                                }}
+                              >
+                                <MdOutlineFileDownload size={20} />
+                              </p>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    ))
-                  ) : (
-                    data?.status != "rejected" &&(<p className="border rounded-md py-1.5 pl-4">No file attached</p>)
-                  )}
-
-                 
+                      ))
+                    : data?.status != "rejected" && (
+                        <p className="border rounded-md py-1.5 pl-4">
+                          No file attached
+                        </p>
+                      )}
 
                   {data?.status == "processing" && (
                     <div className="flex items-center">
@@ -737,35 +740,34 @@ const [submittedFilters, setSubmittedFilters] = useState({});
             {data?.status == "rejected" && (
               <div className="w-full">
                 <div className="border rounded-md bg-white p-2 shadow-md">
-                  
-                    <div className="flex-row">
-                      <div className="flex-1 mb-2">
-                        <div>
-                          <p className="font-semibold text-bChkRed">Rejection Reason</p>
-                        </div>
-                        <div>
-                          <p>{data?.rejection_reason}</p>
-                        </div>
-                      </div>
-                      <div className="flex-1 mb-2">
-                        <p className="font-semibold text-bChkRed">Rejected By:</p>
-                        <p className="col-span-4">
-                          {data?.rejected_by
-                            ? `${data.rejected_by.first_name} ${data.rejected_by.last_name}`
-                            : 'N/A'}
+                  <div className="flex-row">
+                    <div className="flex-1 mb-2">
+                      <div>
+                        <p className="font-semibold text-bChkRed">
+                          Rejection Reason
                         </p>
                       </div>
-
-                      <div className="flex-1 mb-2">
-                        <p className="font-semibold text-bChkRed">Rejection Date</p>
-                        <p>
-                          {moment(data?.updated_at).format("Do MMMM, YYYY")}
-                        </p>
+                      <div>
+                        <p>{data?.rejection_reason}</p>
                       </div>
                     </div>
-                </div>
+                    <div className="flex-1 mb-2">
+                      <p className="font-semibold text-bChkRed">Rejected By:</p>
+                      <p className="col-span-4">
+                        {data?.rejected_by
+                          ? `${data.rejected_by.first_name} ${data.rejected_by.last_name}`
+                          : "N/A"}
+                      </p>
+                    </div>
 
-                
+                    <div className="flex-1 mb-2">
+                      <p className="font-semibold text-bChkRed">
+                        Rejection Date
+                      </p>
+                      <p>{moment(data?.updated_at).format("Do MMMM, YYYY")}</p>
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
           </div>
@@ -785,15 +787,14 @@ const [submittedFilters, setSubmittedFilters] = useState({});
 
             {(data?.status == "received" || data?.status == "submitted") && (
               <Button
-              radius="none"
-              size="md"
-              className="w-1/2 bg-gray-300 text-gray-800 font-medium !rounded-md"
+                radius="none"
+                size="md"
+                className="w-1/2 bg-gray-300 text-gray-800 font-medium !rounded-md"
                 onClick={() => declineDisclosure.onOpen()}
               >
                 Deny Request
               </Button>
             )}
-           
 
             {data?.status !== "created" && data?.status !== "completed" && (
               <Button
@@ -950,11 +951,10 @@ const [submittedFilters, setSubmittedFilters] = useState({});
                       return;
                     }
 
-                    console.log(resss?.data);
                     setData(resss?.data);
                     setProcessing(false);
                     toast.success("Documents uploaded successfully");
-                    institutionDocumentRequests()
+                    institutionDocumentRequests();
                     //mutate("/institution/requests/document-requests");
                     fileUploadDisclosure.onClose();
                   }}
@@ -1035,8 +1035,6 @@ const [submittedFilters, setSubmittedFilters] = useState({});
               }
             )
             .then((res) => {
-              console.log(res);
-
               setData(res?.data);
               setProcessing(false);
               toast.success("Request declined successfully");
@@ -1044,7 +1042,6 @@ const [submittedFilters, setSubmittedFilters] = useState({});
               declineDisclosure.onClose();
             })
             .catch((err) => {
-              console.log(err);
               toast.error(err.response.data.message);
               setProcessing(false);
               declineDisclosure.onClose();

@@ -117,8 +117,6 @@ function ValidationRequestReport() {
     setSelectedDocumentType({});
   };
 
-  console.log("infdd", institutionValidationRequestReports);
-
   return (
     <>
       <div className="bg-[#f8f8f8] p-[1vw] my-[1vw] rounded-[0.2vw]">

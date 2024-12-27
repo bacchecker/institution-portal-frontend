@@ -25,8 +25,6 @@ function Dashboard() {
     isFetching: isRevenuePercentageFetching,
   } = useGetRevenuePercentageQuery();
 
-  console.log("revenue", revenuePercentage);
-
   const {
     data: revenueGraph,
     // isLoading,
@@ -94,7 +92,8 @@ function Dashboard() {
                 </h4>
                 <h4
                   className={`text-[0.8vw]  ${
-                    revenuePercentage?.validation_requests?.percentage_change >= 0
+                    revenuePercentage?.validation_requests?.percentage_change >=
+                    0
                       ? "text-[#27CA40]"
                       : "text-[#ff0404]"
                   }`}

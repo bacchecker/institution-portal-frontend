@@ -12,9 +12,6 @@ function UpdateTicket({ setOpenModal, openModal, selectedTicket }) {
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedType, setSelectedType] = useState("");
 
-  console.log("selectedTicket", selectedTicket);
-  
-
   const typeData = [
     { title: "general", value: "general" },
     { title: "technical", value: "technical" },

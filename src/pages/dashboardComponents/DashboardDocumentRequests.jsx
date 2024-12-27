@@ -47,8 +47,6 @@ function DashboardDocumentRequests() {
     setSelectedRequest(request);
   };
 
-  console.log("request", institutionDocumentRequests?.paginatedRequests?.data);
-
   return (
     <>
       <div className="w-full h-full gap-[3vw] overflow-auto bg-[#f8f8f8] p-[1vw] table-cover scroll-width">
@@ -315,9 +313,9 @@ function DashboardDocumentRequests() {
                             <td className="py-[1vw] border-b  ">
                               <div className="flex gap-[0.2vw]">
                                 <div className="w-[2.5vw] h-[2.5vw] bg-[#cb3cff33] rounded-[50%] flex overflow-hidden">
-                                  {request?.user?.profile_photo_url && (
+                                  {request?.user?.photo && (
                                     <img
-                                      src={request?.user?.profile_photo_url}
+                                      src={`https://admin-dev.baccheck.online/storage/${request?.user?.photo}`}
                                       alt=""
                                       className="w-full h-full object-cover"
                                     />

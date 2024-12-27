@@ -319,16 +319,17 @@ export default function ValidationRequest() {
                 onSubmit={handleSubmit}
                 className="flex flex-row gap-3 items-center"
               >
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   className="bg-white text-gray-900 text-sm rounded-[4px] font-[400] focus:outline-none block w-[260px] p-[9.5px] placeholder:text-gray-500"
                   name="search_query"
                   placeholder="Search by user name or unique code"
                   value={filters.search_query}
-                  onChange={(e) => setFilters({ ...filters, search_query: e.target.value })}
-
+                  onChange={(e) =>
+                    setFilters({ ...filters, search_query: e.target.value })
+                  }
                 />
-                
+
                 <select
                   name="document_type"
                   value={filters.document_type || ""}
@@ -337,7 +338,9 @@ export default function ValidationRequest() {
                   }`}
                   onChange={handleDocumentTypeChange}
                 >
-                  <option value="" className="text-gray-500" disabled selected>Document Type</option>
+                  <option value="" className="text-gray-500" disabled selected>
+                    Document Type
+                  </option>
                   {documentTypes.map((item) => (
                     <option key={item.key} value={item.key}>
                       {item.name}
@@ -517,7 +520,7 @@ export default function ValidationRequest() {
                 </TableCell>
                 <TableCell className="font-semibold">
                   <CustomUser
-                    avatarSrc={item?.user?.photo}
+                    avatarSrc={`https://admin-dev.baccheck.online/storage/${item?.user?.photo}`}
                     name={`${item?.user?.first_name} ${item?.user?.last_name}`}
                     email={`${item?.user?.email}`}
                   />
@@ -658,8 +661,14 @@ export default function ValidationRequest() {
                     <div className="text-gray-500">Index Number</div>
                     <div className="col-span-2">{data?.index_number}</div>
                     <div className="text-gray-500 mt-2">Applicant Picture</div>
-                    <div className="col-span-2 w-10 h-10 rounded-full bg-gray-200">
-                      <img src={data?.user?.profile_photo_url} alt="" />
+                    <div className="col-span-2 w-10 h-10 rounded-full bg-gray-200 overflow-hidden">
+                      {data?.user?.photo && (
+                        <img
+                          src={`https://admin-dev.baccheck.online/storage/${data?.user?.photo}`}
+                          alt=""
+                          className="w-full h-full object-cover"
+                        />
+                      )}
                     </div>
                   </div>
                 </div>
@@ -982,7 +991,6 @@ export default function ValidationRequest() {
                 }
               )
               .then((res) => {
-                console.log(res);
                 if (data?.status == "processing") {
                   fetchValidationChecklist();
                 }
@@ -995,7 +1003,6 @@ export default function ValidationRequest() {
                 changeStatusDisclosure.onClose();
               })
               .catch((err) => {
-                console.log(err);
                 toast.error(err.response.data.message);
                 setProcessing(false);
                 changeStatusDisclosure.onClose();
@@ -1036,8 +1043,6 @@ export default function ValidationRequest() {
                 }
               )
               .then((res) => {
-                console.log(res);
-
                 setData(res?.data);
                 setProcessing(false);
                 toast.success("Request declined successfully");
@@ -1046,7 +1051,6 @@ export default function ValidationRequest() {
                 declineDisclosure.onClose();
               })
               .catch((err) => {
-                console.log(err);
                 toast.error(err.response.data.message);
                 setProcessing(false);
                 declineDisclosure.onClose();

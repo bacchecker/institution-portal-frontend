@@ -39,10 +39,6 @@ function AccountUnderReview() {
     enabledTransports: ["ws", "wss"],
   });
 
-  window.Echo.connector.pusher.connection.bind("connected", () => {
-    console.log("WebSocket connected successfully!");
-  });
-
   window.Echo.connector.pusher.connection.bind("error", (error) => {
     console.error("WebSocket connection error:", error);
   });

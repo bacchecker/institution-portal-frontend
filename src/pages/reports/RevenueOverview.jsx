@@ -12,8 +12,6 @@ function RevenueOverview() {
 
   const user = JSON.parse(secureLocalStorage.getItem("user"));
 
-  console.log("user", user);
-
   const handleTabClick = (e) => {
     const target = e.target;
     setLineStyle({
@@ -38,7 +36,6 @@ function RevenueOverview() {
   } = useGetInstitutionRevenueQuery({
     institutionID: user?.institution?.id,
   });
-
 
   return (
     <>

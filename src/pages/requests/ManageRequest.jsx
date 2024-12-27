@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {Tabs, Tab, Chip} from "@nextui-org/react";
+import { Tabs, Tab, Chip } from "@nextui-org/react";
 import { IoDocuments, IoShieldCheckmark } from "react-icons/io5";
 import { FaAnchorCircleCheck, FaUser } from "react-icons/fa6";
 import DocumentRequest from "./DocumentRequest";
@@ -8,25 +8,25 @@ import axios from "@/utils/axiosConfig";
 import Navbar from "@/components/Navbar";
 
 export default function ManageRequest() {
+  const [docRequest, setDocRequest] = useState(0);
+  const [valRequest, setValRequest] = useState(0);
 
-    const [docRequest, setDocRequest] = useState(0);
-    const [valRequest, setValRequest] = useState(0);
+  useEffect(() => {
+    const fetchPendingDocuments = async () => {
+      try {
+        const response = await axios.get(
+          "/institution/requests/pending-documents"
+        );
 
-    useEffect(() => {
-        const fetchPendingDocuments = async () => {
-            try {
-                const response = await axios.get("/institution/requests/pending-documents");
-                console.log("API response:", response.data); // Debugging
-                setValRequest(response.data.valRequest || 0); // Fallback to 0 if undefined
-                setDocRequest(response.data.docRequest || 0);
-            } catch (error) {
-                console.error("Error fetching data:", error);
-            }
-        };
+        setValRequest(response.data.valRequest || 0); // Fallback to 0 if undefined
+        setDocRequest(response.data.docRequest || 0);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
 
-        fetchPendingDocuments();
-    }, []);
- 
+    fetchPendingDocuments();
+  }, []);
 
   return (
     <div title="Manage Request" className="bg-white text-sm w-full">
@@ -35,7 +35,8 @@ export default function ManageRequest() {
         <Tabs
           aria-label="Options"
           classNames={{
-            tabList: "gap-6 w-full relative rounded-none p-0 border-b border-divider",
+            tabList:
+              "gap-6 w-full relative rounded-none p-0 border-b border-divider",
             cursor: "w-full bg-bChkRed",
             tab: "max-w-fit px-2 h-[52px]",
             tabContent: "group-data-[selected=true]:text-bChkRed",
@@ -47,7 +48,7 @@ export default function ManageRequest() {
             key="document"
             title={
               <div className="flex items-center space-x-2">
-                <IoDocuments size={20}/>
+                <IoDocuments size={20} />
                 <span>Document Request</span>
                 <Chip size="sm" variant="faded">
                   {docRequest}
@@ -55,7 +56,7 @@ export default function ManageRequest() {
               </div>
             }
           >
-              <DocumentRequest />
+            <DocumentRequest />
           </Tab>
           <Tab
             key="music"
@@ -69,13 +70,13 @@ export default function ManageRequest() {
               </div>
             }
           >
-              <ValidationRequest />
+            <ValidationRequest />
           </Tab>
           <Tab
             key="videos"
             title={
               <div className="flex items-center space-x-2">
-                <FaAnchorCircleCheck size={20}/>
+                <FaAnchorCircleCheck size={20} />
                 <span>Verification Request</span>
                 <Chip size="sm" variant="faded">
                   1
@@ -83,7 +84,7 @@ export default function ManageRequest() {
               </div>
             }
           >
-              <p>Verification Request</p>
+            <p>Verification Request</p>
           </Tab>
         </Tabs>
       </div>

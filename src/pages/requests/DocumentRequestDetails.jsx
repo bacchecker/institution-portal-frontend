@@ -12,7 +12,6 @@ function DocumentRequestDetails({ setOpenModal, openModal, selectedRequest }) {
     title: "",
     description: "",
   };
-  console.log("log", selectedRequest);
 
   const [userInput, setUserInput] = useState(initialUserInput);
   const [selectedImage, setSelectedImage] = useState(null);
@@ -222,30 +221,37 @@ function DocumentRequestDetails({ setOpenModal, openModal, selectedRequest }) {
         <div className="flex w-full">
           <h4 className="text-[0.9vw] w-[40%]">Status</h4>
           <div
-                  className={`col-span-2 flex items-center justify-center py-[0.4vw] rounded-[0.2vw] px-[1vw] space-x-2  
+            className={`col-span-2 flex items-center justify-center py-[0.4vw] rounded-[0.2vw] px-[1vw] space-x-2  
                     ${
-                      selectedRequest?.status === 'cancelled' || selectedRequest?.status === 'rejected'
-                        ? 'text-red-600 bg-red-200'
-                        : selectedRequest?.status === 'completed'
-                        ? 'text-green-600 bg-green-200'
-                        : selectedRequest?.status === 'processing' || selectedRequest?.status === 'received'
-                        ? 'text-yellow-600 bg-yellow-200'
-                        : 'text-gray-600 bg-gray-200'
+                      selectedRequest?.status === "cancelled" ||
+                      selectedRequest?.status === "rejected"
+                        ? "text-red-600 bg-red-200"
+                        : selectedRequest?.status === "completed"
+                        ? "text-green-600 bg-green-200"
+                        : selectedRequest?.status === "processing" ||
+                          selectedRequest?.status === "received"
+                        ? "text-yellow-600 bg-yellow-200"
+                        : "text-gray-600 bg-gray-200"
                     }`}
-                >
-                  <div
-                    className={`h-[0.6vw] w-[0.6vw] rounded-full ${
-                      selectedRequest?.status === 'cancelled' || selectedRequest?.status === 'rejected'
-                        ? 'bg-red-600'
-                        : selectedRequest?.status === 'completed'
-                        ? 'bg-green-600'
-                        : selectedRequest?.status === 'processing' || selectedRequest?.status === 'received'
-                        ? 'bg-yellow-600'
-                        : 'bg-gray-600'
-                    }`}
-                  ></div>
-                  <h4 className="text-[0.8vw]">{selectedRequest?.status?.charAt(0)?.toUpperCase() + selectedRequest?.status?.slice(1)}</h4>
-                </div>
+          >
+            <div
+              className={`h-[0.6vw] w-[0.6vw] rounded-full ${
+                selectedRequest?.status === "cancelled" ||
+                selectedRequest?.status === "rejected"
+                  ? "bg-red-600"
+                  : selectedRequest?.status === "completed"
+                  ? "bg-green-600"
+                  : selectedRequest?.status === "processing" ||
+                    selectedRequest?.status === "received"
+                  ? "bg-yellow-600"
+                  : "bg-gray-600"
+              }`}
+            ></div>
+            <h4 className="text-[0.8vw]">
+              {selectedRequest?.status?.charAt(0)?.toUpperCase() +
+                selectedRequest?.status?.slice(1)}
+            </h4>
+          </div>
         </div>
         <div className="flex w-full">
           <h4 className="text-[0.9vw] w-[40%]">Document Format</h4>
