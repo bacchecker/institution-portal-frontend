@@ -46,6 +46,9 @@ export const baccheckerApi = createApi({
     "DocumentRequest",
     "Analytics",
     "Log",
+    "Payment",
+    "Validation",
+    "Affiliation",
   ],
   endpoints: (builder) => ({
     loginUser: builder.mutation({
@@ -267,6 +270,62 @@ export const baccheckerApi = createApi({
       query: () => "/institution/requests/monthly-percentage",
       providesTags: ["DocumentRequest"],
     }),
+    getInstitutionDocuments: builder.query({
+      query: ({ selectedAcademicLevel }) => {
+        let queryString = `/institutions/document-types`;
+
+        if (
+          selectedAcademicLevel !== undefined &&
+          selectedAcademicLevel !== "" &&
+          selectedAcademicLevel !== null
+        ) {
+          queryString += `?academic_level=${selectedAcademicLevel}`;
+        }
+        return queryString;
+      },
+      providesTags: ["InstitutionType"],
+    }),
+    getFilteredInstitutions: builder.query({
+      query: ({
+        selectedAcademicLevel,
+        selectedInstitutionType,
+        selectedNonInstitutionType,
+      }) => {
+        let queryString = `/institution?type=${selectedInstitutionType}`;
+
+        if (
+          selectedAcademicLevel !== undefined &&
+          selectedAcademicLevel !== "" &&
+          selectedAcademicLevel !== null
+        ) {
+          queryString += `&academic_level=${selectedAcademicLevel}`;
+        }
+        if (
+          selectedNonInstitutionType !== undefined &&
+          selectedNonInstitutionType !== "" &&
+          selectedNonInstitutionType !== null
+        ) {
+          queryString += `&institution_type=${selectedNonInstitutionType}`;
+        }
+        return queryString;
+      },
+      providesTags: ["Institution"],
+    }),
+    getNonAcademicInstitutionTypes: builder.query({
+      query: () => "/institution/institution-types",
+      providesTags: ["InstitutionType"],
+    }),
+
+    getUserAffiliation: builder.query({
+      query: ({ institutionType, academicLevel }) => {
+        let queryString = `/profile/affiliations?institution_type=${institutionType}`;
+        if (academicLevel) {
+          queryString += `&academic_level=${academicLevel}`;
+        }
+        return queryString;
+      },
+      providesTags: ["Affiliation"],
+    }),
 
     getAllExistingDocumentTypes: builder.query({
       query: ({ selectedAcademicLevel, selectedInstitutionType }) => {
@@ -442,6 +501,14 @@ export const baccheckerApi = createApi({
       }),
       invalidatesTags: ["Department", "Log"],
     }),
+    initiatePayment: builder.mutation({
+      query: (body) => ({
+        url: "/payments/initiate",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["Payment", "Document", "Log"],
+    }),
 
     updateUser: builder.mutation({
       query: ({ id, body }) => ({
@@ -468,6 +535,14 @@ export const baccheckerApi = createApi({
         body,
       }),
       invalidatesTags: ["DocumentRequest", "Log"],
+    }),
+    validateDocument: builder.mutation({
+      query: (body) => ({
+        url: "/verifications",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["Log"],
     }),
   }),
 });
@@ -511,4 +586,10 @@ export const {
   useGetInstitutionRevenueGraphQuery,
   useGetUserSystemLogsQuery,
   useGetRevenuePercentageQuery,
+  useGetUserAffiliationQuery,
+  useGetNonAcademicInstitutionTypesQuery,
+  useGetFilteredInstitutionsQuery,
+  useGetInstitutionDocumentsQuery,
+  useInitiatePaymentMutation,
+  useValidateDocumentMutation,
 } = baccheckerApi;
