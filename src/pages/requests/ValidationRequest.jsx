@@ -312,9 +312,9 @@ export default function ValidationRequest() {
   return (
     <>
       <div title="Validation Request">
-        <section className="px-3">
+        <section className="px-0 lg:px-3">
           <Card className="md:w-full w-full mx-auto rounded-none shadow-none border-none">
-            <CardBody className="w-full bg-gray-100 p-6">
+            <CardBody className="w-full bg-gray-100 p-3 lg:p-6">
               <form
                 onSubmit={handleSubmit}
                 className="flex flex-row gap-3 items-center"
@@ -424,12 +424,12 @@ export default function ValidationRequest() {
           </Card>
 
           <div className="my-3 w-full shadow-none rounded-lg">
-            <div className="grid w-full grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid w-full grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-2 lg:gap-4">
               <div
                 onClick={() => {
                   setStatus("allRequests");
                 }}
-                className="rounded-md bg-gray-100 p-4 flex space-x-4 cursor-pointer"
+                className="rounded-md bg-gray-100 p-3 lg:p-4 flex space-x-4 cursor-pointer"
               >
                 <div className="flex items-center justify-center bg-purple-200 text-cusPurp rounded-full w-10 h-10">
                   <IoDocuments size={18} />
@@ -443,7 +443,7 @@ export default function ValidationRequest() {
                 onClick={() => {
                   setStatus("pending");
                 }}
-                className="rounded-md bg-gray-100 p-4 flex space-x-4 cursor-pointer"
+                className="rounded-md bg-gray-100 p-3 lg:p-4 flex space-x-4 cursor-pointer"
               >
                 <div className="flex items-center justify-center bg-yellow-200 text-yellow-500 rounded-full w-10 h-10">
                   <PiQueueFill size={18} />
@@ -457,7 +457,7 @@ export default function ValidationRequest() {
                 onClick={() => {
                   setStatus("approved");
                 }}
-                className="rounded-md bg-gray-100 p-4 flex space-x-4 cursor-pointer"
+                className="rounded-md bg-gray-100 p-3 lg:p-4 flex space-x-4 cursor-pointer"
               >
                 <div className="flex items-center justify-center bg-green-200 text-green-600 rounded-full w-10 h-10">
                   <FaHeart size={18} />
@@ -471,7 +471,7 @@ export default function ValidationRequest() {
                 onClick={() => {
                   setStatus("rejected");
                 }}
-                className="rounded-md bg-gray-100 p-4 flex space-x-4 cursor-pointer"
+                className="rounded-md bg-gray-100 p-3 lg:p-4 flex space-x-4 cursor-pointer"
               >
                 <div className="flex items-center justify-center bg-red-200 text-red-600 rounded-full w-10 h-10">
                   <FcCancel size={18} />
@@ -695,7 +695,7 @@ export default function ValidationRequest() {
                     </Button>
                   </section>
 
-                  <section className="grid grid-cols-2 gap-2">
+                  <section className="grid grid-cols-1 lg:grid-cols-2 gap-2">
                     <div className="gap-3 p-2 rounded-lg border">
                       <div className="w-full flex flex-col gap-1">
                         <p className="font-semibold">

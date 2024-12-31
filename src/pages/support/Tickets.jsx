@@ -152,7 +152,7 @@ export default function Tickets() {
       </div>
 
       <Card className="md:w-full w-full mx-auto shadow-none rounded-md">
-          <CardBody className="w-full bg-gray-100 p-6">
+          <CardBody className="w-full bg-gray-100 md:p-6 p-4">
             <form
               onSubmit={handleSubmit}
               className="flex flex-row gap-3 items-center"

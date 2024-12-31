@@ -68,7 +68,7 @@ const Navbar = () => {
             
           </form>
       </div>
-    <div className="flex items-center justify-center space-x-2">
+    <div className="hidden lg:flex items-center justify-center space-x-2">
       <div className="rounded-full bg-gray-200 text-white p-3">
         <FaUser size={20}/>
       </div>

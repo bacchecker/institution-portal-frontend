@@ -89,13 +89,13 @@ export default function Drawer({
                 </h3>
               </div>
               <Button
-                color="danger"
-                variant="flat"
+                radius="full"
+                variant="bordered"
                 onPress={() => setIsOpen(false)}
                 size="sm"
                 isIconOnly
               >
-                <IoClose className="size-4" />
+                <IoClose className="size-5" />
               </Button>
             </div>
 
