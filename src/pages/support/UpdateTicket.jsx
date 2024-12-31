@@ -5,7 +5,7 @@ import { useUpdateTicketMutation } from "@/redux/apiSlice";
 import { toast } from "sonner";
 import LoadItems from "@/components/LoadItems";
 
-function UpdateTicket({ setOpenModal, openModal, selectedTicket }) {
+function UpdateTicket({ setOpenModal, openModal, selectedTicket, fetchTickets }) {
   const [userInput, setUserInput] = useState([]);
   const [userInitialInput, setUserInitialInput] = useState([]);
   const [selectedImage, setSelectedImage] = useState(null);
@@ -134,7 +134,9 @@ function UpdateTicket({ setOpenModal, openModal, selectedTicket }) {
         progress: undefined,
         theme: "light",
       });
+      
       setOpenModal(!openModal);
+      fetchTickets()
       setSelectedImage(null);
     }
   }, [isSuccess, data]);

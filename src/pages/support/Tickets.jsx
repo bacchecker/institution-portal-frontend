@@ -5,14 +5,18 @@ import { FaChevronLeft, FaChevronRight, FaPlus } from "react-icons/fa6";
 import { Select, SelectItem, Spinner, TableCell, TableRow, Dropdown,
   DropdownItem,
   DropdownMenu,
-  DropdownTrigger, Button } from "@nextui-org/react";
+  DropdownTrigger, Button, 
+  Card,
+  CardBody} from "@nextui-org/react";
 import CustomTable from "@/components/CustomTable";
 import axios from "@/utils/axiosConfig";
 import CreateTicket from "./CreateTicket";
+import AddTicket from "./AddTicket";
 import moment from 'moment';
 import UpdateTicket from "./UpdateTicket";
 import Elipsis from "../../assets/icons/elipsis";
 import Navbar from "@/components/Navbar";
+import { MdOutlineFilterAlt, MdOutlineFilterAltOff } from "react-icons/md";
 
 export default function Tickets() {
 
@@ -20,6 +24,7 @@ export default function Tickets() {
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState('');
     const [status, setStatus] = useState('');
+    const [total, setTotal] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [lastPage, setLastPage] = useState(1);
     const [openDrawer, setOpenDrawer] = useState(false);
@@ -28,18 +33,27 @@ export default function Tickets() {
     const [selectedData, setSelectedData] = useState({});
     const [sortBy, setSortBy] = useState(null);
     const [sortOrder, setSortOrder] = useState("asc");
+    const [filters, setFilters] = useState({
+        search_query: "",
+        status: null,
+    });
+    const [submittedFilters, setSubmittedFilters] = useState({});
 
+    const statusData = [
+      { id: "open", name: "Open" },
+      { id: "closed", name: "Closed" },
+      { id: "in progress", name: "In Progress" }
+    ];
     // Fetch tickets
     const fetchTickets = async () => {
       setLoading(true);
       try {
           const response = await axios.get('/tickets', {
             params: {
-              search,
-              status,
+              ...submittedFilters,
               page: currentPage,
-              ...(sortBy && { sort_by: sortBy }),
-              ...(sortOrder && { sort_order: sortOrder }),
+              sort_by: sortBy,
+              sort_order: sortOrder,
             },
           });
           const ticketsData = response.data.tickets
@@ -57,7 +71,7 @@ export default function Tickets() {
 
     useEffect(() => {
         fetchTickets();
-    }, [search, status, currentPage, sortBy, sortOrder]);
+    }, [submittedFilters, currentPage, sortBy, sortOrder]);
 
     // Handle page change
     const handlePageChange = (page) => {
@@ -82,20 +96,28 @@ export default function Tickets() {
         }
         return pageNumbers;
     };
+    const handleStatusChange = (event) => {
+      setFilters({ ...filters, status: event.target.value });
+    };
+    const handleSubmit = (event) => {
+      event.preventDefault();
+      setSubmittedFilters({ ...filters });
+      setCurrentPage(1); // Reset to first page on filter submit
+    };
   return (
-    <div title="Tickets">
+    <div title="Tickets" className="bg-white">
     <Navbar />
     <div className="p-4">
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        <div className="col-span-2 lg:col-span-3">
+        <div className="col-span-2 lg:col-span-3 mb-2">
           <div className="flex items-center space-x-2 text-gray-700">
             <p className="text-xl font-semibold">Support Ticket</p>
             <div className="flex items-center space-x-2 border border-gray-400 rounded-full px-2 py-1">
-              <BsQuestionCircle size={20}/>
-              <p className="text-base">Help</p>
+              <BsQuestionCircle size={16}/>
+              <p className="text-sm">Help</p>
             </div>
           </div>
-          <p className="w-2/3 font-light text-base mt-2 text-gray-800">Create a formal report of a service when you need
+          <p className="w-2/3 font-light text-sm mt-2 text-gray-800">Create a formal report of a service when you need
           help or encounter a problem.</p>
         </div>
         <div className="flex justify-end">
@@ -104,22 +126,23 @@ export default function Tickets() {
             onClick={() => {
               setOpenDrawer(true);
             }} 
-            className="flex items-center justify-center w-4/5 text-base space-x-2 bg-bChkRed rounded-lg text-white h-12">
+            className="flex items-center justify-center text-sm space-x-2 bg-bChkRed rounded-lg text-white h-9 px-4">
             <FaPlus size={18}/>
             <p>Create Ticket</p>
           </button>
         </div>
-          {/* <AddTicket
+          <AddTicket
             fetchTickets={fetchTickets}
-            setOpenDrawer={setOpenDrawer}
-            openDrawer={openDrawer}
-          /> */}
+            setOpenModal={setOpenDrawer}
+            openModal={openDrawer}
+          />
           <UpdateTicket
             selectedTicket={selectedData}
             setOpenModal={setOpenEditDrawer}
             openModal={openEditDrawer}
+            fetchTickets={fetchTickets}
           />
-          <CreateTicket setOpenModal={setOpenDrawer} openModal={openDrawer} />
+          {/* <CreateTicket setOpenModal={setOpenDrawer} openModal={openDrawer} /> */}
           {/* <EditTicket
             fetchTickets={fetchTickets}
             setOpenEditDrawer={setOpenEditDrawer}
@@ -127,7 +150,83 @@ export default function Tickets() {
             selectedData={selectedData}
           /> */}
       </div>
-      <div className="bg-white px-4 py-3 mt-5 rounded-xl">
+
+      <Card className="md:w-full w-full mx-auto shadow-none rounded-md">
+          <CardBody className="w-full bg-gray-100 p-6">
+            <form
+              onSubmit={handleSubmit}
+              className="flex flex-row gap-3 items-center"
+            >
+              <input
+                type="text"
+                className={`bg-white text-gray-900 text-sm rounded-[4px] font-[400] focus:outline-none block w-[360px] p-[9.5px] placeholder:text-gray-500`}
+                name="search_query"
+                placeholder="Search by ticket description, subject or type"
+                value={filters.search_query}
+                onChange={(e) =>
+                  setFilters({ ...filters, search_query: e.target.value })
+                }
+              />
+
+              <select
+                name="status"
+                value={filters.status || ""}
+                className={`bg-white text-sm rounded-[4px] focus:outline-none block w-[220px] p-[9px] ${
+                  filters.status ? "text-gray-900" : "text-gray-500"
+                }`}
+                onChange={handleStatusChange}
+              >
+                <option value="" className="text-gray-500" disabled selected>
+                  Status
+                </option>
+                {statusData.map((item) => (
+                  <option key={item.key} value={item.key}>
+                    {item.name}
+                  </option>
+                ))}
+              </select>
+
+              
+
+              <div className="flex space-x-2">
+                <Button
+                  startContent={<MdOutlineFilterAlt size={17} />}
+                  radius="none"
+                  size="sm"
+                  type="submit"
+                  className="rounded-[4px] bg-bChkRed text-white"
+                >
+                  Filter
+                </Button>
+                <Button
+                  startContent={<MdOutlineFilterAltOff size={17} />}
+                  radius="none"
+                  size="sm"
+                  type="button"
+                  className="rounded-[4px] bg-black text-white"
+                  onClick={() => {
+                    setFilters({
+                      search_query: "",
+                      document_type: null,
+                      start_date: null,
+                      end_date: null,
+                    });
+
+                    setSubmittedFilters({
+                      search_query: "",
+                      document_type: null,
+                      start_date: null,
+                      end_date: null,
+                    });
+                  }}
+                >
+                  Clear
+                </Button>
+              </div>
+            </form>
+          </CardBody>
+        </Card>
+      {/* <div className="bg-white px-4 py-3 mt-5 rounded-xl">
         <div className="text-gray-700 flex items-center space-x-4">
           <p className="text-lg font-semibold">Ticket History</p>
           <div className="relative w-full lg:w-1/2">
@@ -151,7 +250,7 @@ export default function Tickets() {
               
           </Select>
         </div>
-      </div>
+      </div> */}
       <section className="md:w-full w-[98vw] min-h-[60vh] mx-auto mt-2">
        
             <CustomTable
@@ -183,7 +282,7 @@ export default function Tickets() {
                   
                   <TableCell className="px-4 py-2">
                     <span
-                      className={`px-4 py-2 font-light rounded-full border ${
+                      className={`px-3 text-xs py-1 font-light rounded-full border ${
                         item?.status === 'open'
                           ? 'bg-gray-200 text-gray-700 border-gray-400'
                           : item?.status === 'in progress'

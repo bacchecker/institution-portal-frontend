@@ -48,7 +48,6 @@ export default function DocumentRequest() {
   const [total, setTotal] = useState(0);
   const fileUploadDisclosure = useDisclosure();
   const changeStatusDisclosure = useDisclosure();
-  const [dateRange, setDateRange] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [openDrawer, setOpenDrawer] = useState(false);
   const [bulkDownloadLoading, setBulkDownloadLoading] = useState(false);
