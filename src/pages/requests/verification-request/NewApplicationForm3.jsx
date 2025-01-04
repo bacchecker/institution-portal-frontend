@@ -57,7 +57,7 @@ function NewApplicationForm3({ totalApplicationAmount, uniqueRequestedCode }) {
         unique_code: uniqueRequestedCode,
         amount: totalApplicationAmount,
         payment_detail: userInput?.payment_detail,
-        payment_type: "validation",
+        payment_type: "verification",
       });
     } else {
       toast.error("Fill All Required Fields");

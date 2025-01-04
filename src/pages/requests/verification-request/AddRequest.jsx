@@ -26,11 +26,13 @@ function NewApplicationForm({
     otherInstitutionAddress: "",
     otherInstitutionEmail: "",
     otherInstitutionPostalAddress: "",
-    
     reason: "",
+    doc_owner_full_name: "",
+    doc_owner_email: "",
   };
   const [userInput, setUserInput] = useState(initialUserInput);
   const user = JSON?.parse(secureLocalStorage?.getItem("user"))?.user;
+  const institutionName = JSON?.parse(secureLocalStorage?.getItem("user"))?.institution;
   const [selectedAcademicLevel, setSelectedAcademicLevel] = useState("");
   const [currentScreen, setCurrentScreen] = useState(1);
   const [allDocuments, setAllDocuments] = useState([]);
@@ -203,13 +205,9 @@ function NewApplicationForm({
 
   const handleSeletedDocument = (item, index) => {
     const updatedItems = [...items];
-    if (item?.document_type_id) {
-      updatedItems[index].institution_document_type_id = item?.id;
-      updatedItems[index].document_type_id = item?.document_type_id;
-    } else {
-      updatedItems[index].document_type_id = item?.id;
-    }
-    console.log(updatedItems);
+    updatedItems[index].institution_document_type_id = item?.id;
+    updatedItems[index].document_type_id = item?.document_type.id;
+    
     
     setItems(updatedItems);
   };
@@ -226,10 +224,8 @@ function NewApplicationForm({
         otherInstitutionAddress: "",
         otherInstitutionEmail: "",
         otherInstitutionPostalAddress: "",
-        /* index_number: "",
-        program_of_study: "",
-        start_year: "",
-        end_year: "", */
+        doc_owner_full_name: "",
+        doc_owner_email: "",
         reason: "",
       }));
       setAllDocuments(selectedInstitution?.document_types);
@@ -412,6 +408,8 @@ function NewApplicationForm({
         );
         formData.append(`documents[${index}][file]`, item.file);
       }
+      formData.append(`documents[${index}][doc_owner_email]`, userInput[`doc_owner_email_${index}`]);
+      formData.append(`documents[${index}][doc_owner_full_name]`, userInput[`doc_owner_full_name_${index}`]);
     });
 
     try {
@@ -473,8 +471,7 @@ function NewApplicationForm({
               <input
                 type="text"
                 readOnly
-                value={`${user?.first_name || ""} ${user?.other_name || ""} ${
-                  user?.last_name || ""
+                value={`${ institutionName.name || ""
                 }`}
                 className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0 read-only:bg-[#d8d8d8]"
               />
@@ -882,6 +879,41 @@ function NewApplicationForm({
                 <span className="text-[#ff0404]">Note</span>: This fee is based
                 on the number of copies
               </h6> */}
+              </div>
+              <div className="border rounded-sm p-4 mt-4">
+                <p className="text-sm font-medium">Document Owner Information</p>
+                <div className="md:mt-[1vw] mt-[5vw]">
+                  <h4 className="md:text-[1vw] text-[4vw] mb-1">
+                    Full Name
+                    <span className="text-[#f1416c]">*</span>
+                  </h4>
+                  <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
+                    <input
+                      type="text"
+                      name={`doc_owner_full_name_${i}`} // Add index here
+                      value={userInput[`doc_owner_full_name_${i}`] || ""}
+                      onChange={handleUserInput}
+                      required
+                      className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0"
+                    />
+                  </div>
+                </div>
+                <div className="md:mt-[1vw] mt-[5vw]">
+                  <h4 className="md:text-[1vw] text-[4vw] mb-1">
+                    Email Address
+                    <span className="text-[#f1416c]">*</span>
+                  </h4>
+                  <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
+                    <input
+                      type="email"
+                      name={`doc_owner_email_${i}`} // Add index here
+                      value={userInput[`doc_owner_email_${i}`] || ""}
+                      onChange={handleUserInput}
+                      required
+                      className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0"
+                    />
+                  </div>
+                </div>
               </div>
               {items.length === 1 && (
                 <h6 className="text-[#2e2e2e] md:text-[0.7vw] text-[2.7vw] font-[600] mt-[0.3vw]">

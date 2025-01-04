@@ -38,7 +38,7 @@ function NewApplicationForm2({
       </div>
       <div className="px-[1vw]">
         <h4 className="md:text-[1vw] text-[3.5vw] text-center">
-          Your document request has been successfully{" "}
+          Your verification request has been successfully{" "}
           <span className="text-[#ff0404] font-[400]">created</span>. You can
           continue with the payment to submit your application to the
           institution for processing, or choose to make the payment later.

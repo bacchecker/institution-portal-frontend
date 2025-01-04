@@ -314,7 +314,7 @@ export default function OutgoingRequests() {
 
   return (
     <>
-    <div title="Incoming Request">
+    <div title="Outgoing Request">
         <section className="px-3">
         <Card className="md:w-full w-full mx-auto rounded-none shadow-none border-none">
             <CardBody className="w-full bg-gray-100 p-6">

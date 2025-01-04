@@ -1,8 +1,7 @@
 import React, {useState, useEffect} from "react";
 import { BsQuestionCircle } from "react-icons/bs";
-import { CiMenuKebab } from "react-icons/ci";
 import { FaChevronLeft, FaChevronRight, FaPlus } from "react-icons/fa6";
-import { Select, SelectItem, Spinner, TableCell, TableRow, Dropdown,
+import { TableCell, TableRow, Dropdown,
   DropdownItem,
   DropdownMenu,
   DropdownTrigger, Button, 
@@ -10,7 +9,6 @@ import { Select, SelectItem, Spinner, TableCell, TableRow, Dropdown,
   CardBody} from "@nextui-org/react";
 import CustomTable from "@/components/CustomTable";
 import axios from "@/utils/axiosConfig";
-import CreateTicket from "./CreateTicket";
 import AddTicket from "./AddTicket";
 import moment from 'moment';
 import UpdateTicket from "./UpdateTicket";
@@ -22,8 +20,6 @@ export default function Tickets() {
 
     const [tickets, setTickets] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [search, setSearch] = useState('');
-    const [status, setStatus] = useState('');
     const [total, setTotal] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [lastPage, setLastPage] = useState(1);
@@ -107,9 +103,9 @@ export default function Tickets() {
   return (
     <div title="Tickets" className="bg-white">
     <Navbar />
-    <div className="p-4">
+    <div className="p-2 lg:p-4">
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        <div className="col-span-2 lg:col-span-3 mb-2">
+        <div className="col-span-2 lg:col-span-3 lg:mb-2">
           <div className="flex items-center space-x-2 text-gray-700">
             <p className="text-xl font-semibold">Support Ticket</p>
             <div className="flex items-center space-x-2 border border-gray-400 rounded-full px-2 py-1">
@@ -117,10 +113,10 @@ export default function Tickets() {
               <p className="text-sm">Help</p>
             </div>
           </div>
-          <p className="w-2/3 font-light text-sm mt-2 text-gray-800">Create a formal report of a service when you need
+          <p className="w-full lg:w-2/3 font-light text-sm mt-2 text-gray-800">Create a formal report of a service when you need
           help or encounter a problem.</p>
         </div>
-        <div className="flex justify-end">
+        <div className="flex lg:justify-end mb-2 lg:mb-0">
           <button 
             type="button"
             onClick={() => {
