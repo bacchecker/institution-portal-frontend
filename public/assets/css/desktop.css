@@ -168,7 +168,24 @@
   tbody tr:nth-child(even) {
     background-color: #ffffff;
   }
+  .action-dropdown-class12 {
+    width: 14vw;
+    position: absolute;
+    display: flex;
+    border-radius: 0.25rem !important;
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+    box-shadow: 0px 1px 2px -1px rgba(0, 0, 0, 0.1),
+      0px 1px 3px 0px rgba(0, 0, 0, 0.1);
+    border: 1px solid #ddd;
+    background: #fff;
+    z-index: 60 !important;
+  }
 
+  .action-dropdown-content {
+    width: 14vw !important;
+    border-radius: 0.25rem !important;
+  }
   .sidemenu-h {
     height: 0;
     overflow: hidden;

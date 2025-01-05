@@ -7,6 +7,7 @@ function Dropdown({
   dropdownClass,
   openDropDownFilter,
   setOpenDropDownFilter,
+  isClose
 }) {
   const [openFilter, setOpenFilter] = useState(false);
   const [dropdownPosition, setDropdownPosition] = useState("top");
@@ -24,7 +25,10 @@ function Dropdown({
     }
   };
 
+  
+
   const isOpen = isControlled ? openDropDownFilter : openFilter;
+
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -38,6 +42,14 @@ function Dropdown({
           setOpenFilter(false);
         }
       }
+
+      if (isClose) {
+        if (isControlled) {
+          setOpenDropDownFilter(false);
+        } else {
+          setOpenFilter(false);
+        }
+      }
     };
 
     document.addEventListener("mousedown", handleClickOutside);
@@ -45,7 +57,7 @@ function Dropdown({
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [isControlled, setOpenDropDownFilter]);
+  }, [isControlled, setOpenDropDownFilter, isClose]);
 
   const updateDropdownPosition = () => {
     if (dropdownRef.current && filterDropdownRef.current) {
@@ -91,9 +103,9 @@ function Dropdown({
       {isOpen && (
         <div
           ref={dropdownRef}
-          className={`absolute right-0 ${
+          className={`absolute z-[22] right-0 ${
             dropdownPosition === "top" ? "top-[110%]" : "bottom-[110%]"
-          } h-[fit-content] z-[1] border border-[#e0e0e0] shadow-lg bg-white rounded-[0.5rem] ${dropdownClass}`}
+          } h-[fit-content] border border-[#e0e0e0] shadow-lg bg-white rounded-[0.5rem] ${dropdownClass}`}
         >
           {children}
         </div>

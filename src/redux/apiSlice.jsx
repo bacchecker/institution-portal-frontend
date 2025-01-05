@@ -139,6 +139,48 @@ export const baccheckerApi = createApi({
       providesTags: ["DocumentRequest"],
     }),
 
+    getInstitutionValidationRequests: builder.query({
+      query: ({
+        page,
+        searchValue,
+        selectedFrom,
+        selectedTo,
+        selectedDocumentType,
+        sortBy,
+        sortOrder,
+        selectedStatus,
+      }) => {
+        let queryString = `/institution/requests/validation-requests?page=${page}`;
+        if (searchValue) {
+          queryString += `&search_query=${searchValue}`;
+        }
+        if (selectedFrom) {
+          queryString += `&start_date=${selectedFrom}`;
+        }
+        if (selectedTo) {
+          queryString += `&end_date=${selectedTo}`;
+        }
+        if (selectedDocumentType) {
+          queryString += `&document_type=${selectedDocumentType}`;
+        }
+        if (sortBy) {
+          queryString += `&sort_by=${sortBy}`;
+        }
+        if (sortOrder) {
+          queryString += `&sort_order=${sortOrder}`;
+        }
+        if (selectedStatus) {
+          queryString += `&status=${selectedStatus}`;
+        }
+
+        return queryString;
+      },
+      providesTags: ["Validation"],
+    }),
+
+
+
+
     getInstitutionDocumentTypes: builder.query({
       query: ({ page, perPage }) => {
         let queryString = `/institution/document-types?page=${page}`;
@@ -418,7 +460,6 @@ export const baccheckerApi = createApi({
         method: "POST",
         body,
       }),
-      // invalidatesTags: ["User", "Log"],
     }),
     createInstitutionUser: builder.mutation({
       query: (body) => ({
@@ -462,6 +503,15 @@ export const baccheckerApi = createApi({
         body,
       }),
       invalidatesTags: ["DocumentType", "Log"],
+    }),
+
+    customizeDashboard: builder.mutation({
+      query: (body) => ({
+        url: "/institution/dashboard",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["Log"],
     }),
     deleteDomentType: builder.mutation({
       query: ({ id }) => ({
@@ -592,4 +642,6 @@ export const {
   useGetInstitutionDocumentsQuery,
   useInitiatePaymentMutation,
   useValidateDocumentMutation,
+  useCustomizeDashboardMutation,
+  useGetInstitutionValidationRequestsQuery
 } = baccheckerApi;

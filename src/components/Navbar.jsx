@@ -26,7 +26,7 @@ const Navbar = () => {
   };
   return (
     
-    <div className="flex justify-between w-full h-[62px] border-b bg-[#f8f8f8] p-4">
+    <div className="flex justify-between w-full h-[62px] border-b bg-[#f8f8f8] p-4 md:mt-0 mt-[20vw]">
       <div className="flex justify-center">
           <form onSubmit={handleSearch} className="relative flex items-center w-72 xl:w-96">
             <input

@@ -21,6 +21,12 @@
     flex-wrap: wrap;
     gap: 4vw;
   }
+  .flex-sm-col{
+    flex-direction: column;
+  }
+  .jus-sm{
+    justify-content: end;
+  }
   .content {
     animation: moving 0.5s ease;
   }

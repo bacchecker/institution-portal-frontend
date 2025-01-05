@@ -152,8 +152,8 @@ function Team({ setActiveStep }) {
       {isDeleteInstitutionUserLoading && <LoadingPage />}
 
       <>
-        <div className="w-full h-full  gap-[3vw] overflow-auto bg-white table-cover  scroll-width">
-          <table className="md:w-full w-[230vw] border-collapse md:text-[0.8vw] text-[3.5vw] rounded-[0.7vw] relative">
+        <div className="w-full h-full gap-[3vw] overflow-auto bg-white table-cover  scroll-width">
+          <table className="md:w-full w-[160vw] border-collapse md:text-[0.8vw] text-[3.5vw] rounded-[0.7vw] relative">
             <thead className="bg-[#f0efef] sticky top-0 z-[20]">
               <tr className="text-left">
                 <th className="md:py-[1vw] py-[3vw] md:px-[1vw] px-[3vw] border-b max-w-[15%]">
@@ -248,7 +248,7 @@ function Team({ setActiveStep }) {
                                 <Dropdown
                                   buttonContent={
                                     <>
-                                      <i className="bx bx-dots-vertical-rounded text-[1.2vw]"></i>
+                                      <i className="bx bx-dots-vertical-rounded md:text-[1.2vw] text-[3.5vw]"></i>
                                     </>
                                   }
                                   buttonclassName="action-button-class"

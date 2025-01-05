@@ -101,7 +101,7 @@ function SystemLogs() {
   return (
     <>
       <Navbar />
-      <div className="bg-white p-[1vw]">
+      <div className="bg-white md:p-[1vw] p-[5vw]">
         <div className="flex justify-between mt-[2vw] flex-direct-sm">
           <div className="flex items-center gap-[2vw]">
             <h4 className="md:text-[1.2vw] text-[3.5vw] font-[600]">
@@ -197,7 +197,7 @@ function SystemLogs() {
         </div>
         <div className="content">
           <div className="w-full md:min-h-[40vw] min-h-[100vw] gap-[3vw] overflow-auto bg-[#f8f8f8] p-[1vw] table-cover md:mt-[1vw] mt-[6vw] scroll-width">
-            <table className="md:w-full w-[230vw] border-collapse md:text-[0.9vw] text-[3.5vw] relative">
+            <table className="md:w-full w-[250vw] border-collapse md:text-[0.9vw] text-[3.5vw] relative">
               <thead className="bg-white sticky top-0 z-[20]">
                 <tr className="text-left">
                   <th className="md:py-[1vw] py-[3vw] md:px-[1vw] px-[3vw] border-b">

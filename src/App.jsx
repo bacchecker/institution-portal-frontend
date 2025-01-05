@@ -114,7 +114,7 @@ function App() {
                     }
                   />
                   <Route
-                    path="/system-logs"
+                    path="/activity-logs"
                     element={
                       <AuthenticatedSuccessProtectedRoute>
                         <AccountSetupProtectedRoute>

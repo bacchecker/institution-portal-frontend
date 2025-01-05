@@ -18,7 +18,6 @@ export default function ManageRequest() {
         const fetchPendingDocuments = async () => {
             try {
                 const response = await axios.get("/institution/requests/pending-documents");
-                console.log("API response:", response.data); // Debugging
                 setValRequest(response.data.valRequest || 0); // Fallback to 0 if undefined
                 setDocRequest(response.data.docRequest || 0);
                 setVerRequest(response.data.verRequest || 0);

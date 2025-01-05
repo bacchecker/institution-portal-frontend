@@ -78,7 +78,7 @@ function Sidebar() {
 
   return (
     <>
-      <div className="w-full h-[20vw] bg-white fixed top-0 flex justify-between items-center z-0 display-no-md px-[5vw]">
+      <div className="w-full h-[20vw] bg-white fixed top-0 flex justify-between items-center z-[1000] display-no-md px-[5vw]">
         <button
           onClick={() => handleDropdownToggle("hamburgermenu")}
           className="w-[11vw] h-[11vw] rounded-[50%] flex justify-center items-center border border-[#000]"
@@ -100,12 +100,11 @@ function Sidebar() {
         </div>
       </div>
       <div
-        className={`md:w-[18%] fixed md:left-0 left-[-100%] top-0 bottom-0 bg-[#f8f8f8] border-r-2 border-[#E5E5E5] z-0 w-full flex md:flex-col flex-col-reverse nav-mobile ${
-          (activeDropdown === "hamburgermenu" ||
+        className={`md:w-[18%] fixed md:left-0 left-[-100%] top-0 bottom-0 bg-[#f8f8f8] border-r-2 border-[#E5E5E5] z-[1001] w-full flex md:flex-col flex-col-reverse nav-mobile ${(activeDropdown === "hamburgermenu" ||
             activeDropdown === "support" ||
             activeDropdown === "service") &&
           "open1"
-        }`}
+          }`}
       >
         <div className="w-full h-[80%]">
           <div className="flex w-full justify-center py-[5px] md:border-b-2 border-[#E5E5E5]">
@@ -128,9 +127,8 @@ function Sidebar() {
                   <Link
                     to="/dashboard"
                     onClick={() => handleDropdownToggle("close")}
-                    className={`flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[10vw] md:rounded-[0.3vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] ${
-                      pathname === "/dashboard" && "active"
-                    }`}
+                    className={`flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[15vw] md:rounded-[0.3vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] ${pathname === "/dashboard" && "active"
+                      }`}
                   >
                     <i class="bx bxs-dashboard md:text-[1.3vw] text-[5vw] menu-icon"></i>
                     <span className="md:text-[1.1vw] text-[4vw] link">
@@ -142,9 +140,8 @@ function Sidebar() {
                   <Link
                     to="/manage-document"
                     onClick={() => handleDropdownToggle("close")}
-                    className={`flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[10vw] md:rounded-[0.3vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] ${
-                      pathname.includes("manage-document") && "active"
-                    }`}
+                    className={`flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[15vw] md:rounded-[0.3vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] ${pathname.includes("manage-document") && "active"
+                      }`}
                   >
                     <i class="bx bxs-file md:text-[1.3vw] text-[5vw] menu-icon"></i>
                     <span className="md:text-[1.1vw] text-[4vw] link">
@@ -157,9 +154,8 @@ function Sidebar() {
                   <Link
                     to="/payment"
                     onClick={() => handleDropdownToggle("close")}
-                    className={`flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[15vw] md:rounded-[0.3vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] ${
-                      pathname === "/payment" && "active"
-                    }`}
+                    className={`flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[15vw] md:rounded-[0.3vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] ${pathname === "/payment" && "active"
+                      }`}
                   >
                     <i className="bx bx-money md:text-[1.3vw] text-[5vw] menu-icon"></i>
                     <span className="md:text-[1.1vw] text-[4vw] link">
@@ -171,9 +167,8 @@ function Sidebar() {
                   <Link
                     to="/user-support"
                     onClick={() => handleDropdownToggle("close")}
-                    className={`flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[10vw] md:rounded-[0.3vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] ${
-                      pathname.includes("user-support") && "active"
-                    }`}
+                    className={`flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[15vw] md:rounded-[0.3vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] ${pathname.includes("user-support") && "active"
+                      }`}
                   >
                     <i class="bx bx-support md:text-[1.3vw] text-[5vw] menu-icon"></i>
                     <span className="md:text-[1.1vw] text-[4vw] link">
@@ -185,9 +180,8 @@ function Sidebar() {
                   <Link
                     to="/reports"
                     onClick={() => handleDropdownToggle("close")}
-                    className={`flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[10vw] md:rounded-[0.3vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] ${
-                      pathname.includes("reports") && "active"
-                    }`}
+                    className={`flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[15vw] md:rounded-[0.3vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] ${pathname.includes("reports") && "active"
+                      }`}
                   >
                     <i class="bx bxs-pie-chart-alt-2 md:text-[1.3vw] text-[5vw] menu-icon"></i>
                     <span className="md:text-[1.1vw] text-[4vw] link">
@@ -199,9 +193,8 @@ function Sidebar() {
                   <Link
                     to="/account-settings"
                     onClick={() => handleDropdownToggle("close")}
-                    className={`flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[15vw] md:rounded-[0.3vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] ${
-                      pathname === "/account-settings" && "active"
-                    }`}
+                    className={`flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[15vw] md:rounded-[0.3vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] ${pathname === "/account-settings" && "active"
+                      }`}
                   >
                     <i className="bx bx-cog md:text-[1.3vw] text-[5vw] menu-icon"></i>
                     <span className="md:text-[1.1vw] text-[4vw] link">
@@ -211,15 +204,14 @@ function Sidebar() {
                 </li>
                 <li>
                   <Link
-                    to="/system-logs"
+                    to="/activity-logs"
                     onClick={() => handleDropdownToggle("close")}
-                    className={`flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[15vw] md:rounded-[0.3vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] ${
-                      pathname === "/system-logs" && "active"
-                    }`}
+                    className={`flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[15vw] md:rounded-[0.3vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] ${pathname === "/activity-logs" && "active"
+                      }`}
                   >
                     <i className="bx bx-cylinder md:text-[1.3vw] text-[5vw] menu-icon"></i>
                     <span className="md:text-[1.1vw] text-[4vw] link">
-                      System Logs
+                      Activity Logs
                     </span>
                   </Link>
                 </li>
@@ -250,11 +242,10 @@ function Sidebar() {
               <i className="bx bx-x text-[8vw]"></i>
             </button>
             <div
-              className={`mb-[1vw] side-show ${
-                activeDropdown === "signout"
+              className={`mb-[1vw] side-show ${activeDropdown === "signout"
                   ? "sidemenu-h"
                   : "sidemenu-h-active"
-              }`}
+                }`}
               ref={(el) => (dropdownRefs.current["signout"] = el)}
               style={{
                 height:
@@ -289,21 +280,18 @@ function Sidebar() {
             >
               <div className="w-[20%]">
                 <div className="w-[2.5vw] h-[2.5vw] rounded-[50%] border border-[#000] flex items-center justify-center text-[1vw] font-[600] uppercase">
-                  {`${user?.first_name?.[0] || ""}${
-                    user?.last_name?.[0] || ""
-                  }`}
+                  {`${user?.first_name?.[0] || ""}${user?.last_name?.[0] || ""
+                    }`}
                 </div>
               </div>
               <div className="w-[65%]">
                 <h4
                   className="text-[0.7vw] font-[600]  text-nowrap overflow-hidden text-ellipsis"
-                  title={`${user?.first_name || ""} ${user?.other_name || ""} ${
-                    user?.last_name || ""
-                  }`}
+                  title={`${user?.first_name || ""} ${user?.other_name || ""} ${user?.last_name || ""
+                    }`}
                 >
-                  {`${user?.first_name || ""} ${user?.other_name || ""} ${
-                    user?.last_name || ""
-                  }`}
+                  {`${user?.first_name || ""} ${user?.other_name || ""} ${user?.last_name || ""
+                    }`}
                 </h4>
                 <h4
                   className="text-[0.7vw]  text-nowrap overflow-hidden text-ellipsis"

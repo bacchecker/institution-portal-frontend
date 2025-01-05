@@ -41,7 +41,7 @@ const RevenueGraph = ({ revenueGraph }) => {
   return (
     <div>
       <div className="pt-[1vw] pb-[2vw] pl-[1vw]">
-        <h2 className="text-[1.2vw] font-[600]">Monthly Revenue</h2>
+        <h2 className="md:text-[1.2vw] text-[3.5vw] font-[600]">Monthly Revenue</h2>
       </div>
       <ResponsiveContainer width="100%" height={350}>
         <AreaChart data={chartData}>
