@@ -28,10 +28,15 @@ function Dashboard() {
   const [lineStyle, setLineStyle] = useState({ width: 0, left: 0 });
   const [clickedItems, setClickedItems] = useState([]);
   const [clickedDefaultItems, setClickedDefaultItems] = useState([]);
-  const dashboardScreens = JSON.parse(user?.institution?.dashboard_screens);
-
-
-
+  const dashboardScreens = (() => {
+    try {
+      const screens = user?.institution?.dashboard_screens;
+      return screens ? JSON.parse(screens) : [];
+    } catch (error) {
+      console.error('Error parsing dashboard_screens:', error);
+      return [];
+    }
+  })();
 
   const handleTabClick = (e) => {
     const target = e.target;
