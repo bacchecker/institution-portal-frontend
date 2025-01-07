@@ -217,17 +217,17 @@ function ValidationRequestReport() {
                     <div className="flex flex-col items-center justify-center md:gap-[0.01vw] gap-[0.3vw]">
                       <i
                         className={`bx bxs-up-arrow text-[0.6vw] ${(!sortOrder || sortOrder === "desc") &&
-                            sortBy === "unique_code"
-                            ? "text-[#ffffff]"
-                            : ""
+                          sortBy === "unique_code"
+                          ? "text-[#ffffff]"
+                          : ""
                           }`}
                       ></i>
 
                       <i
                         className={`bx bxs-down-arrow text-[0.6vw] ${(!sortOrder || sortOrder === "asc") &&
-                            sortBy === "unique_code"
-                            ? "text-[#ffffff]"
-                            : ""
+                          sortBy === "unique_code"
+                          ? "text-[#ffffff]"
+                          : ""
                           }`}
                       ></i>
                     </div>
@@ -247,16 +247,16 @@ function ValidationRequestReport() {
                     <div className="flex flex-col items-center justify-center md:gap-[0.1vw] gap-[0.3vw]">
                       <i
                         className={`bx bxs-up-arrow text-[0.6vw] ${(!sortOrder || sortOrder === "desc") &&
-                            sortBy === "document_type.name"
-                            ? "text-[#ffffff]"
-                            : ""
+                          sortBy === "document_type.name"
+                          ? "text-[#ffffff]"
+                          : ""
                           }`}
                       ></i>
                       <i
                         className={`bx bxs-down-arrow text-[0.6vw] ${(!sortOrder || sortOrder === "asc") &&
-                            sortBy === "document_type.name"
-                            ? "text-[#ffffff]"
-                            : ""
+                          sortBy === "document_type.name"
+                          ? "text-[#ffffff]"
+                          : ""
                           }`}
                       ></i>
                     </div>
@@ -276,16 +276,16 @@ function ValidationRequestReport() {
                     <div className="flex flex-col items-center justify-center md:gap-[0.1vw] gap-[0.3vw]">
                       <i
                         className={`bx bxs-up-arrow text-[0.6vw] ${(!sortOrder || sortOrder === "desc") &&
-                            sortBy === "created_at"
-                            ? "text-[#ffffff]"
-                            : ""
+                          sortBy === "created_at"
+                          ? "text-[#ffffff]"
+                          : ""
                           }`}
                       ></i>
                       <i
                         className={`bx bxs-down-arrow text-[0.6vw] ${(!sortOrder || sortOrder === "asc") &&
-                            sortBy === "created_at"
-                            ? "text-[#ffffff]"
-                            : ""
+                          sortBy === "created_at"
+                          ? "text-[#ffffff]"
+                          : ""
                           }`}
                       ></i>
                     </div>
@@ -303,16 +303,16 @@ function ValidationRequestReport() {
                     <div className="flex flex-col items-center justify-center md:gap-[0.1vw] gap-[0.3vw]">
                       <i
                         className={`bx bxs-up-arrow text-[0.6vw] ${(!sortOrder || sortOrder === "desc") &&
-                            sortBy === "document_requests.status"
-                            ? "text-[#ffffff]"
-                            : ""
+                          sortBy === "document_requests.status"
+                          ? "text-[#ffffff]"
+                          : ""
                           }`}
                       ></i>
                       <i
                         className={`bx bxs-down-arrow text-[0.6vw] ${(!sortOrder || sortOrder === "asc") &&
-                            sortBy === "document_requests.status"
-                            ? "text-[#ffffff]"
-                            : ""
+                          sortBy === "document_requests.status"
+                          ? "text-[#ffffff]"
+                          : ""
                           }`}
                       ></i>
                     </div>
@@ -330,16 +330,16 @@ function ValidationRequestReport() {
                     <div className="flex flex-col items-center justify-center md:gap-[0.1vw] gap-[0.3vw]">
                       <i
                         className={`bx bxs-up-arrow text-[0.6vw] ${(!sortOrder || sortOrder === "desc") &&
-                            sortBy === "amount"
-                            ? "text-[#ffffff]"
-                            : ""
+                          sortBy === "amount"
+                          ? "text-[#ffffff]"
+                          : ""
                           }`}
                       ></i>
                       <i
                         className={`bx bxs-down-arrow text-[0.6vw] ${(!sortOrder || sortOrder === "asc") &&
-                            sortBy === "amount"
-                            ? "text-[#ffffff]"
-                            : ""
+                          sortBy === "amount"
+                          ? "text-[#ffffff]"
+                          : ""
                           }`}
                       ></i>
                     </div>
@@ -377,9 +377,9 @@ function ValidationRequestReport() {
                                 {payment.unique_code}
                               </td>
                               <td className="py-[1vw] px-[2.5vw] border-b max-w-[15%]">
-                                {payment.validation_request?.institution_document_type
+                                {payment.validation_request?.institution_document_type?.document_type
                                   ?.name ? payment.validation_request?.institution_document_type
-                                  ?.name :
+                                    ?.document_type?.name :
                                   payment.validation_request?.document_type
                                     ?.name
                                 }
@@ -390,40 +390,40 @@ function ValidationRequestReport() {
                               <td className="md:py-[1vw] py-[3vw] md:px-[2.5vw] px-[6vw] border-b max-w-[10%]">
                                 <div
                                   className={`md:py-[0.3vw] py-[0.5vw] md:px-[1vw] px-[3vw] w-[fit-content] border ${payment.validation_request?.status?.toLowerCase() ===
-                                      "submitted"
-                                      ? "border-[#f8e5cc] bg-[#fbf5ee]"
+                                    "submitted"
+                                    ? "border-[#f8e5cc] bg-[#fbf5ee]"
+                                    : payment.validation_request?.status?.toLowerCase() ===
+                                      "cancelled"
+                                      ? "border-[#ffc7c7] bg-[#eaeaea]"
                                       : payment.validation_request?.status?.toLowerCase() ===
-                                        "cancelled"
-                                        ? "border-[#ffc7c7] bg-[#eaeaea]"
+                                        "processing"
+                                        ? "border-[#bdbdfd] bg-[#ededfd]"
                                         : payment.validation_request?.status?.toLowerCase() ===
-                                          "processing"
-                                          ? "border-[#bdbdfd] bg-[#ededfd]"
+                                          "completed"
+                                          ? "border-[#fdd1d8] bg-[#fbecef]"
                                           : payment.validation_request?.status?.toLowerCase() ===
-                                            "completed"
-                                            ? "border-[#fdd1d8] bg-[#fbecef]"
-                                            : payment.validation_request?.status?.toLowerCase() ===
-                                              "created"
-                                              ? "border-[#858585] bg-[#efefef]"
-                                              : "border-[#C4FFE1] bg-[#ECFFF5]"
+                                            "created"
+                                            ? "border-[#858585] bg-[#efefef]"
+                                            : "border-[#C4FFE1] bg-[#ECFFF5]"
                                     } flex items-center justify-center md:rounded-[2vw] rounded-[4vw]`}
                                 >
                                   <h4
                                     className={`md:text-[0.8vw] text-[3vw] ${payment.validation_request?.status?.toLowerCase() ===
-                                        "submitted"
-                                        ? "text-[#FFA52D]"
+                                      "submitted"
+                                      ? "text-[#FFA52D]"
+                                      : payment.validation_request?.status?.toLowerCase() ===
+                                        "cancelled"
+                                        ? "text-[#ff0404]"
                                         : payment.validation_request?.status?.toLowerCase() ===
-                                          "cancelled"
-                                          ? "text-[#ff0404]"
+                                          "processing"
+                                          ? "text-[#0000ff]"
                                           : payment.validation_request?.status?.toLowerCase() ===
-                                            "processing"
-                                            ? "text-[#0000ff]"
+                                            "completed"
+                                            ? "text-[#ffc0cb]"
                                             : payment.validation_request?.status?.toLowerCase() ===
-                                              "completed"
-                                              ? "text-[#ffc0cb]"
-                                              : payment.validation_request?.status?.toLowerCase() ===
-                                                "created"
-                                                ? "text-[#000]"
-                                                : "text-[#00612D]"
+                                              "created"
+                                              ? "text-[#000]"
+                                              : "text-[#00612D]"
                                       } capitalize`}
                                   >
                                     {payment.validation_request?.status}

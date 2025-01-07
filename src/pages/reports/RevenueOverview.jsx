@@ -52,7 +52,7 @@ function RevenueOverview() {
                   GH¢{" "}
                   {parseFloat(institutionRevenue?.total_revenue ?? 0).toFixed(
                     2
-                  )}
+                  ).replace(/\d(?=(\d{3})+\.)/g, '$&,')}
                 </h4>
               </div>
             </div>
@@ -71,7 +71,7 @@ function RevenueOverview() {
                   GH¢{" "}
                   {parseInt(
                     institutionRevenue?.document_request_revenue ?? 0
-                  ).toFixed(2)}
+                  ).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}
                 </h4>
               </div>
             </div>
@@ -89,7 +89,7 @@ function RevenueOverview() {
                   GH¢{" "}
                   {parseInt(
                     institutionRevenue?.validation_request_revenue ?? 0
-                  ).toFixed(2)}
+                  ).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}
                 </h4>
               </div>
             </div>
