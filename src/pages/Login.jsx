@@ -56,6 +56,7 @@ function Login() {
     }
   };
 
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const { email, password, remember } = userInput;
@@ -161,6 +162,9 @@ function Login() {
   useEffect(() => {
     if (error) {
       toast.error(error?.data?.message);
+      if (isError || error) {
+        recaptchaRef.current.reset();
+      }
     }
   }, [error]);
   return (
@@ -206,9 +210,8 @@ function Login() {
             >
               <i
                 onClick={() => setShowPassword((prev) => !prev)}
-                className={`bx ${
-                  showPassword ? "bx-hide" : "bx-show"
-                } text-[#2e2e2e] md:text-[1.5vw] text-[6vw] cursor-pointer`}
+                className={`bx ${showPassword ? "bx-hide" : "bx-show"
+                  } text-[#2e2e2e] md:text-[1.5vw] text-[6vw] cursor-pointer`}
               ></i>
             </button>
             <input
