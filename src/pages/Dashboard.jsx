@@ -28,7 +28,8 @@ function Dashboard() {
   const [lineStyle, setLineStyle] = useState({ width: 0, left: 0 });
   const [clickedItems, setClickedItems] = useState([]);
   const [clickedDefaultItems, setClickedDefaultItems] = useState([]);
-  const dashboardScreens = JSON.parse(user?.institution?.dashboard_screens);
+  const cleanedString = user?.institution?.dashboard_screens.replace(/[^\x20-\x7E]/g, '');
+  const dashboardScreens = JSON.parse(cleanedString);
 
 
 
