@@ -57,7 +57,7 @@ export default function ValidationRequest() {
   const [sortOrder, setSortOrder] = useState("asc");
   const user = JSON?.parse(secureLocalStorage?.getItem("user"))?.user;
   const [documentTypes, setDocumentTypes] = useState([]);
-  const [checkListSections, setCheckListSections] = useState([]);
+  const [validationAnswers, setValidationAnswers] = useState([]);
   const [allRequests, setAllRequests] = useState(0);
   const [pending, setPending] = useState(0);
   const [rejected, setRejected] = useState(0);
@@ -134,18 +134,6 @@ export default function ValidationRequest() {
     setInstitutionId(user?.institution_id);
     fetchInstitutionDocs();
   }, []);
-
-  /* useEffect(() => {
-    const fetchPercentage = async () => {
-      try {
-        const response = await axios.get("/institution/requests/monthly-percentage");
-        
-      } catch (error) {
-        console.error(error);
-      }
-    };
-    fetchPercentage();
-  }, []); */
 
   useEffect(() => {
     institutionValidationRequests();
@@ -252,7 +240,7 @@ export default function ValidationRequest() {
   const handleSubmitValidationAnswers = async (event) => {
     event.preventDefault();
 
-    const allItemIds = checkListSections.sections.flatMap((section) =>
+    const allItemIds = validationAnswers.sections.flatMap((section) =>
       section.items.map((item) => item.id)
     );
 
@@ -299,11 +287,11 @@ export default function ValidationRequest() {
     }
   };
 
-  const fetchValidationChecklist = async (documentTypeId) => {
+  const fetchRequestAnswers = async (requestId) => {
     try {
-      const url = `/validation-checklist-items/${documentTypeId}`;
+      const url = `/validation-requests/answers/${requestId}`;
       const response = await axios.get(url);
-      setCheckListSections(response.data.data);
+      setValidationAnswers(response.data.data);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -545,7 +533,7 @@ export default function ValidationRequest() {
                     className="rounded-[4px] text-white"
                     onClick={async () => {
                       if (item?.status === "processing") {
-                        await fetchValidationChecklist(item?.document_type?.id);
+                        await fetchRequestAnswers(item?.id);
                       }
 
                       setOpenDrawer(true);
@@ -774,9 +762,9 @@ export default function ValidationRequest() {
               <div className="-mt-2">
                 <div className="">
                   <div className="space-y-2">
-                    {checkListSections.sections &&
-                    checkListSections.sections.length > 0 ? (
-                      checkListSections.sections.map((section) => (
+                    {validationAnswers.sections &&
+                    validationAnswers.sections.length > 0 ? (
+                      validationAnswers.sections.map((section) => (
                         <div
                           key={section.id}
                           className="space-y-4 pb-4 border p-3 rounded-md"
@@ -955,8 +943,8 @@ export default function ValidationRequest() {
                   size="md"
                   onClick={handleSubmitValidationAnswers}
                   disabled={
-                    !checkListSections.sections ||
-                    checkListSections.sections.length === 0
+                    !validationAnswers.sections ||
+                    validationAnswers.sections.length === 0
                   } // Disable if no sections
                 >
                   Submit Validations

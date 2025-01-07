@@ -149,6 +149,20 @@ function Sidebar() {
                     </span>
                   </Link>
                 </li>
+                <li>
+                  <Link
+                    to="/e-check"
+                    onClick={() => handleDropdownToggle("close")}
+                    className={`flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[10vw] md:rounded-[0.3vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] ${
+                      pathname.includes("e-check") && "active"
+                    }`}
+                  >
+                    <i class="bx bxs-check-shield md:text-[1.3vw] text-[5vw] menu-icon"></i>
+                    <span className="md:text-[1.1vw] text-[4vw] link">
+                      E-Check
+                    </span>
+                  </Link>
+                </li>
 
                 <li>
                   <Link

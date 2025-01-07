@@ -5,7 +5,6 @@ import SelectInput from "@/components/SelectInput";
 import {
   useGetFilteredInstitutionsQuery,
   useGetInstitutionDocumentsQuery,
-  useGetNonAcademicInstitutionTypesQuery,
   useGetUserAffiliationQuery,
   useValidateDocumentMutation,
 } from "@/redux/apiSlice";
@@ -14,12 +13,14 @@ import { toast } from "sonner";
 import LoadItems from "@/components/LoadItems";
 import NewApplicationForm2 from "./NewApplicationForm2";
 import NewApplicationForm3 from "./NewApplicationForm3";
+import axios from "@/utils/axiosConfig";
 
 function NewApplicationForm({
   setOpenModal,
   openModal,
   setCurrentTab,
   setSelectedStatus,
+  fetchVerificationRequests
 }) {
   const initialUserInput = {
     otherInstitution: "",
@@ -37,6 +38,7 @@ function NewApplicationForm({
   const [currentScreen, setCurrentScreen] = useState(1);
   const [allDocuments, setAllDocuments] = useState([]);
   const [isChecked, setIsChecked] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [totalApplicationAmount, setTotalApplicationAmount] = useState(null);
   const [uniqueRequestedCode, setUniqueRequestedCode] = useState(null);
   const [selectedInstitution, setSelectedInstitution] = useState({});
@@ -313,6 +315,7 @@ function NewApplicationForm({
       },
     ]);
   };
+
   const handleItemDelete = (i) => {
     const list = [...items];
     list.splice(i, 1);
@@ -324,6 +327,7 @@ function NewApplicationForm({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsSaving(true)
     const hasErrors = items.some((item) => {
       if (item.document_type_id === "") {
         toast.error("Document is missing", {
@@ -336,6 +340,7 @@ function NewApplicationForm({
           progress: undefined,
           theme: "light",
         });
+        setIsSaving(false)
         return true;
       }
 
@@ -350,6 +355,7 @@ function NewApplicationForm({
           progress: undefined,
           theme: "light",
         });
+        setIsSaving(false)
         return true;
       }
 
@@ -372,6 +378,7 @@ function NewApplicationForm({
         progress: undefined,
         theme: "light",
       });
+      setIsSaving(false)
       return;
     
     } 
@@ -413,10 +420,12 @@ function NewApplicationForm({
     });
 
     try {
-      await validateDocument(formData);
-    } catch (error) {
-      console.error("Error validating document:", error);
-      toast.error("Failed to submit documents", {
+      const response = await axios.post(
+        "/verifications",
+        formData
+      );
+
+      toast.success(response.data.message, {
         position: "top-right",
         autoClose: 1202,
         hideProgressBar: false,
@@ -426,20 +435,25 @@ function NewApplicationForm({
         progress: undefined,
         theme: "light",
       });
+      setOpenModal(!openModal);
+      fetchVerificationRequests();
+      setIsSaving(false)
+    } catch (error) {
+      toast.error(error.response.data.message, {
+        position: "top-right",
+        autoClose: 1202,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
+      setIsSaving(false)
     }
   };
 
-  useEffect(() => {
-    if (isSuccess && data) {
-      const totalAmount = data?.data?.reduce(
-        (sum, item) => sum + parseFloat(item.total_amount),
-        0
-      );
-      setTotalApplicationAmount(totalAmount);
-      setUniqueRequestedCode(data?.data[0]?.unique_code);
-      setCurrentScreen(2);
-    }
-  }, [isSuccess, data]);
+ 
 
   useEffect(() => {
     if (!openModal && (currentScreen === 2 || currentScreen === 3)) {
@@ -965,10 +979,10 @@ function NewApplicationForm({
 
           <button
             type="submit"
-            disabled={isLoading}
+            disabled={isSaving}
             className="bg-[#FF0404] md:my-[2vw!important] my-[4vw!important] w-full flex justify-center items-center md:py-[0.7vw] py-[2vw] h-[fit-content] md:rounded-[0.3vw] rounded-[2vw] gap-[0.5vw] hover:bg-[#ef4545] transition-all duration-300 disabled:bg-[#fa6767]"
           >
-            {isLoading ? (
+            {isSaving ? (
               <div className="flex items-center justify-center gap-2">
                 <LoadItems color={"#ffffff"} size={15} />
                 <h4 className="md:text-[1vw] text-[3.5vw] text-[#ffffff]">

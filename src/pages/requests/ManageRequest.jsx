@@ -73,7 +73,7 @@ export default function ManageRequest() {
           >
               <ValidationRequest />
           </Tab>
-          <Tab
+          {/* <Tab
             key="videos"
             title={
               <div className="flex items-center space-x-2">
@@ -86,7 +86,7 @@ export default function ManageRequest() {
             }
           >
             <VerificationRequest />
-          </Tab>
+          </Tab> */}
         </Tabs>
       </div>
     </div>
