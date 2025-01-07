@@ -295,10 +295,10 @@ function DashboardValidationRequestReports() {
                                 {payment.unique_code}
                               </td>
                               <td className="py-[1vw] px-[2.5vw] border-b max-w-[15%]">
-                                {payment.document_request?.institution_document_type?.document_type
-                                  ?.name ? payment.document_request?.institution_document_type
+                              {payment.validation_request?.institution_document_type?.document_type
+                                  ?.name ? payment.validation_request?.institution_document_type
                                     ?.document_type?.name :
-                                  payment.document_request?.document_type
+                                  payment.validation_request?.document_type
                                     ?.name
                                 }
                               </td>
