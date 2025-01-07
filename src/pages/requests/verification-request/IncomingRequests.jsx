@@ -599,69 +599,66 @@ export default function IncomingRequests() {
             {data?.status != "processing" ? (
             <div className="flex flex-col gap-2 mb-6">
                 <div className="grid grid-cols-3 gap-y-4 gap-x-2 border-b pb-4">
-                <div className="text-gray-500">Request ID</div>
-                <div className="col-span-2">#{data?.unique_code}</div>
-                <div className="text-gray-500">Requested Date</div>
-                <div className="col-span-2">
-                    {moment(data?.created_at).format("Do MMMM, YYYY")}
-                </div>
-                <div className="text-gray-500">Status</div>
-                <div
-                    className={`col-span-2 flex items-center justify-center py-1 space-x-2 w-28 
-                    ${
-                        data?.status === "cancelled" ||
-                        data?.status === "rejected"
-                        ? "text-red-600 bg-red-200"
-                        : data?.status === "completed"
-                        ? "text-green-600 bg-green-200"
-                        : data?.status === "processing" ||
-                            data?.status === "received"
-                        ? "text-yellow-600 bg-yellow-200"
-                        : "text-gray-600 bg-gray-200"
-                    }`}
-                >
-                    <div
-                    className={`h-2 w-2 rounded-full ${
-                        data?.status === "cancelled" ||
-                        data?.status === "rejected"
-                        ? "bg-red-600"
-                        : data?.status === "completed"
-                        ? "bg-green-600"
-                        : data?.status === "processing" ||
-                            data?.status === "received"
-                        ? "bg-yellow-600"
-                        : "bg-gray-600"
-                    }`}
-                    ></div>
-                    <p>
-                    {data?.status.charAt(0).toUpperCase() +
-                        data?.status.slice(1)}
-                    </p>
-                </div>
-                <div className="text-gray-500">Total Cash</div>
-                <div className="col-span-2">GH¢ {data?.total_amount}</div>
-                </div>
-                <div className="py-4">
-                <p className="font-semibold mb-4 text-base">
-                    Applicant Details
-                </p>
-                <div className="grid grid-cols-3 gap-y-4 border-b pb-4">
-                    <div className="text-gray-500">Applicant Name</div>
-                    <div className="col-span-2">
-                    {data?.user?.first_name} {data?.user?.other_name}{" "}
-                    {data?.user?.last_name}
-                    </div>
-                    <div className="text-gray-500">Applicant Email</div>
-                    <div className="col-span-2">{data?.user?.email}</div>
-                    <div className="text-gray-500">Phone Number</div>
-                    <div className="col-span-2">{data?.user?.phone}</div>
-                    <div className="text-gray-500">Index Number</div>
-                    <div className="col-span-2">{data?.index_number}</div>
-                    <div className="text-gray-500 mt-2">Applicant Picture</div>
-                    <div className="col-span-2 w-10 h-10 rounded-full bg-gray-200">
-                    <img src={data?.user?.profile_photo_url} alt="" />
-                    </div>
-                </div>
+                  <div className="text-gray-500">Request ID</div>
+                  <div className="col-span-2">#{data?.unique_code}</div>
+                  <div className="text-gray-500">Requested Date</div>
+                  <div className="col-span-2">
+                      {moment(data?.created_at).format("Do MMMM, YYYY")}
+                  </div>
+                  <div className="text-gray-500">Status</div>
+                  <div
+                      className={`col-span-2 flex items-center justify-center py-1 space-x-2 w-28 
+                      ${
+                          data?.status === "cancelled" ||
+                          data?.status === "rejected"
+                          ? "text-red-600 bg-red-200"
+                          : data?.status === "completed"
+                          ? "text-green-600 bg-green-200"
+                          : data?.status === "processing" ||
+                              data?.status === "received"
+                          ? "text-yellow-600 bg-yellow-200"
+                          : "text-gray-600 bg-gray-200"
+                      }`}
+                  >
+                      <div
+                      className={`h-2 w-2 rounded-full ${
+                          data?.status === "cancelled" ||
+                          data?.status === "rejected"
+                          ? "bg-red-600"
+                          : data?.status === "completed"
+                          ? "bg-green-600"
+                          : data?.status === "processing" ||
+                              data?.status === "received"
+                          ? "bg-yellow-600"
+                          : "bg-gray-600"
+                      }`}
+                      ></div>
+                      <p>
+                      {data?.status.charAt(0).toUpperCase() +
+                          data?.status.slice(1)}
+                      </p>
+                  </div>
+                  <div className="text-gray-500">Document Fee</div>
+                  <div className="col-span-2">GH¢ {data?.total_amount}</div>
+                  </div>
+                  <div className="py-4">
+                  <p className="font-semibold mb-4 text-base">
+                      Verifying Institution
+                  </p>
+                  <div className="grid grid-cols-3 gap-y-4 border-b pb-4">
+                      <div className="text-gray-500">Institution Name</div>
+                      <div className="col-span-2">
+                      {data?.receiving_institution?.name}
+                      </div>
+                      <div className="text-gray-500">Institution Email</div>
+                      <div className="col-span-2">{data?.receiving_institution?.institution_email}</div>
+                      <div className="text-gray-500">Phone Number</div>
+                      <div className="col-span-2">{data?.receiving_institution?.helpline_contact}</div>
+                      <div className="text-gray-500 mt-2">Institution Logo</div>
+                      <div className="col-span-2 w-10 h-10 rounded-full bg-gray-200">
+                      <img src={`https://admin-dev.baccheck.online/storage/${data?.receiving_institution?.logo}`} alt="" />
+                      </div>
+                  </div>
                 </div>
 
                 <div className="-mt-4">
@@ -686,7 +683,7 @@ export default function IncomingRequests() {
                     </Button>
                 </section>
 
-                <section className="grid grid-cols-2 gap-2">
+                <section className="grid grid-cols-1 xl:grid-cols-2 gap-2">
                     <div className="gap-3 p-2 rounded-lg border">
                     <div className="w-full flex flex-col gap-1">
                         <p className="font-semibold">
