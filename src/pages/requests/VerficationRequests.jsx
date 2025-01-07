@@ -31,7 +31,7 @@ export default function VerificationRequest() {
               title={
                 <div className="flex items-center space-x-2">
                   <FaCircleArrowDown className="rotate-45" size={20}/>
-                  <span>Incoming</span>
+                  <span>Inbound</span>
                   {/* <Chip size="sm" variant="faded">
                     {docRequest}
                   </Chip> */}
@@ -45,7 +45,7 @@ export default function VerificationRequest() {
               title={
                 <div className="flex items-center space-x-2">
                   <FaCircleArrowDown style={{ transform: 'rotate(-135deg)' }} size={20}/>
-                  <span>Outgoing</span>
+                  <span>Outbound</span>
                   {/* <Chip size="sm" variant="faded">
                     {docRequest}
                   </Chip> */}

@@ -928,7 +928,7 @@ export default function OutgoingRequests() {
                 </Button>
             )}
 
-            {data?.status !== "created" &&
+            {/* {data?.status !== "created" &&
                 data?.status !== "completed" &&
                 data?.status !== "processing" && (
                 <Button
@@ -960,7 +960,7 @@ export default function OutgoingRequests() {
                 >
                 Submit Verifications
                 </Button>
-            )}
+            )} */}
             </div>
         </div>
         </Drawer>
