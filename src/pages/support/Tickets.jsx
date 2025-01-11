@@ -15,6 +15,7 @@ import UpdateTicket from "./UpdateTicket";
 import Elipsis from "../../assets/icons/elipsis";
 import Navbar from "@/components/Navbar";
 import { MdOutlineFilterAlt, MdOutlineFilterAltOff } from "react-icons/md";
+import PermissionWrapper from "@/components/permissions/PermissionWrapper";
 
 export default function Tickets() {
 
@@ -116,17 +117,20 @@ export default function Tickets() {
           <p className="w-full lg:w-2/3 font-light text-sm mt-2 text-gray-800">Create a formal report of a service when you need
           help or encounter a problem.</p>
         </div>
-        <div className="flex lg:justify-end mb-2 lg:mb-0">
-          <button 
-            type="button"
-            onClick={() => {
-              setOpenDrawer(true);
-            }} 
-            className="flex items-center justify-center text-sm space-x-2 bg-bChkRed rounded-lg text-white h-9 px-4">
-            <FaPlus size={18}/>
-            <p>Create Ticket</p>
-          </button>
-        </div>
+        <PermissionWrapper permission={['tickets.create']}>
+          <div className="flex lg:justify-end mb-2 lg:mb-0">
+            <button 
+              type="button"
+              onClick={() => {
+                setOpenDrawer(true);
+              }} 
+              className="flex items-center justify-center text-sm space-x-2 bg-bChkRed rounded-lg text-white h-9 px-4">
+              <FaPlus size={18}/>
+              <p>Create Ticket</p>
+            </button>
+          </div>
+        </PermissionWrapper>
+        
           <AddTicket
             fetchTickets={fetchTickets}
             setOpenModal={setOpenDrawer}
@@ -304,6 +308,7 @@ export default function Tickets() {
                         >
                           View Response
                         </DropdownItem>
+                        {secureLocalStorage.getItem('userPermissions')?.includes('tickets.create') && (
                         <DropdownItem
                           key="edit"
                           onClick={() => {
@@ -313,7 +318,7 @@ export default function Tickets() {
                           }}
                         >
                           Edit Ticket
-                        </DropdownItem>
+                        </DropdownItem>)}
                       </DropdownMenu>
                     </Dropdown>
                     

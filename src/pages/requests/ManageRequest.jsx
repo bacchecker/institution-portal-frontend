@@ -7,6 +7,8 @@ import ValidationRequest from "./ValidationRequest";
 import axios from "@/utils/axiosConfig";
 import Navbar from "@/components/Navbar";
 import VerificationRequest from "./VerficationRequests";
+import PermissionWrapper from "@/components/permissions/PermissionWrapper";
+import secureLocalStorage from "react-secure-storage";
 
 export default function ManageRequest() {
 
@@ -45,49 +47,42 @@ export default function ManageRequest() {
           color="danger"
           variant="underlined"
         >
-          <Tab
-            key="document"
-            title={
-              <div className="flex items-center space-x-2">
-                <IoDocuments size={20}/>
-                <span>Document Request</span>
-                <Chip size="sm" variant="faded">
-                  {docRequest}
-                </Chip>
-              </div>
-            }
-          >
+          {/* Conditionally render Tab components */}
+          {secureLocalStorage.getItem('userPermissions')?.includes('document-requests.view') && (
+            <Tab
+              key="document"
+              title={
+                <div className="flex items-center space-x-2">
+                  <IoDocuments size={20} />
+                  <span>Document Request</span>
+                  <Chip size="sm" variant="faded">
+                    {docRequest}
+                  </Chip>
+                </div>
+              }
+            >
               <DocumentRequest />
-          </Tab>
-          <Tab
-            key="music"
-            title={
-              <div className="flex items-center space-x-2">
-                <IoShieldCheckmark size={20} />
-                <span>Validation Request</span>
-                <Chip size="sm" variant="faded">
-                  {valRequest}
-                </Chip>
-              </div>
-            }
-          >
+            </Tab>
+          )}
+
+          {secureLocalStorage.getItem('userPermissions')?.includes('validation-requests.view') && (
+            <Tab
+              key="payment"
+              title={
+                <div className="flex items-center space-x-2">
+                  <IoShieldCheckmark size={20} />
+                  <span>Validation Request</span>
+                  <Chip size="sm" variant="faded">
+                    {valRequest}
+                  </Chip>
+                </div>
+              }
+            >
               <ValidationRequest />
-          </Tab>
-          {/* <Tab
-            key="videos"
-            title={
-              <div className="flex items-center space-x-2">
-                <FaAnchorCircleCheck size={20}/>
-                <span>Verification Request</span>
-                <Chip size="sm" variant="faded">
-                {verRequest}
-                </Chip>
-              </div>
-            }
-          >
-            <VerificationRequest />
-          </Tab> */}
+            </Tab>
+          )}
         </Tabs>
+
       </div>
     </div>
   );

@@ -20,7 +20,7 @@ import {
 } from "@nextui-org/react";
 import CustomTable from "@/components/CustomTable";
 import moment from "moment";
-import axios from "../../utils/axiosConfig";
+import axios from "@/utils/axiosConfig";
 import StatusChip from "@/components/status-chip";
 import Drawer from "@/components/Drawer";
 import CustomUser from "@/components/custom-user";
@@ -40,6 +40,7 @@ import { FcCancel } from "react-icons/fc";
 import { MdOutlineFileDownload, MdOutlineFilterAlt } from "react-icons/md";
 import { MdOutlineFilterAltOff } from "react-icons/md";
 import DeleteModal from "@/components/DeleteModal";
+import PermissionWrapper from "@/components/permissions/PermissionWrapper";
 
 export default function DocumentRequest() {
   const [data, setData] = useState(null);
@@ -783,36 +784,39 @@ export default function DocumentRequest() {
             >
               Close
             </Button>
-
-            {(data?.status == "received" || data?.status == "submitted") && (
-              <Button
-                radius="none"
-                size="md"
-                className="w-1/2 bg-gray-300 text-gray-800 font-medium !rounded-md"
-                onClick={() => declineDisclosure.onOpen()}
-              >
-                Deny Request
-              </Button>
-            )}
-
-            {data?.status !== "created" && data?.status !== "completed" && (
-              <Button
-                radius="none"
-                className="bg-bChkRed text-white font-medium w-1/2 !rounded-md"
-                size="md"
-                onClick={() => changeStatusDisclosure.onOpen()}
-              >
-                {data?.status === "submitted"
-                  ? "Acknowledge Request"
-                  : data?.status === "received"
-                  ? "Process Request"
-                  : data?.status == "processing"
-                  ? "Complete Request"
-                  : data?.status == "rejected"
-                  ? "Revert Rejection"
-                  : "Acknowledge Request"}
-              </Button>
-            )}
+              <PermissionWrapper permission={['document-requests.cancel']}>
+                {(data?.status == "received" || data?.status == "submitted") && (
+                  <Button
+                    radius="none"
+                    size="md"
+                    className="w-1/2 bg-gray-300 text-gray-800 font-medium !rounded-md"
+                    onClick={() => declineDisclosure.onOpen()}
+                  >
+                    Decline Request
+                  </Button>
+                )}
+              </PermissionWrapper>
+              <PermissionWrapper permission={['document-requests.process']}>
+                {data?.status !== "created" && data?.status !== "completed" && (
+                  <Button
+                    radius="none"
+                    className="bg-bChkRed text-white font-medium w-1/2 !rounded-md"
+                    size="md"
+                    onClick={() => changeStatusDisclosure.onOpen()}
+                  >
+                    {data?.status === "submitted"
+                      ? "Acknowledge Request"
+                      : data?.status === "received"
+                      ? "Process Request"
+                      : data?.status == "processing"
+                      ? "Complete Request"
+                      : data?.status == "rejected"
+                      ? "Revert Rejection"
+                      : "Acknowledge Request"}
+                  </Button>
+                )}
+              </PermissionWrapper>
+            
           </div>
         </div>
       </Drawer>

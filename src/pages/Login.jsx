@@ -6,7 +6,7 @@ import { useDispatch } from "react-redux";
 import { useLoginUserMutation } from "../redux/apiSlice";
 import { toast } from "sonner";
 import LoadItems from "@/components/LoadItems";
-import { setUser, setUserToken } from "../redux/authSlice";
+import { setUser, setUserToken, setUserPermissions } from "../redux/authSlice";
 import ReCAPTCHA from "react-google-recaptcha";
 import {
   resetInputValues,
@@ -97,6 +97,7 @@ function Login() {
 
     const user = data?.data?.user;
     const token = data?.data?.token;
+    const permissions = data?.data?.permissions.names;
     const institution = data?.data?.institution;
     const selectedTemplate = data?.data?.letter_template;
 
@@ -115,6 +116,11 @@ function Login() {
           dispatch(
             setUserToken({
               token,
+            })
+          );
+          dispatch(
+            setUserPermissions({
+              permissions,
             })
           );
           navigate("/2fa-authentication");
@@ -144,6 +150,11 @@ function Login() {
           dispatch(
             setUserToken({
               token,
+            })
+          );
+          dispatch(
+            setUserPermissions({
+              permissions,
             })
           );
         }

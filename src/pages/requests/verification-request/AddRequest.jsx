@@ -34,7 +34,6 @@ function NewApplicationForm({
     security_answer: "",
   };
   const [userInput, setUserInput] = useState(initialUserInput);
-  const user = JSON?.parse(secureLocalStorage?.getItem("user"))?.user;
   const institutionName = JSON?.parse(secureLocalStorage?.getItem("user"))?.institution;
   const [selectedAcademicLevel, setSelectedAcademicLevel] = useState("");
   const [currentScreen, setCurrentScreen] = useState(1);
@@ -208,7 +207,7 @@ function NewApplicationForm({
     return type?.document_type?.name || type?.name || "";
   };
 
-  const handleSeletedDocument = (item, index) => {
+  const handleSelectedDocument = (item, index) => {
     const updatedItems = [...items];
     updatedItems[index].institution_document_type_id = item?.id;
     updatedItems[index].document_type_id = item?.document_type.id;
@@ -826,7 +825,7 @@ function NewApplicationForm({
                         : item?.document_type_id
                     )}
                     onItemSelect={(selectedItem) =>
-                      handleSeletedDocument(selectedItem, i)
+                      handleSelectedDocument(selectedItem, i)
                     }
                     className="custom-dropdown-class display-md-none"
                   />

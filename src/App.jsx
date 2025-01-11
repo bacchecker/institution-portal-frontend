@@ -20,6 +20,8 @@ import RevenueOverview from "@/pages/reports/RevenueOverview";
 import SystemLogs from "./pages/SystemLogs";
 import SearchAll from "./pages/SearchAll";
 import VerificationRequest from "./pages/requests/VerficationRequests";
+import PermissionProtectedRoute from "./components/permissions/PermissionProtectedRoute";
+import Unauthorized from "./components/permissions/Unauthorized";
 
 function App() {
   return (
@@ -41,7 +43,9 @@ function App() {
                     element={
                       <AuthenticatedSuccessProtectedRoute>
                         <AccountUnderReviewProtection>
-                          <AccountUnderReview />
+                          
+                            <AccountUnderReview />
+                          
                         </AccountUnderReviewProtection>
                       </AuthenticatedSuccessProtectedRoute>
                     }
@@ -79,7 +83,9 @@ function App() {
                     element={
                       <AuthenticatedSuccessProtectedRoute>
                         <AccountSetupProtectedRoute>
-                          <ManageRequest />
+                          <PermissionProtectedRoute permission={['document-requests.view']}>
+                            <ManageRequest />
+                          </PermissionProtectedRoute>
                         </AccountSetupProtectedRoute>
                       </AuthenticatedSuccessProtectedRoute>
                     }
@@ -134,6 +140,7 @@ function App() {
                       </AuthenticatedSuccessProtectedRoute>
                     }
                   />
+                  <Route path="/unauthorized" element={<Unauthorized />} />
                 </Routes>
               </RootLayout>
             </PrivateRoute>

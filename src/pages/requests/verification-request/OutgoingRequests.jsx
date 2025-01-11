@@ -40,6 +40,7 @@ import { GiCancel } from "react-icons/gi";
 import { MdOutlineFilterAlt, MdOutlineFilterAltOff } from "react-icons/md";
 import secureLocalStorage from "react-secure-storage";
 import AddRequest from "./AddRequest";
+import PermissionWrapper from "../../../components/permissions/PermissionWrapper";
 
 export default function OutgoingRequests() {
   const changeStatusDisclosure = useDisclosure();
@@ -558,16 +559,19 @@ export default function OutgoingRequests() {
                 </TableRow>
                 ))}
             </CustomTable>
-            <button
+            <PermissionWrapper permission={['verification-requests.create']}>
+              <button
                 type="button"
                 onClick={() => {
                     setOpenAddDrawer(true);
                 }} 
                 className="fixed flex items-center space-x-2 bottom-4 right-4 bg-black text-white px-4 py-2 rounded-full shadow-lg hover:bg-gray-800 focus:outline-none "
-            >
+              >
                 <FaPlus />
                 <p>New Request</p>
-            </button>
+              </button>
+            </PermissionWrapper>
+            
             <section>
                 <div className="flex justify-between items-center my-1">
                 <div>
@@ -778,17 +782,19 @@ export default function OutgoingRequests() {
             >
                 Close
             </Button>
-
-            {data?.status === "created" && data?.token != null && new Date(data?.token_expires_at) < new Date() && (
-                <Button
-                radius="none"
-                size="md"
-                className="w-1/2 bg-gray-300 text-gray-800 font-medium !rounded-md"
-                onClick={() => changeStatusDisclosure.onOpen()}
-                >
-                Resend Request
-                </Button>
-            )}
+                <PermissionWrapper permission={['verification-requests.create']}>
+                  {data?.status === "created" && data?.token != null && new Date(data?.token_expires_at) < new Date() && (
+                    <Button
+                    radius="none"
+                    size="md"
+                    className="w-1/2 bg-gray-300 text-gray-800 font-medium !rounded-md"
+                    onClick={() => changeStatusDisclosure.onOpen()}
+                    >
+                    Resend Request
+                    </Button>
+                  )}
+                </PermissionWrapper>
+            
 
             {/* {data?.status !== "created" &&
                 data?.status !== "completed" &&

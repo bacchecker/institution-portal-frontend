@@ -4,6 +4,7 @@ import secureLocalStorage from "react-secure-storage";
 const initialState = {
   token: null,
   user: null,
+  permissions: [], // Permissions array
   two_factor: null,
   institution: null,
   selectedTemplate: null,
@@ -23,6 +24,7 @@ export const authSlice = createSlice({
           selectedTemplate: action.payload.selectedTemplate,
         })
       );
+
       state.user = action.payload.user;
       state.two_factor = action.payload.two_factor;
       state.institution = action.payload.institution;
@@ -38,9 +40,18 @@ export const authSlice = createSlice({
 
       state.token = action.payload.token;
     },
+    setUserPermissions: (state, action) => {
+      secureLocalStorage.setItem(
+        "userPermissions",
+        JSON.stringify(action.payload.permissions)
+      );
+
+      state.permissions = action.payload.permissions;
+    },
     logout: (state) => {
       secureLocalStorage.clear();
       state.user = null;
+      state.permissions = []; // Clear permissions
       state.token = null;
       state.two_factor = null;
       state.institution = null;
@@ -49,6 +60,6 @@ export const authSlice = createSlice({
   },
 });
 
-export const { setUser, logout, setUserToken } = authSlice.actions;
+export const { setUser, logout, setUserToken, setUserPermissions } = authSlice.actions;
 
 export default authSlice.reducer;
