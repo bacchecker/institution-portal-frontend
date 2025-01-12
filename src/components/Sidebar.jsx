@@ -93,7 +93,7 @@ function Sidebar() {
 
   return (
     <>
-      <div className="w-full h-[20vw] bg-white fixed top-0 flex justify-between items-center z-50 lg:z-0 display-no-md px-[5vw]">
+      <div className="w-full h-[20vw] bg-white fixed top-0 flex justify-between items-center z-10 lg:z-0 display-no-md px-[5vw]">
         <button
           onClick={() => handleDropdownToggle("hamburgermenu")}
           className="w-[11vw] h-[11vw] rounded-[50%] flex justify-center items-center border border-[#000]"
