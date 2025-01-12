@@ -9,6 +9,7 @@ function RevenueOverview() {
   const [currentScreen, setCurrentScreen] = useState(1);
   const lineRef = useRef(null);
   const [lineStyle, setLineStyle] = useState({ width: 0, left: 0 });
+  const isAdmin = JSON.parse(secureLocalStorage.getItem("userRole"))?.isAdmin;
 
   const user = JSON.parse(secureLocalStorage.getItem("user"));
   let permissions = secureLocalStorage.getItem('userPermissions') || [];
@@ -55,7 +56,7 @@ function RevenueOverview() {
     <>
       <Navbar />
       <div className="bg-white p-[1vw]">
-        {(permissions?.includes("document-requests.view") && permissions?.includes("verification-requests.view") && permissions?.includes("validation-requests.view")) ? (
+        {((permissions?.includes("document-requests.view") && permissions?.includes("verification-requests.view") && permissions?.includes("validation-requests.view")) || isAdmin) ? (
           <div className="flex justify-between items-center">
             <div className="w-[23%] bg-[#f8f8f8] p-[0.2vw] rounded-[0.4vw] border border-[#0000000f]">
               <div className="w-full bg-[#ffffff] border border-[#0000000f] rounded-[0.3vw] flex p-[0.5vw] items-center gap-[0.5vw]">

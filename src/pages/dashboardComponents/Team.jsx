@@ -148,7 +148,6 @@ function Team({ setActiveStep }) {
     }
   }, [isDeleteInstitutionUserSuccess]);
 
-  console.log("");
 
   return (
     <>

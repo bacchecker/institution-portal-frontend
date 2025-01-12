@@ -103,8 +103,7 @@ function Login() {
     const selectedTemplate = data?.data?.letter_template;
     const isAdmin = data?.data?.isAdmin;
 
-    console.log("isss", isAdmin);
-    
+
 
     if (user?.type?.toLowerCase() !== "user") {
       if (token) {
