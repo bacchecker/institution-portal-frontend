@@ -14,7 +14,6 @@ export default function ManageRequest() {
 
     const [docRequest, setDocRequest] = useState(0);
     const [valRequest, setValRequest] = useState(0);
-    const [verRequest, setVerRequest] = useState(0);
 
     useEffect(() => {
         const fetchPendingDocuments = async () => {
@@ -22,7 +21,6 @@ export default function ManageRequest() {
                 const response = await axios.get("/institution/requests/pending-documents");
                 setValRequest(response.data.valRequest || 0); // Fallback to 0 if undefined
                 setDocRequest(response.data.docRequest || 0);
-                setVerRequest(response.data.verRequest || 0);
             } catch (error) {
                 console.error("Error fetching data:", error);
             }
@@ -48,7 +46,8 @@ export default function ManageRequest() {
           variant="underlined"
         >
           {/* Conditionally render Tab components */}
-          {secureLocalStorage.getItem('userPermissions')?.includes('document-requests.view') && (
+          {(secureLocalStorage.getItem('userPermissions')?.includes('document-requests.view') || 
+            JSON.parse(secureLocalStorage.getItem('userRole'))?.isAdmin) && (
             <Tab
               key="document"
               title={
@@ -65,22 +64,24 @@ export default function ManageRequest() {
             </Tab>
           )}
 
-          {secureLocalStorage.getItem('userPermissions')?.includes('validation-requests.view') && (
-            <Tab
-              key="payment"
-              title={
-                <div className="flex items-center space-x-2">
-                  <IoShieldCheckmark size={20} />
-                  <span>Validation Request</span>
-                  <Chip size="sm" variant="faded">
-                    {valRequest}
-                  </Chip>
-                </div>
-              }
-            >
-              <ValidationRequest />
-            </Tab>
+          {(secureLocalStorage.getItem('userPermissions')?.includes('validation-requests.view') || 
+            JSON.parse(secureLocalStorage.getItem('userRole'))?.isAdmin) && (
+              <Tab
+                key="validation"
+                title={
+                  <div className="flex items-center space-x-2">
+                    <IoShieldCheckmark size={20} />
+                    <span>Validation Request</span>
+                    <Chip size="sm" variant="faded">
+                      {valRequest}
+                    </Chip>
+                  </div>
+                }
+              >
+                <ValidationRequest />
+              </Tab>
           )}
+
         </Tabs>
 
       </div>

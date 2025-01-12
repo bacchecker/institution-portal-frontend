@@ -62,7 +62,7 @@ export default function VerificationRequest() {
                 </div>
               }
             >
-              <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 lg:gap-5 px-4 pt-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 lg:gap-5 px-4 pt-4">
                 <div className="bg-black text-white rounded-lg p-5">
                   <div className="flex items-center justify-between">
                     <p className="text-lg">E-Check Subscription</p>

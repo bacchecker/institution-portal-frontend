@@ -866,7 +866,7 @@ function NewApplicationForm({
                     className="custom-dropdown-class display-md-none"
                   />
                 </div>
-                {item?.document_type_id && (
+                {/* {item?.document_type_id && (
                   <div className="md:mt-[2vw] mt-[10vw]">
                     <h4 className="md:text-[1vw] text-[4vw] mb-1">
                       Verification Fee
@@ -882,7 +882,7 @@ function NewApplicationForm({
                       />
                     </div>
                   </div>
-                )}
+                )} */}
                 <div className="md:mt-[2vw] mt-[8vw]">
                   <h4 className="md:text-[1vw] text-[4vw] mb-1">
                     Upload Document File
@@ -1014,7 +1014,7 @@ function NewApplicationForm({
                     />
                   </div>
                 </div>
-                <p className="text-sm font-medium mt-[2vw]">Security Question & Answer</p>
+                {/* <p className="text-sm font-medium mt-[2vw]">Security Question & Answer</p>
                 <div className="md:mt-[1vw] mt-[5vw]">
                   <h4 className="md:text-[1vw] text-[4vw] mb-1">
                     Question
@@ -1049,7 +1049,7 @@ function NewApplicationForm({
                 </div>
                 <h6 className="text-[#2e2e2e] md:text-[0.7vw] text-[2.7vw] font-[600] mt-[0.3vw]">
                   Document owner must answer this question before proceeding with approval or denial.
-                </h6>
+                </h6> */}
               </div>
               {items.length === 1 && (
                 <h6 className="text-[#2e2e2e] md:text-[0.7vw] text-[2.7vw] font-[600] mt-[0.3vw]">

@@ -608,11 +608,11 @@ export default function OutgoingRequests() {
         }
         isOpen={openDrawer}
         setIsOpen={setOpenDrawer}
-        classNames="w-[100vw] md:w-[45vw] z-10"
+        classNames="w-[100vw] md:w-[45vw] xl:w-[35vw] z-10"
         >
         <div className="h-full flex flex-col -mt-2 xl:pl-2 font-semibold justify-between">
             <div className="flex flex-col gap-2 mb-6">
-                <div className="grid grid-cols-3 gap-y-4 gap-x-2 border-b pb-4">
+                <div className="grid grid-cols-3 gap-y-3 gap-x-2 border-b pb-4">
                   <div className="text-gray-500">Request ID</div>
                   <div className="col-span-2">#{data?.unique_code}</div>
                   <div className="text-gray-500">Requested Date</div>
@@ -655,28 +655,45 @@ export default function OutgoingRequests() {
                       </p>
 
                   </div>
-                  <div className="text-gray-500">Document Fee</div>
-                  <div className="col-span-2">GH¢ {data?.total_amount}</div>
+                  {/* <div className="text-gray-500">Document Fee</div>
+                  <div className="col-span-2">GH¢ {data?.total_amount}</div> */}
                   </div>
-                  <div className="py-4">
-                  <p className="font-semibold mb-4 text-base">
-                      Verifying Institution
-                  </p>
-                  <div className="grid grid-cols-3 gap-y-4 border-b pb-4">
-                      <div className="text-gray-500">Institution Name</div>
-                      <div className="col-span-2">
-                      {data?.receiving_institution?.name}
-                      </div>
-                      <div className="text-gray-500">Institution Email</div>
-                      <div className="col-span-2">{data?.receiving_institution?.institution_email}</div>
-                      <div className="text-gray-500">Phone Number</div>
-                      <div className="col-span-2">{data?.receiving_institution?.helpline_contact}</div>
-                      <div className="text-gray-500 mt-2">Institution Logo</div>
-                      <div className="col-span-2 w-10 h-10 rounded-full bg-gray-200">
-                      <img src={`https://admin-dev.baccheck.online/storage/${data?.receiving_institution?.logo}`} alt="" />
-                      </div>
-                  </div>
-                </div>
+                  <div className="p">
+                    <p className="font-semibold mb-4 text-base">
+                        Document Owner
+                    </p>
+                    <div className="grid grid-cols-3 gap-y-3 border-b pb-4">
+                        <div className="text-gray-500">Full Name</div>
+                        <div className="col-span-2">
+                        {data?.doc_owner_full_name}
+                        </div>
+                        <div className="text-gray-500">Email Addres</div>
+                        <div className="col-span-2">{data?.doc_owner_email}</div>
+                        <div className="text-gray-500">Phone Number</div>
+                        <div className="col-span-2">{data?.doc_owner_phone}</div>
+                        <div className="text-gray-500">Date of Birth</div>
+                        <div className="col-span-2">{data?.doc_owner_dob}</div>
+                    </div>
+                  </div>  
+                  <div className="pb-4">
+                    <p className="font-semibold mb-4 text-base">
+                        Verifying Institution
+                    </p>
+                    <div className="grid grid-cols-3 gap-y-3 border-b pb-4">
+                        <div className="text-gray-500">Institution Name</div>
+                        <div className="col-span-2">
+                        {data?.receiving_institution?.name}
+                        </div>
+                        <div className="text-gray-500">Institution Email</div>
+                        <div className="col-span-2">{data?.receiving_institution?.institution_email}</div>
+                        <div className="text-gray-500">Phone Number</div>
+                        <div className="col-span-2">{data?.receiving_institution?.helpline_contact}</div>
+                        <div className="text-gray-500 mt-2">Institution Logo</div>
+                        <div className="col-span-2 w-10 h-10 rounded-full bg-gray-200">
+                        <img src={`https://admin-dev.baccheck.online/storage/${data?.receiving_institution?.logo}`} alt="" className="object-fit"/>
+                        </div>
+                    </div>
+                  </div>  
 
                 <div className="-mt-4">
                 <section className="mb-3 flex items-center justify-between">
@@ -700,7 +717,7 @@ export default function OutgoingRequests() {
                     </Button>
                 </section>
 
-                <section className="grid grid-cols-1 xl:grid-cols-2 gap-2">
+                <section className="grid grid-cols-1 gap-2">
                     <div className="gap-3 p-2 rounded-lg border">
                     <div className="w-full flex flex-col gap-1">
                         <p className="font-semibold">
