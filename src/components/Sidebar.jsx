@@ -18,6 +18,8 @@ function Sidebar() {
   const dispatch = useDispatch();
   const user = JSON?.parse(secureLocalStorage?.getItem("user"))?.user;
   const token = JSON?.parse(secureLocalStorage?.getItem("userToken"))?.token;
+  let permissions = secureLocalStorage.getItem('userPermissions') || [];
+  const isAdmin = JSON.parse(secureLocalStorage.getItem("userRole"))?.isAdmin;
 
   const handleDropdownToggle = (dropdownId) => {
     setActiveDropdown(activeDropdown === dropdownId ? null : dropdownId);
@@ -37,10 +39,10 @@ function Sidebar() {
 
   const handleMenuClick = async () => {
     const subscription = await fetchSubscription(); // Fetch the latest subscription data
-  
+
     // Ensure total_credit is 0 if subscription is empty or doesn't have total_credit
     const totalCredit = subscription?.total_credit || 0;
-  
+
     if (totalCredit < 5) {
       navigate('/subscription-plans'); // Redirect to subscription plan page
     } else {
@@ -116,8 +118,8 @@ function Sidebar() {
       </div>
       <div
         className={`md:w-[18%] fixed md:left-0 left-[-100%] top-0 bottom-0 bg-[#f8f8f8] border-r-2 border-[#E5E5E5] z-[1001] md:z-0 w-full flex md:flex-col flex-col-reverse nav-mobile ${(activeDropdown === "hamburgermenu" ||
-            activeDropdown === "support" ||
-            activeDropdown === "service") &&
+          activeDropdown === "support" ||
+          activeDropdown === "service") &&
           "open1"
           }`}
       >
@@ -138,47 +140,46 @@ function Sidebar() {
           <div className="w-full h-[100%] overflow-auto">
             <div className="h-[70%] overflow-auto md:px-[1.5vw] px-[5vw] sidebar-menu">
               <ul className="flex flex-col gap-[0.7vw] mt-[2vw] item-list">
-                
-                  <li>
-                    <Link
-                      to="/dashboard"
-                      onClick={() => handleDropdownToggle("close")}
-                      className={`flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[15vw] md:rounded-[0.3vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] ${pathname === "/dashboard" && "active"
-                        }`}
-                    >
-                      <i class="bx bxs-dashboard md:text-[1.3vw] text-[5vw] menu-icon"></i>
-                      <span className="md:text-[1.1vw] text-[4vw] link">
-                        Dashboard
-                      </span>
-                    </Link>
-                  </li>
-                
-                <PermissionWrapper permission={['document-requests.view', 'validation-requests.view']}>
+
                 <li>
                   <Link
-                    to="/manage-document"
+                    to="/dashboard"
                     onClick={() => handleDropdownToggle("close")}
-                    className={`flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[15vw] md:rounded-[0.3vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] ${pathname.includes("manage-document") && "active"
+                    className={`flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[15vw] md:rounded-[0.3vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] ${pathname === "/dashboard" && "active"
                       }`}
                   >
-                    <i class="bx bxs-file md:text-[1.3vw] text-[5vw] menu-icon"></i>
+                    <i class="bx bxs-dashboard md:text-[1.3vw] text-[5vw] menu-icon"></i>
                     <span className="md:text-[1.1vw] text-[4vw] link">
-                      Manage Document
+                      Dashboard
                     </span>
                   </Link>
                 </li>
+
+                <PermissionWrapper permission={['document-requests.view', 'validation-requests.view']}>
+                  <li>
+                    <Link
+                      to="/manage-document"
+                      onClick={() => handleDropdownToggle("close")}
+                      className={`flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[15vw] md:rounded-[0.3vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] ${pathname.includes("manage-document") && "active"
+                        }`}
+                    >
+                      <i class="bx bxs-file md:text-[1.3vw] text-[5vw] menu-icon"></i>
+                      <span className="md:text-[1.1vw] text-[4vw] link">
+                        Manage Document
+                      </span>
+                    </Link>
+                  </li>
                 </PermissionWrapper>
                 <PermissionWrapper permission={['verification-requests.view']}>
                   <li>
-                  <Link
-                    onClick={() => {
-                      handleMenuClick(); // Call the first function
-                      handleDropdownToggle("close"); // Call the second function
-                    }}
-                    className={`flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[10vw] md:rounded-[0.3vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] ${
-                      pathname.includes("e-check") || pathname.includes("subscription-plans") ? "active" : ""
-                    }`}
-                  >
+                    <Link
+                      onClick={() => {
+                        handleMenuClick(); // Call the first function
+                        handleDropdownToggle("close"); // Call the second function
+                      }}
+                      className={`flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[10vw] md:rounded-[0.3vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] ${pathname.includes("e-check") || pathname.includes("subscription-plans") ? "active" : ""
+                        }`}
+                    >
                       <i class="bx bxs-check-shield md:text-[1.3vw] text-[5vw] menu-icon"></i>
                       <span className="md:text-[1.1vw] text-[4vw] link">
                         E-Check
@@ -186,7 +187,6 @@ function Sidebar() {
                     </Link>
                   </li>
                 </PermissionWrapper>
-                
                 <PermissionWrapper permission={['institution.payments.view']}>
                   <li>
                     <Link
@@ -217,7 +217,7 @@ function Sidebar() {
                     </Link>
                   </li>
                 </PermissionWrapper>
-                <PermissionWrapper permission={['institution.reports.view']}>
+                {((permissions?.includes("institution.reports.view") && (permissions.includes("document-requests.view") || permissions.includes("validation-requests.view") || permissions.includes("verification-requests.view"))) || isAdmin) && (
                   <li>
                     <Link
                       to="/reports"
@@ -231,7 +231,8 @@ function Sidebar() {
                       </span>
                     </Link>
                   </li>
-                </PermissionWrapper>
+                )}
+
                 <PermissionWrapper permission={['institution.settings.view']}>
                   <li>
                     <Link
@@ -262,7 +263,7 @@ function Sidebar() {
                     </Link>
                   </li>
                 </PermissionWrapper>
-                
+
                 {/* <li>
                   <Link
                     to="/profile"
@@ -291,8 +292,8 @@ function Sidebar() {
             </button>
             <div
               className={`mb-[1vw] side-show ${activeDropdown === "signout"
-                  ? "sidemenu-h"
-                  : "sidemenu-h-active"
+                ? "sidemenu-h"
+                : "sidemenu-h-active"
                 }`}
               ref={(el) => (dropdownRefs.current["signout"] = el)}
               style={{

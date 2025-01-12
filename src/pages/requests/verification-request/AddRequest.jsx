@@ -179,7 +179,6 @@ function NewApplicationForm({
         );
       }
   
-      console.log("Filtered Institutions:", filteredInstitutions);
   
       if (userAffiliations?.affiliations?.length > 0) {
         const institutionIds = userAffiliations?.affiliations?.map(

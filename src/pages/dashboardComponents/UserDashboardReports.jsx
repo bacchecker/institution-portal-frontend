@@ -4,7 +4,7 @@ import secureLocalStorage from "react-secure-storage";
 import DashboardDocumentRequestReport from "./DashboardDocumentRequestReport";
 import DashboardValidationRequestReports from "./DashboardValidationRequestReports";
 
-function UserDashboardReports({ clickedDefaultItems, dashboardScreens, permissions }) {
+function UserDashboardReports({ permissions }) {
     const [currentScreen1, setCurrentScreen1] = useState(1);
     const lineRef1 = useRef(null);
     const [lineStyle, setLineStyle] = useState({ width: 0, left: 0 });

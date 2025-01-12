@@ -4,29 +4,21 @@ import Team from "./dashboardComponents/Team";
 import DashboardDocumentRequests from "./dashboardComponents/DashboardDocumentRequests";
 import Navbar from "@/components/Navbar";
 import {
-    useGetAllPermissionsQuery,
     useGetDashboardAnalyticsQuery,
     useGetInstitutionRevenueGraphQuery,
     useGetRevenuePercentageQuery,
 } from "../redux/apiSlice";
 import RevenueGraph from "./dashboardComponents/RevenueGraph";
-import { useDispatch } from "react-redux";
 import DashboardValidationRequest from "./dashboardComponents/DashboardValidationRequest";
 import DashboardSupportTickets from "./dashboardComponents/DashboardSupportTickets";
-import DashboardReports from "./dashboardComponents/DashboardReports";
 import UserDashboardReports from "./dashboardComponents/UserDashboardReports";
 
 function UserDashboard() {
     const user = JSON.parse(secureLocalStorage.getItem("user"));
     const [currentScreen, setCurrentScreen] = useState(1);
-    const dispatch = useDispatch()
     const lineRef = useRef(null);
     const [lineStyle, setLineStyle] = useState({ width: 0, left: 0 });
-    const [clickedDefaultItems, setClickedDefaultItems] = useState([]);
-    const cleanedString = user?.institution?.dashboard_screens
-        ? user?.institution?.dashboard_screens.replace(/[^\x20-\x7E]/g, '')
-        : '["/revenue"]';
-    const dashboardScreens = JSON.parse(cleanedString);
+
     let permissions = secureLocalStorage.getItem('userPermissions') || [];
 
 
@@ -48,15 +40,6 @@ function UserDashboard() {
             });
         }
     }, [currentScreen]);
-
-    const {
-        data: allPermissions,
-        isLoading: isAllPermissionsLoading,
-        isFetching: isAllPermissionsFetching,
-    } = useGetAllPermissionsQuery();
-
-    console.log("all", allPermissions);
-
 
 
 
@@ -85,12 +68,11 @@ function UserDashboard() {
             setCurrentScreen(1)
         } else if (permissions.includes("document-requests.view") && permissions.includes("validation-requests.view")) {
             setCurrentScreen(1)
-        } else if (!permissions.includes("document-requests.view") && !permissions.includes("validation-requests.view")) {
+        } else if (!permissions.includes("document-requests.view") && permissions.includes("validation-requests.view")) {
             setCurrentScreen(2)
         }
     }, [permissions])
 
-    console.log("permiss", permissions);
 
 
     return (
@@ -464,7 +446,7 @@ function UserDashboard() {
                 )}
                 {(permissions?.includes("institution.reports.view") && (permissions.includes("document-requests.view") || permissions.includes("validation-requests.view"))) && (
                     <div className="w-full md:h-[40vw] mt-[6vw] h-[100vw] md:mt-[2vw] border md:rounded-[0.4vw] rounded-[1.1vw] border-[#0000000f] overflow-hidden">
-                        <UserDashboardReports clickedDefaultItems={clickedDefaultItems} dashboardScreens={dashboardScreens} permissions={permissions} />
+                        <UserDashboardReports permissions={permissions} />
                     </div>
                 )}
             </div>
