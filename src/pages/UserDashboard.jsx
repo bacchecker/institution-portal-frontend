@@ -4,23 +4,17 @@ import Team from "./dashboardComponents/Team";
 import DashboardDocumentRequests from "./dashboardComponents/DashboardDocumentRequests";
 import Navbar from "@/components/Navbar";
 import {
-    useCustomizeDashboardMutation,
     useGetAllPermissionsQuery,
     useGetDashboardAnalyticsQuery,
     useGetInstitutionRevenueGraphQuery,
     useGetRevenuePercentageQuery,
 } from "../redux/apiSlice";
 import RevenueGraph from "./dashboardComponents/RevenueGraph";
-import Dropdown from "../components/Dropdown";
-import LoadItems from "../components/LoadItems";
-import LoadingPage from "../components/LoadingPage";
-import { toast } from "sonner";
-import { setUser } from "../redux/authSlice";
 import { useDispatch } from "react-redux";
 import DashboardValidationRequest from "./dashboardComponents/DashboardValidationRequest";
 import DashboardSupportTickets from "./dashboardComponents/DashboardSupportTickets";
 import DashboardReports from "./dashboardComponents/DashboardReports";
-import PermissionWrapper from "../components/permissions/PermissionWrapper";
+import UserDashboardReports from "./dashboardComponents/UserDashboardReports";
 
 function UserDashboard() {
     const user = JSON.parse(secureLocalStorage.getItem("user"));
@@ -33,6 +27,7 @@ function UserDashboard() {
         ? user?.institution?.dashboard_screens.replace(/[^\x20-\x7E]/g, '')
         : '["/revenue"]';
     const dashboardScreens = JSON.parse(cleanedString);
+    let permissions = secureLocalStorage.getItem('userPermissions') || [];
 
 
 
@@ -85,7 +80,16 @@ function UserDashboard() {
     } = useGetInstitutionRevenueGraphQuery();
 
 
-    let permissions = secureLocalStorage.getItem('userPermissions') || [];
+    useEffect(() => {
+        if (permissions.includes("document-requests.view") && !permissions.includes("validation-requests.view")) {
+            setCurrentScreen(1)
+        } else if (permissions.includes("document-requests.view") && permissions.includes("validation-requests.view")) {
+            setCurrentScreen(1)
+        } else if (!permissions.includes("document-requests.view") && !permissions.includes("validation-requests.view")) {
+            setCurrentScreen(2)
+        }
+    }, [permissions])
+
     console.log("permiss", permissions);
 
 
@@ -385,15 +389,27 @@ function UserDashboard() {
                     <></>
                 )}
 
-                <div className="flex flex-sm-col w-full md:mt-[2vw] mt-[6vw] justify-between">
-                    <div className="md:w-[58%] w-full md:h-[26vw] border md:rounded-[0.4vw] rounded-[1.1vw] border-[#0000000f]">
-                        <RevenueGraph revenueGraph={revenueGraph} />
+                {permissions?.includes("institution.dashboard.revenue-stats") && permissions?.includes("institution.users.view") && (
+                    <div className="flex flex-sm-col w-full md:mt-[2vw] mt-[6vw] justify-between">
+                        <div className="md:w-[58%] w-full md:h-[26vw] border md:rounded-[0.4vw] rounded-[1.1vw] border-[#0000000f]">
+                            <RevenueGraph revenueGraph={revenueGraph} />
+                        </div>
+                        <div className="md:w-[40%] w-full md:h-[26vw] md:mt-0 mt-[6vw] h-[100vw] border md:rounded-[0.4vw] rounded-[1.1vw] border-[#0000000f overflow-hidden">
+                            <Team />
+                        </div>
                     </div>
-                    <div className="md:w-[40%] w-full md:h-[26vw] md:mt-0 mt-[6vw] h-[100vw] border md:rounded-[0.4vw] rounded-[1.1vw] border-[#0000000f overflow-hidden">
-                        <Team />
+                )}
+                {permissions?.includes("institution.dashboard.revenue-stats") && !permissions?.includes("institution.users.view") && (
+                    <div className="flex flex-sm-col w-full md:mt-[2vw] mt-[6vw] justify-between">
+                        <div className="md:w-full w-full md:h-[26vw] border md:rounded-[0.4vw] rounded-[1.1vw] border-[#0000000f]">
+                            <RevenueGraph revenueGraph={revenueGraph} />
+                        </div>
+                        {/* <div className="md:w-[40%] w-full md:h-[26vw] md:mt-0 mt-[6vw] h-[100vw] border md:rounded-[0.4vw] rounded-[1.1vw] border-[#0000000f overflow-hidden">
+                            <Team />
+                        </div> */}
                     </div>
-                </div>
-                {(clickedDefaultItems.includes("validation") || dashboardScreens.includes("validation")) && (
+                )}
+                {(permissions?.includes("document-requests.view") && permissions?.includes("validation-requests.view")) && (
                     <div className="w-full border-b border-[#d5d6d6] flex md:mt-[3vw] mt-[8vw] md:gap-[2vw] gap-[6vw] relative">
                         <button
                             className={`md:text-[1vw] text-[3.5vw] tab_button py-[0.3vw] ${currentScreen === 1 && "active-button"
@@ -431,22 +447,24 @@ function UserDashboard() {
                         ></div>
                     </div>
                 )}
-                <div className="w-full md:h-[40vw] mt-[6vw] h-[100vw] md:mt-[2vw] border md:rounded-[0.4vw] rounded-[1.1vw] border-[#0000000f] overflow-hidden">
-                    {currentScreen === 1 && (
-                        <DashboardDocumentRequests />
-                    )}
-                    {currentScreen === 2 && (
-                        <DashboardValidationRequest />
-                    )}
-                </div>
-                {(clickedDefaultItems.includes("support") || dashboardScreens.includes("support")) && (
+                {(permissions.includes("document-requests.view") || permissions.includes("validation-requests.view")) && (
+                    <div className="w-full md:h-[40vw] mt-[6vw] h-[100vw] md:mt-[2vw] border md:rounded-[0.4vw] rounded-[1.1vw] border-[#0000000f] overflow-hidden">
+                        {currentScreen === 1 && (
+                            <DashboardDocumentRequests />
+                        )}
+                        {currentScreen === 2 && (
+                            <DashboardValidationRequest />
+                        )}
+                    </div>
+                )}
+                {permissions?.includes("institution.tickets.view") && (
                     <div className="w-full md:h-[40vw] mt-[6vw] h-[100vw] md:mt-[2vw] border md:rounded-[0.4vw] rounded-[1.1vw] border-[#0000000f] overflow-hidden">
                         <DashboardSupportTickets />
                     </div>
                 )}
-                {(clickedDefaultItems.includes("reports_validation_requests") || dashboardScreens.includes("reports_validation_requests") || clickedDefaultItems.includes("reports_document_requests") || dashboardScreens.includes("reports_document_requests")) && (
+                {(permissions?.includes("institution.reports.view") && (permissions.includes("document-requests.view") || permissions.includes("validation-requests.view"))) && (
                     <div className="w-full md:h-[40vw] mt-[6vw] h-[100vw] md:mt-[2vw] border md:rounded-[0.4vw] rounded-[1.1vw] border-[#0000000f] overflow-hidden">
-                        <DashboardReports clickedDefaultItems={clickedDefaultItems} dashboardScreens={dashboardScreens} />
+                        <UserDashboardReports clickedDefaultItems={clickedDefaultItems} dashboardScreens={dashboardScreens} permissions={permissions} />
                     </div>
                 )}
             </div>
