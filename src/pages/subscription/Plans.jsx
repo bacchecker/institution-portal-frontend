@@ -86,7 +86,7 @@ export default function Plans() {
     <div title="Subscription Plan" className="bg-white">
     <Navbar />
       <div className="">
-        <div className="bg-white rounded-lg p-4 lg:p-10">
+        <div className="bg-white rounded-lg p-2 lg:p-10">
           <div className="w-full rounded-lg border-t-4 border-bChkRed p-5 shadow bg-yellow-50 font-normal text-sm">
             <p className="uppercase font-semibold text-lg text-black mb-2">Simplifying Document Verification</p>
             <div className="flex lg:flex-row flex-col space-y-2 items-center lg:justify-between">
@@ -199,13 +199,13 @@ export default function Plans() {
               {plans.map((plan) => (
                 <div
                   key={plan.id}
-                  className="rounded-xl shadow-md shadow-gray-400 px-5 py-7"
+                  className="rounded-xl shadow-md shadow-gray-400 px-3 lg:px-5 py-5 lg:py-7"
                 >
                   <div className="flex space-x-2 items-center">
                     <div className="w-2.5 h-2.5 rounded-full bg-bChkRed"></div>
                     <p>{plan.name}</p>
                   </div>
-                  <p className="text-3xl font-semibold text-black mt-2">
+                  <p className="text-lg lg:text-2xl xl:text-3xl font-semibold text-black mt-2">
                     GH₵ <span>{(plan?.amount)}</span>
                   </p>
                   <div className="flex flex-col space-y-1 mt-4">

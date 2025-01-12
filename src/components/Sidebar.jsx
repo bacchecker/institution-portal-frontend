@@ -93,7 +93,7 @@ function Sidebar() {
 
   return (
     <>
-      <div className="w-full h-[20vw] bg-white fixed top-0 flex justify-between items-center z-0 display-no-md px-[5vw]">
+      <div className="w-full h-[20vw] bg-white fixed top-0 flex justify-between items-center z-50 lg:z-0 display-no-md px-[5vw]">
         <button
           onClick={() => handleDropdownToggle("hamburgermenu")}
           className="w-[11vw] h-[11vw] rounded-[50%] flex justify-center items-center border border-[#000]"
@@ -170,12 +170,15 @@ function Sidebar() {
                 </PermissionWrapper>
                 <PermissionWrapper permission={['verification-requests.view']}>
                   <li>
-                    <Link
-                      onClick={handleMenuClick}
-                      className={`flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[10vw] md:rounded-[0.3vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] ${
-                        pathname.includes("e-check") && "active"
-                      }`}
-                    >
+                  <Link
+                    onClick={() => {
+                      handleMenuClick(); // Call the first function
+                      handleDropdownToggle("close"); // Call the second function
+                    }}
+                    className={`flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[10vw] md:rounded-[0.3vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] ${
+                      pathname.includes("e-check") || pathname.includes("subscription-plans") ? "active" : ""
+                    }`}
+                  >
                       <i class="bx bxs-check-shield md:text-[1.3vw] text-[5vw] menu-icon"></i>
                       <span className="md:text-[1.1vw] text-[4vw] link">
                         E-Check
