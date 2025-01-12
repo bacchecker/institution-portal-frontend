@@ -5,6 +5,7 @@ import DashboardDocumentRequests from "./dashboardComponents/DashboardDocumentRe
 import Navbar from "@/components/Navbar";
 import {
     useCustomizeDashboardMutation,
+    useGetAllPermissionsQuery,
     useGetDashboardAnalyticsQuery,
     useGetInstitutionRevenueGraphQuery,
     useGetRevenuePercentageQuery,
@@ -19,6 +20,7 @@ import { useDispatch } from "react-redux";
 import DashboardValidationRequest from "./dashboardComponents/DashboardValidationRequest";
 import DashboardSupportTickets from "./dashboardComponents/DashboardSupportTickets";
 import DashboardReports from "./dashboardComponents/DashboardReports";
+import PermissionWrapper from "../components/permissions/PermissionWrapper";
 
 function UserDashboard() {
     const user = JSON.parse(secureLocalStorage.getItem("user"));
@@ -26,7 +28,6 @@ function UserDashboard() {
     const dispatch = useDispatch()
     const lineRef = useRef(null);
     const [lineStyle, setLineStyle] = useState({ width: 0, left: 0 });
-    const [clickedItems, setClickedItems] = useState([]);
     const [clickedDefaultItems, setClickedDefaultItems] = useState([]);
     const cleanedString = user?.institution?.dashboard_screens
         ? user?.institution?.dashboard_screens.replace(/[^\x20-\x7E]/g, '')
@@ -53,24 +54,15 @@ function UserDashboard() {
         }
     }, [currentScreen]);
 
+    const {
+        data: allPermissions,
+        isLoading: isAllPermissionsLoading,
+        isFetching: isAllPermissionsFetching,
+    } = useGetAllPermissionsQuery();
+
+    console.log("all", allPermissions);
 
 
-    useEffect(() => {
-        if (dashboardScreens) {
-            setClickedItems(dashboardScreens)
-        }
-    }, [])
-
-    const handleItemClick = (item) => {
-        setClickedItems((prevItems) =>
-            prevItems.includes(item)
-                ? prevItems.filter((i) => i !== item)
-                : [...prevItems, item]
-        );
-    };
-
-
-    const isItemClicked = (item) => clickedItems.includes(item);
 
 
 
@@ -93,119 +85,306 @@ function UserDashboard() {
     } = useGetInstitutionRevenueGraphQuery();
 
 
-
-
-
+    let permissions = secureLocalStorage.getItem('userPermissions') || [];
+    console.log("permiss", permissions);
 
 
     return (
         <>
             <Navbar />
             <div className="bg-white md:p-[1vw] p-[5vw]">
-                <div className="flex flex-sm-col justify-between md:items-center">
-                    <h1 className="md:text-[1.7vw] text-[4.2vw]">
-                        Welcome, {user?.user?.first_name} {user?.user?.other_name}{" "}
-                        {user?.user?.last_name}
-                    </h1>
-                </div>
-                <div className="flex flex-sm-col justify-between items-center mt-[2vw] gap-[4vw] md:gap-0">
-                    <div className="md:w-[32%] w-full bg-[#f8f8f8] md:p-[0.2vw] p-[1vw] md:rounded-[0.4vw] rounded-[1.1vw] border border-[#0000000f]">
-                        <div className="w-full bg-[#ffffff] border border-[#0000000f] md:rounded-[0.3vw] rounded-[1vw] flex md:p-[0.5vw] p-[2vw] items-center md:gap-[0.5vw] gap-[1vw]">
-                            <div className="md:w-[3vw] md:h-[3vw] w-[10vw] h-[10vw] bg-[#ff0404] md:rounded-[0.2vw] rounded-[0.8vw] flex items-center justify-center">
-                                <img src="/assets/img/docx.svg" alt="" className="md:w-[1.5vw] w-[5vw]" />
-                            </div>
-                            <div className="flex flex-col">
-                                <h4 className="md:text-[1.5vw] text-[4vw] font-[600]">
-                                    {parseInt(
-                                        revenuePercentage?.document_requests?.current_month_count ??
-                                        0
-                                    ).toLocaleString()}
+                {!permissions?.includes("document-requests.view") && !permissions?.includes("verification-requests.view") && !permissions?.includes("validation-requests.view") && (
+                    <div className="flex flex-sm-col justify-between md:items-center">
+                        <h1 className="md:text-[1.7vw] text-[4.2vw]">
+                            Welcome, {user?.user?.first_name} {user?.user?.other_name}{" "}
+                            {user?.user?.last_name}
+                        </h1>
+                    </div>
+                )}
+                {(permissions?.includes("document-requests.view") && permissions?.includes("verification-requests.view") && permissions?.includes("validation-requests.view")) ? (
+                    <>
+                        <div className="flex flex-sm-col justify-between md:items-center">
+                            <h1 className="md:text-[1.7vw] text-[4.2vw]">
+                                Welcome, {user?.user?.first_name} {user?.user?.other_name}{" "}
+                                {user?.user?.last_name}
+                            </h1>
+                        </div>
+                        <div className="flex flex-sm-col justify-between items-center mt-[2vw] gap-[4vw] md:gap-0">
+                            <div className="md:w-[32%] w-full bg-[#f8f8f8] md:p-[0.2vw] p-[1vw] md:rounded-[0.4vw] rounded-[1.1vw] border border-[#0000000f]">
+                                <div className="w-full bg-[#ffffff] border border-[#0000000f] md:rounded-[0.3vw] rounded-[1vw] flex md:p-[0.5vw] p-[2vw] items-center md:gap-[0.5vw] gap-[1vw]">
+                                    <div className="md:w-[3vw] md:h-[3vw] w-[10vw] h-[10vw] bg-[#ff0404] md:rounded-[0.2vw] rounded-[0.8vw] flex items-center justify-center">
+                                        <img src="/assets/img/docx.svg" alt="" className="md:w-[1.5vw] w-[5vw]" />
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <h4 className="md:text-[1.5vw] text-[4vw] font-[600]">
+                                            {parseInt(
+                                                revenuePercentage?.document_requests?.current_month_count ??
+                                                0
+                                            ).toLocaleString()}
+                                        </h4>
+                                        <h4
+                                            className={`md:text-[0.8vw] text-[3.5vw]  ${revenuePercentage?.document_requests?.percentage_change >= 0
+                                                ? "text-[#27CA40]"
+                                                : "text-[#ff0404]"
+                                                }`}
+                                        >
+                                            {parseFloat(
+                                                revenuePercentage?.document_requests?.percentage_change ?? 0
+                                            ).toFixed(2)}
+                                            % Previous Month
+                                        </h4>
+                                    </div>
+                                </div>
+                                <h4 className="md:text-[0.9vw] text-[3vw] md:mt-[0.5vw] mt-[1vw] mb-[0.3vw]">
+                                    Total Document Request
                                 </h4>
-                                <h4
-                                    className={`md:text-[0.8vw] text-[3.5vw]  ${revenuePercentage?.document_requests?.percentage_change >= 0
-                                        ? "text-[#27CA40]"
-                                        : "text-[#ff0404]"
-                                        }`}
-                                >
-                                    {parseFloat(
-                                        revenuePercentage?.document_requests?.percentage_change ?? 0
-                                    ).toFixed(2)}
-                                    % Previous Month
+                            </div>
+
+                            <div className="md:w-[32%] w-full bg-[#f8f8f8] md:p-[0.2vw] p-[1vw] md:rounded-[0.4vw] rounded-[1.1vw] border border-[#0000000f]">
+                                <div className="w-full bg-[#ffffff] border border-[#0000000f] md:rounded-[0.3vw] rounded-[1vw] flex md:p-[0.5vw] p-[2vw] items-center md:gap-[0.5vw] gap-[1vw]">
+                                    <div className="md:w-[3vw] md:h-[3vw] w-[10vw] h-[10vw] bg-[#EC7AFF] md:rounded-[0.2vw] rounded-[0.8vw] flex items-center justify-center">
+                                        <img src="/assets/img/docx.svg" alt="" className="md:w-[1.5vw] w-[5vw]" />
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <h4 className="md:text-[1.5vw] text-[4vw] font-[600]">
+                                            {parseInt(
+                                                revenuePercentage?.validation_requests
+                                                    ?.current_month_count ?? 0
+                                            ).toLocaleString()}
+                                        </h4>
+                                        <h4
+                                            className={`md:text-[0.8vw] text-[3.5vw]  ${revenuePercentage?.validation_requests?.percentage_change >=
+                                                0
+                                                ? "text-[#27CA40]"
+                                                : "text-[#ff0404]"
+                                                }`}
+                                        >
+                                            {parseFloat(
+                                                revenuePercentage?.validation_requests?.percentage_change ??
+                                                0
+                                            ).toFixed(2)}
+                                            % Previous Month
+                                        </h4>
+                                    </div>
+                                </div>
+                                <h4 className="md:text-[0.9vw] text-[3vw] md:mt-[0.5vw] mt-[1vw] mb-[0.3vw]">
+                                    Total Validation Request
+                                </h4>
+                            </div>
+                            <div className="md:w-[32%] w-full bg-[#f8f8f8] md:p-[0.2vw] p-[1vw] md:rounded-[0.4vw] rounded-[1.1vw] border border-[#0000000f]">
+                                <div className="w-full bg-[#ffffff] border border-[#0000000f] md:rounded-[0.3vw] rounded-[1vw] flex md:p-[0.5vw] p-[2vw] items-center md:gap-[0.5vw] gap-[1vw]">
+                                    <div className="md:w-[3vw] md:h-[3vw] w-[10vw] h-[10vw] bg-[#FFC130] md:rounded-[0.2vw] rounded-[0.8vw] flex items-center justify-center">
+                                        <img src="/assets/img/docx.svg" alt="" className="md:w-[1.5vw] w-[5vw]" />
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <h4 className="md:text-[1.5vw] text-[4vw] font-[600]">0</h4>
+                                        <h4 className="md:text-[0.8vw] text-[3.5vw] text-[#27CA40]">
+                                            0.00% Previous Month
+                                        </h4>
+                                    </div>
+                                </div>
+                                <h4 className="md:text-[0.9vw] text-[3vw] md:mt-[0.5vw] mt-[1vw] mb-[0.3vw]">
+                                    Total Verification Request
                                 </h4>
                             </div>
                         </div>
-                        <h4 className="md:text-[0.9vw] text-[3vw] md:mt-[0.5vw] mt-[1vw] mb-[0.3vw]">
-                            Total Document Request
-                        </h4>
-                    </div>
-                    <div className="md:w-[32%] w-full bg-[#f8f8f8] md:p-[0.2vw] p-[1vw] md:rounded-[0.4vw] rounded-[1.1vw] border border-[#0000000f]">
-                        <div className="w-full bg-[#ffffff] border border-[#0000000f] md:rounded-[0.3vw] rounded-[1vw] flex md:p-[0.5vw] p-[2vw] items-center md:gap-[0.5vw] gap-[1vw]">
-                            <div className="md:w-[3vw] md:h-[3vw] w-[10vw] h-[10vw] bg-[#EC7AFF] md:rounded-[0.2vw] rounded-[0.8vw] flex items-center justify-center">
-                                <img src="/assets/img/docx.svg" alt="" className="md:w-[1.5vw] w-[5vw]" />
-                            </div>
-                            <div className="flex flex-col">
-                                <h4 className="md:text-[1.5vw] text-[4vw] font-[600]">
-                                    {parseInt(
-                                        revenuePercentage?.validation_requests
-                                            ?.current_month_count ?? 0
-                                    ).toLocaleString()}
-                                </h4>
-                                <h4
-                                    className={`md:text-[0.8vw] text-[3.5vw]  ${revenuePercentage?.validation_requests?.percentage_change >=
-                                        0
-                                        ? "text-[#27CA40]"
-                                        : "text-[#ff0404]"
-                                        }`}
-                                >
-                                    {parseFloat(
-                                        revenuePercentage?.validation_requests?.percentage_change ??
-                                        0
-                                    ).toFixed(2)}
-                                    % Previous Month
-                                </h4>
-                            </div>
+                    </>
+                ) : ((!permissions?.includes("document-requests.view") && permissions?.includes("verification-requests.view") && permissions?.includes("validation-requests.view")) ||
+                    (permissions?.includes("document-requests.view") && !permissions?.includes("verification-requests.view") && permissions?.includes("validation-requests.view")) ||
+                    (permissions?.includes("document-requests.view") && permissions?.includes("verification-requests.view") && !permissions?.includes("validation-requests.view"))) ? (
+                    <div className="flex w-full justify-between items-start">
+                        <div className="flex flex-sm-col justify-between md:items-center w-[40%]">
+                            <h1 className="md:text-[1.7vw] text-[4.2vw]">
+                                Welcome, {user?.user?.first_name} {user?.user?.other_name}{" "}
+                                {user?.user?.last_name}
+                            </h1>
                         </div>
-                        <h4 className="md:text-[0.9vw] text-[3vw] md:mt-[0.5vw] mt-[1vw] mb-[0.3vw]">
-                            Total Validation Request
-                        </h4>
-                    </div>
-                    <div className="md:w-[32%] w-full bg-[#f8f8f8] md:p-[0.2vw] p-[1vw] md:rounded-[0.4vw] rounded-[1.1vw] border border-[#0000000f]">
-                        <div className="w-full bg-[#ffffff] border border-[#0000000f] md:rounded-[0.3vw] rounded-[1vw] flex md:p-[0.5vw] p-[2vw] items-center md:gap-[0.5vw] gap-[1vw]">
-                            <div className="md:w-[3vw] md:h-[3vw] w-[10vw] h-[10vw] bg-[#FFC130] md:rounded-[0.2vw] rounded-[0.8vw] flex items-center justify-center">
-                                <img src="/assets/img/docx.svg" alt="" className="md:w-[1.5vw] w-[5vw]" />
-                            </div>
-                            <div className="flex flex-col">
-                                <h4 className="md:text-[1.5vw] text-[4vw] font-[600]">0</h4>
-                                <h4 className="md:text-[0.8vw] text-[3.5vw] text-[#27CA40]">
-                                    0.00% Previous Month
-                                </h4>
-                            </div>
+                        <div className="flex flex-sm-col justify-end items-center gap-[4vw] md:gap-[2vw] w-[60%]">
+                            {permissions?.includes("document-requests.view") && (
+                                <div className="md:w-[48%] w-full bg-[#f8f8f8] md:p-[0.2vw] p-[1vw] md:rounded-[0.4vw] rounded-[1.1vw] border border-[#0000000f]">
+                                    <div className="w-full bg-[#ffffff] border border-[#0000000f] md:rounded-[0.3vw] rounded-[1vw] flex md:p-[0.5vw] p-[2vw] items-center md:gap-[0.5vw] gap-[1vw]">
+                                        <div className="md:w-[3vw] md:h-[3vw] w-[10vw] h-[10vw] bg-[#ff0404] md:rounded-[0.2vw] rounded-[0.8vw] flex items-center justify-center">
+                                            <img src="/assets/img/docx.svg" alt="" className="md:w-[1.5vw] w-[5vw]" />
+                                        </div>
+                                        <div className="flex flex-col">
+                                            <h4 className="md:text-[1.5vw] text-[4vw] font-[600]">
+                                                {parseInt(
+                                                    revenuePercentage?.document_requests?.current_month_count ??
+                                                    0
+                                                ).toLocaleString()}
+                                            </h4>
+                                            <h4
+                                                className={`md:text-[0.8vw] text-[3.5vw]  ${revenuePercentage?.document_requests?.percentage_change >= 0
+                                                    ? "text-[#27CA40]"
+                                                    : "text-[#ff0404]"
+                                                    }`}
+                                            >
+                                                {parseFloat(
+                                                    revenuePercentage?.document_requests?.percentage_change ?? 0
+                                                ).toFixed(2)}
+                                                % Previous Month
+                                            </h4>
+                                        </div>
+                                    </div>
+                                    <h4 className="md:text-[0.9vw] text-[3vw] md:mt-[0.5vw] mt-[1vw] mb-[0.3vw]">
+                                        Total Document Request
+                                    </h4>
+                                </div>
+                            )}
+                            {permissions?.includes("validation-requests.view") && (
+                                <div className="md:w-[48%] w-full bg-[#f8f8f8] md:p-[0.2vw] p-[1vw] md:rounded-[0.4vw] rounded-[1.1vw] border border-[#0000000f]">
+                                    <div className="w-full bg-[#ffffff] border border-[#0000000f] md:rounded-[0.3vw] rounded-[1vw] flex md:p-[0.5vw] p-[2vw] items-center md:gap-[0.5vw] gap-[1vw]">
+                                        <div className="md:w-[3vw] md:h-[3vw] w-[10vw] h-[10vw] bg-[#EC7AFF] md:rounded-[0.2vw] rounded-[0.8vw] flex items-center justify-center">
+                                            <img src="/assets/img/docx.svg" alt="" className="md:w-[1.5vw] w-[5vw]" />
+                                        </div>
+                                        <div className="flex flex-col">
+                                            <h4 className="md:text-[1.5vw] text-[4vw] font-[600]">
+                                                {parseInt(
+                                                    revenuePercentage?.validation_requests
+                                                        ?.current_month_count ?? 0
+                                                ).toLocaleString()}
+                                            </h4>
+                                            <h4
+                                                className={`md:text-[0.8vw] text-[3.5vw]  ${revenuePercentage?.validation_requests?.percentage_change >=
+                                                    0
+                                                    ? "text-[#27CA40]"
+                                                    : "text-[#ff0404]"
+                                                    }`}
+                                            >
+                                                {parseFloat(
+                                                    revenuePercentage?.validation_requests?.percentage_change ??
+                                                    0
+                                                ).toFixed(2)}
+                                                % Previous Month
+                                            </h4>
+                                        </div>
+                                    </div>
+                                    <h4 className="md:text-[0.9vw] text-[3vw] md:mt-[0.5vw] mt-[1vw] mb-[0.3vw]">
+                                        Total Validation Request
+                                    </h4>
+                                </div>
+                            )}
+                            {permissions?.includes("verification-requests.view") && (
+                                <div className="md:w-[48%] w-full bg-[#f8f8f8] md:p-[0.2vw] p-[1vw] md:rounded-[0.4vw] rounded-[1.1vw] border border-[#0000000f]">
+                                    <div className="w-full bg-[#ffffff] border border-[#0000000f] md:rounded-[0.3vw] rounded-[1vw] flex md:p-[0.5vw] p-[2vw] items-center md:gap-[0.5vw] gap-[1vw]">
+                                        <div className="md:w-[3vw] md:h-[3vw] w-[10vw] h-[10vw] bg-[#FFC130] md:rounded-[0.2vw] rounded-[0.8vw] flex items-center justify-center">
+                                            <img src="/assets/img/docx.svg" alt="" className="md:w-[1.5vw] w-[5vw]" />
+                                        </div>
+                                        <div className="flex flex-col">
+                                            <h4 className="md:text-[1.5vw] text-[4vw] font-[600]">0</h4>
+                                            <h4 className="md:text-[0.8vw] text-[3.5vw] text-[#27CA40]">
+                                                0.00% Previous Month
+                                            </h4>
+                                        </div>
+                                    </div>
+                                    <h4 className="md:text-[0.9vw] text-[3vw] md:mt-[0.5vw] mt-[1vw] mb-[0.3vw]">
+                                        Total Verification Request
+                                    </h4>
+                                </div>
+                            )}
+
                         </div>
-                        <h4 className="md:text-[0.9vw] text-[3vw] md:mt-[0.5vw] mt-[1vw] mb-[0.3vw]">
-                            Total Verification Request
-                        </h4>
                     </div>
-                    {/* <div className="w-[23%] bg-[#f8f8f8] p-[0.2vw] rounded-[0.4vw] border border-[#0000000f]">
-            <div className="w-full bg-[#ffffff] border border-[#0000000f] rounded-[0.3vw] flex p-[0.5vw] items-center gap-[0.5vw]">
-              <div className="w-[3vw] h-[3vw] bg-[#ff0404] rounded-[0.2vw] flex items-center justify-center">
-                <img src="/assets/img/docx.svg" alt="" className="w-[1.5vw]" />
-              </div>
-              <div className="flex flex-col">
-                <h4 className="text-[1.5vw] font-[600]">
-                  {parseInt(
-                    analytics?.documentRequests?.pending ?? 0
-                  ).toLocaleString()}
-                </h4>
-                <h4 className="text-[0.8vw] text-[#ff0404]">
-                  -83.2% Previous Month
-                </h4>
-              </div>
-            </div>
-            <h4 className="text-[0.9vw] mt-[0.5vw] mb-[0.3vw]">
-              Total Pending Document Request
-            </h4>
-          </div> */}
-                </div>
+                ) : ((!permissions?.includes("document-requests.view") && !permissions?.includes("verification-requests.view") && permissions?.includes("validation-requests.view")) ||
+                    (!permissions?.includes("document-requests.view") && permissions?.includes("verification-requests.view") && !permissions?.includes("validation-requests.view")) ||
+                    (permissions?.includes("document-requests.view") && !permissions?.includes("verification-requests.view") && !permissions?.includes("validation-requests.view"))) ? (
+                    <div className="flex w-full justify-between items-start">
+                        <div className="flex flex-sm-col justify-between md:items-center w-[40%]">
+                            <h1 className="md:text-[1.7vw] text-[4.2vw]">
+                                Welcome, {user?.user?.first_name} {user?.user?.other_name}{" "}
+                                {user?.user?.last_name}
+                            </h1>
+                        </div>
+                        <div className="flex flex-sm-col justify-end items-center gap-[4vw] md:gap-[2vw] w-[60%]">
+                            {permissions?.includes("document-requests.view") && (
+                                <div className="md:w-[48%] w-full bg-[#f8f8f8] md:p-[0.2vw] p-[1vw] md:rounded-[0.4vw] rounded-[1.1vw] border border-[#0000000f]">
+                                    <div className="w-full bg-[#ffffff] border border-[#0000000f] md:rounded-[0.3vw] rounded-[1vw] flex md:p-[0.5vw] p-[2vw] items-center md:gap-[0.5vw] gap-[1vw]">
+                                        <div className="md:w-[3vw] md:h-[3vw] w-[10vw] h-[10vw] bg-[#ff0404] md:rounded-[0.2vw] rounded-[0.8vw] flex items-center justify-center">
+                                            <img src="/assets/img/docx.svg" alt="" className="md:w-[1.5vw] w-[5vw]" />
+                                        </div>
+                                        <div className="flex flex-col">
+                                            <h4 className="md:text-[1.5vw] text-[4vw] font-[600]">
+                                                {parseInt(
+                                                    revenuePercentage?.document_requests?.current_month_count ??
+                                                    0
+                                                ).toLocaleString()}
+                                            </h4>
+                                            <h4
+                                                className={`md:text-[0.8vw] text-[3.5vw]  ${revenuePercentage?.document_requests?.percentage_change >= 0
+                                                    ? "text-[#27CA40]"
+                                                    : "text-[#ff0404]"
+                                                    }`}
+                                            >
+                                                {parseFloat(
+                                                    revenuePercentage?.document_requests?.percentage_change ?? 0
+                                                ).toFixed(2)}
+                                                % Previous Month
+                                            </h4>
+                                        </div>
+                                    </div>
+                                    <h4 className="md:text-[0.9vw] text-[3vw] md:mt-[0.5vw] mt-[1vw] mb-[0.3vw]">
+                                        Total Document Request
+                                    </h4>
+                                </div>
+                            )}
+                            {permissions?.includes("validation-requests.view") && (
+                                <div className="md:w-[48%] w-full bg-[#f8f8f8] md:p-[0.2vw] p-[1vw] md:rounded-[0.4vw] rounded-[1.1vw] border border-[#0000000f]">
+                                    <div className="w-full bg-[#ffffff] border border-[#0000000f] md:rounded-[0.3vw] rounded-[1vw] flex md:p-[0.5vw] p-[2vw] items-center md:gap-[0.5vw] gap-[1vw]">
+                                        <div className="md:w-[3vw] md:h-[3vw] w-[10vw] h-[10vw] bg-[#EC7AFF] md:rounded-[0.2vw] rounded-[0.8vw] flex items-center justify-center">
+                                            <img src="/assets/img/docx.svg" alt="" className="md:w-[1.5vw] w-[5vw]" />
+                                        </div>
+                                        <div className="flex flex-col">
+                                            <h4 className="md:text-[1.5vw] text-[4vw] font-[600]">
+                                                {parseInt(
+                                                    revenuePercentage?.validation_requests
+                                                        ?.current_month_count ?? 0
+                                                ).toLocaleString()}
+                                            </h4>
+                                            <h4
+                                                className={`md:text-[0.8vw] text-[3.5vw]  ${revenuePercentage?.validation_requests?.percentage_change >=
+                                                    0
+                                                    ? "text-[#27CA40]"
+                                                    : "text-[#ff0404]"
+                                                    }`}
+                                            >
+                                                {parseFloat(
+                                                    revenuePercentage?.validation_requests?.percentage_change ??
+                                                    0
+                                                ).toFixed(2)}
+                                                % Previous Month
+                                            </h4>
+                                        </div>
+                                    </div>
+                                    <h4 className="md:text-[0.9vw] text-[3vw] md:mt-[0.5vw] mt-[1vw] mb-[0.3vw]">
+                                        Total Validation Request
+                                    </h4>
+                                </div>
+                            )}
+                            {permissions?.includes("verification-requests.view") && (
+                                <div className="md:w-[48%] w-full bg-[#f8f8f8] md:p-[0.2vw] p-[1vw] md:rounded-[0.4vw] rounded-[1.1vw] border border-[#0000000f]">
+                                    <div className="w-full bg-[#ffffff] border border-[#0000000f] md:rounded-[0.3vw] rounded-[1vw] flex md:p-[0.5vw] p-[2vw] items-center md:gap-[0.5vw] gap-[1vw]">
+                                        <div className="md:w-[3vw] md:h-[3vw] w-[10vw] h-[10vw] bg-[#FFC130] md:rounded-[0.2vw] rounded-[0.8vw] flex items-center justify-center">
+                                            <img src="/assets/img/docx.svg" alt="" className="md:w-[1.5vw] w-[5vw]" />
+                                        </div>
+                                        <div className="flex flex-col">
+                                            <h4 className="md:text-[1.5vw] text-[4vw] font-[600]">0</h4>
+                                            <h4 className="md:text-[0.8vw] text-[3.5vw] text-[#27CA40]">
+                                                0.00% Previous Month
+                                            </h4>
+                                        </div>
+                                    </div>
+                                    <h4 className="md:text-[0.9vw] text-[3vw] md:mt-[0.5vw] mt-[1vw] mb-[0.3vw]">
+                                        Total Verification Request
+                                    </h4>
+                                </div>
+                            )}
+
+                        </div>
+                    </div>
+                ) : (
+                    <></>
+                )}
+
                 <div className="flex flex-sm-col w-full md:mt-[2vw] mt-[6vw] justify-between">
                     <div className="md:w-[58%] w-full md:h-[26vw] border md:rounded-[0.4vw] rounded-[1.1vw] border-[#0000000f]">
                         <RevenueGraph revenueGraph={revenueGraph} />

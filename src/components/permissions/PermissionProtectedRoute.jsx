@@ -11,6 +11,7 @@ import secureLocalStorage from 'react-secure-storage';
  */
 const PermissionProtectedRoute = ({ permission, children }) => {
     let permissions = secureLocalStorage.getItem('userPermissions') || [];
+    const isAdmin = JSON.parse(secureLocalStorage.getItem("userRole"))?.isAdmin;
 
     // Parse permissions if stored as a string
     if (typeof permissions === 'string') {
@@ -34,7 +35,7 @@ const PermissionProtectedRoute = ({ permission, children }) => {
         ? permission.some(hasPermission) // At least one permission must match
         : hasPermission(permission);
 
-    return hasRequiredPermissions ? children : <Navigate to="/unauthorized" />;
+    return hasRequiredPermissions || isAdmin ? children : <Navigate to="/unauthorized" />;
 };
 
 export default PermissionProtectedRoute;

@@ -24,7 +24,8 @@ function Team({ setActiveStep }) {
   const [selectedUser, setSelectedUser] = useState({});
 
   const user = JSON.parse(secureLocalStorage.getItem("user"));
-
+  let permissions = secureLocalStorage.getItem('userPermissions') || [];
+  const isAdmin = JSON.parse(secureLocalStorage.getItem("userRole"))?.isAdmin;
   const {
     data: institutionUsers,
     isLoading,
@@ -147,6 +148,8 @@ function Team({ setActiveStep }) {
     }
   }, [isDeleteInstitutionUserSuccess]);
 
+  console.log("");
+
   return (
     <>
       {isDeleteInstitutionUserLoading && <LoadingPage />}
@@ -244,6 +247,7 @@ function Team({ setActiveStep }) {
                               <td className="py-[1vw] px-[1vw] border-b max-w-[15%]">
                                 {user?.department?.name}
                               </td>
+                              {(permissions?.includes("institution.users.update") || permissions?.includes("institution.users.delete") || isAdmin)}
                               <td className="text-end border-b">
                                 <Dropdown
                                   buttonContent={
@@ -255,18 +259,22 @@ function Team({ setActiveStep }) {
                                   dropdownclassName="action-dropdown-class"
                                 >
                                   <div className="action-dropdown-content">
-                                    <button
-                                      onClick={() => handleSelectedUser(user)}
-                                      className="dropdown-item flex justify-between disabled:cursor-not-allowed"
-                                    >
-                                      Edit
-                                    </button>
-                                    <button
-                                      onClick={() => handleClickDelete(user)}
-                                      className="dropdown-item flex justify-between disabled:cursor-not-allowed"
-                                    >
-                                      Delete
-                                    </button>
+                                    {(permissions?.includes("institution.users.update") || isAdmin) && (
+                                      <button
+                                        onClick={() => handleSelectedUser(user)}
+                                        className="dropdown-item flex justify-between disabled:cursor-not-allowed"
+                                      >
+                                        Edit
+                                      </button>
+                                    )}
+                                    {(permissions?.includes("institution.users.delete") || isAdmin) && (
+                                      <button
+                                        onClick={() => handleClickDelete(user)}
+                                        className="dropdown-item flex justify-between disabled:cursor-not-allowed"
+                                      >
+                                        Delete
+                                      </button>
+                                    )}
                                   </div>
                                 </Dropdown>
                               </td>

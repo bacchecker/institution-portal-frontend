@@ -1,6 +1,5 @@
 import React from 'react';
 import secureLocalStorage from 'react-secure-storage';
-import secureStorage from 'react-secure-storage';
 
 /**
  * Wraps components or elements with a permission check.
