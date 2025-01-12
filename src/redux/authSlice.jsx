@@ -5,6 +5,7 @@ const initialState = {
   token: null,
   user: null,
   permissions: [], // Permissions array
+  subscription: null,
   two_factor: null,
   institution: null,
   selectedTemplate: null,
@@ -21,6 +22,7 @@ export const authSlice = createSlice({
           user: action.payload.user,
           two_factor: action.payload.two_factor,
           institution: action.payload.institution,
+          subscription: action.payload.subscription,
           selectedTemplate: action.payload.selectedTemplate,
         })
       );
@@ -52,6 +54,7 @@ export const authSlice = createSlice({
       secureLocalStorage.clear();
       state.user = null;
       state.permissions = []; // Clear permissions
+      state.subscription = null;
       state.token = null;
       state.two_factor = null;
       state.institution = null;

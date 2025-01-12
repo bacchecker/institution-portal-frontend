@@ -30,6 +30,9 @@ function NewApplicationForm({
     reason: "",
     doc_owner_full_name: "",
     doc_owner_email: "",
+    doc_owner_phone: "",
+    doc_owner_institution: "",
+    doc_owner_dob: "",
     security_question: "",
     security_answer: "",
   };
@@ -40,6 +43,8 @@ function NewApplicationForm({
   const [allDocuments, setAllDocuments] = useState([]);
   const [isChecked, setIsChecked] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [subscription, setSubscription] = useState([]);
   const [totalApplicationAmount, setTotalApplicationAmount] = useState(null);
   const [uniqueRequestedCode, setUniqueRequestedCode] = useState(null);
   const [selectedInstitution, setSelectedInstitution] = useState({});
@@ -77,6 +82,7 @@ function NewApplicationForm({
 
   useEffect(() => {
     if (!openModal) {
+      fetchSubscription()
       setCurrentScreen(1);
       setUserInput(initialUserInput);
       setIsChecked(false);
@@ -90,6 +96,19 @@ function NewApplicationForm({
     }
   }, [openModal]);
 
+  
+  const fetchSubscription = async () => {
+    setLoading(true);
+    try {
+        const response = await axios.get('/institution/updated-subscription');
+
+        setSubscription(response.data.subscription);
+        setLoading(false);
+    } catch (error) {
+        console.error('Error fetching plans:', error);
+        setLoading(false);
+    }
+  };
   const {
     data: userAffiliations,
     isLoading: isUserAffiliationsLoading,
@@ -230,6 +249,9 @@ function NewApplicationForm({
         otherInstitutionPostalAddress: "",
         doc_owner_full_name: "",
         doc_owner_email: "",
+        doc_owner_phone: "",
+        doc_owner_institution: "",
+        doc_owner_dob: "",
         security_question: "",
         security_answer: "",
         reason: "",
@@ -420,9 +442,12 @@ function NewApplicationForm({
         formData.append(`documents[${index}][file]`, item.file);
       }
       formData.append(`documents[${index}][doc_owner_email]`, userInput[`doc_owner_email_${index}`]);
+      formData.append(`documents[${index}][doc_owner_phone]`, userInput[`doc_owner_phone_${index}`]);
+      formData.append(`documents[${index}][doc_owner_institution]`, userInput[`doc_owner_institution_${index}`]);
+      formData.append(`documents[${index}][doc_owner_dob]`, userInput[`doc_owner_dob_${index}`]);
       formData.append(`documents[${index}][doc_owner_full_name]`, userInput[`doc_owner_full_name_${index}`]);
-      formData.append(`documents[${index}][security_question]`, userInput[`security_question_${index}`] || "");
-      formData.append(`documents[${index}][security_answer]`, userInput[`security_answer_${index}`] || "");
+      /* formData.append(`documents[${index}][security_question]`, userInput[`security_question_${index}`] || "");
+      formData.append(`documents[${index}][security_answer]`, userInput[`security_answer_${index}`] || ""); */
     });
 
     try {
@@ -492,6 +517,18 @@ function NewApplicationForm({
                 type="text"
                 readOnly
                 value={`${ institutionName.name || ""
+                }`}
+                className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0 read-only:bg-[#d8d8d8]"
+              />
+            </div>
+          </div>
+          <div className="md:mt-[2vw] mt-[10vw]">
+            <h4 className="md:text-[1vw] text-[4vw] mb-1">Subscription Plan (Credits)</h4>
+            <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
+              <input
+                type="text"
+                readOnly
+                value={`${ subscription?.total_credit || 0
                 }`}
                 className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0 read-only:bg-[#d8d8d8]"
               />
@@ -906,8 +943,24 @@ function NewApplicationForm({
                   <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
                     <input
                       type="text"
-                      name={`doc_owner_full_name_${i}`} // Add index here
+                      name={`doc_owner_full_name_${i}`}
                       value={userInput[`doc_owner_full_name_${i}`] || ""}
+                      onChange={handleUserInput}
+                      required
+                      className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0"
+                    />
+                  </div>
+                </div>
+                <div className="md:mt-[1vw] mt-[5vw]">
+                  <h4 className="md:text-[1vw] text-[4vw] mb-1">
+                    Date of Birth
+                    <span className="text-[#f1416c]">*</span>
+                  </h4>
+                  <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
+                    <input
+                      type="date"
+                      name={`doc_owner_dob_${i}`}
+                      value={userInput[`doc_owner_dob_${i}`] || ""}
                       onChange={handleUserInput}
                       required
                       className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0"
@@ -924,6 +977,38 @@ function NewApplicationForm({
                       type="email"
                       name={`doc_owner_email_${i}`}
                       value={userInput[`doc_owner_email_${i}`] || ""}
+                      onChange={handleUserInput}
+                      required
+                      className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0"
+                    />
+                  </div>
+                </div>
+                <div className="md:mt-[1vw] mt-[5vw]">
+                  <h4 className="md:text-[1vw] text-[4vw] mb-1">
+                    Phone Number
+                    <span className="text-[#f1416c]">*</span>
+                  </h4>
+                  <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
+                    <input
+                      type="text"
+                      name={`doc_owner_phone_${i}`}
+                      value={userInput[`doc_owner_phone_${i}`] || ""}
+                      onChange={handleUserInput}
+                      required
+                      className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0"
+                    />
+                  </div>
+                </div>
+                <div className="md:mt-[1vw] mt-[5vw]">
+                  <h4 className="md:text-[1vw] text-[4vw] mb-1">
+                    Institution Attended
+                    <span className="text-[#f1416c]">*</span>
+                  </h4>
+                  <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
+                    <input
+                      type="text"
+                      name={`doc_owner_institution_${i}`}
+                      value={userInput[`doc_owner_institution_${i}`] || ""}
                       onChange={handleUserInput}
                       required
                       className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0"

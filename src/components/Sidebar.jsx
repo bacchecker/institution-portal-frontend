@@ -7,6 +7,7 @@ import { logout } from "../redux/authSlice";
 import LoadItems from "./LoadItems";
 import { toast } from "sonner";
 import PermissionWrapper from "./permissions/PermissionWrapper";
+import { fetchSubscription } from "../pages/subscription/fetchSubscription";
 
 function Sidebar() {
   const { pathname } = useLocation();
@@ -33,6 +34,16 @@ function Sidebar() {
       }
     }
   }, [activeDropdown]);
+
+  const handleMenuClick = async () => {
+    const subscription = await fetchSubscription(); // Fetch the latest subscription data
+
+    if (subscription?.total_credit < 5) {
+      navigate('/subscription-plans'); // Redirect to subscription plan page
+    } else {
+      navigate('/e-check'); // Redirect to e-check
+    }
+  };
 
   useEffect(() => {
     const viewportWidth = window.innerWidth;
@@ -79,7 +90,7 @@ function Sidebar() {
 
   return (
     <>
-      <div className="w-full h-[20vw] bg-white fixed top-0 flex justify-between items-center z-[1000] display-no-md px-[5vw]">
+      <div className="w-full h-[20vw] bg-white fixed top-0 flex justify-between items-center z-0 display-no-md px-[5vw]">
         <button
           onClick={() => handleDropdownToggle("hamburgermenu")}
           className="w-[11vw] h-[11vw] rounded-[50%] flex justify-center items-center border border-[#000]"
@@ -101,7 +112,7 @@ function Sidebar() {
         </div>
       </div>
       <div
-        className={`md:w-[18%] fixed md:left-0 left-[-100%] top-0 bottom-0 bg-[#f8f8f8] border-r-2 border-[#E5E5E5] z-[1001] w-full flex md:flex-col flex-col-reverse nav-mobile ${(activeDropdown === "hamburgermenu" ||
+        className={`md:w-[18%] fixed md:left-0 left-[-100%] top-0 bottom-0 bg-[#f8f8f8] border-r-2 border-[#E5E5E5] z-[1001] md:z-0 w-full flex md:flex-col flex-col-reverse nav-mobile ${(activeDropdown === "hamburgermenu" ||
             activeDropdown === "support" ||
             activeDropdown === "service") &&
           "open1"
@@ -157,8 +168,7 @@ function Sidebar() {
                 <PermissionWrapper permission={['verification-requests.view']}>
                   <li>
                     <Link
-                      to="/e-check"
-                      onClick={() => handleDropdownToggle("close")}
+                      onClick={handleMenuClick}
                       className={`flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[10vw] md:rounded-[0.3vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] ${
                         pathname.includes("e-check") && "active"
                       }`}
@@ -171,7 +181,7 @@ function Sidebar() {
                   </li>
                 </PermissionWrapper>
                 
-                <PermissionWrapper permission={['payments.view']}>
+                <PermissionWrapper permission={['institution.payments.view']}>
                   <li>
                     <Link
                       to="/payment"
@@ -186,7 +196,7 @@ function Sidebar() {
                     </Link>
                   </li>
                 </PermissionWrapper>
-                <PermissionWrapper permission={['tickets.view']}>
+                <PermissionWrapper permission={['institution.tickets.view']}>
                   <li>
                     <Link
                       to="/user-support"
@@ -201,7 +211,7 @@ function Sidebar() {
                     </Link>
                   </li>
                 </PermissionWrapper>
-                <PermissionWrapper permission={['reports.view']}>
+                <PermissionWrapper permission={['institution.reports.view']}>
                   <li>
                     <Link
                       to="/reports"
@@ -216,7 +226,7 @@ function Sidebar() {
                     </Link>
                   </li>
                 </PermissionWrapper>
-                <PermissionWrapper permission={['settings.view']}>
+                <PermissionWrapper permission={['institution.settings.view']}>
                   <li>
                     <Link
                       to="/account-settings"
@@ -231,7 +241,7 @@ function Sidebar() {
                     </Link>
                   </li>
                 </PermissionWrapper>
-                <PermissionWrapper permission={['activity-logs.view']}>
+                <PermissionWrapper permission={['institution.activity-logs.view']}>
                   <li>
                     <Link
                       to="/activity-logs"

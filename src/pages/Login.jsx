@@ -98,6 +98,7 @@ function Login() {
     const user = data?.data?.user;
     const token = data?.data?.token;
     const permissions = data?.data?.permissions.names;
+    const subscription = data?.data?.subscription;
     const institution = data?.data?.institution;
     const selectedTemplate = data?.data?.letter_template;
 
@@ -110,6 +111,7 @@ function Login() {
               user,
               two_factor: true,
               institution,
+              subscription,
               selectedTemplate,
             })
           );

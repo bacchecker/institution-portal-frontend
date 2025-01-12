@@ -22,6 +22,7 @@ import SearchAll from "./pages/SearchAll";
 import VerificationRequest from "./pages/requests/VerficationRequests";
 import PermissionProtectedRoute from "./components/permissions/PermissionProtectedRoute";
 import Unauthorized from "./components/permissions/Unauthorized";
+import Plans from "./pages/subscription/Plans";
 
 function App() {
   return (
@@ -115,7 +116,10 @@ function App() {
                     element={
                       <AuthenticatedSuccessProtectedRoute>
                         <AccountSetupProtectedRoute>
+                        <PermissionProtectedRoute permission={['tickets.view']}>
                           <Tickets />
+                        </PermissionProtectedRoute>
+                          
                         </AccountSetupProtectedRoute>
                       </AuthenticatedSuccessProtectedRoute>
                     }
@@ -125,7 +129,9 @@ function App() {
                     element={
                       <AuthenticatedSuccessProtectedRoute>
                         <AccountSetupProtectedRoute>
-                          <RevenueOverview />
+                          <PermissionProtectedRoute permission={['reports.view']}>
+                            <RevenueOverview />
+                          </PermissionProtectedRoute>
                         </AccountSetupProtectedRoute>
                       </AuthenticatedSuccessProtectedRoute>
                     }
@@ -135,7 +141,21 @@ function App() {
                     element={
                       <AuthenticatedSuccessProtectedRoute>
                         <AccountSetupProtectedRoute>
+                        <PermissionProtectedRoute permission={['activity-logs.view']}>
                           <SystemLogs />
+                        </PermissionProtectedRoute>
+                        </AccountSetupProtectedRoute>
+                      </AuthenticatedSuccessProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/subscription-plans"
+                    element={
+                      <AuthenticatedSuccessProtectedRoute>
+                        <AccountSetupProtectedRoute>
+                          <PermissionProtectedRoute permission={['document-requests.view']}>
+                            <Plans />
+                          </PermissionProtectedRoute>
                         </AccountSetupProtectedRoute>
                       </AuthenticatedSuccessProtectedRoute>
                     }

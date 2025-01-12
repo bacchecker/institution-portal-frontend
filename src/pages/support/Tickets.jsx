@@ -117,7 +117,7 @@ export default function Tickets() {
           <p className="w-full lg:w-2/3 font-light text-sm mt-2 text-gray-800">Create a formal report of a service when you need
           help or encounter a problem.</p>
         </div>
-        <PermissionWrapper permission={['tickets.create']}>
+        <PermissionWrapper permission={['institution.tickets.create']}>
           <div className="flex lg:justify-end mb-2 lg:mb-0">
             <button 
               type="button"
@@ -308,7 +308,7 @@ export default function Tickets() {
                         >
                           View Response
                         </DropdownItem>
-                        {secureLocalStorage.getItem('userPermissions')?.includes('tickets.create') && (
+                        {secureLocalStorage.getItem('userPermissions')?.includes('institution.tickets.create') && (
                         <DropdownItem
                           key="edit"
                           onClick={() => {
