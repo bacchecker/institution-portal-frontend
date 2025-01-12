@@ -96,7 +96,10 @@ function App() {
                     element={
                       <AuthenticatedSuccessProtectedRoute>
                         <AccountSetupProtectedRoute>
+                        <PermissionProtectedRoute permission={['verification-requests.view']}>
                           <VerificationRequest />
+                        </PermissionProtectedRoute>
+                          
                         </AccountSetupProtectedRoute>
                       </AuthenticatedSuccessProtectedRoute>
                     }
@@ -116,7 +119,7 @@ function App() {
                     element={
                       <AuthenticatedSuccessProtectedRoute>
                         <AccountSetupProtectedRoute>
-                        <PermissionProtectedRoute permission={['tickets.view']}>
+                        <PermissionProtectedRoute permission={['institution.tickets.view']}>
                           <Tickets />
                         </PermissionProtectedRoute>
                           
@@ -129,7 +132,7 @@ function App() {
                     element={
                       <AuthenticatedSuccessProtectedRoute>
                         <AccountSetupProtectedRoute>
-                          <PermissionProtectedRoute permission={['reports.view']}>
+                          <PermissionProtectedRoute permission={['institution.reports.view']}>
                             <RevenueOverview />
                           </PermissionProtectedRoute>
                         </AccountSetupProtectedRoute>
@@ -141,7 +144,7 @@ function App() {
                     element={
                       <AuthenticatedSuccessProtectedRoute>
                         <AccountSetupProtectedRoute>
-                        <PermissionProtectedRoute permission={['activity-logs.view']}>
+                        <PermissionProtectedRoute permission={['institution.activity-logs.view']}>
                           <SystemLogs />
                         </PermissionProtectedRoute>
                         </AccountSetupProtectedRoute>
@@ -153,7 +156,7 @@ function App() {
                     element={
                       <AuthenticatedSuccessProtectedRoute>
                         <AccountSetupProtectedRoute>
-                          <PermissionProtectedRoute permission={['document-requests.view']}>
+                          <PermissionProtectedRoute permission={['verification-requests.view']}>
                             <Plans />
                           </PermissionProtectedRoute>
                         </AccountSetupProtectedRoute>

@@ -37,8 +37,11 @@ function Sidebar() {
 
   const handleMenuClick = async () => {
     const subscription = await fetchSubscription(); // Fetch the latest subscription data
-
-    if (subscription?.total_credit < 5) {
+  
+    // Ensure total_credit is 0 if subscription is empty or doesn't have total_credit
+    const totalCredit = subscription?.total_credit || 0;
+  
+    if (totalCredit < 5) {
       navigate('/subscription-plans'); // Redirect to subscription plan page
     } else {
       navigate('/e-check'); // Redirect to e-check

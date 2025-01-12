@@ -89,8 +89,8 @@ export default function Plans() {
         <div className="bg-white rounded-lg p-4 lg:p-10">
           <div className="w-full rounded-lg border-t-4 border-bChkRed p-5 shadow bg-yellow-50 font-normal text-sm">
             <p className="uppercase font-semibold text-lg text-black mb-2">Simplifying Document Verification</p>
-            <div className="flex items-center justify-between">
-              <p className="w-2/3 text-justify">E-Check is an advanced document verification solution offered by BacChecker, 
+            <div className="flex lg:flex-row flex-col space-y-2 items-center lg:justify-between">
+              <p className="w-full lg:w-2/3 text-justify">E-Check is an advanced document verification solution offered by BacChecker, 
                 designed to streamline and simplify the verification process between institutions and document owners. 
                 This service enables institutions to verify documents such as certificates, transcripts, or other credentials
                 efficiently, securely, and with minimal effort.
@@ -112,9 +112,9 @@ export default function Plans() {
             </div>
             
           </div>
-          <div className="flex flex-col lg:flex-row lg:justify-between">
+          <div className="flex flex-col lg:flex-row lg:justify-between mt-4">
             <div className="p-1">
-              <h2 className="font-extrabold text-3xl mb-2">Choose your plan</h2>
+              <h2 className="font-bold text-2xl lg:text-3xl mb-2">Choose your plan</h2>
               <div className="flex space-x-2 items-center">
                 <MdOutlineRocketLaunch size={20}/>
                 <p className="w-4/5 lg:w-1/2 text-sm">Get the right plan for your institution. Plans can be upgraded in the future</p>
