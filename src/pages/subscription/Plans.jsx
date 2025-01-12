@@ -12,7 +12,8 @@ export default function Plans() {
 
     const [plans, setPlans] = useState([]);
 
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
     const [openDrawer, setOpenDrawer] = useState(false);
     const [data, setData] = useState(null);
     // Payment States
@@ -62,7 +63,7 @@ export default function Plans() {
   
     const handleFormSubmit = async (e) => {
       e.preventDefault();
-    
+      setIsSaving(true)
       const payload = {
         subscription_plan_id: data?.id,
         channel: selectedPayment,
@@ -77,8 +78,10 @@ export default function Plans() {
         if (response.data.status == "success") {
           window.location.href = response?.data?.authorization_url;
         }
+        setIsSaving(false)
       } catch (error) {
         console.error("Error:", error.response?.data || error.message);
+        setIsSaving(false)
       }
     }
 
@@ -393,7 +396,18 @@ export default function Plans() {
             type="submit"
             className="w-1/2 bg-bChkRed text-white py-2 rounded-md hover:bg-red-700"
           >
-            Submit Payment
+            {isSaving ? (
+              <div className="flex items-center justify-center gap-2">
+                <LoadItems color={"#ffffff"} size={15} />
+                <h4 className=" text-[#ffffff]">
+                  Submitting...
+                </h4>
+              </div>
+            ) : (
+              <h4 className=" text-[#ffffff]">
+                Submit Payment
+              </h4>
+            )}
           </button>
           </div>
           </form>
