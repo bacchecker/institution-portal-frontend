@@ -1,4 +1,5 @@
 import React from 'react';
+import secureLocalStorage from 'react-secure-storage';
 import secureStorage from 'react-secure-storage';
 
 /**
@@ -9,8 +10,9 @@ import secureStorage from 'react-secure-storage';
  * @returns {React.ReactNode|null} - The children if permission is granted, or null otherwise.
  */
 const PermissionWrapper = ({ permission, children }) => {
-    let permissions = secureStorage.getItem('userPermissions') || [];   
-    if (typeof permissions === 'string') {
+    let permissions = secureLocalStorage.getItem('userPermissions') || [];   
+  const isAdmin = JSON.parse(secureLocalStorage.getItem("userRole"))?.isAdmin;
+  if (typeof permissions === 'string') {
         permissions = JSON.parse(permissions); // Ensure permissions is an array
     }
 
@@ -25,7 +27,7 @@ const PermissionWrapper = ({ permission, children }) => {
         ? permission.some(hasPermission) // At least one permission must match
         : hasPermission(permission);
 
-    return hasRequiredPermissions ? children : null;
+    return hasRequiredPermissions || isAdmin ? children : null;
 };
 
 export default PermissionWrapper;

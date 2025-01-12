@@ -6,7 +6,7 @@ import { useDispatch } from "react-redux";
 import { useLoginUserMutation } from "../redux/apiSlice";
 import { toast } from "sonner";
 import LoadItems from "@/components/LoadItems";
-import { setUser, setUserToken, setUserPermissions } from "../redux/authSlice";
+import { setUser, setUserToken, setUserPermissions, setIsAdmin } from "../redux/authSlice";
 import ReCAPTCHA from "react-google-recaptcha";
 import {
   resetInputValues,
@@ -101,6 +101,10 @@ function Login() {
     const subscription = data?.data?.subscription;
     const institution = data?.data?.institution;
     const selectedTemplate = data?.data?.letter_template;
+    const isAdmin = data?.data?.isAdmin;
+
+    console.log("isss", isAdmin);
+    
 
     if (user?.type?.toLowerCase() !== "user") {
       if (token) {
@@ -123,6 +127,11 @@ function Login() {
           dispatch(
             setUserPermissions({
               permissions,
+            })
+          );
+          dispatch(
+            setIsAdmin({
+              isAdmin,
             })
           );
           navigate("/2fa-authentication");
@@ -157,6 +166,11 @@ function Login() {
           dispatch(
             setUserPermissions({
               permissions,
+            })
+          );
+          dispatch(
+            setIsAdmin({
+              isAdmin,
             })
           );
         }
