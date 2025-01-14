@@ -289,7 +289,7 @@ export default function ValidationRequest() {
 
   const fetchRequestAnswers = async (requestId) => {
     try {
-      const url = `/validation-requests/answers/${requestId}`;
+      const url = `/institution/requests/validation-requests/answers/${requestId}`;
       const response = await axios.get(url);
       setValidationAnswers(response.data.data);
     } catch (error) {
