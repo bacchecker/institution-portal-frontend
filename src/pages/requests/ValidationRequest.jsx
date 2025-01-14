@@ -38,6 +38,7 @@ import { FcCancel } from "react-icons/fc";
 import { GiCancel } from "react-icons/gi";
 import { MdOutlineFilterAlt, MdOutlineFilterAltOff } from "react-icons/md";
 import secureLocalStorage from "react-secure-storage";
+import PermissionWrapper from "../../components/permissions/PermissionWrapper";
 
 export default function ValidationRequest() {
   const changeStatusDisclosure = useDisclosure();
@@ -905,51 +906,55 @@ export default function ValidationRequest() {
               >
                 Close
               </Button>
-
-              {(data?.status == "received" || data?.status == "submitted") && (
-                <Button
-                  radius="none"
-                  size="md"
-                  className="w-1/2 bg-gray-300 text-gray-800 font-medium !rounded-md"
-                  onClick={() => declineDisclosure.onOpen()}
-                >
-                  Decline Request
-                </Button>
-              )}
-
-              {data?.status !== "created" &&
-                data?.status !== "completed" &&
-                data?.status !== "processing" && (
+              <PermissionWrapper permission={['validation-requests.cancel']}>
+                {(data?.status == "received" || data?.status == "submitted") && (
                   <Button
+                    radius="none"
+                    size="md"
+                    className="w-1/2 bg-gray-300 text-gray-800 font-medium !rounded-md"
+                    onClick={() => declineDisclosure.onOpen()}
+                  >
+                    Decline Request
+                  </Button>
+                )}
+              </PermissionWrapper>
+              
+              <PermissionWrapper permission={['validation-requests.process']}>
+                {data?.status !== "created" &&
+                  data?.status !== "completed" &&
+                  data?.status !== "processing" && (
+                    <Button
+                      radius="none"
+                      className="bg-bChkRed text-white font-medium w-1/2 !rounded-md"
+                      size="md"
+                      onClick={() => changeStatusDisclosure.onOpen()}
+                    >
+                      {data?.status === "submitted"
+                        ? "Acknowledge Request"
+                        : data?.status === "received"
+                        ? "Process Request"
+                        : data?.status === "rejected" || "cancelled"
+                        ? "Revert Rejection"
+                        : "Acknowledge Request"}
+                    </Button>
+                  )}
+                {data?.status === "processing" && (
+                  <Button
+                    isLoading={isSaving}
                     radius="none"
                     className="bg-bChkRed text-white font-medium w-1/2 !rounded-md"
                     size="md"
-                    onClick={() => changeStatusDisclosure.onOpen()}
+                    onClick={handleSubmitValidationAnswers}
+                    disabled={
+                      !validationAnswers.sections ||
+                      validationAnswers.sections.length === 0
+                    } // Disable if no sections
                   >
-                    {data?.status === "submitted"
-                      ? "Acknowledge Request"
-                      : data?.status === "received"
-                      ? "Process Request"
-                      : data?.status === "rejected" || "cancelled"
-                      ? "Revert Rejection"
-                      : "Acknowledge Request"}
+                    Submit Validations
                   </Button>
                 )}
-              {data?.status === "processing" && (
-                <Button
-                  isLoading={isSaving}
-                  radius="none"
-                  className="bg-bChkRed text-white font-medium w-1/2 !rounded-md"
-                  size="md"
-                  onClick={handleSubmitValidationAnswers}
-                  disabled={
-                    !validationAnswers.sections ||
-                    validationAnswers.sections.length === 0
-                  } // Disable if no sections
-                >
-                  Submit Validations
-                </Button>
-              )}
+              </PermissionWrapper>
+              
             </div>
           </div>
         </Drawer>

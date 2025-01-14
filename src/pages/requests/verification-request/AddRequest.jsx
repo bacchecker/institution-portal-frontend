@@ -30,15 +30,21 @@ function NewApplicationForm({
     reason: "",
     doc_owner_full_name: "",
     doc_owner_email: "",
+    doc_owner_phone: "",
+    doc_owner_institution: "",
+    doc_owner_dob: "",
+    security_question: "",
+    security_answer: "",
   };
   const [userInput, setUserInput] = useState(initialUserInput);
-  const user = JSON?.parse(secureLocalStorage?.getItem("user"))?.user;
   const institutionName = JSON?.parse(secureLocalStorage?.getItem("user"))?.institution;
   const [selectedAcademicLevel, setSelectedAcademicLevel] = useState("");
   const [currentScreen, setCurrentScreen] = useState(1);
   const [allDocuments, setAllDocuments] = useState([]);
   const [isChecked, setIsChecked] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [subscription, setSubscription] = useState([]);
   const [totalApplicationAmount, setTotalApplicationAmount] = useState(null);
   const [uniqueRequestedCode, setUniqueRequestedCode] = useState(null);
   const [selectedInstitution, setSelectedInstitution] = useState({});
@@ -76,6 +82,7 @@ function NewApplicationForm({
 
   useEffect(() => {
     if (!openModal) {
+      fetchSubscription()
       setCurrentScreen(1);
       setUserInput(initialUserInput);
       setIsChecked(false);
@@ -89,6 +96,19 @@ function NewApplicationForm({
     }
   }, [openModal]);
 
+  
+  const fetchSubscription = async () => {
+    setLoading(true);
+    try {
+        const response = await axios.get('/institution/updated-subscription');
+
+        setSubscription(response.data.subscription);
+        setLoading(false);
+    } catch (error) {
+        console.error('Error fetching plans:', error);
+        setLoading(false);
+    }
+  };
   const {
     data: userAffiliations,
     isLoading: isUserAffiliationsLoading,
@@ -150,35 +170,35 @@ function NewApplicationForm({
 
   useEffect(() => {
     if (userAffiliations && institutions) {
+      let filteredInstitutions = institutions?.data?.institutions;
+  
+      // Exclude the logged-in user's institution
+      if (institutionName?.id) {
+        filteredInstitutions = filteredInstitutions?.filter(
+          (institution) => String(institution.id) !== String(institutionName.id)
+        );
+      }
+  
+  
       if (userAffiliations?.affiliations?.length > 0) {
         const institutionIds = userAffiliations?.affiliations?.map(
           (item) => item?.institution_id
         );
-
-        const insAffiliations = institutions?.data?.institutions
+  
+        const insAffiliations = filteredInstitutions
           ?.filter((item) => institutionIds.includes(item?.id))
-          .map((institution) => {
-            // Find matching affiliation for this institution
-            const matchingAffiliation = userAffiliations.affiliations.find(
-              (aff) => aff.institution_id === institution.id
-            );
-
-            return {
-              ...institution,
-              /* program_studied: matchingAffiliation?.program_studied,
-              start_year: matchingAffiliation?.start_year,
-              end_year: matchingAffiliation?.end_year,
-              index_number: matchingAffiliation?.index_number,
-              employee_id: matchingAffiliation?.employee_id, */
-            };
-          });
-
+          .map((institution) => ({
+            ...institution,
+          }));
+  
         setAllInstitutions(insAffiliations);
       } else {
-        setAllInstitutions(institutions?.data?.institutions);
+        setAllInstitutions(filteredInstitutions);
       }
     }
-  }, [institutions, userAffiliations]);
+  }, [institutions, userAffiliations, institutionName?.id]);
+  
+  
 
   
 
@@ -205,7 +225,7 @@ function NewApplicationForm({
     return type?.document_type?.name || type?.name || "";
   };
 
-  const handleSeletedDocument = (item, index) => {
+  const handleSelectedDocument = (item, index) => {
     const updatedItems = [...items];
     updatedItems[index].institution_document_type_id = item?.id;
     updatedItems[index].document_type_id = item?.document_type.id;
@@ -228,6 +248,11 @@ function NewApplicationForm({
         otherInstitutionPostalAddress: "",
         doc_owner_full_name: "",
         doc_owner_email: "",
+        doc_owner_phone: "",
+        doc_owner_institution: "",
+        doc_owner_dob: "",
+        security_question: "",
+        security_answer: "",
         reason: "",
       }));
       setAllDocuments(selectedInstitution?.document_types);
@@ -416,7 +441,12 @@ function NewApplicationForm({
         formData.append(`documents[${index}][file]`, item.file);
       }
       formData.append(`documents[${index}][doc_owner_email]`, userInput[`doc_owner_email_${index}`]);
+      formData.append(`documents[${index}][doc_owner_phone]`, userInput[`doc_owner_phone_${index}`]);
+      formData.append(`documents[${index}][doc_owner_institution]`, userInput[`doc_owner_institution_${index}`]);
+      formData.append(`documents[${index}][doc_owner_dob]`, userInput[`doc_owner_dob_${index}`]);
       formData.append(`documents[${index}][doc_owner_full_name]`, userInput[`doc_owner_full_name_${index}`]);
+      /* formData.append(`documents[${index}][security_question]`, userInput[`security_question_${index}`] || "");
+      formData.append(`documents[${index}][security_answer]`, userInput[`security_answer_${index}`] || ""); */
     });
 
     try {
@@ -491,6 +521,18 @@ function NewApplicationForm({
               />
             </div>
           </div>
+          <div className="md:mt-[2vw] mt-[10vw]">
+            <h4 className="md:text-[1vw] text-[4vw] mb-1">Subscription Plan (Credits)</h4>
+            <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
+              <input
+                type="text"
+                readOnly
+                value={`${ subscription?.total_credit || 0
+                }`}
+                className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0 read-only:bg-[#d8d8d8]"
+              />
+            </div>
+          </div>
           <div className="md:mt-[2vw] mt-[8vw]">
             <h4 className="md:text-[1vw] text-[4vw] mb-1">
               Credential Type<span className="text-[#f1416c]">*</span>
@@ -560,7 +602,7 @@ function NewApplicationForm({
                             </h4>
                             <SearchSelectInput
                               placeholder={"Select Option"}
-                              data={institutions?.data?.institutions}
+                              data={allInstitutions}
                               isLoading={
                                 isInstitutionLoading || isInstitutionFetching
                               }
@@ -819,12 +861,12 @@ function NewApplicationForm({
                         : item?.document_type_id
                     )}
                     onItemSelect={(selectedItem) =>
-                      handleSeletedDocument(selectedItem, i)
+                      handleSelectedDocument(selectedItem, i)
                     }
                     className="custom-dropdown-class display-md-none"
                   />
                 </div>
-                {item?.document_type_id && (
+                {/* {item?.document_type_id && (
                   <div className="md:mt-[2vw] mt-[10vw]">
                     <h4 className="md:text-[1vw] text-[4vw] mb-1">
                       Verification Fee
@@ -840,7 +882,7 @@ function NewApplicationForm({
                       />
                     </div>
                   </div>
-                )}
+                )} */}
                 <div className="md:mt-[2vw] mt-[8vw]">
                   <h4 className="md:text-[1vw] text-[4vw] mb-1">
                     Upload Document File
@@ -889,10 +931,6 @@ function NewApplicationForm({
                     .jpg, .jpeg, .pdf, .png
                   </h6>
                 </div>
-                {/* <h6 className="text-[#2e2e2e] md:text-[0.7vw] text-[2.7vw] font-[600]">
-                <span className="text-[#ff0404]">Note</span>: This fee is based
-                on the number of copies
-              </h6> */}
               </div>
               <div className="border rounded-sm p-4 mt-4">
                 <p className="text-sm font-medium">Document Owner Information</p>
@@ -904,8 +942,24 @@ function NewApplicationForm({
                   <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
                     <input
                       type="text"
-                      name={`doc_owner_full_name_${i}`} // Add index here
+                      name={`doc_owner_full_name_${i}`}
                       value={userInput[`doc_owner_full_name_${i}`] || ""}
+                      onChange={handleUserInput}
+                      required
+                      className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0"
+                    />
+                  </div>
+                </div>
+                <div className="md:mt-[1vw] mt-[5vw]">
+                  <h4 className="md:text-[1vw] text-[4vw] mb-1">
+                    Date of Birth
+                    <span className="text-[#f1416c]">*</span>
+                  </h4>
+                  <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
+                    <input
+                      type="date"
+                      name={`doc_owner_dob_${i}`}
+                      value={userInput[`doc_owner_dob_${i}`] || ""}
                       onChange={handleUserInput}
                       required
                       className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0"
@@ -920,7 +974,7 @@ function NewApplicationForm({
                   <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
                     <input
                       type="email"
-                      name={`doc_owner_email_${i}`} // Add index here
+                      name={`doc_owner_email_${i}`}
                       value={userInput[`doc_owner_email_${i}`] || ""}
                       onChange={handleUserInput}
                       required
@@ -928,6 +982,74 @@ function NewApplicationForm({
                     />
                   </div>
                 </div>
+                <div className="md:mt-[1vw] mt-[5vw]">
+                  <h4 className="md:text-[1vw] text-[4vw] mb-1">
+                    Phone Number
+                    <span className="text-[#f1416c]">*</span>
+                  </h4>
+                  <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
+                    <input
+                      type="text"
+                      name={`doc_owner_phone_${i}`}
+                      value={userInput[`doc_owner_phone_${i}`] || ""}
+                      onChange={handleUserInput}
+                      required
+                      className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0"
+                    />
+                  </div>
+                </div>
+                <div className="md:mt-[1vw] mt-[5vw]">
+                  <h4 className="md:text-[1vw] text-[4vw] mb-1">
+                    Institution Attended
+                    <span className="text-[#f1416c]">*</span>
+                  </h4>
+                  <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
+                    <input
+                      type="text"
+                      name={`doc_owner_institution_${i}`}
+                      value={userInput[`doc_owner_institution_${i}`] || ""}
+                      onChange={handleUserInput}
+                      required
+                      className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0"
+                    />
+                  </div>
+                </div>
+                {/* <p className="text-sm font-medium mt-[2vw]">Security Question & Answer</p>
+                <div className="md:mt-[1vw] mt-[5vw]">
+                  <h4 className="md:text-[1vw] text-[4vw] mb-1">
+                    Question
+                    <span className="text-[#f1416c]">*</span>
+                  </h4>
+                  <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
+                    <input
+                      type="text"
+                      name={`security_question_${i}`}
+                      value={userInput[`security_question_${i}`] || ""}
+                      onChange={handleUserInput}
+                      required
+                      className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0"
+                    />
+                  </div>
+                </div>
+                <div className="md:mt-[1vw] mt-[5vw]">
+                  <h4 className="md:text-[1vw] text-[4vw] mb-1">
+                    Answer
+                    <span className="text-[#f1416c]">*</span>
+                  </h4>
+                  <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
+                    <input
+                      type="text"
+                      name={`security_answer_${i}`}
+                      value={userInput[`security_answer_${i}`] || ""}
+                      onChange={handleUserInput}
+                      required
+                      className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0"
+                    />
+                  </div>
+                </div>
+                <h6 className="text-[#2e2e2e] md:text-[0.7vw] text-[2.7vw] font-[600] mt-[0.3vw]">
+                  Document owner must answer this question before proceeding with approval or denial.
+                </h6> */}
               </div>
               {items.length === 1 && (
                 <h6 className="text-[#2e2e2e] md:text-[0.7vw] text-[2.7vw] font-[600] mt-[0.3vw]">

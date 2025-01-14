@@ -19,6 +19,7 @@ function SystemLogs() {
     to: currentDate,
   };
   const user = JSON?.parse(secureLocalStorage?.getItem("user"));
+  let permissions = secureLocalStorage.getItem('userPermissions') || [];
 
 
   const [userInput, setUserInput] = useState(initialUserInput);
@@ -176,23 +177,26 @@ function SystemLogs() {
                 Clear
               </h4>
             </button>
-            <button
-              type="button"
-              onClick={handleExportLogs}
-              className="new-btn border border-[#000000]  px-[1vw] md:text-[1vw] text-[3.5vw] text-[#000000]  md:mt-0 mt-[3vw] flex justify-center items-center md:py-[0.7vw] py-[2vw] md:h-[2.3vw] h-[12vw] md:rounded-[0.3vw] rounded-[1vw] gap-[0.5vw] hover:bg-[#202020] hover:text-[#ffffff] transition-all duration-300"
-            >
-              {isExportReload ? (
-                <>
-                  <LoadItems color={"#000000"} size={15} />
-                  <h4>Exporting...</h4>
-                </>
-              ) : (
-                <>
-                  <i class="bx bx-export"></i>
-                  Export
-                </>
-              )}
-            </button>
+
+            {permissions.includes("institution.activity-logs.export") && (
+              <button
+                type="button"
+                onClick={handleExportLogs}
+                className="new-btn border border-[#000000]  px-[1vw] md:text-[1vw] text-[3.5vw] text-[#000000]  md:mt-0 mt-[3vw] flex justify-center items-center md:py-[0.7vw] py-[2vw] md:h-[2.3vw] h-[12vw] md:rounded-[0.3vw] rounded-[1vw] gap-[0.5vw] hover:bg-[#202020] hover:text-[#ffffff] transition-all duration-300"
+              >
+                {isExportReload ? (
+                  <>
+                    <LoadItems color={"#000000"} size={15} />
+                    <h4>Exporting...</h4>
+                  </>
+                ) : (
+                  <>
+                    <i class="bx bx-export"></i>
+                    Export
+                  </>
+                )}
+              </button>
+            )}
           </form>
         </div>
         <div className="content">

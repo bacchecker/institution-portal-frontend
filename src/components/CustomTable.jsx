@@ -83,8 +83,8 @@ const CustomTable = ({
           isLoading={loadingState}
           loadingContent={<Spinner color="danger" label="Loading...." />}
           emptyContent={
-            <div className="md:!h-[65vh] h-[60vh] flex flex-col gap-8 items-center justify-center">
-              <img src="/assets/img/no-data.svg" alt="No data" className="w-1/4 md:w-1/6 h-auto" />
+            <div className="md:!h-[35vh] h-[30vh] flex flex-col gap-8 items-center justify-center">
+              <img src="/assets/img/no-data.svg" alt="No data" className="w-1/4 md:w-[10%] h-auto" />
               <p className="text-center text-slate-500 font-montserrat font-medium text-base -mt-6">
                 No data available
               </p>

@@ -6,6 +6,8 @@ import { useDispatch } from "react-redux";
 import { logout } from "../redux/authSlice";
 import LoadItems from "./LoadItems";
 import { toast } from "sonner";
+import PermissionWrapper from "./permissions/PermissionWrapper";
+import { fetchSubscription } from "../pages/subscription/fetchSubscription";
 
 function Sidebar() {
   const { pathname } = useLocation();
@@ -16,6 +18,8 @@ function Sidebar() {
   const dispatch = useDispatch();
   const user = JSON?.parse(secureLocalStorage?.getItem("user"))?.user;
   const token = JSON?.parse(secureLocalStorage?.getItem("userToken"))?.token;
+  let permissions = secureLocalStorage.getItem('userPermissions') || [];
+  const isAdmin = JSON.parse(secureLocalStorage.getItem("userRole"))?.isAdmin;
 
   const handleDropdownToggle = (dropdownId) => {
     setActiveDropdown(activeDropdown === dropdownId ? null : dropdownId);
@@ -32,6 +36,19 @@ function Sidebar() {
       }
     }
   }, [activeDropdown]);
+
+  const handleMenuClick = async () => {
+    const subscription = await fetchSubscription(); // Fetch the latest subscription data
+
+    // Ensure total_credit is 0 if subscription is empty or doesn't have total_credit
+    const totalCredit = subscription?.total_credit || 0;
+
+    if (totalCredit < 5) {
+      navigate('/subscription-plans'); // Redirect to subscription plan page
+    } else {
+      navigate('/e-check'); // Redirect to e-check
+    }
+  };
 
   useEffect(() => {
     const viewportWidth = window.innerWidth;
@@ -78,7 +95,7 @@ function Sidebar() {
 
   return (
     <>
-      <div className="w-full h-[20vw] bg-white fixed top-0 flex justify-between items-center z-[1000] display-no-md px-[5vw]">
+      <div className="w-full h-[20vw] bg-white fixed top-0 flex justify-between items-center z-10 lg:z-0 display-no-md px-[5vw]">
         <button
           onClick={() => handleDropdownToggle("hamburgermenu")}
           className="w-[11vw] h-[11vw] rounded-[50%] flex justify-center items-center border border-[#000]"
@@ -100,9 +117,9 @@ function Sidebar() {
         </div>
       </div>
       <div
-        className={`md:w-[18%] fixed md:left-0 left-[-100%] top-0 bottom-0 bg-[#f8f8f8] border-r-2 border-[#E5E5E5] z-[1001] w-full flex md:flex-col flex-col-reverse nav-mobile ${(activeDropdown === "hamburgermenu" ||
-            activeDropdown === "support" ||
-            activeDropdown === "service") &&
+        className={`md:w-[18%] fixed md:left-0 left-[-100%] top-0 bottom-0 bg-[#f8f8f8] border-r-2 border-[#E5E5E5] z-[1001] md:z-0 w-full flex md:flex-col flex-col-reverse nav-mobile ${(activeDropdown === "hamburgermenu" ||
+          activeDropdown === "support" ||
+          activeDropdown === "service") &&
           "open1"
           }`}
       >
@@ -123,6 +140,7 @@ function Sidebar() {
           <div className="w-full h-[100%] overflow-auto">
             <div className="h-[70%] overflow-auto md:px-[1.5vw] px-[5vw] sidebar-menu">
               <ul className="flex flex-col gap-[0.7vw] mt-[2vw] item-list">
+
                 <li>
                   <Link
                     to="/dashboard"
@@ -136,99 +154,116 @@ function Sidebar() {
                     </span>
                   </Link>
                 </li>
-                <li>
-                  <Link
-                    to="/manage-document"
-                    onClick={() => handleDropdownToggle("close")}
-                    className={`flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[15vw] md:rounded-[0.3vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] ${pathname.includes("manage-document") && "active"
-                      }`}
-                  >
-                    <i class="bx bxs-file md:text-[1.3vw] text-[5vw] menu-icon"></i>
-                    <span className="md:text-[1.1vw] text-[4vw] link">
-                      Manage Document
-                    </span>
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/e-check"
-                    onClick={() => handleDropdownToggle("close")}
-                    className={`flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[10vw] md:rounded-[0.3vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] ${
-                      pathname.includes("e-check") && "active"
-                    }`}
-                  >
-                    <i class="bx bxs-check-shield md:text-[1.3vw] text-[5vw] menu-icon"></i>
-                    <span className="md:text-[1.1vw] text-[4vw] link">
-                      E-Check
-                    </span>
-                  </Link>
-                </li>
 
-                <li>
-                  <Link
-                    to="/payment"
-                    onClick={() => handleDropdownToggle("close")}
-                    className={`flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[15vw] md:rounded-[0.3vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] ${pathname === "/payment" && "active"
-                      }`}
-                  >
-                    <i className="bx bx-money md:text-[1.3vw] text-[5vw] menu-icon"></i>
-                    <span className="md:text-[1.1vw] text-[4vw] link">
-                      Payment Settings
-                    </span>
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/user-support"
-                    onClick={() => handleDropdownToggle("close")}
-                    className={`flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[15vw] md:rounded-[0.3vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] ${pathname.includes("user-support") && "active"
-                      }`}
-                  >
-                    <i class="bx bx-support md:text-[1.3vw] text-[5vw] menu-icon"></i>
-                    <span className="md:text-[1.1vw] text-[4vw] link">
-                      Support
-                    </span>
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/reports"
-                    onClick={() => handleDropdownToggle("close")}
-                    className={`flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[15vw] md:rounded-[0.3vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] ${pathname.includes("reports") && "active"
-                      }`}
-                  >
-                    <i class="bx bxs-pie-chart-alt-2 md:text-[1.3vw] text-[5vw] menu-icon"></i>
-                    <span className="md:text-[1.1vw] text-[4vw] link">
-                      Reports
-                    </span>
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/account-settings"
-                    onClick={() => handleDropdownToggle("close")}
-                    className={`flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[15vw] md:rounded-[0.3vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] ${pathname === "/account-settings" && "active"
-                      }`}
-                  >
-                    <i className="bx bx-cog md:text-[1.3vw] text-[5vw] menu-icon"></i>
-                    <span className="md:text-[1.1vw] text-[4vw] link">
-                      Account Settings
-                    </span>
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/activity-logs"
-                    onClick={() => handleDropdownToggle("close")}
-                    className={`flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[15vw] md:rounded-[0.3vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] ${pathname === "/activity-logs" && "active"
-                      }`}
-                  >
-                    <i className="bx bx-cylinder md:text-[1.3vw] text-[5vw] menu-icon"></i>
-                    <span className="md:text-[1.1vw] text-[4vw] link">
-                      Activity Logs
-                    </span>
-                  </Link>
-                </li>
+                <PermissionWrapper permission={['document-requests.view', 'validation-requests.view']}>
+                  <li>
+                    <Link
+                      to="/manage-document"
+                      onClick={() => handleDropdownToggle("close")}
+                      className={`flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[15vw] md:rounded-[0.3vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] ${pathname.includes("manage-document") && "active"
+                        }`}
+                    >
+                      <i class="bx bxs-file md:text-[1.3vw] text-[5vw] menu-icon"></i>
+                      <span className="md:text-[1.1vw] text-[4vw] link">
+                        Manage Document
+                      </span>
+                    </Link>
+                  </li>
+                </PermissionWrapper>
+                <PermissionWrapper permission={['verification-requests.view']}>
+                  <li>
+                    <Link
+                      onClick={() => {
+                        handleMenuClick(); // Call the first function
+                        handleDropdownToggle("close"); // Call the second function
+                      }}
+                      className={`flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[10vw] md:rounded-[0.3vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] ${pathname.includes("e-check") || pathname.includes("subscription-plans") ? "active" : ""
+                        }`}
+                    >
+                      <i class="bx bxs-check-shield md:text-[1.3vw] text-[5vw] menu-icon"></i>
+                      <span className="md:text-[1.1vw] text-[4vw] link">
+                        E-Check
+                      </span>
+                    </Link>
+                  </li>
+                </PermissionWrapper>
+                <PermissionWrapper permission={['institution.payments.view']}>
+                  <li>
+                    <Link
+                      to="/payment"
+                      onClick={() => handleDropdownToggle("close")}
+                      className={`flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[15vw] md:rounded-[0.3vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] ${pathname === "/payment" && "active"
+                        }`}
+                    >
+                      <i className="bx bx-money md:text-[1.3vw] text-[5vw] menu-icon"></i>
+                      <span className="md:text-[1.1vw] text-[4vw] link">
+                        Payment Settings
+                      </span>
+                    </Link>
+                  </li>
+                </PermissionWrapper>
+                <PermissionWrapper permission={['institution.tickets.view']}>
+                  <li>
+                    <Link
+                      to="/user-support"
+                      onClick={() => handleDropdownToggle("close")}
+                      className={`flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[15vw] md:rounded-[0.3vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] ${pathname.includes("user-support") && "active"
+                        }`}
+                    >
+                      <i class="bx bx-support md:text-[1.3vw] text-[5vw] menu-icon"></i>
+                      <span className="md:text-[1.1vw] text-[4vw] link">
+                        Support
+                      </span>
+                    </Link>
+                  </li>
+                </PermissionWrapper>
+                {((permissions?.includes("institution.reports.view") && (permissions.includes("document-requests.view") || permissions.includes("validation-requests.view") || permissions.includes("verification-requests.view"))) || isAdmin) && (
+                  <li>
+                    <Link
+                      to="/reports"
+                      onClick={() => handleDropdownToggle("close")}
+                      className={`flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[15vw] md:rounded-[0.3vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] ${pathname.includes("reports") && "active"
+                        }`}
+                    >
+                      <i class="bx bxs-pie-chart-alt-2 md:text-[1.3vw] text-[5vw] menu-icon"></i>
+                      <span className="md:text-[1.1vw] text-[4vw] link">
+                        Reports
+                      </span>
+                    </Link>
+                  </li>
+                )}
+
+                <PermissionWrapper permission={['institution.settings.view']}>
+                  <li>
+                    <Link
+                      to="/account-settings"
+                      onClick={() => handleDropdownToggle("close")}
+                      className={`flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[15vw] md:rounded-[0.3vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] ${pathname === "/account-settings" && "active"
+                        }`}
+                    >
+                      <i className="bx bx-cog md:text-[1.3vw] text-[5vw] menu-icon"></i>
+                      <span className="md:text-[1.1vw] text-[4vw] link">
+                        Account Settings
+                      </span>
+                    </Link>
+                  </li>
+                </PermissionWrapper>
+                <PermissionWrapper permission={['institution.activity-logs.view']}>
+                  <li>
+                    <Link
+                      to="/activity-logs"
+                      onClick={() => handleDropdownToggle("close")}
+                      className={`flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[15vw] md:rounded-[0.3vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] ${pathname === "/activity-logs" && "active"
+                        }`}
+                    >
+                      <i className="bx bx-cylinder md:text-[1.3vw] text-[5vw] menu-icon"></i>
+                      <span className="md:text-[1.1vw] text-[4vw] link">
+                        Activity Logs
+                      </span>
+                    </Link>
+                  </li>
+                </PermissionWrapper>
+
                 {/* <li>
                   <Link
                     to="/profile"
@@ -257,8 +292,8 @@ function Sidebar() {
             </button>
             <div
               className={`mb-[1vw] side-show ${activeDropdown === "signout"
-                  ? "sidemenu-h"
-                  : "sidemenu-h-active"
+                ? "sidemenu-h"
+                : "sidemenu-h-active"
                 }`}
               ref={(el) => (dropdownRefs.current["signout"] = el)}
               style={{

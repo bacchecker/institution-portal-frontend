@@ -55,7 +55,7 @@ export default function Drawer({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ type: "tween" }}
-          className="fixed inset-0 bg-black/60 flex justify-end"
+          className="fixed z-50 inset-0 bg-black/60 flex justify-end"
         >
           <motion.div
             ref={bottonDrawerRef}
@@ -66,7 +66,7 @@ export default function Drawer({
             className={`${classNames} bg-white h-full flex flex-col gap-4 overflow-y-auto vertical-scrollbar`}
           >
             {/* Drawer header */}
-            <div className="border-b py-2 px-4 flex justify-between items-center">
+            <div className="border-b py-2.5 px-4 flex justify-between items-center z-50">
               <div className="flex gap-3 items-center">
                 {detailedView && (
                   <Button
