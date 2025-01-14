@@ -763,9 +763,9 @@ export default function ValidationRequest() {
               <div className="-mt-2">
                 <div className="">
                   <div className="space-y-2">
-                    {validationAnswers.sections &&
-                    validationAnswers.sections.length > 0 ? (
-                      validationAnswers.sections.map((section) => (
+                    {validationAnswers?.sections &&
+                    validationAnswers?.sections?.length > 0 ? (
+                      validationAnswers?.sections.map((section) => (
                         <div
                           key={section.id}
                           className="space-y-4 pb-4 border p-3 rounded-md"
@@ -906,8 +906,9 @@ export default function ValidationRequest() {
               >
                 Close
               </Button>
-              <PermissionWrapper permission={['validation-requests.cancel']}>
-                {(data?.status == "received" || data?.status == "submitted") && (
+              <PermissionWrapper permission={["validation-requests.cancel"]}>
+                {(data?.status == "received" ||
+                  data?.status == "submitted") && (
                   <Button
                     radius="none"
                     size="md"
@@ -918,8 +919,8 @@ export default function ValidationRequest() {
                   </Button>
                 )}
               </PermissionWrapper>
-              
-              <PermissionWrapper permission={['validation-requests.process']}>
+
+              <PermissionWrapper permission={["validation-requests.process"]}>
                 {data?.status !== "created" &&
                   data?.status !== "completed" &&
                   data?.status !== "processing" && (
@@ -954,7 +955,6 @@ export default function ValidationRequest() {
                   </Button>
                 )}
               </PermissionWrapper>
-              
             </div>
           </div>
         </Drawer>
