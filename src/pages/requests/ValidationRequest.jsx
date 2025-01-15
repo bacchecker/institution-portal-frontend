@@ -866,7 +866,7 @@ export default function ValidationRequest() {
                                   ?.input_type === "dropdown" && (
                                   <select
                                     className="w-full border rounded p-2.5 text-gray-700 focus:outline-none"
-                                    value={item?.answers || ""}
+                                    defaultValue={item?.answers || ""}
                                     onChange={(e) =>
                                       handleChange(item.id, e.target.value)
                                     }
