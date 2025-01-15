@@ -292,11 +292,14 @@ export default function ValidationRequest() {
     try {
       const url = `/institution/requests/validation-requests/answers/${requestId}`;
       const response = await axios.get(url);
-      setValidationAnswers(response.data.data);
+      console.log("Response", response.data.sections);
+
+      setValidationAnswers(response.data);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
+  console.log(validationRequests);
 
   return (
     <>
@@ -780,15 +783,19 @@ export default function ValidationRequest() {
 
                           {/* Render Items */}
                           <div className="space-y-4">
-                            {section.items.map((item) => (
+                            {section.checklist_items.map((item) => (
                               <div key={item.id} className="space-y-2">
                                 {/* Question Text */}
                                 <p className="text-sm font-normal">
-                                  {item.question_text}
+                                  {
+                                    item?.institutionDocumentTypeChecklistItem
+                                      ?.question_text
+                                  }
                                 </p>
 
                                 {/* Input Types */}
-                                {item.input_type === "yes_no" && (
+                                {item?.institutionDocumentTypeChecklistItem
+                                  ?.input_type === "yes_no" && (
                                   <div className="flex space-x-4 text-base text-gray-600">
                                     {/* Yes Option */}
                                     <div
@@ -842,22 +849,24 @@ export default function ValidationRequest() {
                                   </div>
                                 )}
 
-                                {item.input_type === "text" && (
+                                {item?.institutionDocumentTypeChecklistItem
+                                  ?.input_type === "text" && (
                                   <textarea
                                     className="w-full border rounded p-2 text-gray-700 focus:outline-none"
                                     rows="3"
                                     placeholder="Enter your answer..."
-                                    value={answers[item.id] || ""}
+                                    value={item.answer || ""}
                                     onChange={(e) =>
                                       handleChange(item.id, e.target.value)
                                     }
                                   ></textarea>
                                 )}
 
-                                {item.input_type === "dropdown" && (
+                                {item?.institutionDocumentTypeChecklistItem
+                                  ?.input_type === "dropdown" && (
                                   <select
                                     className="w-full border rounded p-2.5 text-gray-700 focus:outline-none"
-                                    value={answers[item.id] || ""}
+                                    value={item?.answers || ""}
                                     onChange={(e) =>
                                       handleChange(item.id, e.target.value)
                                     }
@@ -865,11 +874,13 @@ export default function ValidationRequest() {
                                     <option value="" disabled>
                                       Select an option...
                                     </option>
-                                    {item.options.map((option, index) => (
-                                      <option key={index} value={option}>
-                                        {option}
-                                      </option>
-                                    ))}
+                                    {item?.institutionDocumentTypeChecklistItem?.options.map(
+                                      (option, index) => (
+                                        <option key={index} value={option}>
+                                          {option}
+                                        </option>
+                                      )
+                                    )}
                                   </select>
                                 )}
                               </div>
@@ -947,8 +958,8 @@ export default function ValidationRequest() {
                     size="md"
                     onClick={handleSubmitValidationAnswers}
                     disabled={
-                      !validationAnswers.sections ||
-                      validationAnswers.sections.length === 0
+                      !validationAnswers?.sections ||
+                      validationAnswers?.sections.length === 0
                     } // Disable if no sections
                   >
                     Submit Validations
