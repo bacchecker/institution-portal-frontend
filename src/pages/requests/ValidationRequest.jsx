@@ -32,7 +32,7 @@ import {
   FaHeart,
   FaRegCircleCheck,
 } from "react-icons/fa6";
-import { IoDocuments } from "react-icons/io5";
+import { IoCloseCircleOutline, IoDocuments } from "react-icons/io5";
 import { PiQueueFill } from "react-icons/pi";
 import { FcCancel } from "react-icons/fc";
 import { GiCancel } from "react-icons/gi";
@@ -240,38 +240,40 @@ export default function ValidationRequest() {
 
   const handleSubmitValidationAnswers = async (event) => {
     event.preventDefault();
-
-    const allItemIds = validationAnswers.sections.flatMap((section) =>
-      section.items.map((item) => item.id)
+  
+    const allChecklistItems = validationAnswers.sections.flatMap((section) =>
+      section.checklist_items.map((item) => ({
+        id: item.id,
+      }))
     );
-
+  
     // Check if every item has an answer
-    const unansweredItems = allItemIds.filter(
-      (itemId) => !answers[itemId] || answers[itemId].trim() === ""
+    const unansweredItems = allChecklistItems.filter(
+      (item) => !answers[item.id] || answers[item.id].trim() === ""
     );
-
+  
     if (unansweredItems.length > 0) {
-      // Show an error message and prevent submission
       toast.error("Please provide answers to all questions before submitting.");
       return;
     }
-
+  
     const payload = {
-      validation_request: data?.id, // Include validation_request_id
-      checklist: Object.keys(answers).map((itemId) => ({
-        id: itemId,
-        value: answers[itemId],
+      validation_request_id: data?.id,
+      checklist: allChecklistItems.map((item) => ({
+        
+        id: item.id, // The checklist item's id
+        answer: answers[item.id], // Yes or No
       })),
     };
-
+  
     try {
       setIsSaving(true);
-
+  
       const response = await axios.post(
-        "/institution/requests/validation-request-answers",
+        "/institution/requests/confirm-request-answers",
         payload
       );
-
+  
       if (response.status === 201) {
         toast.success(response.data.message);
         setAnswers({});
@@ -287,13 +289,14 @@ export default function ValidationRequest() {
       setIsSaving(false);
     }
   };
+  
 
   const fetchRequestAnswers = async (requestId) => {
     try {
       const url = `/institution/requests/validation-requests/answers/${requestId}`;
       const response = await axios.get(url);
-      console.log("Response", response.data.sections);
-
+      console.log(response);
+      
       setValidationAnswers(response.data);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -588,9 +591,9 @@ export default function ValidationRequest() {
           }
           isOpen={openDrawer}
           setIsOpen={setOpenDrawer}
-          classNames="w-[100vw] md:w-[45vw] z-10"
+          classNames="w-[100vw] md:w-[45vw] xl:w-[35vw] z-10"
         >
-          <div className="h-full flex flex-col -mt-2 xl:pl-2 font-semibold justify-between">
+          <div className="h-full flex flex-col -mt-2 font-semibold justify-between">
             {data?.status != "processing" ? (
               <div className="flex flex-col gap-2 mb-6">
                 <div className="grid grid-cols-3 gap-y-4 gap-x-2 border-b pb-4">
@@ -766,15 +769,16 @@ export default function ValidationRequest() {
               <div className="-mt-2">
                 <div className="">
                   <div className="space-y-2">
-                    {validationAnswers?.sections &&
-                    validationAnswers?.sections?.length > 0 ? (
-                      validationAnswers?.sections.map((section) => (
+                    {validationAnswers.sections && validationAnswers.sections.length > 0 ? (
+                      validationAnswers.sections.map((section) => (
                         <div
-                          key={section.id}
-                          className="space-y-4 pb-4 border p-3 rounded-md"
+                          key={section.section_id}
+                          className="space-y-4 pb-4 border-b"
                         >
                           {/* Section Header */}
-                          <h2 className="text-base">{section.name}</h2>
+                          <h2 className="text-base">
+                            {section.checklist_items[0]?.institutionDocumentTypeChecklistItem?.section?.name}
+                          </h2>
                           {section.description && (
                             <p className="font-light text-gray-700 text-xs">
                               {section.description}
@@ -782,107 +786,71 @@ export default function ValidationRequest() {
                           )}
 
                           {/* Render Items */}
-                          <div className="space-y-4">
+                          <div className="grid grid-cols-2 gap-4">
                             {section.checklist_items.map((item) => (
                               <div key={item.id} className="space-y-2">
                                 {/* Question Text */}
-                                <p className="text-sm font-normal">
-                                  {
-                                    item?.institutionDocumentTypeChecklistItem
-                                      ?.question_text
-                                  }
-                                </p>
+                                <div>
+                                  <h4 className="text-sm font-medium">
+                                    {item.institutionDocumentTypeChecklistItem.question_text}
+                                  </h4>
+                                </div>
+                                
+                                {/* Answer Display */}
+                                <div className="relative w-full">
+                                  {item.institutionDocumentTypeChecklistItem && (
+                                    <input
+                                      type="text"
+                                      value={item.answer || ""}
+                                      readOnly
+                                      className="w-full px-3 py-2 border border-gray-300 rounded-[3px] bg-white text-gray-400 font-normal"
+                                    />
+                                  )}
+                                  
+                                </div>
 
-                                {/* Input Types */}
-                                {item?.institutionDocumentTypeChecklistItem
-                                  ?.input_type === "yes_no" && (
-                                  <div className="flex space-x-4 text-base text-gray-600">
-                                    {/* Yes Option */}
-                                    <div
-                                      className={`flex items-center justify-center space-x-2 cursor-pointer border pr-2 font-normal rounded-[4px] py-0.5 ${
-                                        answers[item.id] === "yes"
-                                          ? "text-green-600 border-green-600"
-                                          : "text-gray-600"
-                                      }`}
-                                      onClick={() =>
-                                        handleChange(item.id, "yes")
-                                      }
-                                    >
-                                      <input
-                                        type="radio"
-                                        name={item.id}
-                                        value="yes"
-                                        checked={answers[item.id] === "yes"}
-                                        onChange={() =>
-                                          handleChange(item.id, "yes")
-                                        }
-                                        className="hidden"
-                                      />
-                                      <FaRegCircleCheck size={18} />
-                                      <span>Yes</span>
-                                    </div>
-
-                                    {/* No Option */}
-                                    <div
-                                      className={`flex items-center justify-center space-x-2 cursor-pointer border font-normal rounded-[4px] pr-2 py-0.5 ${
-                                        answers[item.id] === "no"
-                                          ? "text-red-600 border-red-600"
-                                          : "text-gray-600"
-                                      }`}
-                                      onClick={() =>
-                                        handleChange(item.id, "no")
-                                      }
-                                    >
-                                      <input
-                                        type="radio"
-                                        name={item.id}
-                                        value="no"
-                                        checked={answers[item.id] === "no"}
-                                        onChange={() =>
-                                          handleChange(item.id, "no")
-                                        }
-                                        className="hidden"
-                                      />
-                                      <GiCancel size={18} />
-                                      <span>No</span>
-                                    </div>
-                                  </div>
-                                )}
-
-                                {item?.institutionDocumentTypeChecklistItem
-                                  ?.input_type === "text" && (
-                                  <textarea
-                                    className="w-full border rounded p-2 text-gray-700 focus:outline-none"
-                                    rows="3"
-                                    placeholder="Enter your answer..."
-                                    value={item.answer || ""}
-                                    onChange={(e) =>
-                                      handleChange(item.id, e.target.value)
-                                    }
-                                  ></textarea>
-                                )}
-
-                                {item?.institutionDocumentTypeChecklistItem
-                                  ?.input_type === "dropdown" && (
-                                  <select
-                                    className="w-full border rounded p-2.5 text-gray-700 focus:outline-none"
-                                    defaultValue={item?.answers || ""}
-                                    onChange={(e) =>
-                                      handleChange(item.id, e.target.value)
-                                    }
+                                {/* Yes/No Buttons */}
+                                <div className="flex space-x-3 text-base text-gray-600">
+                                  <div
+                                    className={`flex items-center justify-center space-x-2 cursor-pointer pr-2 font-normal rounded-[4px] py-0.5 ${
+                                      answers[item.id] === "yes"
+                                        ? "text-green-600 border-green-600"
+                                        : "text-gray-600"
+                                    }`}
+                                    onClick={() => handleChange(item.id, "yes")}
                                   >
-                                    <option value="" disabled>
-                                      Select an option...
-                                    </option>
-                                    {item?.institutionDocumentTypeChecklistItem?.options.map(
-                                      (option, index) => (
-                                        <option key={index} value={option}>
-                                          {option}
-                                        </option>
-                                      )
-                                    )}
-                                  </select>
-                                )}
+                                    <input
+                                      type="radio"
+                                      name={item.id}
+                                      value="yes"
+                                      checked={answers[item.id] === "yes"}
+                                      onChange={() => handleChange(item.id, "yes")}
+                                      className="hidden"
+                                    />
+                                    <FaRegCircleCheck size={18} />
+                                    <span>Yes</span>
+                                  </div>
+
+                                  <div
+                                    className={`flex items-center justify-center space-x-2 cursor-pointer font-normal rounded-[4px] pr-2 py-0.5 ${
+                                      answers[item.id] === "no"
+                                        ? "text-red-600 border-red-600"
+                                        : "text-gray-600"
+                                    }`}
+                                    onClick={() => handleChange(item.id, "no")}
+                                  >
+                                    <input
+                                      type="radio"
+                                      name={item.id}
+                                      value="no"
+                                      checked={answers[item.id] === "no"}
+                                      onChange={() => handleChange(item.id, "no")}
+                                      className="hidden"
+                                    />
+                                    <IoCloseCircleOutline size={22} />
+                                    <span>No</span>
+                                  </div>
+                                </div>
                               </div>
                             ))}
                           </div>
@@ -902,6 +870,7 @@ export default function ValidationRequest() {
                     )}
                   </div>
                 </div>
+
               </div>
             )}
 
@@ -962,7 +931,7 @@ export default function ValidationRequest() {
                       validationAnswers?.sections.length === 0
                     } // Disable if no sections
                   >
-                    Submit Validations
+                    Confirm Validations
                   </Button>
                 )}
               </PermissionWrapper>
@@ -976,8 +945,8 @@ export default function ValidationRequest() {
           title="Change Request Status"
           onButtonClick={async () => {
             setProcessing(true);
-            await axios
-              .post(
+            try {
+              const res = await axios.post(
                 `/institution/requests/validation-requests/${data?.id}/status`,
                 {
                   id: data?.id,
@@ -985,48 +954,46 @@ export default function ValidationRequest() {
                   user_id: data?.user_id,
                   unique_code: data?.unique_code,
                   status:
-                    data?.status == "submitted"
+                    data?.status === "submitted"
                       ? "received"
-                      : data?.status == "received"
+                      : data?.status === "received"
                       ? "processing"
-                      : data?.status == "rejected" || "cancelled"
+                      : data?.status === "rejected" || data?.status === "cancelled"
                       ? "received"
                       : "completed",
                 }
-              )
-              .then((res) => {
-                if (data?.status == "processing") {
-                  fetchValidationChecklist();
-                }
+              );
 
-                setData(res?.data);
-                setProcessing(false);
-                toast.success("Request status updated successfully");
-                institutionValidationRequests();
-                //mutate("/institution/requests/validation-requests");
-                changeStatusDisclosure.onClose();
-              })
-              .catch((err) => {
-                toast.error(err.response.data.message);
-                setProcessing(false);
-                changeStatusDisclosure.onClose();
-                return;
-              });
+              // Use the updated status from the response
+              if (res?.data?.status === "processing") {
+                await fetchRequestAnswers(data?.id); // Fetch answers only after the status is confirmed updated
+              }
+
+              setData(res?.data);
+              toast.success("Request status updated successfully");
+              institutionValidationRequests();
+              changeStatusDisclosure.onClose();
+            } catch (err) {
+              toast.error(err.response.data.message || "Failed to update status");
+            } finally {
+              setProcessing(false);
+            }
           }}
         >
           <p className="font-quicksand">
             Are you sure to change status to{" "}
             <span className="font-semibold">
-              {data?.status == "submitted"
+              {data?.status === "submitted"
                 ? "Received"
-                : data?.status == "received"
+                : data?.status === "received"
                 ? "Processing"
-                : data?.status == "rejected" || "cancelled"
+                : data?.status === "rejected" || data?.status === "cancelled"
                 ? "Received"
                 : "Complete Request"}
             </span>
           </p>
         </ConfirmModal>
+
 
         <DeleteModal
           disclosure={declineDisclosure}

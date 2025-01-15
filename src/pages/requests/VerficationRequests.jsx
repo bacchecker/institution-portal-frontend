@@ -4,10 +4,12 @@ import IncomingRequests from "../requests/verification-request/IncomingRequests"
 import OutgoingRequests from "./verification-request/OutgoingRequests";
 import Navbar from "@/components/Navbar";
 import axios from "@/utils/axiosConfig";
-import { FaCircleArrowDown } from "react-icons/fa6";
+import { FaCircleArrowDown, FaCreditCard } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
 import { MdDashboard } from "react-icons/md";
-
+import { HiMiniUsers } from "react-icons/hi2";
+import { IoMdTrendingUp } from "react-icons/io";
+import Dashboard from "./verification-request/Dashboard";
 
 export default function VerificationRequest() {
 
@@ -18,7 +20,7 @@ export default function VerificationRequest() {
   useEffect(() => {
     const fetchDashboardStats = async () => {
         try {
-            const response = await axios.get("/institution/updated-subscription");
+            const response = await axios.get("/institution/verification/dashboard-data");
             setReceivedRequest(response.data.received_requests || 0); // Fallback to 0 if undefined
             setSentRequest(response.data.sent_requests || 0);
             setSubscription(response.data.subscription || {});
@@ -62,41 +64,7 @@ export default function VerificationRequest() {
                 </div>
               }
             >
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 lg:gap-5 px-4 pt-4">
-                <div className="bg-black text-white rounded-lg p-5">
-                  <div className="flex items-center justify-between">
-                    <p className="text-lg">E-Check Subscription</p>
-                    <button
-                      onClick={handleNavigation}
-                      className="text-[11px] uppercase text-green-600 rounded-full px-2 bg-green-100 border border-green-600"
-                    >
-                      Upgrade
-                    </button>
-                  </div>
-                  
-                  <div className="flex justify-between">
-                    <p>Balance</p>
-                    <p>{subscription?.total_credit || 0}</p>
-                  </div>
-                  
-                </div>
-                <div className="bg-black text-white rounded-lg p-5">
-                  <p className="text-lg">Verification Sent</p>
-                  <div className="flex justify-between">
-                    <p>Count</p>
-                    <p>{sentRequest}</p>
-                  </div>
-                  
-                </div>
-                <div className="bg-black text-white rounded-lg p-5">
-                  <p className="text-lg">Verification Received</p>
-                  <div className="flex justify-between">
-                    <p>Count</p>
-                    <p>{receivedRequest}</p>
-                  </div>
-                  
-                </div>
-              </div>   
+              <Dashboard />
             </Tab>
             
             <Tab

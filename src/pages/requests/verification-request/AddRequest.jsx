@@ -100,7 +100,7 @@ function NewApplicationForm({
   const fetchSubscription = async () => {
     setLoading(true);
     try {
-        const response = await axios.get('/institution/updated-subscription');
+        const response = await axios.get('/institution/verification/dashboard-data');
 
         setSubscription(response.data.subscription);
         setLoading(false);
@@ -932,7 +932,7 @@ function NewApplicationForm({
                   </h6>
                 </div>
               </div>
-              <div className="border rounded-sm p-4 mt-4">
+              <div className="border rounded-md p-4 mt-4">
                 <p className="text-sm font-medium">Document Owner Information</p>
                 <div className="md:mt-[1vw] mt-[5vw]">
                   <h4 className="md:text-[1vw] text-[4vw] mb-1">
@@ -948,7 +948,9 @@ function NewApplicationForm({
                       required
                       className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0"
                     />
+                    
                   </div>
+                  <p className="text-[10px] text-bChkRed font-medium">Note: <span className="text-black">Please input surname first</span></p>
                 </div>
                 <div className="md:mt-[1vw] mt-[5vw]">
                   <h4 className="md:text-[1vw] text-[4vw] mb-1">

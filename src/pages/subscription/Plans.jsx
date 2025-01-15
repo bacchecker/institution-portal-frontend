@@ -1,7 +1,6 @@
 import React, {useState, useEffect} from "react";
 import axios from "@/utils/axiosConfig";
 import Navbar from "@/components/Navbar";
-import PermissionWrapper from "@/components/permissions/PermissionWrapper";
 import { MdOutlineRocketLaunch } from "react-icons/md";
 import { IoIosStar } from "react-icons/io";
 import Drawer from "@/components/Drawer";

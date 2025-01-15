@@ -117,7 +117,7 @@ function Sidebar() {
         </div>
       </div>
       <div
-        className={`md:w-[18%] fixed md:left-0 left-[-100%] top-0 bottom-0 bg-[#f8f8f8] border-r-2 border-[#E5E5E5] z-[1001] md:z-0 w-full flex md:flex-col flex-col-reverse nav-mobile ${(activeDropdown === "hamburgermenu" ||
+        className={`md:w-[17%] fixed md:left-0 left-[-100%] top-0 bottom-0 bg-[#f8f8f8] border-r-2 border-[#E5E5E5] z-[1001] md:z-0 w-full flex md:flex-col flex-col-reverse nav-mobile ${(activeDropdown === "hamburgermenu" ||
           activeDropdown === "support" ||
           activeDropdown === "service") &&
           "open1"
@@ -170,7 +170,7 @@ function Sidebar() {
                     </Link>
                   </li>
                 </PermissionWrapper>
-                <PermissionWrapper permission={['verification-requests.view']}>
+                {/* <PermissionWrapper permission={['verification-requests.view']}>
                   <li>
                     <Link
                       onClick={() => {
@@ -181,6 +181,21 @@ function Sidebar() {
                         }`}
                     >
                       <i class="bx bxs-check-shield md:text-[1.3vw] text-[5vw] menu-icon"></i>
+                      <span className="md:text-[1.1vw] text-[4vw] link">
+                        E-Check
+                      </span>
+                    </Link>
+                  </li>
+                </PermissionWrapper> */}
+                <PermissionWrapper permission={['verification-requests.view']}>
+                  <li>
+                    <Link
+                      to="/e-check"
+                      onClick={() => handleDropdownToggle("close")}
+                      className={`flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[15vw] md:rounded-[0.3vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] ${pathname === "/e-check" && "active"
+                        }`}
+                    >
+                      <i className="bx bx-money md:text-[1.3vw] text-[5vw] menu-icon"></i>
                       <span className="md:text-[1.1vw] text-[4vw] link">
                         E-Check
                       </span>
