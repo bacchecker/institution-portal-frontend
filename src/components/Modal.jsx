@@ -63,7 +63,7 @@ export default function Drawer({
                 initial="closed"
                 animate="open"
                 exit="closed"
-                className={`${classNames} bg-white h-4/5 flex flex-col gap-4 overflow-y-auto vertical-scrollbar`}
+                className={`${classNames} bg-white h-[90%] flex flex-col gap-4 overflow-y-auto vertical-scrollbar`}
             >
                 
 

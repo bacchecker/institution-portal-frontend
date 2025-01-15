@@ -9,6 +9,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsi
 import Modal from "@/components/Modal";
 import { fetchSubscription } from "../../subscription/fetchSubscription";
 import LoadItems from "../../../components/LoadItems";
+import { IoCloseCircleOutline } from "react-icons/io5";
 
 export default function Dashboard() {
     const [receivedRequest, setReceivedRequest] = useState(0);
@@ -31,7 +32,8 @@ export default function Dashboard() {
     const [isSaving, setIsSaving] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
     const [lastPage, setLastPage] = useState(1);
-    const [total, setTotal] = useState(0);
+    const [totalPages, setTotalPages] = useState(0);
+
 
     const pages = [
         <div className="w-full flex flex-col justify-center h-full">
@@ -224,7 +226,8 @@ export default function Dashboard() {
                 setPlans(planResponse.data);
                 setCurrentPage(planResponse.current_page);
                 setLastPage(planResponse.last_page);
-                setTotal(planResponse.total);
+                setTotalPages(Math.ceil(planResponse.total / planResponse.per_page));
+
               setLoading(false);
           } catch (error) {
               console.error('Error fetching plans:', error);
@@ -264,32 +267,7 @@ export default function Dashboard() {
     const handlePaymentChange = (e) => {
         setSelectedPayment(e.target.value); // Set the selected payment method
     };
-
-    const handlePageChange = (page) => {
-        if (page >= 1 && page <= lastPage) {
-          setCurrentPage(page);
-        }
-      };
-    
-      const renderPageNumbers = () => {
-        const pages = [];
-        for (let i = 1; i <= lastPage; i++) {
-          pages.push(
-            <button
-              key={i}
-              onClick={() => handlePageChange(i)}
-              className={`py-1.5 px-2.5 border rounded-lg ${
-                currentPage === i
-                  ? "bg-bChkRed text-white"
-                  : "bg-white text-gray-800"
-              }`}
-            >
-              {i}
-            </button>
-          );
-        }
-        return pages;
-      };
+   
 
   return (
     <>
@@ -533,9 +511,18 @@ export default function Dashboard() {
             classNames="w-[98vw] xl:w-[75vw] z-10 rounded-md"
         >
             <div className="h-full flex flex-col relative p-4 text-black">
+                <div className="w-full flex justify-end">
+                    <button
+                        onClick={() => {
+                            setOpenSubDrawer(false);
+                        }}
+                    >
+                        Close
+                    </button>
+                </div>
                 <div className="">
-                    <p className="font-semibold mb-2 text-lg">Choose Plan</p>
-                    <p className="w-full xl:w-2/3 text-sm">E-Check makes document verification fast, secure, and hassle-free. Choose a plan that fits your needs and start verifying instantly!</p>
+                    <p className="font-semibold mb-1 text-lg">Choose Plan</p>
+                    <p className="w-full xl:w-2/3 text-xs">E-Check makes document verification fast, secure, and hassle-free. Choose a plan that fits your needs and start verifying instantly!</p>
                 </div>
                 {loading ? (
                     <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 lg:gap-5 mt-4 lg:mt-8">
@@ -655,34 +642,50 @@ export default function Dashboard() {
                         
                     </div>
                 )}
-                <section>
-                    <div className="flex justify-between items-center my-1">
-                    <div>
-                        <span className="text-gray-600 font-medium text-sm">
-                        Page {currentPage} of {lastPage} - ({total} entries)
-                        </span>
-                    </div>
-                    <div className="flex space-x-2">
+                <div className="w-full absolute bottom-0 left-0 bg-white">
+                    <div className="flex justify-between items-center px-4">
+                        {/* Previous Button */}
                         <button
-                        disabled={currentPage === 1}
-                        onClick={() => handlePageChange(currentPage - 1)}
-                        className="px-2 bg-white text-gray-800 border rounded-lg disabled:bg-gray-300 disabled:text-white"
+                        disabled={currentPage === 0}
+                        className={`${
+                            currentPage === 0
+                            ? "bg-gray-300 text-gray-600 cursor-not-allowed"
+                            : "bg-bChkRed text-white hover:bg-red-500"
+                        } px-6 py-1 rounded-sm text-xs`}
+                        onClick={handlePrevious}
                         >
-                        <FaChevronLeft size={12} />
+                        Previous
                         </button>
-        
-                        {renderPageNumbers()}
-        
+
+                        {/* Page Indicators */}
+                        <div className="flex space-x-2">
+                        {Array.from({ length: totalPages }).map((_, index) => (
+                            <div
+                            key={index}
+                            className={`w-8 h-1 transition-all rounded-xl ${
+                                currentPage === index ? "bg-bChkRed" : "bg-gray-200"
+                            }`}
+                            ></div>
+                        ))}
+                        </div>
+
+                        {/* Next Button */}
                         <button
-                        disabled={currentPage === lastPage}
-                        onClick={() => handlePageChange(currentPage + 1)}
-                        className="px-2 bg-white text-gray-800 border rounded-lg disabled:bg-gray-300 disabled:text-white disabled:border-0"
+                        disabled={currentPage === totalPages - 1}
+                        className={`${
+                            currentPage === totalPages - 1
+                            ? "bg-gray-300 text-gray-600 cursor-not-allowed"
+                            : "bg-bChkRed text-white hover:bg-red-500"
+                        } px-6 py-1 rounded-sm text-xs`}
+                        onClick={handleNext}
                         >
-                        <FaChevronRight size={12} />
+                        Next
                         </button>
+
                     </div>
-                    </div>
-                </section>
+                </div>
+
+
             </div>
         </Modal>
         <Modal
