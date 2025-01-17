@@ -193,7 +193,7 @@ function EditDocumentType({ setOpenModal, openModal, selectedDocumentType }) {
           </div>
           <div className="md:mt-[2vw] mt-[10vw]">
             <h4 className="md:text-[1vw] text-[4vw] mb-1">
-              Document Fee<span className="text-[#f1416c]">*</span>
+              Document Request Fee<span className="text-[#f1416c]">*</span>
             </h4>
             <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
               <input
@@ -209,10 +209,11 @@ function EditDocumentType({ setOpenModal, openModal, selectedDocumentType }) {
                 className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0"
               />
             </div>
+            <h4 className="md:text-[0.8vw] text-[2.5vw] text-[#f1416c]">{`(A fee charged for requesting the issuance or retrieval of official documents, such as transcripts, certificates, or other records from the institution.)`}</h4>
           </div>
           <div className="md:mt-[2vw] mt-[10vw]">
             <h4 className="md:text-[1vw] text-[4vw] mb-1">
-              Validation Fee<span className="text-[#f1416c]">*</span>
+              Validation Request Fee<span className="text-[#f1416c]">*</span>
             </h4>
             <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
               <input
@@ -228,10 +229,11 @@ function EditDocumentType({ setOpenModal, openModal, selectedDocumentType }) {
                 className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0"
               />
             </div>
+            <h4 className="md:text-[0.8vw] text-[2.5vw] text-[#f1416c]">{`(A fee for confirming and validating the accuracy of specific information or credentials provided in institutional documents upon request.)`}</h4>
           </div>
           <div className="md:mt-[2vw] mt-[10vw]">
             <h4 className="md:text-[1vw] text-[4vw] mb-1">
-              Verification Fee<span className="text-[#f1416c]">*</span>
+              Verification Request Fee<span className="text-[#f1416c]">*</span>
             </h4>
             <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
               <input
@@ -247,10 +249,11 @@ function EditDocumentType({ setOpenModal, openModal, selectedDocumentType }) {
                 className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0"
               />
             </div>
+            <h4 className="md:text-[0.8vw] text-[2.5vw] text-[#f1416c]">{`(A fee charged for processing and verifying the authenticity of institutional documents upon request by students, alumni, or other entities.)`}</h4>
           </div>
           <div className="md:mt-[2vw] mt-[10vw]">
             <h4 className="md:text-[1vw] text-[4vw] mb-1">
-              Printing Fee
+              Document Printing Fee
               {userInput.hard_copy ? (
                 <span className="text-[#ff0404]">*</span>
               ) : (

@@ -7,6 +7,7 @@ const validateEmail = (email) => {
   ];
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
   if (!emailRegex.test(email)) {
     return "Invalid email format";
   }
@@ -18,4 +19,5 @@ const validateEmail = (email) => {
 
   return "";
 };
+
 export default validateEmail;

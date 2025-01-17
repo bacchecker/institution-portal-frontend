@@ -174,13 +174,13 @@ function AddNewDepartment({ setOpenModal, openModal, allPermissions }) {
               {Object?.entries(groupedPermissions)?.map(
                 ([category, subcategories]) => (
                   <div key={category} className="mb-[0.2vw]">
-                    <h2 className="text-[0.9vw] capitalize font-[600]">{`Manage ${category.replace(
-                      "-",
-                      " "
-                    )}`}</h2>
-                    {Object?.entries(subcategories)?.map(
-                      ([subcategory, actions]) => (
-                        <div key={subcategory} className="ml-[0.5vw]">
+                    <h2 className="text-[0.9vw] capitalize font-[600]">
+                      {`Manage ${category.replace("-", " ")}`}
+                    </h2>
+                    {Object?.entries(subcategories)
+                      ?.filter(([subcategory]) => !["roles", "permissions"].includes(subcategory))
+                      .map(([subcategory, actions]) => (
+                        <div key={subcategory} className="ml-[0.5vw] mt-[1vw]">
                           <h3 className="text-[0.9vw] capitalize">
                             {subcategory.replace("-", " ")}
                           </h3>
@@ -198,11 +198,11 @@ function AddNewDepartment({ setOpenModal, openModal, allPermissions }) {
                             </div>
                           ))}
                         </div>
-                      )
-                    )}
+                      ))}
                   </div>
                 )
               )}
+
             </div>
           </div>
         </div>

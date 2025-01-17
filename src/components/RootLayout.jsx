@@ -35,6 +35,8 @@ function RootLayout({ children }) {
 
   // TO DO Private Implementation Later
 
+
+
   useEffect(() => {
     if (user?.institution?.id) {
       window.Echo.channel(`institution.${user?.institution?.id}`).listen(
@@ -67,7 +69,7 @@ function RootLayout({ children }) {
         setUser({
           user: institutionDetails.institutionData?.user,
           two_factor: user.two_factor,
-          institution: institutionDetails.institutionData?.institution,
+          institution: user?.institution,
           selectedTemplate: user.selectedTemplate,
         })
       );
@@ -83,7 +85,7 @@ function RootLayout({ children }) {
   return (
     <>
       {pathname === "/2fa-authentication" ||
-      pathname === "/2fa-authentication-success" ? (
+        pathname === "/2fa-authentication-success" ? (
         <div className="flex flex-col p-[5vw] items-center">{children}</div>
       ) : pathname === "/account-under-review" ||
         pathname === "/account-setup" ? (
@@ -94,9 +96,8 @@ function RootLayout({ children }) {
         <div className="flex w-full relative">
           <Sidebar />
           <main
-            className={`md:pl-[17vw] w-full ${
-              pathname === "/account-settings" ? "bg-white" : "bg-[#d6d6d653]"
-            }`}
+            className={`md:pl-[17vw] w-full ${pathname === "/account-settings" ? "bg-white" : "bg-[#d6d6d653]"
+              }`}
           >
             {children}
           </main>

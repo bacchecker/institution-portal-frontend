@@ -33,7 +33,7 @@ export const baccheckerApi = createApi({
     return result;
   },
   keepUnusedDataFor: 5,
-  refetchOnFocus: true,
+  // refetchOnFocus: true,
   refetchOnReconnect: true,
   tagTypes: [
     "User",

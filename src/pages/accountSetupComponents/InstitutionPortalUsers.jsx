@@ -1,23 +1,17 @@
 import React, { useEffect, useState } from "react";
 import {
   useCreateNextScreenMutation,
-  useDeleteDomentTypeMutation,
   useDeleteInstitutionUserMutation,
-  useGetAllExistingDocumentTypesQuery,
   useGetInstitutionDepartmentsQuery,
-  useGetInstitutionDocumentTypesQuery,
   useGetInstitutionUsersQuery,
 } from "../../redux/apiSlice";
-import formatText from "@/components/FormatText";
 import LoadItems from "@/components/LoadItems";
-import AddNewDocumentType from "./institutionDocumentTypesComponents/AddNewDocumentType";
 import secureLocalStorage from "react-secure-storage";
 import Dropdown from "@/components/Dropdown";
 import { useDispatch } from "react-redux";
 import { setUser } from "../../redux/authSlice";
 import Swal from "sweetalert2";
 import LoadingPage from "@/components/LoadingPage";
-import EditDocumentType from "./institutionDocumentTypesComponents/EditDocumentType";
 import AddNewUser from "./institutionPortalUsersComponents/AddNewUser";
 import EditUser from "./institutionPortalUsersComponents/EditUser";
 
@@ -282,7 +276,7 @@ function InstitutionPortalUsers({ setActiveStep }) {
                   {!isFetching && !isLoading ? (
                     <>
                       {institutionUsers?.institutionUsers?.data?.length ===
-                      0 ? (
+                        0 ? (
                         <tr>
                           <td colSpan={7} rowSpan={5}>
                             <div className="w-full h-[35vw] flex flex-col justify-center items-center">

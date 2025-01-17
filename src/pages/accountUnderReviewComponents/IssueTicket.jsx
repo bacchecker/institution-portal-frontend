@@ -90,7 +90,7 @@ function IssueTicket({ setOpenModal, openModal }) {
       formData.append("description", description);
       formData.append("type", selectedType?.value);
       formData.append("category", selectedCategory?.value);
-      formData.append("file", selectedImage);
+      selectedImage && formData.append("file", selectedImage);
       try {
         await createTicket(formData);
       } catch (error) {

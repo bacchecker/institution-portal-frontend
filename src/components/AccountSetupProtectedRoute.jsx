@@ -5,7 +5,9 @@ import RedirectToAccountSetupPage from "./RedirectToAccountSetupPage";
 function AccountSetupProtectedRoute({ children }) {
   const user = JSON?.parse(secureLocalStorage?.getItem("user"));
 
-  return user?.institution?.setup_done ? (
+  
+
+  return user?.institution?.setup_done === 1 ? (
     children
   ) : (
     <RedirectToAccountSetupPage />
