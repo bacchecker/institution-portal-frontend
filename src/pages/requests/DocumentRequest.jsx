@@ -493,7 +493,7 @@ export default function DocumentRequest() {
               <TableCell>
                 {moment(item?.created_at).format("MMM D, YYYY")}
               </TableCell>
-              <TableCell>{item?.document_type?.name}</TableCell>
+              <TableCell>{item?.institution_document_type?.document_type?.name}</TableCell>
               <TableCell>
                 {item?.document_format == "hard_copy"
                   ? "Hard Copy"
@@ -602,9 +602,9 @@ export default function DocumentRequest() {
                 Document Request Summary
               </p>
               <div className="grid grid-cols-3 gap-y-4 border-b pb-4">
-                <div className="text-gray-500">{data?.document_type.name}</div>
+                <div className="text-gray-500">{data?.institution_document_type?.document_type?.name}</div>
                 <div className="col-span-2">
-                  {data?.document_type.description}
+                  {data?.institution_document_type?.document_type.description}
                 </div>
                 <div className="text-gray-500">Status</div>
                 <div
