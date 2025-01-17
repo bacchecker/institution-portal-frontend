@@ -188,7 +188,7 @@ function InstitutionDocumentTypes({ setActiveStep }) {
               className="bg-[#000000] md:my-[2vw!important] my-[4vw!important] w-fit flex justify-center items-center md:py-[0.7vw] py-[2vw] md:px-[2vw] h-[fit-content] md:rounded-[0.3vw] rounded-[2vw] gap-[0.5vw] hover:bg-[#282727] transition-all duration-300 disabled:bg-[#282727]"
             >
               <h4 className="md:text-[1vw] text-[3.5vw] text-[#ffffff]">
-                Add Doucment Type
+                Add Document Type
               </h4>
             </button>
           </div>

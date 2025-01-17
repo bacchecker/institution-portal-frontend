@@ -130,7 +130,7 @@ function EditDocumentType({ setOpenModal, openModal, selectedDocumentType }) {
 
   return (
     <SideModal
-      title={"DocumentType Details"}
+      title={"Document Type Details"}
       setOpenModal={setOpenModal}
       openModal={openModal}
     >
