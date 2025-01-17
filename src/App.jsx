@@ -44,9 +44,7 @@ function App() {
                     element={
                       <AuthenticatedSuccessProtectedRoute>
                         <AccountUnderReviewProtection>
-                          
-                            <AccountUnderReview />
-                          
+                          <AccountUnderReview />
                         </AccountUnderReviewProtection>
                       </AuthenticatedSuccessProtectedRoute>
                     }
@@ -73,9 +71,9 @@ function App() {
                     path="/dashboard"
                     element={
                       <AuthenticatedSuccessProtectedRoute>
-                        <AccountSetupProtectedRoute>
-                          <Dashboard />
-                        </AccountSetupProtectedRoute>
+                        {/* <AccountSetupProtectedRoute> */}
+                        <Dashboard />
+                        {/* </AccountSetupProtectedRoute> */}
                       </AuthenticatedSuccessProtectedRoute>
                     }
                   />
@@ -83,11 +81,11 @@ function App() {
                     path="/manage-document"
                     element={
                       <AuthenticatedSuccessProtectedRoute>
-                        <AccountSetupProtectedRoute>
-                          <PermissionProtectedRoute permission={['document-requests.view']}>
-                            <ManageRequest />
-                          </PermissionProtectedRoute>
-                        </AccountSetupProtectedRoute>
+                        {/* <AccountSetupProtectedRoute> */}
+                        <PermissionProtectedRoute permission={['document-requests.view']}>
+                          <ManageRequest />
+                        </PermissionProtectedRoute>
+                        {/* </AccountSetupProtectedRoute> */}
                       </AuthenticatedSuccessProtectedRoute>
                     }
                   />
@@ -95,12 +93,11 @@ function App() {
                     path="/e-check"
                     element={
                       <AuthenticatedSuccessProtectedRoute>
-                        <AccountSetupProtectedRoute>
+                        {/* <AccountSetupProtectedRoute> */}
                         <PermissionProtectedRoute permission={['verification-requests.view']}>
                           <VerificationRequest />
                         </PermissionProtectedRoute>
-                          
-                        </AccountSetupProtectedRoute>
+                        {/* </AccountSetupProtectedRoute> */}
                       </AuthenticatedSuccessProtectedRoute>
                     }
                   />
@@ -108,9 +105,9 @@ function App() {
                     path="/search-all"
                     element={
                       <AuthenticatedSuccessProtectedRoute>
-                        <AccountSetupProtectedRoute>
+                        {/* <AccountSetupProtectedRoute> */}
                           <SearchAll />
-                        </AccountSetupProtectedRoute>
+                        {/* </AccountSetupProtectedRoute> */}
                       </AuthenticatedSuccessProtectedRoute>
                     }
                   />
@@ -118,12 +115,11 @@ function App() {
                     path="/user-support"
                     element={
                       <AuthenticatedSuccessProtectedRoute>
-                        <AccountSetupProtectedRoute>
-                        <PermissionProtectedRoute permission={['institution.tickets.view']}>
-                          <Tickets />
-                        </PermissionProtectedRoute>
-                          
-                        </AccountSetupProtectedRoute>
+                        {/* <AccountSetupProtectedRoute> */}
+                          <PermissionProtectedRoute permission={['institution.tickets.view']}>
+                            <Tickets />
+                          </PermissionProtectedRoute>
+                        {/* </AccountSetupProtectedRoute> */}
                       </AuthenticatedSuccessProtectedRoute>
                     }
                   />
@@ -131,11 +127,11 @@ function App() {
                     path="/reports"
                     element={
                       <AuthenticatedSuccessProtectedRoute>
-                        <AccountSetupProtectedRoute>
+                        {/* <AccountSetupProtectedRoute> */}
                           <PermissionProtectedRoute permission={['institution.reports.view']}>
                             <RevenueOverview />
                           </PermissionProtectedRoute>
-                        </AccountSetupProtectedRoute>
+                        {/* </AccountSetupProtectedRoute> */}
                       </AuthenticatedSuccessProtectedRoute>
                     }
                   />
@@ -143,11 +139,11 @@ function App() {
                     path="/activity-logs"
                     element={
                       <AuthenticatedSuccessProtectedRoute>
-                        <AccountSetupProtectedRoute>
-                        <PermissionProtectedRoute permission={['institution.activity-logs.view']}>
-                          <SystemLogs />
-                        </PermissionProtectedRoute>
-                        </AccountSetupProtectedRoute>
+                        {/* <AccountSetupProtectedRoute> */}
+                          <PermissionProtectedRoute permission={['institution.activity-logs.view']}>
+                            <SystemLogs />
+                          </PermissionProtectedRoute>
+                        {/* </AccountSetupProtectedRoute> */}
                       </AuthenticatedSuccessProtectedRoute>
                     }
                   />
@@ -155,11 +151,11 @@ function App() {
                     path="/subscription-plans"
                     element={
                       <AuthenticatedSuccessProtectedRoute>
-                        <AccountSetupProtectedRoute>
+                        {/* <AccountSetupProtectedRoute> */}
                           <PermissionProtectedRoute permission={['verification-requests.view']}>
                             <Plans />
                           </PermissionProtectedRoute>
-                        </AccountSetupProtectedRoute>
+                        {/* </AccountSetupProtectedRoute> */}
                       </AuthenticatedSuccessProtectedRoute>
                     }
                   />
