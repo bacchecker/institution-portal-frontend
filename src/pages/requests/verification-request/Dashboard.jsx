@@ -18,17 +18,23 @@ export default function Dashboard() {
     const [tab, setTab] = useState("day");
     const [plans, setPlans] = useState([]);
     const [data, setData] = useState([]);
+    const [paymentData, setPaymentData] = useState([]);
     const [recentVerifications, setRecentVerifications] = useState([]);
     const [loading, setLoading] = useState(true);
     const [openDrawer, setOpenDrawer] = useState(false);
     const [openSubDrawer, setOpenSubDrawer] = useState(false);
     const [openPaymentDrawer, setOpenPaymentDrawer] = useState(false);
     // Payment States
-    const [selectedPayment, setSelectedPayment] = useState("");
-    const [mobileNetwork, setMobileNetwork] = useState("");
-    const [cardType, setCardType] = useState("");
-    const [cardNumber, setCardNumber] = useState("");
-    const [mobileNumber, setMobileNumber] = useState("");
+    const [selectedPayment, setSelectedPayment] = useState("card");
+    const [paymentDetails, setPaymentDetails] = useState({
+        cardNumber: "",
+        firstName: "",
+        lastName: "",
+        expirationDate: "",
+        cvv: "",
+        mobileMoneyNumber: "",
+        mobileNetwork: "",
+    });
     const [isSaving, setIsSaving] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
     const [lastPage, setLastPage] = useState(1);
@@ -38,7 +44,7 @@ export default function Dashboard() {
     const pages = [
         <div className="w-full flex flex-col justify-center h-full">
             <div className="w-full bg-black rounded-md h-48"></div>
-            <button onClick={() => {
+            <button type="button" onClick={() => {
                     setOpenDrawer(false);
                 }} className="w-full flex justify-end mt-1 font-normal underline">Skip</button>
             <div className="font-normal">
@@ -51,9 +57,9 @@ export default function Dashboard() {
         </div>,
         <div className="w-full flex flex-col justify-center h-full">
             <div className="w-full bg-black rounded-md h-48"></div>
-            <button onClick={() => {
+            <butto type="button" onClick={() => {
                     setOpenDrawer(false);
-                }} className="w-full flex justify-end mt-1 font-normal underline">Skip</button>
+                }} className="w-full flex justify-end mt-1 font-normal underline">Skip</butto>
                 <div className="font-normal pb-16">
                 <p className="font-semibold text-black mb-3 text-lg">How Does E-Check Work?</p>
                 <ol className="list-decimal list-inside space-y-2 text-gray-700">
@@ -138,7 +144,7 @@ export default function Dashboard() {
                     {plans.map((plan) => (
                     <div
                         key={plan.id}
-                        className="w-full rounded-xl px-3 lg:px-5 py-5 lg:py-7 bg-gray-100 shadow-sm hover:shadow-md"
+                        className="w-full rounded-xl px-3 lg:px-5 py-5 lg:py-7 bg-gray-100 shadow-sm hover:shadow-md flex flex-col justify-between"
                     >
                         <div className="w-full flex flex-col text-[13px] pb-3 border-b mb-2">
                         <p className="text-center">{plan?.name}</p>
@@ -162,9 +168,11 @@ export default function Dashboard() {
                         </div>
                         </div>
                         <button
+                        type="button"
                         onClick={() => {
                             setData(plan);
-                            setOpenDrawer(true);
+                            setOpenPaymentDrawer(true);
+                            setOpenSubDrawer(false);
                         }}
                         className="w-full hover:text-white text-gray-500 hover:bg-gray-500 bg-gray-300 rounded-md mt-6 py-2 text-xs"
                         >
@@ -173,7 +181,7 @@ export default function Dashboard() {
                     </div>
                     ))}
                 </div>
-                )}
+            )}
 
         </div>,
         
@@ -280,12 +288,12 @@ export default function Dashboard() {
         e.preventDefault();
         setIsSaving(true)
         const payload = {
-        subscription_plan_id: data?.id,
+        subscription_plan_id: paymentData?.id,
         channel: selectedPayment,
         payment_type: 'subscription',
-        amount: data?.amount,
-        ...(selectedPayment === "card" && { payment_method: cardType, payment_detail: cardNumber }),
-        ...(selectedPayment === "mobile_money" && { payment_method: mobileNetwork, payment_detail: mobileNumber }),
+        amount: paymentData?.amount,
+        ...(selectedPayment === "card" && { payment_method: cardType, "VISA": paymentDetails.cardNumber }),
+        ...(selectedPayment === "mobile_money" && { payment_method: paymentDetails.mobileNetwork, payment_detail: paymentDetails.mobileNumber }),
         };
     
         try {
@@ -300,9 +308,13 @@ export default function Dashboard() {
         }
     }
 
-    const handlePaymentChange = (e) => {
-        setSelectedPayment(e.target.value); // Set the selected payment method
-    };
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setPaymentDetails((prevDetails) => ({
+          ...prevDetails,
+          [name]: value,
+        }));
+      };
    
 
   return (
@@ -353,7 +365,8 @@ export default function Dashboard() {
                 <p className="font-medium">Remaining E-check subscription balance</p>
                 <div className="w-full flex items-center justify-between">
                     <p className="text-black text-xl font-semibold">{subscription?.total_credit || 0} Credits</p>
-                    <button 
+                    <button
+                        type="button" 
                         onClick={() => {
                             setOpenSubDrawer(true);
                         }} 
@@ -373,6 +386,7 @@ export default function Dashboard() {
                     <p className="font-medium text-base text-black">Verification Request</p>
                     <div className="mb-4 text-center bg-gray-200 rounded-md p-1">
                         <button
+                            type="button"
                             onClick={() => setTab("day")}
                             className={`mx-2 px-4 py-1 rounded border text-xs ${
                                 tab === "day" ? "bg-white text-purple-700" : "bg-gray-200 text-gray-500"
@@ -381,6 +395,7 @@ export default function Dashboard() {
                             Day
                         </button>
                         <button
+                            type="button"
                             onClick={() => setTab("week")}
                             className={`mx-2 px-4 py-1 rounded border text-xs ${
                                 tab === "week" ? "bg-white text-purple-700" : "bg-gray-200 text-gray-500"
@@ -481,7 +496,7 @@ export default function Dashboard() {
         <Modal
             isOpen={openDrawer}
             setIsOpen={setOpenDrawer}
-            classNames="w-[100vw] md:w-[80vw] xl:w-[60vw] z-10 rounded-md"
+            classNames="w-[98vw] md:w-[80vw] xl:w-[60vw] z-10 rounded-md"
         >
             <div className="h-full flex flex-col relative">
 
@@ -523,6 +538,7 @@ export default function Dashboard() {
                         {/* Next Button */}
                         {currentPage-1 < pages.length - 1 && (
                             <button
+                                type="button"
                                 className="bg-bChkRed text-white px-6 py-1 rounded-sm text-xs hover:bg-red-500"
                                 onClick={handleNext}
                             >
@@ -532,6 +548,7 @@ export default function Dashboard() {
                         {/* Close Button */}
                         {currentPage-1 === pages.length - 1 && (
                             <button
+                                type="button"
                                 className="bg-bChkRed text-white px-6 py-1 rounded-sm text-xs hover:bg-red-500"
                                 onClick={() => {
                                     setOpenDrawer(false);
@@ -547,11 +564,12 @@ export default function Dashboard() {
         <Modal
             isOpen={openSubDrawer}
             setIsOpen={setOpenSubDrawer}
-            classNames="w-[98vw] xl:w-[75vw] z-10 rounded-md"
+            classNames="w-[98vw] md:w-[80vw] xl:w-[60vw] z-10 rounded-md"
         >
             <div className="h-full flex flex-col relative p-4 text-black">
                 <div className="w-full flex justify-end">
                     <button
+                        type="button"
                         onClick={() => {
                             setOpenSubDrawer(false);
                         }}
@@ -564,127 +582,97 @@ export default function Dashboard() {
                     <p className="w-full xl:w-2/3 text-xs">E-Check makes document verification fast, secure, and hassle-free. Choose a plan that fits your needs and start verifying instantly!</p>
                 </div>
                 {loading ? (
-                    <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 lg:gap-5 mt-4 lg:mt-8">
-                        <div role="status" className="max-w-sm p-4 border border-gray-200 rounded shadow animate-pulse md:p-6 dark:border-gray-700">
-                            <div className="flex items-center justify-center h-48 mb-4 bg-gray-300 rounded dark:bg-gray-700">
-                                <svg className="w-10 h-10 text-gray-200 dark:text-gray-600" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 20">
-                                    <path d="M14.066 0H7v5a2 2 0 0 1-2 2H0v11a1.97 1.97 0 0 0 1.934 2h12.132A1.97 1.97 0 0 0 16 18V2a1.97 1.97 0 0 0-1.934-2ZM10.5 6a1.5 1.5 0 1 1 0 2.999A1.5 1.5 0 0 1 10.5 6Zm2.221 10.515a1 1 0 0 1-.858.485h-8a1 1 0 0 1-.9-1.43L5.6 10.039a.978.978 0 0 1 .936-.57 1 1 0 0 1 .9.632l1.181 2.981.541-1a.945.945 0 0 1 .883-.522 1 1 0 0 1 .879.529l1.832 3.438a1 1 0 0 1-.031.988Z"/>
-                                    <path d="M5 5V.13a2.96 2.96 0 0 0-1.293.749L.879 3.707A2.98 2.98 0 0 0 .13 5H5Z"/>
-                                </svg>
-                            </div>
-                            <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-48 mb-4"></div>
-                            <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 mb-2.5"></div>
-                            <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 mb-2.5"></div>
-                            <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700"></div>
-                            <div className="flex items-center mt-4">
-                            <svg className="w-10 h-10 me-3 text-gray-200 dark:text-gray-700" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-                                    <path d="M10 0a10 10 0 1 0 10 10A10.011 10.011 0 0 0 10 0Zm0 5a3 3 0 1 1 0 6 3 3 0 0 1 0-6Zm0 13a8.949 8.949 0 0 1-4.951-1.488A3.987 3.987 0 0 1 9 13h2a3.987 3.987 0 0 1 3.951 3.512A8.949 8.949 0 0 1 10 18Z"/>
-                                </svg>
-                                <div>
-                                    <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-32 mb-2"></div>
-                                    <div className="w-48 h-2 bg-gray-200 rounded-full dark:bg-gray-700"></div>
-                                </div>
-                            </div>
-                            <span className="sr-only">Loading...</span>
-                        </div>
-                        <div role="status" className="max-w-sm p-4 border border-gray-200 rounded shadow animate-pulse md:p-6 dark:border-gray-700">
-                            <div className="flex items-center justify-center h-48 mb-4 bg-gray-300 rounded dark:bg-gray-700">
-                                <svg className="w-10 h-10 text-gray-200 dark:text-gray-600" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 20">
-                                    <path d="M14.066 0H7v5a2 2 0 0 1-2 2H0v11a1.97 1.97 0 0 0 1.934 2h12.132A1.97 1.97 0 0 0 16 18V2a1.97 1.97 0 0 0-1.934-2ZM10.5 6a1.5 1.5 0 1 1 0 2.999A1.5 1.5 0 0 1 10.5 6Zm2.221 10.515a1 1 0 0 1-.858.485h-8a1 1 0 0 1-.9-1.43L5.6 10.039a.978.978 0 0 1 .936-.57 1 1 0 0 1 .9.632l1.181 2.981.541-1a.945.945 0 0 1 .883-.522 1 1 0 0 1 .879.529l1.832 3.438a1 1 0 0 1-.031.988Z"/>
-                                    <path d="M5 5V.13a2.96 2.96 0 0 0-1.293.749L.879 3.707A2.98 2.98 0 0 0 .13 5H5Z"/>
-                                </svg>
-                            </div>
-                            <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-48 mb-4"></div>
-                            <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 mb-2.5"></div>
-                            <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 mb-2.5"></div>
-                            <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700"></div>
-                            <div className="flex items-center mt-4">
-                            <svg className="w-10 h-10 me-3 text-gray-200 dark:text-gray-700" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-                                    <path d="M10 0a10 10 0 1 0 10 10A10.011 10.011 0 0 0 10 0Zm0 5a3 3 0 1 1 0 6 3 3 0 0 1 0-6Zm0 13a8.949 8.949 0 0 1-4.951-1.488A3.987 3.987 0 0 1 9 13h2a3.987 3.987 0 0 1 3.951 3.512A8.949 8.949 0 0 1 10 18Z"/>
-                                </svg>
-                                <div>
-                                    <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-32 mb-2"></div>
-                                    <div className="w-48 h-2 bg-gray-200 rounded-full dark:bg-gray-700"></div>
-                                </div>
-                            </div>
-                            <span className="sr-only">Loading...</span>
-                        </div>
-                        <div role="status" className="max-w-sm p-4 border border-gray-200 rounded shadow animate-pulse md:p-6 dark:border-gray-700">
-                            <div className="flex items-center justify-center h-48 mb-4 bg-gray-300 rounded dark:bg-gray-700">
-                                <svg className="w-10 h-10 text-gray-200 dark:text-gray-600" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 20">
-                                    <path d="M14.066 0H7v5a2 2 0 0 1-2 2H0v11a1.97 1.97 0 0 0 1.934 2h12.132A1.97 1.97 0 0 0 16 18V2a1.97 1.97 0 0 0-1.934-2ZM10.5 6a1.5 1.5 0 1 1 0 2.999A1.5 1.5 0 0 1 10.5 6Zm2.221 10.515a1 1 0 0 1-.858.485h-8a1 1 0 0 1-.9-1.43L5.6 10.039a.978.978 0 0 1 .936-.57 1 1 0 0 1 .9.632l1.181 2.981.541-1a.945.945 0 0 1 .883-.522 1 1 0 0 1 .879.529l1.832 3.438a1 1 0 0 1-.031.988Z"/>
-                                    <path d="M5 5V.13a2.96 2.96 0 0 0-1.293.749L.879 3.707A2.98 2.98 0 0 0 .13 5H5Z"/>
-                                </svg>
-                            </div>
-                            <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-48 mb-4"></div>
-                            <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 mb-2.5"></div>
-                            <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 mb-2.5"></div>
-                            <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700"></div>
-                            <div className="flex items-center mt-4">
-                            <svg className="w-10 h-10 me-3 text-gray-200 dark:text-gray-700" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-                                    <path d="M10 0a10 10 0 1 0 10 10A10.011 10.011 0 0 0 10 0Zm0 5a3 3 0 1 1 0 6 3 3 0 0 1 0-6Zm0 13a8.949 8.949 0 0 1-4.951-1.488A3.987 3.987 0 0 1 9 13h2a3.987 3.987 0 0 1 3.951 3.512A8.949 8.949 0 0 1 10 18Z"/>
-                                </svg>
-                                <div>
-                                    <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-32 mb-2"></div>
-                                    <div className="w-48 h-2 bg-gray-200 rounded-full dark:bg-gray-700"></div>
-                                </div>
-                            </div>
-                            <span className="sr-only">Loading...</span>
-                        </div>
-                    </div>
-                    ):(
-                    <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 lg:gap-5 mt-4 lg:mt-8">
-                        {plans.map((plan) => (
-                        <div
-                            key={plan.id}
-                            className="w-full rounded-xl px-3 lg:px-5 py-5 lg:py-7 bg-gray-100"
+                <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 lg:gap-5 mt-4 lg:mt-8">
+                    {[...Array(3)].map((_, index) => (
+                    <div
+                        key={index}
+                        role="status"
+                        className="max-w-sm p-4 border border-gray-200 rounded shadow animate-pulse md:p-6 dark:border-gray-700"
+                    >
+                        <div className="flex items-center justify-center h-48 mb-4 bg-gray-300 rounded dark:bg-gray-700">
+                        <svg
+                            className="w-10 h-10 text-gray-200 dark:text-gray-600"
+                            aria-hidden="true"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="currentColor"
+                            viewBox="0 0 16 20"
                         >
-                            <div className="w-full flex flex-col text-[13px] pb-3 border-b mb-2">
-                                <p className="text-center">{plan?.name}</p>
-                                <p className="font-semibold text-base text-center">GH₵ {plan?.amount}</p>
-                                <p className="font-light text-center -mt-1">Non-expiry</p>
-                            </div>
-                            <div className="my-2">
-                                <p className="font-semibold text-xs">Description</p>
-                                <p className="text-gray-500 text-xs text-justify mt-2">
-                                {plan?.description}
-                                </p>
-                            </div>
-                            
-                            <div className="flex flex-col space-y-1 mt-4 text-xs">
-                                <p className="font-semibold">Features</p>
-                                <div className="flex space-x-2 text-xs">
-                                    {/* <IoIosStar className="text-yellow-500" /> */}
-                                    <p>{plan?.credit} Credits</p>
-                                </div>
-                                <div className="flex space-x-2 text-xs">
-                                    {/* <IoIosStar className="text-yellow-500" /> */}
-                                    <p>{plan?.bonus} Bonus</p>
-                                </div>
-                                <div className="flex space-x-2 text-xs">
-                                    {/* <IoIosStar className="text-yellow-500" /> */}
-                                    <p>{plan?.total_credit} Total Credits</p>
-                                </div>
-                            </div>
-                            
-                            <button 
+                            <path d="M14.066 0H7v5a2 2 0 0 1-2 2H0v11a1.97 1.97 0 0 0 1.934 2h12.132A1.97 1.97 0 0 0 16 18V2a1.97 1.97 0 0 0-1.934-2ZM10.5 6a1.5 1.5 0 1 1 0 2.999A1.5 1.5 0 0 1 10.5 6Zm2.221 10.515a1 1 0 0 1-.858.485h-8a1 1 0 0 1-.9-1.43L5.6 10.039a.978.978 0 0 1 .936-.57 1 1 0 0 1 .9.632l1.181 2.981.541-1a.945.945 0 0 1 .883-.522 1 1 0 0 1 .879.529l1.832 3.438a1 1 0 0 1-.031.988Z" />
+                            <path d="M5 5V.13a2.96 2.96 0 0 0-1.293.749L.879 3.707A2.98 2.98 0 0 0 .13 5H5Z" />
+                        </svg>
+                        </div>
+                        <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-48 mb-4"></div>
+                        <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 mb-2.5"></div>
+                        <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 mb-2.5"></div>
+                        <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700"></div>
+                    </div>
+                    ))}
+                </div>
+                ) : plans.length === 0 ? (
+                <div className="text-center mt-8">
+                    <div className="md:!h-[40vh] h-[30vh] flex flex-col gap-8 items-center justify-center">
+                    <img src="/assets/img/no-data.svg" alt="No data" className="w-1/4 md:w-[10%] h-auto" />
+                    <p className="text-center text-slate-500 font-montserrat font-medium text-base -mt-6">
+                    No plans available at the moment. Please check back later.
+                    </p>
+                    </div>
+                </div>
+                ) : (
+                <div
+                    className={`grid ${
+                    plans.length === 1
+                        ? "grid-cols-1"
+                        : plans.length === 2
+                        ? "grid-cols-1 sm:grid-cols-2"
+                        : "grid-cols-2 lg:grid-cols-3"
+                    } gap-3 lg:gap-5 mt-4 lg:mt-8`}
+                >
+                    {plans.map((plan) => (
+                    <div
+                        key={plan.id}
+                        className="w-full rounded-xl px-3 lg:px-5 py-5 lg:py-7 bg-gray-100 shadow-sm hover:shadow-md flex flex-col justify-between"
+                    >
+                        <div className="w-full flex flex-col text-[13px] pb-3 border-b mb-2">
+                        <p className="text-center">{plan?.name}</p>
+                        <p className="font-semibold text-base text-center">GH₵ {plan?.amount}</p>
+                        <p className="font-light text-center -mt-1">Non-expiry</p>
+                        </div>
+                        <div className="my-2">
+                        <p className="font-semibold text-xs">Description</p>
+                        <p className="text-gray-500 text-xs text-justify mt-2">{plan?.description}</p>
+                        </div>
+                        <div className="flex flex-col space-y-1 mt-4 text-xs">
+                        <p className="font-semibold">Features</p>
+                        <div className="flex space-x-2 text-xs">
+                            <p>{plan?.credit} Credits</p>
+                        </div>
+                        <div className="flex space-x-2 text-xs">
+                            <p>{plan?.bonus} Bonus</p>
+                        </div>
+                        <div className="flex space-x-2 text-xs">
+                            <p>{plan?.total_credit} Total Credits</p>
+                        </div>
+                        </div>
+                        <button
+                            type="button"
                             onClick={() => {
-                                setData(plan);
-                                setOpenDrawer(true);
+                                setPaymentData(plan);
+                                setOpenPaymentDrawer(true);
+                                setOpenSubDrawer(false);
                             }}
                             className="w-full hover:text-white text-gray-500 hover:bg-gray-500 bg-gray-300 rounded-md mt-6 py-2 text-xs"
-                            >
-                            Choose Plan
-                            </button>
-                        </div>
-                        ))}
-                        
+                        >
+                        Choose Plan
+                        </button>
                     </div>
+                    ))}
+                </div>
                 )}
                 <div className="w-full absolute bottom-0 left-0 bg-white">
                     <div className="flex justify-between items-center px-4">
                         {/* Previous Button */}
                         <button
+                        type="button"
                         disabled={currentPage === 0}
                         className={`${
                             currentPage === 0
@@ -710,6 +698,7 @@ export default function Dashboard() {
 
                         {/* Next Button */}
                         <button
+                        type="button"
                         disabled={currentPage === totalPages - 1}
                         className={`${
                             currentPage === totalPages - 1
@@ -731,164 +720,227 @@ export default function Dashboard() {
             title="Payment Details"
             isOpen={openPaymentDrawer}
             setIsOpen={setOpenPaymentDrawer}
-            classNames="w-[100vw] md:w-[40vw] lg:w-[32vw] xl:w-[28vw] z-10"
+            classNames="w-[100vw] md:w-[80vw] lg:w-[60vw] z-10 rounded-md"
         >
-            <div className="h-full flex flex-col justify-between">
+            <div className="h-full flex flex-col relative p-4">
             <form onSubmit={handleFormSubmit} className="relative space-y-4 h-full text-sm">
-            <div className="flex flex-col space-y-3 -mt-5 font-semibold">
-                <div className="text-sm border-2 border-green-600 rounded-md p-4">
-                <div className="flex items-center justify-between space-x-2 ">
-                    <div className="flex space-x-3 items-center text-green-700">
-                    <FaRegCircleCheck size={24}/>
-                    <div className="text-lg">
-                        <p>{data?.name}</p>
+            <div className="flex flex-col font-semibold py-2">
+                {/* <div className="text-sm border-2 border-green-600 rounded-md p-4">
+                    <div className="flex items-center justify-between space-x-2 ">
+                        <div className="flex space-x-3 items-center text-green-700">
+                        <FaRegCircleCheck size={24}/>
+                        <div className="text-lg">
+                            <p>{paymentData?.name}</p>
+                        </div>
+                        </div>
+                        <div className="text-lg"><span className="text-sm font-normal">GH₵ </span>{paymentData?.amount}</div>
                     </div>
+                    <div className="flex space-x-2 mt-4 justify-end">
+                        <div className="flex space-x-1 text-xs">
+                            <IoIosStar className="text-yellow-500" />
+                            <p>{paymentData?.credit} Credits</p>
+                        </div>
+                        <div className="flex space-x-1 text-xs">
+                            <IoIosStar className="text-yellow-500" />
+                            <p>{paymentData?.bonus} Bonus</p>
+                        </div>
+                        <div className="flex space-x-1 text-xs">
+                            <IoIosStar className="text-yellow-500" />
+                            <p>{paymentData?.total_credit} Total Credit</p>
+                        </div>
                     </div>
-                    <div className="text-lg"><span className="text-sm font-normal">GH₵ </span>{data?.amount}</div>
-                </div>
-                <div className="flex space-x-2 mt-4 justify-end">
-                    <div className="flex space-x-1 text-xs">
-                        <IoIosStar className="text-yellow-500" />
-                        <p>{data?.credit} Credits</p>
-                    </div>
-                    <div className="flex space-x-1 text-xs">
-                        <IoIosStar className="text-yellow-500" />
-                        <p>{data?.bonus} Bonus</p>
-                    </div>
-                    <div className="flex space-x-1 text-xs">
-                        <IoIosStar className="text-yellow-500" />
-                        <p>{data?.total_credit} Total Credit</p>
-                    </div>
+                
+                </div> */}
+                <div className="">
+                    <p className="font-semibold text-black text-base">Add a billing method</p>
+                    <p className="font-normal text-black w-full xl:w-2/3">E-Check makes document verification fast, secure and hassle-free. Choose a plan that fits your needs and start verifying instantly</p> 
                 </div>
                 
-                </div>
-                <p className="uppercase text-sm">Select Payment Method</p>
+                <div class="flex flex-row space-x-4 mt-12">
+                    <div class="flex items-center">
+                        <input
+                        id="card-option"
+                        type="radio"
+                        name="payment"
+                        value="card"
+                        checked={selectedPayment === "card"}
+                        onChange={() => setSelectedPayment("card")}
+                        class="w-5 h-5 bg-gray-100 border-gray-300"
+                        />
+                        <label
+                        for="card-option"
+                        class="ms-2 text-base font-medium text-gray-900 dark:text-gray-300"
+                        >
+                        Debit Card
+                        </label>
+                    </div>
 
-                {/* Card Payment */}
-                <div
-                className={`flex justify-between items-center rounded-lg p-3 cursor-pointer ${
-                    selectedPayment === "card" ? "bg-bChkRed text-white" : "bg-gray-100 text-black"
-                }`}
-                onClick={() => setSelectedPayment("card")}
-                >
-                <input
-                    type="radio"
-                    name="payment"
-                    value="card"
-                    checked={selectedPayment === "card"}
-                    onChange={handlePaymentChange}
-                    className="hidden"
-                />
-                <div className="flex items-center space-x-4">
-                    <p>Card</p>
-                    <img
-                    src="/assets/img/visa-mastercard.svg"
-                    alt="Card"
-                    className="h-4 w-auto"
-                    />
-                </div>
+                    <div class="flex items-center">
+                        <input
+                        id="mobile-money-option"
+                        type="radio"
+                        name="payment"
+                        value="mobile_money"
+                        checked={selectedPayment === "mobile_money"}
+                        onChange={() => setSelectedPayment("mobile_money")}
+                        class="w-5 h-5 bg-gray-100 border-gray-300"
+                        />
+                        <label
+                        for="mobile-money-option"
+                        class="ms-2 text-base font-medium text-gray-900 dark:text-gray-300"
+                        >
+                        Mobile Wallet
+                        </label>
+                    </div>
                 </div>
 
-                {/* Mobile Money */}
-                <div
-                className={`flex justify-between items-center rounded-lg p-3 cursor-pointer ${
-                    selectedPayment === "mobile_money"
-                    ? "bg-bChkRed text-white"
-                    : "bg-gray-100 text-black"
-                }`}
-                onClick={() => setSelectedPayment("mobile_money")}
-                >
-                <input
-                    type="radio"
-                    name="payment"
-                    value="mobile_money"
-                    checked={selectedPayment === "mobile_money"}
-                    onChange={handlePaymentChange}
-                    className="hidden"
-                />
-                <div className="flex space-x-4 items-center">
-                    <p>Mobile Money</p>
-                    <img
-                    src="/assets/img/momo.png"
-                    alt="Mobile Money"
-                    className="h-4 w-auto"
-                    />
-                </div>
-                </div>
             </div>
 
             {/* Additional Fields for Card Payment */}
             {selectedPayment === "card" && (
-                <div className="space-y-3">
-                <select
-                    value={cardType}
-                    onChange={(e) => setCardType(e.target.value)}
-                    className="w-full border border-gray-300 p-2 rounded-md focus:outline-none"
-                >
-                    <option value="">Select Card Type</option>
-                    <option value="VISA">VISA</option>
-                    <option value="Master Card">Master Card</option>
-                </select>
-                <input
-                    type="text"
-                    placeholder="Card Number"
-                    value={cardNumber}
-                    onChange={(e) => setCardNumber(e.target.value)}
-                    className="w-full border border-gray-300 p-2 rounded-md focus:outline-none"
-                />
+                <div className="">
+                <div className="mb-5">
+                    <h4 className="md:text-[1vw] text-[4vw] mb-1">
+                        Card Number
+                    </h4>
+                    <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
+                        <input
+                        type="text"
+                        name="cardNumber"
+                        value={paymentDetails.cardNumber}
+                        onChange={handleInputChange}
+                        className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-white absolute left-0 right-0 bottom-0 top-0"
+                        />
+                    </div>
+                </div>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    <div className="">
+                        <h4 className="md:text-[1vw] text-[4vw] mb-1">
+                            First Name
+                        </h4>
+                        <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
+                            <input
+                            type="text"
+                            name="firstName"
+                            value={paymentDetails.firstName}
+                            onChange={handleInputChange}
+                            className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-white absolute left-0 right-0 bottom-0 top-0"
+                            />
+                        </div>
+                    </div>
+                    <div className="">
+                        <h4 className="md:text-[1vw] text-[4vw] mb-1">
+                            Last Name
+                        </h4>
+                        <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
+                            <input
+                            type="text"
+                            name="lastName"
+                            value={paymentDetails.lastName}
+                            onChange={handleInputChange}
+                            className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-white absolute left-0 right-0 bottom-0 top-0"
+                            />
+                        </div>
+                    </div>
+                    <div className="">
+                        <h4 className="md:text-[1vw] text-[4vw] mb-1">
+                            Expiration Date
+                        </h4>
+                        <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
+                            <input
+                            type="text"
+                            name="expirationDate"
+                            value={paymentDetails.expirationDate}
+                            onChange={handleInputChange}
+                            className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-white absolute left-0 right-0 bottom-0 top-0"
+                            />
+                        </div>
+                    </div>
+                    <div className="">
+                        <h4 className="md:text-[1vw] text-[4vw] mb-1">
+                           CVV
+                        </h4>
+                        <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
+                            <input
+                            type="text"
+                            name="cvv"
+                            value={paymentDetails.cvv}
+                            onChange={handleInputChange}
+                            className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-white absolute left-0 right-0 bottom-0 top-0"
+                            />
+                        </div>
+                    </div>
+                </div>
+               
                 </div>
             )}
 
             {/* Additional Fields for Mobile Money */}
             {selectedPayment === "mobile_money" && (
-                <div className="space-y-3">
-                <select
-                    value={mobileNetwork}
-                    onChange={(e) => setMobileNetwork(e.target.value)}
-                    className="w-full border border-gray-300 p-2 rounded-md focus:outline-none"
-                >
-                    <option value="">Select Mobile Network</option>
-                    <option value="MTN">MTN</option>
-                    <option value="Telecel">Telecel</option>
-                </select>
-                <input
-                    type="number"
-                    placeholder="Mobile Number"
-                    value={mobileNumber}
-                    onChange={(e) => setMobileNumber(e.target.value)}
-                    className="w-full border border-gray-300 p-2 rounded-md focus:outline-none"
-                />
+                <div className="space-y-6">
+                    <div className="md:mt-[2vw] mt-[10vw]">
+                    <h4 className="md:text-[1vw] text-[4vw] mb-1">
+                        Mobile Network
+                    </h4>
+                        <select
+                            name="mobileNetwork"
+                            value={paymentDetails.mobileNetwork}
+                            onChange={handleInputChange}
+                            className="w-full border border-gray-300 p-3 text-base rounded-md focus:outline-none"
+                        >
+                            <option value="">Select Mobile Network</option>
+                            <option value="MTN">MTN</option>
+                            <option value="Telecel">Telecel</option>
+                        </select>
+                </div>
+                
+                <div className="md:mt-[2vw] mt-[10vw]">
+                    <h4 className="md:text-[1vw] text-[4vw] mb-1">
+                        Mobile Number
+                    </h4>
+                    <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
+                        <input
+                        type="text"
+                        name="mobileNumber"
+                        value={paymentDetails.mobileNumber}
+                        onChange={handleInputChange}
+                        className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-white absolute left-0 right-0 bottom-0 top-0"
+                        />
+                    </div>
+                </div>
                 </div>
             )}
 
 
             
 
-            <div className="w-full absolute flex items-center space-x-2 justify-center border-t pt-2 text-sm bottom-0">
+            <div className="w-full absolute flex items-center space-x-2 justify-between pt-2 text-sm bottom-0">
                 <button
-                className="w-1/2 bg-black py-2 text-white font-medium !rounded-md"
+                type="button"
+                className=" bg-bChkRed py-2 px-4 text-white font-medium !rounded-sm"
                 onClick={() => {
-                    setOpenDrawer(false);
+                    setOpenPaymentDrawer(false);
+                    setOpenSubDrawer(true);
                     setData(null);
                     handleClear()
                 }}
                 >
-                Close
+                Back
                 </button>
                 <button
                 type="submit"
-                className="w-1/2 bg-bChkRed text-white py-2 rounded-md hover:bg-red-700"
+                className="px-4 bg-bChkRed text-white py-2 rounded-sm hover:bg-red-700"
             >
                 {isSaving ? (
                 <div className="flex items-center justify-center gap-2">
                     <LoadItems color={"#ffffff"} size={15} />
                     <h4 className=" text-[#ffffff]">
-                    Submitting...
+                    Completing...
                     </h4>
                 </div>
                 ) : (
                 <h4 className=" text-[#ffffff]">
-                    Submit Payment
+                    Complete Subscription
                 </h4>
                 )}
             </button>
