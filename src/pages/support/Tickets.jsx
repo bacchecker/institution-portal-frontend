@@ -14,6 +14,7 @@ import moment from 'moment';
 import UpdateTicket from "./UpdateTicket";
 import Elipsis from "../../assets/icons/elipsis";
 import Navbar from "@/components/Navbar";
+import secureLocalStorage from "react-secure-storage";
 import { MdOutlineFilterAlt, MdOutlineFilterAltOff } from "react-icons/md";
 import PermissionWrapper from "@/components/permissions/PermissionWrapper";
 
@@ -308,7 +309,8 @@ export default function Tickets() {
                         >
                           View Response
                         </DropdownItem>
-                        {secureLocalStorage.getItem('userPermissions')?.includes('institution.tickets.create') && (
+                        {(secureLocalStorage.getItem('userPermissions')?.includes('document-requests.view') || 
+                        JSON.parse(secureLocalStorage.getItem('userRole'))?.isAdmin) && (
                         <DropdownItem
                           key="edit"
                           onClick={() => {

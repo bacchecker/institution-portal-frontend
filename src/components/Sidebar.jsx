@@ -155,7 +155,7 @@ function Sidebar() {
                   </Link>
                 </li>
 
-                <PermissionWrapper permission={['document-requests.view', 'validation-requests.view']}>
+                {((permissions?.includes("document-requests.view") && (permissions.includes("validation-requests.view"))) || isAdmin) && (
                   <li>
                     <Link
                       to="/manage-document"
@@ -169,7 +169,7 @@ function Sidebar() {
                       </span>
                     </Link>
                   </li>
-                </PermissionWrapper>
+                )}
                 {/* <PermissionWrapper permission={['verification-requests.view']}>
                   <li>
                     <Link
@@ -187,7 +187,7 @@ function Sidebar() {
                     </Link>
                   </li>
                 </PermissionWrapper> */}
-                <PermissionWrapper permission={['verification-requests.view']}>
+                {((permissions?.includes("verification-requests.view")) || isAdmin) && (
                   <li>
                     <Link
                       to="/e-check"
@@ -201,8 +201,8 @@ function Sidebar() {
                       </span>
                     </Link>
                   </li>
-                </PermissionWrapper>
-                <PermissionWrapper permission={['institution.payments.view']}>
+                )}
+                {((permissions?.includes("institution.payments.view")) || isAdmin) && (
                   <li>
                     <Link
                       to="/payment"
@@ -216,8 +216,8 @@ function Sidebar() {
                       </span>
                     </Link>
                   </li>
-                </PermissionWrapper>
-                <PermissionWrapper permission={['institution.tickets.view']}>
+                )}
+                {((permissions?.includes("institution.tickets.view")) || isAdmin) && (
                   <li>
                     <Link
                       to="/user-support"
@@ -231,7 +231,7 @@ function Sidebar() {
                       </span>
                     </Link>
                   </li>
-                </PermissionWrapper>
+                )}
                 {((permissions?.includes("institution.reports.view") && (permissions.includes("document-requests.view") || permissions.includes("validation-requests.view") || permissions.includes("verification-requests.view"))) || isAdmin) && (
                   <li>
                     <Link
@@ -248,7 +248,7 @@ function Sidebar() {
                   </li>
                 )}
 
-                <PermissionWrapper permission={['institution.settings.view']}>
+              {((permissions?.includes("institution.settings.view")) || isAdmin) && (
                   <li>
                     <Link
                       to="/account-settings"
@@ -262,8 +262,8 @@ function Sidebar() {
                       </span>
                     </Link>
                   </li>
-                </PermissionWrapper>
-                <PermissionWrapper permission={['institution.activity-logs.view']}>
+                )}
+                {((permissions?.includes("institution.activity-logs.view")) || isAdmin) && (
                   <li>
                     <Link
                       to="/activity-logs"
@@ -277,7 +277,7 @@ function Sidebar() {
                       </span>
                     </Link>
                   </li>
-                </PermissionWrapper>
+                )}
 
                 {/* <li>
                   <Link

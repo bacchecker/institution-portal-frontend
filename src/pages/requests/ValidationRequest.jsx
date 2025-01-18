@@ -274,12 +274,11 @@ export default function ValidationRequest() {
         payload
       );
   
-      if (response.status === 201) {
-        toast.success(response.data.message);
-        setAnswers({});
-        setOpenDrawer(false);
-        institutionValidationRequests();
-      }
+      toast.success(response.data.message);
+      setAnswers({});
+      setOpenDrawer(false);
+      institutionValidationRequests();
+      
     } catch (error) {
       toast.error(
         error.response?.data?.message ||
