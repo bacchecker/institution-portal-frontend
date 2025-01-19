@@ -235,6 +235,10 @@ function AddNewUser({
                 className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0"
               />
             </div>
+            <h6 className="text-[#2e2e2e] md:text-[0.7vw] text-[2.7vw] font-[600] mt-[0.3vw]">
+              <span className="text-[#ff0404]">Note</span>: Email domian must be
+              the same as the institution email domain
+            </h6>
           </div>
           <div className="md:mt-[2vw] mt-[8vw]">
             <h4 className="md:text-[1vw] text-[4vw] mb-1">
@@ -254,32 +258,6 @@ function AddNewUser({
                 className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0"
               />
             </div>
-          </div>
-          <div className="md:mt-[2vw] mt-[8vw]">
-            <h4 className="md:text-[1vw] text-[4vw] mb-1">
-              Residential Address<span className="text-[#f1416c]">*</span>
-            </h4>
-            <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
-              <input
-                type="text"
-                name="address"
-                value={userInput.address}
-                onChange={handleUserInput}
-                className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0"
-              />
-            </div>
-          </div>
-          <div className="md:mt-[2vw] mt-[8vw]">
-            <h4 className="md:text-[1vw] text-[4vw] mb-1">
-              Gender<span className="text-[#f1416c]">*</span>
-            </h4>
-            <SelectInput
-              placeholder={"Select Option"}
-              data={data}
-              inputValue={selectedGender?.title}
-              onItemSelect={handleSeletedGender}
-              className="custom-dropdown-class display-md-none"
-            />
           </div>
           <div className="md:mt-[2vw] mt-[8vw]">
             <h4 className="md:text-[1vw] text-[4vw] mb-1">

@@ -29,7 +29,8 @@ function AccountSetup() {
           <div className="w-full  md:h-[3vw] h-[10vw] flex items-center">
             <div className="md:w-[3vw] w-[10vw] h-fit flex justify-center">
               <img
-                src={`${parseInt(current_step) === 1 ||
+                src={`${
+                  parseInt(current_step) === 1 ||
                   (activeStep && activeStep === 1) ||
                   parseInt(current_step) === 2 ||
                   (activeStep && activeStep === 2) ||
@@ -37,14 +38,15 @@ function AccountSetup() {
                   (activeStep && activeStep === 3) ||
                   parseInt(current_step) === 4 ||
                   activeStep === 4
-                  ? "/assets/img/complete1.svg"
-                  : "/assets/img/complete.svg"
-                  }`}
+                    ? "/assets/img/complete1.svg"
+                    : "/assets/img/complete.svg"
+                }`}
                 className="w-[1.5vw]"
               />
             </div>
             <h4
-              className={`text-[0.9vw] font-[600]  ${parseInt(current_step) === 1 ||
+              className={`text-[0.9vw] font-[600]  ${
+                parseInt(current_step) === 1 ||
                 (activeStep && activeStep === 1) ||
                 parseInt(current_step) === 2 ||
                 (activeStep && activeStep === 2) ||
@@ -52,9 +54,9 @@ function AccountSetup() {
                 (activeStep && activeStep === 3) ||
                 parseInt(current_step) === 4 ||
                 activeStep === 4
-                ? "text-[#ff0404]"
-                : "text-[#5F6368]"
-                }`}
+                  ? "text-[#04a604]"
+                  : "text-[#5F6368]"
+              }`}
             >
               Institution Data
             </h4>
@@ -62,7 +64,8 @@ function AccountSetup() {
           <div className="flex">
             <div className="md:w-[3vw] w-[10vw] h-fit flex justify-center">
               <div
-                className={`md:h-[4vw] h-[20vw] w-[1px]  border ${parseInt(current_step) === 1 ||
+                className={`md:h-[4vw] h-[20vw] w-[1px]  border ${
+                  parseInt(current_step) === 1 ||
                   (activeStep && activeStep === 1) ||
                   parseInt(current_step) === 2 ||
                   (activeStep && activeStep === 2) ||
@@ -70,9 +73,9 @@ function AccountSetup() {
                   (activeStep && activeStep === 3) ||
                   parseInt(current_step) === 4 ||
                   activeStep === 4
-                  ? "border-[#ff0404]"
-                  : "border-[#5F6368]"
-                  }`}
+                    ? "border-[#04a604]"
+                    : "border-[#5F6368]"
+                }`}
               ></div>
             </div>
             <h4 className="text-[0.8vw]">
@@ -84,28 +87,30 @@ function AccountSetup() {
           <div className="w-full  md:h-[3vw] h-[10vw] flex items-center">
             <div className="md:w-[3vw] w-[10vw] h-fit flex justify-center">
               <img
-                src={`${parseInt(current_step) === 2 ||
+                src={`${
+                  parseInt(current_step) === 2 ||
                   (activeStep && activeStep === 2) ||
                   parseInt(current_step) === 3 ||
                   (activeStep && activeStep === 3) ||
                   parseInt(current_step) === 4 ||
                   activeStep === 4
-                  ? "/assets/img/complete1.svg"
-                  : "/assets/img/complete.svg"
-                  }`}
+                    ? "/assets/img/complete1.svg"
+                    : "/assets/img/complete.svg"
+                }`}
                 className="w-[1.5vw]"
               />
             </div>
             <h4
-              className={`text-[0.9vw] font-[600]  ${parseInt(current_step) === 2 ||
+              className={`text-[0.9vw] font-[600]  ${
+                parseInt(current_step) === 2 ||
                 (activeStep && activeStep === 2) ||
                 parseInt(current_step) === 3 ||
                 (activeStep && activeStep === 3) ||
                 parseInt(current_step) === 4 ||
                 activeStep === 4
-                ? "text-[#ff0404]"
-                : "text-[#5F6368]"
-                }`}
+                  ? "text-[#04a604]"
+                  : "text-[#5F6368]"
+              }`}
             >
               Institution Document Types
             </h4>
@@ -113,15 +118,16 @@ function AccountSetup() {
           <div className="flex">
             <div className="md:w-[3vw] w-[10vw] h-fit flex justify-center">
               <div
-                className={`md:h-[4vw] h-[20vw] w-[1px] border  ${parseInt(current_step) === 2 ||
+                className={`md:h-[4vw] h-[20vw] w-[1px] border  ${
+                  parseInt(current_step) === 2 ||
                   (activeStep && activeStep === 2) ||
                   parseInt(current_step) === 3 ||
                   (activeStep && activeStep === 3) ||
                   parseInt(current_step) === 4 ||
                   activeStep === 4
-                  ? "border-[#ff0404]"
-                  : "border-[#5F6368]"
-                  }`}
+                    ? "border-[#04a604]"
+                    : "border-[#5F6368]"
+                }`}
               ></div>
             </div>
             <h4 className="text-[0.8vw]">
@@ -134,24 +140,26 @@ function AccountSetup() {
           <div className="w-full  md:h-[3vw] h-[10vw] flex items-center">
             <div className="md:w-[3vw] w-[10vw] h-fit flex justify-center">
               <img
-                src={`${parseInt(current_step) === 3 ||
+                src={`${
+                  parseInt(current_step) === 3 ||
                   (activeStep && activeStep === 3) ||
                   parseInt(current_step) === 4 ||
                   activeStep === 4
-                  ? "/assets/img/complete1.svg"
-                  : "/assets/img/complete.svg"
-                  }`}
+                    ? "/assets/img/complete1.svg"
+                    : "/assets/img/complete.svg"
+                }`}
                 className="w-[1.5vw]"
               />
             </div>
             <h4
-              className={`text-[0.9vw] font-[600] ${parseInt(current_step) === 3 ||
+              className={`text-[0.9vw] font-[600] ${
+                parseInt(current_step) === 3 ||
                 (activeStep && activeStep === 3) ||
                 parseInt(current_step) === 4 ||
                 activeStep === 4
-                ? "text-[#ff0404]"
-                : "text-[#5F6368]"
-                }`}
+                  ? "text-[#04a604]"
+                  : "text-[#5F6368]"
+              }`}
             >
               Institution Departments
             </h4>
@@ -159,13 +167,14 @@ function AccountSetup() {
           <div className="flex">
             <div className="md:w-[3vw] w-[10vw] h-fit flex justify-center">
               <div
-                className={`md:h-[4vw] h-[20vw] w-[1px]  border ${parseInt(current_step) === 3 ||
+                className={`md:h-[4vw] h-[20vw] w-[1px]  border ${
+                  parseInt(current_step) === 3 ||
                   (activeStep && activeStep === 3) ||
                   parseInt(current_step) === 4 ||
                   activeStep === 4
-                  ? "border-[#ff0404]"
-                  : "border-[#5F6368]"
-                  }`}
+                    ? "border-[#04a604]"
+                    : "border-[#5F6368]"
+                }`}
               ></div>
             </div>
             <h4 className="text-[0.8vw]">
@@ -177,18 +186,20 @@ function AccountSetup() {
           <div className="w-full  md:h-[3vw] h-[10vw] flex items-center">
             <div className="md:w-[3vw] w-[10vw] h-fit flex justify-center">
               <img
-                src={`${parseInt(current_step) === 4 || activeStep === 4
-                  ? "/assets/img/complete1.svg"
-                  : "/assets/img/complete.svg"
-                  }`}
+                src={`${
+                  parseInt(current_step) === 4 || activeStep === 4
+                    ? "/assets/img/complete1.svg"
+                    : "/assets/img/complete.svg"
+                }`}
                 className="w-[1.5vw]"
               />
             </div>
             <h4
-              className={`text-[0.9vw] font-[600] ${parseInt(current_step) === 4 || activeStep === 4
-                ? "text-[#ff0404]"
-                : "text-[#5F6368]"
-                }`}
+              className={`text-[0.9vw] font-[600] ${
+                parseInt(current_step) === 4 || activeStep === 4
+                  ? "text-[#04a604]"
+                  : "text-[#5F6368]"
+              }`}
             >
               Institution Portal Users
             </h4>
@@ -215,9 +226,16 @@ function AccountSetup() {
             </h4>
           </button>
           <h4 className="text-[0.9vw]">
-            Or email us on <a href="mailto:info@bacchecker.online" target="_blank" rel="noopener noreferrer" className="underline text-[#ff0404]">info@bacchecker.online</a>{" "}
-            and we will always
-            help you through the process
+            Or email us on{" "}
+            <a
+              href="mailto:info@bacchecker.online"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline text-[#ff0404]"
+            >
+              info@bacchecker.online
+            </a>{" "}
+            and we will always help you through the process
           </h4>
         </div>
       </div>
@@ -235,10 +253,11 @@ function AccountSetup() {
       )}
 
       <div
-        className={`fixed  bg-[#000000dd] z-[30] flex items-center justify-center transition-all duration-300 w-[100vw] h-[100vh] ${parseInt(current_step) === 5 || activeStep === 5
-          ? "top-0 left-0 right-0 bottom-0"
-          : "top-0 left-[100vw] right-0"
-          }`}
+        className={`fixed  bg-[#000000dd] z-[30] flex items-center justify-center transition-all duration-300 w-[100vw] h-[100vh] ${
+          parseInt(current_step) === 5 || activeStep === 5
+            ? "top-0 left-0 right-0 bottom-0"
+            : "top-0 left-[100vw] right-0"
+        }`}
       >
         <div className="w-[40vw] bg-[#ffffff] rounded-[0.2vw]">
           <div className="w-full h-[20vw]">
