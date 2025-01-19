@@ -323,8 +323,8 @@ export default function OutgoingRequests() {
     <>
     <div>
         <section className="px-3">
-        <div className="md:w-full w-full mx-auto rounded-md mb-2">
-            <div className="w-full bg-gray-100 p-6">
+        <Card className="md:w-full w-full mx-auto rounded-md shadow-none border-none mb-2">
+            <CardBody className="w-full bg-gray-100 p-6">
             <form
                 onSubmit={handleSubmit}
                 className="flex flex-row gap-3 items-center"
@@ -427,8 +427,8 @@ export default function OutgoingRequests() {
                 </Button>
                 </div>
             </form>
-            </div>
-        </div>
+            </CardBody>
+        </Card>
 
         {/* <div className="my-3 w-full shadow-none rounded-lg">
             <div className="grid w-full grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -496,7 +496,7 @@ export default function OutgoingRequests() {
             <CustomTable
                 columns={[
                 "ID",
-                "Responding Institution",
+                "Verifying Institution",
                 "Date",
                 "Documents",
                 "Status",
