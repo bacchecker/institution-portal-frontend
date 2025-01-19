@@ -72,7 +72,7 @@ function RootLayout({ children }) {
         })
       );
     }
-  }, [institutionDetails, user, dispatch, message]);
+  }, [institutionDetails, user, dispatch, message, pathname]);
 
   useEffect(() => {
     const storedUser = JSON.parse(secureLocalStorage.getItem("user"));
