@@ -6,7 +6,12 @@ import { useDispatch } from "react-redux";
 import { useLoginUserMutation } from "../redux/apiSlice";
 import { toast } from "sonner";
 import LoadItems from "@/components/LoadItems";
-import { setUser, setUserToken, setUserPermissions, setIsAdmin } from "../redux/authSlice";
+import {
+  setUser,
+  setUserToken,
+  setUserPermissions,
+  setIsAdmin,
+} from "../redux/authSlice";
 import ReCAPTCHA from "react-google-recaptcha";
 import {
   resetInputValues,
@@ -56,7 +61,6 @@ function Login() {
     }
   };
 
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     const { email, password, remember } = userInput;
@@ -103,7 +107,7 @@ function Login() {
     const selectedTemplate = data?.data?.letter_template;
     const isAdmin = data?.data?.isAdmin;
 
-
+    console.log(permissions);
 
     if (user?.type?.toLowerCase() !== "user") {
       if (token) {
@@ -236,8 +240,9 @@ function Login() {
             >
               <i
                 onClick={() => setShowPassword((prev) => !prev)}
-                className={`bx ${showPassword ? "bx-hide" : "bx-show"
-                  } text-[#2e2e2e] md:text-[1.5vw] text-[6vw] cursor-pointer`}
+                className={`bx ${
+                  showPassword ? "bx-hide" : "bx-show"
+                } text-[#2e2e2e] md:text-[1.5vw] text-[6vw] cursor-pointer`}
               ></i>
             </button>
             <input

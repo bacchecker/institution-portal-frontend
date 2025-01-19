@@ -9,7 +9,7 @@ const initialState = {
   two_factor: null,
   institution: null,
   selectedTemplate: null,
-  isAdmin: null
+  isAdmin: null,
 };
 
 export const authSlice = createSlice({
@@ -53,6 +53,8 @@ export const authSlice = createSlice({
       state.isAdmin = action.payload.isAdmin;
     },
     setUserPermissions: (state, action) => {
+      console.log(action.payload.permissions);
+
       secureLocalStorage.setItem(
         "userPermissions",
         JSON.stringify(action.payload.permissions)
@@ -69,11 +71,12 @@ export const authSlice = createSlice({
       state.two_factor = null;
       state.institution = null;
       state.selectedTemplate = null;
-      state.isAdmin = null
+      state.isAdmin = null;
     },
   },
 });
 
-export const { setUser, logout, setUserToken, setUserPermissions, setIsAdmin } = authSlice.actions;
+export const { setUser, logout, setUserToken, setUserPermissions, setIsAdmin } =
+  authSlice.actions;
 
 export default authSlice.reducer;

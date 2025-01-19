@@ -16,6 +16,7 @@ function RootLayout({ children }) {
 
   const user = JSON.parse(secureLocalStorage.getItem("user"));
   const token = JSON?.parse(secureLocalStorage?.getItem("userToken"))?.token;
+  console.log(user);
 
   window.Pusher = Pusher;
   window.Echo = new Echo({
@@ -34,8 +35,6 @@ function RootLayout({ children }) {
   });
 
   // TO DO Private Implementation Later
-
-
 
   useEffect(() => {
     if (user?.institution?.id) {
@@ -65,11 +64,12 @@ function RootLayout({ children }) {
         })
       );
     } else if (institutionDetails && user) {
+      console.log(institutionDetails.institutionData);
       dispatch(
         setUser({
           user: institutionDetails.institutionData?.user,
           two_factor: user.two_factor,
-          institution: user?.institution,
+          institution: institutionDetails.institutionData?.institution,
           selectedTemplate: user.selectedTemplate,
         })
       );
@@ -92,7 +92,7 @@ function RootLayout({ children }) {
   return (
     <>
       {pathname === "/2fa-authentication" ||
-        pathname === "/2fa-authentication-success" ? (
+      pathname === "/2fa-authentication-success" ? (
         <div className="flex flex-col p-[5vw] items-center">{children}</div>
       ) : pathname === "/account-under-review" ||
         pathname === "/account-setup" ? (
@@ -103,8 +103,9 @@ function RootLayout({ children }) {
         <div className="flex w-full relative">
           <Sidebar />
           <main
-            className={`md:pl-[17vw] w-full ${pathname === "/account-settings" ? "bg-white" : "bg-[#d6d6d653]"
-              }`}
+            className={`md:pl-[17vw] w-full ${
+              pathname === "/account-settings" ? "bg-white" : "bg-[#d6d6d653]"
+            }`}
           >
             {children}
           </main>

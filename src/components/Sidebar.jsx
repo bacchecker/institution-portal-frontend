@@ -18,8 +18,9 @@ function Sidebar() {
   const dispatch = useDispatch();
   const user = JSON?.parse(secureLocalStorage?.getItem("user"))?.user;
   const token = JSON?.parse(secureLocalStorage?.getItem("userToken"))?.token;
-  let permissions = secureLocalStorage.getItem('userPermissions') || [];
+  let permissions = secureLocalStorage.getItem("userPermissions") || [];
   const isAdmin = JSON.parse(secureLocalStorage.getItem("userRole"))?.isAdmin;
+  console.log(permissions);
 
   const handleDropdownToggle = (dropdownId) => {
     setActiveDropdown(activeDropdown === dropdownId ? null : dropdownId);
@@ -44,9 +45,9 @@ function Sidebar() {
     const totalCredit = subscription?.total_credit || 0;
 
     if (totalCredit < 5) {
-      navigate('/subscription-plans'); // Redirect to subscription plan page
+      navigate("/subscription-plans"); // Redirect to subscription plan page
     } else {
-      navigate('/e-check'); // Redirect to e-check
+      navigate("/e-check"); // Redirect to e-check
     }
   };
 
@@ -117,11 +118,12 @@ function Sidebar() {
         </div>
       </div>
       <div
-        className={`md:w-[17%] fixed md:left-0 left-[-100%] top-0 bottom-0 bg-[#f8f8f8] border-r-2 border-[#E5E5E5] z-[1001] md:z-0 w-full flex md:flex-col flex-col-reverse nav-mobile ${(activeDropdown === "hamburgermenu" ||
-          activeDropdown === "support" ||
-          activeDropdown === "service") &&
+        className={`md:w-[17%] fixed md:left-0 left-[-100%] top-0 bottom-0 bg-[#f8f8f8] border-r-2 border-[#E5E5E5] z-[1001] md:z-0 w-full flex md:flex-col flex-col-reverse nav-mobile ${
+          (activeDropdown === "hamburgermenu" ||
+            activeDropdown === "support" ||
+            activeDropdown === "service") &&
           "open1"
-          }`}
+        }`}
       >
         <div className="w-full h-[80%]">
           <div className="flex w-full justify-center py-[5px] md:border-b-2 border-[#E5E5E5]">
@@ -140,13 +142,13 @@ function Sidebar() {
           <div className="w-full h-[100%] overflow-auto">
             <div className="h-[70%] overflow-auto md:px-[1.5vw] px-[5vw] sidebar-menu">
               <ul className="flex flex-col gap-[0.7vw] mt-[2vw] item-list">
-
                 <li>
                   <Link
                     to="/dashboard"
                     onClick={() => handleDropdownToggle("close")}
-                    className={`flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[15vw] md:rounded-[0.3vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] ${pathname === "/dashboard" && "active"
-                      }`}
+                    className={`flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[15vw] md:rounded-[0.3vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] ${
+                      pathname === "/dashboard" && "active"
+                    }`}
                   >
                     <i class="bx bxs-dashboard md:text-[1.3vw] text-[5vw] menu-icon"></i>
                     <span className="md:text-[1.1vw] text-[4vw] link">
@@ -155,13 +157,16 @@ function Sidebar() {
                   </Link>
                 </li>
 
-                {((permissions?.includes("document-requests.view") && (permissions.includes("validation-requests.view"))) || isAdmin) && (
+                {((permissions?.includes("document-requests.view") &&
+                  permissions.includes("validation-requests.view")) ||
+                  isAdmin) && (
                   <li>
                     <Link
                       to="/manage-document"
                       onClick={() => handleDropdownToggle("close")}
-                      className={`flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[15vw] md:rounded-[0.3vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] ${pathname.includes("manage-document") && "active"
-                        }`}
+                      className={`flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[15vw] md:rounded-[0.3vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] ${
+                        pathname.includes("manage-document") && "active"
+                      }`}
                     >
                       <i class="bx bxs-file md:text-[1.3vw] text-[5vw] menu-icon"></i>
                       <span className="md:text-[1.1vw] text-[4vw] link">
@@ -187,13 +192,15 @@ function Sidebar() {
                     </Link>
                   </li>
                 </PermissionWrapper> */}
-                {((permissions?.includes("verification-requests.view")) || isAdmin) && (
+                {(permissions?.includes("verification-requests.view") ||
+                  isAdmin) && (
                   <li>
                     <Link
                       to="/e-check"
                       onClick={() => handleDropdownToggle("close")}
-                      className={`flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[15vw] md:rounded-[0.3vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] ${pathname === "/e-check" && "active"
-                        }`}
+                      className={`flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[15vw] md:rounded-[0.3vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] ${
+                        pathname === "/e-check" && "active"
+                      }`}
                     >
                       <i className="bx bx-money md:text-[1.3vw] text-[5vw] menu-icon"></i>
                       <span className="md:text-[1.1vw] text-[4vw] link">
@@ -202,13 +209,15 @@ function Sidebar() {
                     </Link>
                   </li>
                 )}
-                {((permissions?.includes("institution.payments.view")) || isAdmin) && (
+                {(permissions?.includes("institution.payments.view") ||
+                  isAdmin) && (
                   <li>
                     <Link
                       to="/payment"
                       onClick={() => handleDropdownToggle("close")}
-                      className={`flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[15vw] md:rounded-[0.3vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] ${pathname === "/payment" && "active"
-                        }`}
+                      className={`flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[15vw] md:rounded-[0.3vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] ${
+                        pathname === "/payment" && "active"
+                      }`}
                     >
                       <i className="bx bx-money md:text-[1.3vw] text-[5vw] menu-icon"></i>
                       <span className="md:text-[1.1vw] text-[4vw] link">
@@ -217,13 +226,15 @@ function Sidebar() {
                     </Link>
                   </li>
                 )}
-                {((permissions?.includes("institution.tickets.view")) || isAdmin) && (
+                {(permissions?.includes("institution.tickets.view") ||
+                  isAdmin) && (
                   <li>
                     <Link
                       to="/user-support"
                       onClick={() => handleDropdownToggle("close")}
-                      className={`flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[15vw] md:rounded-[0.3vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] ${pathname.includes("user-support") && "active"
-                        }`}
+                      className={`flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[15vw] md:rounded-[0.3vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] ${
+                        pathname.includes("user-support") && "active"
+                      }`}
                     >
                       <i class="bx bx-support md:text-[1.3vw] text-[5vw] menu-icon"></i>
                       <span className="md:text-[1.1vw] text-[4vw] link">
@@ -232,13 +243,18 @@ function Sidebar() {
                     </Link>
                   </li>
                 )}
-                {((permissions?.includes("institution.reports.view") && (permissions.includes("document-requests.view") || permissions.includes("validation-requests.view") || permissions.includes("verification-requests.view"))) || isAdmin) && (
+                {((permissions?.includes("institution.reports.view") &&
+                  (permissions.includes("document-requests.view") ||
+                    permissions.includes("validation-requests.view") ||
+                    permissions.includes("verification-requests.view"))) ||
+                  isAdmin) && (
                   <li>
                     <Link
                       to="/reports"
                       onClick={() => handleDropdownToggle("close")}
-                      className={`flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[15vw] md:rounded-[0.3vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] ${pathname.includes("reports") && "active"
-                        }`}
+                      className={`flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[15vw] md:rounded-[0.3vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] ${
+                        pathname.includes("reports") && "active"
+                      }`}
                     >
                       <i class="bx bxs-pie-chart-alt-2 md:text-[1.3vw] text-[5vw] menu-icon"></i>
                       <span className="md:text-[1.1vw] text-[4vw] link">
@@ -248,13 +264,15 @@ function Sidebar() {
                   </li>
                 )}
 
-              {((permissions?.includes("institution.settings.view")) || isAdmin) && (
+                {(permissions?.includes("institution.settings.view") ||
+                  isAdmin) && (
                   <li>
                     <Link
                       to="/account-settings"
                       onClick={() => handleDropdownToggle("close")}
-                      className={`flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[15vw] md:rounded-[0.3vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] ${pathname === "/account-settings" && "active"
-                        }`}
+                      className={`flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[15vw] md:rounded-[0.3vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] ${
+                        pathname === "/account-settings" && "active"
+                      }`}
                     >
                       <i className="bx bx-cog md:text-[1.3vw] text-[5vw] menu-icon"></i>
                       <span className="md:text-[1.1vw] text-[4vw] link">
@@ -263,13 +281,15 @@ function Sidebar() {
                     </Link>
                   </li>
                 )}
-                {((permissions?.includes("institution.activity-logs.view")) || isAdmin) && (
+                {(permissions?.includes("institution.activity-logs.view") ||
+                  isAdmin) && (
                   <li>
                     <Link
                       to="/activity-logs"
                       onClick={() => handleDropdownToggle("close")}
-                      className={`flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[15vw] md:rounded-[0.3vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] ${pathname === "/activity-logs" && "active"
-                        }`}
+                      className={`flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[15vw] md:rounded-[0.3vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] ${
+                        pathname === "/activity-logs" && "active"
+                      }`}
                     >
                       <i className="bx bx-cylinder md:text-[1.3vw] text-[5vw] menu-icon"></i>
                       <span className="md:text-[1.1vw] text-[4vw] link">
@@ -306,10 +326,11 @@ function Sidebar() {
               <i className="bx bx-x text-[8vw]"></i>
             </button>
             <div
-              className={`mb-[1vw] side-show ${activeDropdown === "signout"
-                ? "sidemenu-h"
-                : "sidemenu-h-active"
-                }`}
+              className={`mb-[1vw] side-show ${
+                activeDropdown === "signout"
+                  ? "sidemenu-h"
+                  : "sidemenu-h-active"
+              }`}
               ref={(el) => (dropdownRefs.current["signout"] = el)}
               style={{
                 height:
@@ -344,18 +365,21 @@ function Sidebar() {
             >
               <div className="w-[20%]">
                 <div className="w-[2.5vw] h-[2.5vw] rounded-[50%] border border-[#000] flex items-center justify-center text-[1vw] font-[600] uppercase">
-                  {`${user?.first_name?.[0] || ""}${user?.last_name?.[0] || ""
-                    }`}
+                  {`${user?.first_name?.[0] || ""}${
+                    user?.last_name?.[0] || ""
+                  }`}
                 </div>
               </div>
               <div className="w-[65%]">
                 <h4
                   className="text-[0.7vw] font-[600]  text-nowrap overflow-hidden text-ellipsis"
-                  title={`${user?.first_name || ""} ${user?.other_name || ""} ${user?.last_name || ""
-                    }`}
+                  title={`${user?.first_name || ""} ${user?.other_name || ""} ${
+                    user?.last_name || ""
+                  }`}
                 >
-                  {`${user?.first_name || ""} ${user?.other_name || ""} ${user?.last_name || ""
-                    }`}
+                  {`${user?.first_name || ""} ${user?.other_name || ""} ${
+                    user?.last_name || ""
+                  }`}
                 </h4>
                 <h4
                   className="text-[0.7vw]  text-nowrap overflow-hidden text-ellipsis"
