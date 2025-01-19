@@ -16,6 +16,7 @@ function RootLayout({ children }) {
 
   const user = JSON.parse(secureLocalStorage.getItem("user"));
   const token = JSON?.parse(secureLocalStorage?.getItem("userToken"))?.token;
+  console.log(user);
 
   window.Pusher = Pusher;
   window.Echo = new Echo({
@@ -53,22 +54,24 @@ function RootLayout({ children }) {
   } = useGetInstitutionDetailsQuery();
 
   useEffect(() => {
-    if (message) {
+    console.log(pathname);
+
+    // if (message) {
+    //   dispatch(
+    //     setUser({
+    //       user: institutionDetails.institutionData?.user,
+    //       two_factor: user.two_factor,
+    //       institution: institutionDetails.institutionData?.institution,
+    //       selectedTemplate: user.selectedTemplate,
+    //     })
+    //   );
+    if (institutionDetails && user) {
       dispatch(
         setUser({
-          user: institutionDetails.institutionData?.user,
-          two_factor: user.two_factor,
-          institution: institutionDetails.institutionData?.institution,
-          selectedTemplate: user.selectedTemplate,
-        })
-      );
-    } else if (institutionDetails && user) {
-      dispatch(
-        setUser({
-          user: institutionDetails.institutionData?.user,
-          two_factor: user.two_factor,
-          institution: institutionDetails.institutionData?.institution,
-          selectedTemplate: user.selectedTemplate,
+          user: institutionDetails?.institutionData?.user,
+          two_factor: user?.two_factor,
+          institution: institutionDetails?.institutionData?.institution,
+          selectedTemplate: user?.selectedTemplate,
         })
       );
     }
