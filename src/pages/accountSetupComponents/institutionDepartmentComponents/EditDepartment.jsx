@@ -9,6 +9,7 @@ import {
 } from "../../../redux/apiSlice";
 import LoadItems from "@/components/LoadItems";
 import { toast } from "sonner";
+import PropTypes from "prop-types";
 
 function EditDepartment({
   setOpenModal,
@@ -68,9 +69,12 @@ function EditDepartment({
     setUserInput({ ...userInput, [name]: value });
   };
   const handleCheckboxChange = (id) => {
-    setSelectedPermissions((prev) =>
-      prev.includes(id) ? prev.filter((permId) => permId !== id) : [...prev, id]
-    );
+    setSelectedPermissions((prev) => {
+      const prevArray = Array.isArray(prev) ? prev : [];
+      return prevArray.includes(id)
+        ? prevArray.filter((permId) => permId !== id)
+        : [...prevArray, id];
+    });
   };
 
   const [updateDepartment, { data, isSuccess, isLoading, isError, error }] =
@@ -95,39 +99,39 @@ function EditDepartment({
         button: "OK",
       });
     } else {
-      const result = await Swal.fire({
-        title: "Are you sure you want to update this department?",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#febf4c",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Yes, I'm sure",
-        cancelButtonText: "No, cancel",
-      });
+      // const result = await Swal.fire({
+      //   title: "Are you sure you want to update this department?",
+      //   icon: "warning",
+      //   showCancelButton: true,
+      //   confirmButtonColor: "#febf4c",
+      //   cancelButtonColor: "#d33",
+      //   confirmButtonText: "Yes, I'm sure",
+      //   cancelButtonText: "No, cancel",
+      // });
 
-      if (result.isConfirmed) {
-        try {
-          await updateDepartment({
-            id,
-            body: {
-              name,
-              description,
-              permissions: selectedPermissions,
-            },
-          });
-        } catch (error) {
-          toast.error("Failed to update department", {
-            position: "top-right",
-            autoClose: 1202,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "light",
-          });
-        }
+      // if (result.isConfirmed) {
+      try {
+        await updateDepartment({
+          id,
+          body: {
+            name,
+            description,
+            permissions: selectedPermissions,
+          },
+        });
+      } catch (error) {
+        toast.error("Failed to update department", {
+          position: "top-right",
+          autoClose: 1202,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
       }
+      // }
     }
   };
 
@@ -202,10 +206,46 @@ function EditDepartment({
               {Object?.entries(groupedPermissions)?.map(
                 ([category, subcategories]) => (
                   <div key={category} className="mb-[0.2vw]">
-                    <h2 className="text-[0.9vw] capitalize font-[600]">{`Manage ${category.replace(
-                      "-",
-                      " "
-                    )}`}</h2>
+                    <div className="flex items-center gap-[0.5vw]">
+                      <h2 className="text-[0.9vw] capitalize font-[600]">
+                        {`Manage ${
+                          category.replace("-", " ") === "verification requests"
+                            ? "E-Check"
+                            : category.replace("-", " ")
+                        }`}
+                      </h2>
+                      <input
+                        type="checkbox"
+                        className="checkbox-design1"
+                        onChange={(e) => {
+                          const ids = Object.values(subcategories)
+                            .flat()
+                            .filter((item) => typeof item === "object")
+                            .map((item) => item.id);
+                          if (e.target.checked) {
+                            setSelectedPermissions((prev) => {
+                              const prevArray = Array.isArray(prev) ? prev : [];
+                              return [...new Set([...prevArray, ...ids])];
+                            });
+                          } else {
+                            setSelectedPermissions((prev) => {
+                              const prevArray = Array.isArray(prev) ? prev : [];
+                              return prevArray.filter(
+                                (id) => !ids.includes(id)
+                              );
+                            });
+                          }
+                        }}
+                        checked={Object.values(subcategories)
+                          .flat()
+                          .filter((item) => typeof item === "object")
+                          .every(
+                            (item) =>
+                              Array.isArray(selectedPermissions) &&
+                              selectedPermissions.includes(item.id)
+                          )}
+                      />
+                    </div>
                     {Object?.entries(subcategories)?.map(
                       ([subcategory, actions]) => (
                         <div key={subcategory} className="ml-[0.5vw]">
@@ -221,7 +261,7 @@ function EditDepartment({
                                   checked={selectedPermissions?.includes(id)}
                                   onChange={() => handleCheckboxChange(id)}
                                 />
-                                {`Can ${action.replace("-", " ")}`}
+                                {`${action.replace("-", " ")}`}
                               </label>
                             </div>
                           ))}
@@ -257,5 +297,25 @@ function EditDepartment({
     </SideModal>
   );
 }
+
+EditDepartment.propTypes = {
+  setOpenModal: PropTypes.func.isRequired,
+  openModal: PropTypes.bool.isRequired,
+  allPermissions: PropTypes.shape({
+    data: PropTypes.arrayOf(
+      PropTypes.shape({
+        name: PropTypes.string,
+        id: PropTypes.number,
+      })
+    ),
+  }),
+  selectedDepartment: PropTypes.shape({
+    permissions: PropTypes.arrayOf(
+      PropTypes.shape({
+        id: PropTypes.number,
+      })
+    ),
+  }),
+};
 
 export default EditDepartment;

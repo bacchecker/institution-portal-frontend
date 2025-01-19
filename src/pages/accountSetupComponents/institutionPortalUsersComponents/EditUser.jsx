@@ -1,12 +1,11 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import SideModal from "@/components/SideModal";
 import SelectInput from "@/components/SelectInput";
 import Swal from "sweetalert2";
-import {
-  useUpdateUserMutation,
-} from "../../../redux/apiSlice";
+import { useUpdateUserMutation } from "../../../redux/apiSlice";
 import LoadItems from "@/components/LoadItems";
 import { toast } from "sonner";
+import PropTypes from "prop-types";
 
 function EditUser({
   setOpenModal,
@@ -58,9 +57,12 @@ function EditUser({
   };
 
   const handleCheckboxChange = (id) => {
-    setSelectedPermissions((prev) =>
-      prev.includes(id) ? prev.filter((permId) => permId !== id) : [...prev, id]
-    );
+    setSelectedPermissions((prev) => {
+      const prevArray = Array.isArray(prev) ? prev : [];
+      return prevArray.includes(id)
+        ? prevArray.filter((permId) => permId !== id)
+        : [...prevArray, id];
+    });
   };
 
   useEffect(() => {
@@ -202,6 +204,27 @@ function EditUser({
       toast.error(error?.data?.message);
     }
   }, [isError]);
+
+  EditUser.propTypes = {
+    setOpenModal: PropTypes.func.isRequired,
+    openModal: PropTypes.bool.isRequired,
+    institutionDepartments: PropTypes.shape({
+      departments: PropTypes.shape({
+        data: PropTypes.array,
+      }),
+      permissions: PropTypes.array,
+    }),
+    isDepartmentsFetching: PropTypes.bool,
+    isDepartmentsLoading: PropTypes.bool,
+    selectedUser: PropTypes.shape({
+      permissions: PropTypes.arrayOf(
+        PropTypes.shape({
+          id: PropTypes.number,
+        })
+      ),
+    }),
+  };
+
   return (
     <SideModal
       title={"User Details"}
@@ -334,10 +357,49 @@ function EditUser({
                 {Object?.entries(groupedPermissions)?.map(
                   ([category, subcategories]) => (
                     <div key={category} className="mb-[0.2vw]">
-                      <h2 className="text-[0.9vw] capitalize font-[600]">{`Manage ${category.replace(
-                        "-",
-                        " "
-                      )}`}</h2>
+                      <div className="flex items-center gap-[0.5vw]">
+                        <h2 className="text-[0.9vw] capitalize font-[600]">
+                          {`Manage ${
+                            category.replace("-", " ") ===
+                            "verification requests"
+                              ? "E-Check"
+                              : category.replace("-", " ")
+                          }`}
+                        </h2>
+                        <input
+                          type="checkbox"
+                          className="checkbox-design1"
+                          onChange={(e) => {
+                            const ids = Object.values(subcategories)
+                              .flat()
+                              .filter((item) => typeof item === "object")
+                              .map((item) => item.id);
+                            if (e.target.checked) {
+                              setSelectedPermissions((prev) => {
+                                const prevArray = Array.isArray(prev)
+                                  ? prev
+                                  : [];
+                                return [...new Set([...prevArray, ...ids])];
+                              });
+                            } else {
+                              setSelectedPermissions((prev) => {
+                                const prevArray = Array.isArray(prev)
+                                  ? prev
+                                  : [];
+                                return prevArray.filter(
+                                  (id) => !ids.includes(id)
+                                );
+                              });
+                            }
+                          }}
+                          checked={Object.values(subcategories)
+                            .flat()
+                            .filter((item) => typeof item === "object")
+                            .every((item) =>
+                              selectedPermissions?.includes(item.id)
+                            )}
+                        />
+                      </div>
                       {Object?.entries(subcategories)?.map(
                         ([subcategory, actions]) => (
                           <div key={subcategory} className="ml-[0.5vw]">

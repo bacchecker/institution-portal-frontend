@@ -303,10 +303,41 @@ function AddNewUser({
                 {Object?.entries(groupedPermissions)?.map(
                   ([category, subcategories]) => (
                     <div key={category} className="mb-[0.2vw]">
-                      <h2 className="text-[0.9vw] capitalize font-[600]">{`Manage ${category.replace(
-                        "-",
-                        " "
-                      )}`}</h2>
+                      <div className="flex items-center gap-[0.5vw]">
+                        <h2 className="text-[0.9vw] capitalize font-[600]">
+                          {`Manage ${
+                            category.replace("-", " ") ==
+                            "verification requests"
+                              ? "E-Check"
+                              : category.replace("-", " ")
+                          }`}
+                        </h2>
+                        <input
+                          type="checkbox"
+                          className="checkbox-design1"
+                          onChange={(e) => {
+                            const ids = Object.values(subcategories)
+                              .flat()
+                              .filter((item) => typeof item === "object")
+                              .map((item) => item.id);
+                            if (e.target.checked) {
+                              setSelectedPermissions((prev) => [
+                                ...new Set([...prev, ...ids]),
+                              ]);
+                            } else {
+                              setSelectedPermissions((prev) =>
+                                prev.filter((id) => !ids.includes(id))
+                              );
+                            }
+                          }}
+                          checked={Object.values(subcategories)
+                            .flat()
+                            .filter((item) => typeof item === "object")
+                            .every((item) =>
+                              selectedPermissions.includes(item.id)
+                            )}
+                        />
+                      </div>
                       {Object?.entries(subcategories)?.map(
                         ([subcategory, actions]) => (
                           <div key={subcategory} className="ml-[0.5vw]">

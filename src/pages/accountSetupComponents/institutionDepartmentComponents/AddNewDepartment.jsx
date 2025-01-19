@@ -26,6 +26,8 @@ function AddNewDepartment({ setOpenModal, openModal, allPermissions }) {
   }, [openModal]);
 
   useEffect(() => {
+    console.log(allPermissions);
+
     if (allPermissions) {
       const groups = allPermissions?.data?.reduce((acc, permission) => {
         const parts = permission.name.split(".");
@@ -174,11 +176,45 @@ function AddNewDepartment({ setOpenModal, openModal, allPermissions }) {
               {Object?.entries(groupedPermissions)?.map(
                 ([category, subcategories]) => (
                   <div key={category} className="mb-[0.2vw]">
-                    <h2 className="text-[0.9vw] capitalize font-[600]">
-                      {`Manage ${category.replace("-", " ")}`}
-                    </h2>
+                    <div className="flex items-center gap-[0.5vw]">
+                      <h2 className="text-[0.9vw] capitalize font-[600]">
+                        {`Manage ${
+                          category.replace("-", " ") == "verification requests"
+                            ? "E-Check"
+                            : category.replace("-", " ")
+                        }`}
+                      </h2>
+                      <input
+                        type="checkbox"
+                        className="checkbox-design1"
+                        onChange={(e) => {
+                          const ids = Object.values(subcategories)
+                            .flat()
+                            .filter((item) => typeof item === "object")
+                            .map((item) => item.id);
+                          if (e.target.checked) {
+                            setSelectedPermissions((prev) => [
+                              ...new Set([...prev, ...ids]),
+                            ]);
+                          } else {
+                            setSelectedPermissions((prev) =>
+                              prev.filter((id) => !ids.includes(id))
+                            );
+                          }
+                        }}
+                        checked={Object.values(subcategories)
+                          .flat()
+                          .filter((item) => typeof item === "object")
+                          .every((item) =>
+                            selectedPermissions.includes(item.id)
+                          )}
+                      />
+                    </div>
                     {Object?.entries(subcategories)
-                      ?.filter(([subcategory]) => !["roles", "permissions"].includes(subcategory))
+                      ?.filter(
+                        ([subcategory]) =>
+                          !["roles", "permissions"].includes(subcategory)
+                      )
                       .map(([subcategory, actions]) => (
                         <div key={subcategory} className="ml-[0.5vw] mt-[1vw]">
                           <h3 className="text-[0.9vw] capitalize">
@@ -193,7 +229,7 @@ function AddNewDepartment({ setOpenModal, openModal, allPermissions }) {
                                   checked={selectedPermissions.includes(id)}
                                   onChange={() => handleCheckboxChange(id)}
                                 />
-                                {`Can ${action.replace("-", " ")}`}
+                                {`${action.replace("-", " ")}`}
                               </label>
                             </div>
                           ))}
@@ -202,7 +238,6 @@ function AddNewDepartment({ setOpenModal, openModal, allPermissions }) {
                   </div>
                 )
               )}
-
             </div>
           </div>
         </div>
