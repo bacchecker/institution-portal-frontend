@@ -641,6 +641,23 @@ export default function IncomingRequests() {
                   <div className="text-gray-500">Document Fee</div>
                   <div className="col-span-2">GH¢ {data?.total_amount}</div>
                   </div>
+                  <div className="p">
+                    <p className="font-semibold mb-4 text-base">
+                        Document Owner
+                    </p>
+                    <div className="grid grid-cols-3 gap-y-3 border-b pb-4">
+                        <div className="text-gray-500">Full Name</div>
+                        <div className="col-span-2">
+                        {data?.doc_owner_full_name}
+                        </div>
+                        <div className="text-gray-500">Email Addres</div>
+                        <div className="col-span-2">{data?.doc_owner_email}</div>
+                        <div className="text-gray-500">Phone Number</div>
+                        <div className="col-span-2">{data?.doc_owner_phone}</div>
+                        <div className="text-gray-500">Date of Birth</div>
+                        <div className="col-span-2">{data?.doc_owner_dob}</div>
+                    </div>
+                  </div>  
                   <div className="py-4">
                   <p className="font-semibold mb-4 text-base">
                       Verifying Institution

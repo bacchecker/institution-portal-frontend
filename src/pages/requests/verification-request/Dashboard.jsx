@@ -9,7 +9,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsi
 import Modal from "@/components/Modal";
 import { fetchSubscription } from "../../subscription/fetchSubscription";
 import LoadItems from "../../../components/LoadItems";
-import { IoCloseCircleOutline } from "react-icons/io5";
+import { toast } from 'sonner';
 
 export default function Dashboard() {
     const [receivedRequest, setReceivedRequest] = useState(0);
@@ -39,7 +39,9 @@ export default function Dashboard() {
     const [currentPage, setCurrentPage] = useState(1);
     const [lastPage, setLastPage] = useState(1);
     const [totalPages, setTotalPages] = useState(0);
-
+    useEffect(() => {
+        setPaymentData(paymentData)
+    }, [paymentData]);
 
     const pages = [
         <div className="w-full flex flex-col justify-center h-full">
@@ -57,9 +59,12 @@ export default function Dashboard() {
         </div>,
         <div className="w-full flex flex-col justify-center h-full">
             <div className="w-full bg-black rounded-md h-48"></div>
-            <butto type="button" onClick={() => {
+            <button type="button" onClick={() => {
                     setOpenDrawer(false);
-                }} className="w-full flex justify-end mt-1 font-normal underline">Skip</butto>
+                }}
+                className="w-full flex justify-end mt-1 font-normal underline">
+                    Skip
+            </button>
                 <div className="font-normal pb-16">
                 <p className="font-semibold text-black mb-3 text-lg">How Does E-Check Work?</p>
                 <ol className="list-decimal list-inside space-y-2 text-gray-700">
@@ -170,7 +175,10 @@ export default function Dashboard() {
                         <button
                         type="button"
                         onClick={() => {
-                            setData(plan);
+                            setPaymentData(plan);
+                            console.log(plan);
+                            console.log(paymentData);
+                            
                             setOpenPaymentDrawer(true);
                             setOpenSubDrawer(false);
                         }}
@@ -230,13 +238,13 @@ export default function Dashboard() {
                 }))
             );
             } else if (tab === "month") {
-            setData(
-                resData.month.map((item) => ({
-                name: moment().month(item.month - 1).format("MMM"),
-                Receiving: item.receiving,
-                Sending: item.sending,
-                }))
-            );
+                setData(
+                    resData.month.map((item) => ({
+                        name: moment(item.month, "YYYY-MM").format("MMM"), // Parse "YYYY-MM" and format to "MMM"
+                        Receiving: item.receiving,
+                        Sending: item.sending,
+                    }))
+                );
             }
         } catch (error) {
             console.error("Error fetching graph data:", error);
@@ -287,6 +295,21 @@ export default function Dashboard() {
     const handleFormSubmit = async (e) => {
         e.preventDefault();
         setIsSaving(true)
+        if (selectedPayment === "card") {
+            if (!paymentDetails.cardNumber || !cardType) {
+                toast.error("Card details are required.");
+                setIsSaving(false)
+                return;
+            }
+        }
+        
+        if (selectedPayment === "mobile_money") {
+            if (!paymentDetails.mobileNetwork || !paymentDetails.mobileNumber) {
+                toast.error("Mobile money details are required.");
+                setIsSaving(false)
+                return;
+            }
+        }
         const payload = {
         subscription_plan_id: paymentData?.id,
         channel: selectedPayment,
@@ -437,17 +460,17 @@ export default function Dashboard() {
                 <p className="text-base font-medium text-black">Recent Validation Received</p>
                 
 
-                <div class="relative overflow-x-auto mt-4">
-                    <table class="w-full text-sm text-left rtl:text-right text-gray-500">
-                        <thead class="text-xs text-gray-700 border-b">
+                <div className="relative overflow-x-auto mt-4">
+                    <table className="w-full text-sm text-left rtl:text-right text-gray-500">
+                        <thead className="text-xs text-gray-700 border-b">
                             <tr>
-                                <th scope="col" class="pr-2 py-3">
+                                <th scope="col" className="pr-2 py-3">
                                     Name
                                 </th>
-                                <th scope="col" class="px-2 py-3">
+                                <th scope="col" className="px-2 py-3">
                                     Email
                                 </th>
-                                <th scope="col" class="px-2 py-3">
+                                <th scope="col" className="px-2 py-3">
                                     Document Type
                                 </th>
                                 
@@ -582,91 +605,91 @@ export default function Dashboard() {
                     <p className="w-full xl:w-2/3 text-xs">E-Check makes document verification fast, secure, and hassle-free. Choose a plan that fits your needs and start verifying instantly!</p>
                 </div>
                 {loading ? (
-                <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 lg:gap-5 mt-4 lg:mt-8">
-                    {[...Array(3)].map((_, index) => (
-                    <div
-                        key={index}
-                        role="status"
-                        className="max-w-sm p-4 border border-gray-200 rounded shadow animate-pulse md:p-6 dark:border-gray-700"
-                    >
-                        <div className="flex items-center justify-center h-48 mb-4 bg-gray-300 rounded dark:bg-gray-700">
-                        <svg
-                            className="w-10 h-10 text-gray-200 dark:text-gray-600"
-                            aria-hidden="true"
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="currentColor"
-                            viewBox="0 0 16 20"
+                    <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 lg:gap-5 mt-4 lg:mt-8">
+                        {[...Array(3)].map((_, index) => (
+                        <div
+                            key={index}
+                            role="status"
+                            className="max-w-sm p-4 border border-gray-200 rounded shadow animate-pulse md:p-6 dark:border-gray-700"
                         >
-                            <path d="M14.066 0H7v5a2 2 0 0 1-2 2H0v11a1.97 1.97 0 0 0 1.934 2h12.132A1.97 1.97 0 0 0 16 18V2a1.97 1.97 0 0 0-1.934-2ZM10.5 6a1.5 1.5 0 1 1 0 2.999A1.5 1.5 0 0 1 10.5 6Zm2.221 10.515a1 1 0 0 1-.858.485h-8a1 1 0 0 1-.9-1.43L5.6 10.039a.978.978 0 0 1 .936-.57 1 1 0 0 1 .9.632l1.181 2.981.541-1a.945.945 0 0 1 .883-.522 1 1 0 0 1 .879.529l1.832 3.438a1 1 0 0 1-.031.988Z" />
-                            <path d="M5 5V.13a2.96 2.96 0 0 0-1.293.749L.879 3.707A2.98 2.98 0 0 0 .13 5H5Z" />
-                        </svg>
+                            <div className="flex items-center justify-center h-48 mb-4 bg-gray-300 rounded dark:bg-gray-700">
+                            <svg
+                                className="w-10 h-10 text-gray-200 dark:text-gray-600"
+                                aria-hidden="true"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="currentColor"
+                                viewBox="0 0 16 20"
+                            >
+                                <path d="M14.066 0H7v5a2 2 0 0 1-2 2H0v11a1.97 1.97 0 0 0 1.934 2h12.132A1.97 1.97 0 0 0 16 18V2a1.97 1.97 0 0 0-1.934-2ZM10.5 6a1.5 1.5 0 1 1 0 2.999A1.5 1.5 0 0 1 10.5 6Zm2.221 10.515a1 1 0 0 1-.858.485h-8a1 1 0 0 1-.9-1.43L5.6 10.039a.978.978 0 0 1 .936-.57 1 1 0 0 1 .9.632l1.181 2.981.541-1a.945.945 0 0 1 .883-.522 1 1 0 0 1 .879.529l1.832 3.438a1 1 0 0 1-.031.988Z" />
+                                <path d="M5 5V.13a2.96 2.96 0 0 0-1.293.749L.879 3.707A2.98 2.98 0 0 0 .13 5H5Z" />
+                            </svg>
+                            </div>
+                            <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-48 mb-4"></div>
+                            <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 mb-2.5"></div>
+                            <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 mb-2.5"></div>
+                            <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700"></div>
                         </div>
-                        <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-48 mb-4"></div>
-                        <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 mb-2.5"></div>
-                        <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 mb-2.5"></div>
-                        <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700"></div>
+                        ))}
                     </div>
-                    ))}
-                </div>
-                ) : plans.length === 0 ? (
-                <div className="text-center mt-8">
-                    <div className="md:!h-[40vh] h-[30vh] flex flex-col gap-8 items-center justify-center">
-                    <img src="/assets/img/no-data.svg" alt="No data" className="w-1/4 md:w-[10%] h-auto" />
-                    <p className="text-center text-slate-500 font-montserrat font-medium text-base -mt-6">
-                    No plans available at the moment. Please check back later.
-                    </p>
+                    ) : plans.length === 0 ? (
+                    <div className="text-center mt-8">
+                        <div className="md:!h-[40vh] h-[30vh] flex flex-col gap-8 items-center justify-center">
+                        <img src="/assets/img/no-data.svg" alt="No data" className="w-1/4 md:w-[10%] h-auto" />
+                        <p className="text-center text-slate-500 font-montserrat font-medium text-base -mt-6">
+                        No plans available at the moment. Please check back later.
+                        </p>
+                        </div>
                     </div>
-                </div>
-                ) : (
-                <div
-                    className={`grid ${
-                    plans.length === 1
-                        ? "grid-cols-1"
-                        : plans.length === 2
-                        ? "grid-cols-1 sm:grid-cols-2"
-                        : "grid-cols-2 lg:grid-cols-3"
-                    } gap-3 lg:gap-5 mt-4 lg:mt-8`}
-                >
-                    {plans.map((plan) => (
+                    ) : (
                     <div
-                        key={plan.id}
-                        className="w-full rounded-xl px-3 lg:px-5 py-5 lg:py-7 bg-gray-100 shadow-sm hover:shadow-md flex flex-col justify-between"
+                        className={`grid ${
+                        plans.length === 1
+                            ? "grid-cols-1"
+                            : plans.length === 2
+                            ? "grid-cols-1 sm:grid-cols-2"
+                            : "grid-cols-2 lg:grid-cols-3"
+                        } gap-3 lg:gap-5 mt-4 lg:mt-8`}
                     >
-                        <div className="w-full flex flex-col text-[13px] pb-3 border-b mb-2">
-                        <p className="text-center">{plan?.name}</p>
-                        <p className="font-semibold text-base text-center">GH₵ {plan?.amount}</p>
-                        <p className="font-light text-center -mt-1">Non-expiry</p>
-                        </div>
-                        <div className="my-2">
-                        <p className="font-semibold text-xs">Description</p>
-                        <p className="text-gray-500 text-xs text-justify mt-2">{plan?.description}</p>
-                        </div>
-                        <div className="flex flex-col space-y-1 mt-4 text-xs">
-                        <p className="font-semibold">Features</p>
-                        <div className="flex space-x-2 text-xs">
-                            <p>{plan?.credit} Credits</p>
-                        </div>
-                        <div className="flex space-x-2 text-xs">
-                            <p>{plan?.bonus} Bonus</p>
-                        </div>
-                        <div className="flex space-x-2 text-xs">
-                            <p>{plan?.total_credit} Total Credits</p>
-                        </div>
-                        </div>
-                        <button
-                            type="button"
-                            onClick={() => {
-                                setPaymentData(plan);
-                                setOpenPaymentDrawer(true);
-                                setOpenSubDrawer(false);
-                            }}
-                            className="w-full hover:text-white text-gray-500 hover:bg-gray-500 bg-gray-300 rounded-md mt-6 py-2 text-xs"
+                        {plans.map((plan) => (
+                        <div
+                            key={plan.id}
+                            className="w-full rounded-xl px-3 lg:px-5 py-5 lg:py-7 bg-gray-100 shadow-sm hover:shadow-md flex flex-col justify-between"
                         >
-                        Choose Plan
-                        </button>
+                            <div className="w-full flex flex-col text-[13px] pb-3 border-b mb-2">
+                            <p className="text-center">{plan?.name}</p>
+                            <p className="font-semibold text-base text-center">GH₵ {plan?.amount}</p>
+                            <p className="font-light text-center -mt-1">Non-expiry</p>
+                            </div>
+                            <div className="my-2">
+                            <p className="font-semibold text-xs">Description</p>
+                            <p className="text-gray-500 text-xs text-justify mt-2">{plan?.description}</p>
+                            </div>
+                            <div className="flex flex-col space-y-1 mt-4 text-xs">
+                            <p className="font-semibold">Features</p>
+                            <div className="flex space-x-2 text-xs">
+                                <p>{plan?.credit} Credits</p>
+                            </div>
+                            <div className="flex space-x-2 text-xs">
+                                <p>{plan?.bonus} Bonus</p>
+                            </div>
+                            <div className="flex space-x-2 text-xs">
+                                <p>{plan?.total_credit} Total Credits</p>
+                            </div>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setPaymentData(plan);
+                                    setOpenPaymentDrawer(true);
+                                    setOpenSubDrawer(false);
+                                }}
+                                className="w-full hover:text-white text-gray-500 hover:bg-gray-500 bg-gray-300 rounded-md mt-6 py-2 text-xs"
+                            >
+                            Choose Plan
+                            </button>
+                        </div>
+                        ))}
                     </div>
-                    ))}
-                </div>
                 )}
                 <div className="w-full absolute bottom-0 left-0 bg-white">
                     <div className="flex justify-between items-center px-4">
@@ -756,8 +779,8 @@ export default function Dashboard() {
                     <p className="font-normal text-black w-full xl:w-2/3">E-Check makes document verification fast, secure and hassle-free. Choose a plan that fits your needs and start verifying instantly</p> 
                 </div>
                 
-                <div class="flex flex-row space-x-4 mt-12">
-                    <div class="flex items-center">
+                <div className="flex flex-row space-x-4 mt-12">
+                    <div className="flex items-center">
                         <input
                         id="card-option"
                         type="radio"
@@ -765,17 +788,17 @@ export default function Dashboard() {
                         value="card"
                         checked={selectedPayment === "card"}
                         onChange={() => setSelectedPayment("card")}
-                        class="w-5 h-5 bg-gray-100 border-gray-300"
+                        className="w-5 h-5 bg-gray-100 border-gray-300"
                         />
                         <label
                         for="card-option"
-                        class="ms-2 text-base font-medium text-gray-900 dark:text-gray-300"
+                        className="ms-2 text-base font-medium text-gray-900 dark:text-gray-300"
                         >
                         Debit Card
                         </label>
                     </div>
 
-                    <div class="flex items-center">
+                    <div className="flex items-center">
                         <input
                         id="mobile-money-option"
                         type="radio"
@@ -783,11 +806,11 @@ export default function Dashboard() {
                         value="mobile_money"
                         checked={selectedPayment === "mobile_money"}
                         onChange={() => setSelectedPayment("mobile_money")}
-                        class="w-5 h-5 bg-gray-100 border-gray-300"
+                        className="w-5 h-5 bg-gray-100 border-gray-300"
                         />
                         <label
                         for="mobile-money-option"
-                        class="ms-2 text-base font-medium text-gray-900 dark:text-gray-300"
+                        className="ms-2 text-base font-medium text-gray-900 dark:text-gray-300"
                         >
                         Mobile Wallet
                         </label>

@@ -27,7 +27,7 @@ import Plans from "./pages/subscription/Plans";
 function App() {
   return (
     <>
-      <Toaster richColors />
+      <Toaster richColors position="top-right"/>
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/reset-password" element={<ResetPassword />} />

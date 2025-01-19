@@ -70,14 +70,21 @@ export default function OutgoingRequests() {
   const [institutionId, setInstitutionId] = useState(null);
   const [filters, setFilters] = useState({
     search_query: "",
-    document_type: null,
+    status: null,
     start_date: null,
     end_date: null,
   });
   const [submittedFilters, setSubmittedFilters] = useState({});
   const [answers, setAnswers] = useState({});
   const [isSaving, setIsSaving] = useState(false);
-
+  const statusData = [
+    { value: "created", name: "Created" },
+    { value: "submitted", name: "Submitted" },
+    { value: "received", name: "Received" },
+    { value: "processing", name: "Processing" },
+    { value: "rejected", name: "Rejected" },
+    { value: "completed", name: "Completed" },
+];
   const handleChange = (itemId, value) => {
     setAnswers((prev) => ({
       ...prev,
@@ -94,7 +101,6 @@ export default function OutgoingRequests() {
           params: {
             ...submittedFilters,
             page: currentPage,
-            status: status,
             sort_by: sortBy,
             sort_order: sortOrder,
           },
@@ -153,7 +159,7 @@ export default function OutgoingRequests() {
 
   useEffect(() => {
     institutionVerificationRequests();
-  }, [submittedFilters, status, currentPage, sortBy, sortOrder]);
+  }, [submittedFilters, currentPage, sortBy, sortOrder]);
 
   const handlePageChange = (page) => {
     if (page >= 1 && page <= lastPage) {
@@ -250,7 +256,7 @@ export default function OutgoingRequests() {
   };
 
   const handleDocumentTypeChange = (event) => {
-    setFilters({ ...filters, document_type: event.target.value });
+    setFilters({ ...filters, status: event.target.value });
   };
 
   const handleSubmitVerificationAnswers = async (event) => {
@@ -315,10 +321,10 @@ export default function OutgoingRequests() {
 
   return (
     <>
-    <div title="Outgoing Request">
+    <div>
         <section className="px-3">
-        <Card className="md:w-full w-full mx-auto rounded-none shadow-none border-none">
-            <CardBody className="w-full bg-gray-100 p-6">
+        <div className="md:w-full w-full mx-auto rounded-md mb-2">
+            <div className="w-full bg-gray-100 p-6">
             <form
                 onSubmit={handleSubmit}
                 className="flex flex-row gap-3 items-center"
@@ -334,18 +340,18 @@ export default function OutgoingRequests() {
                 />
                 
                 <select
-                name="document_type"
-                value={filters.document_type || ""}
+                name="status"
+                value={filters.status || ""}
                 className={`bg-white text-sm rounded-[4px] focus:outline-none block w-[220px] p-[9px] ${
-                    filters.document_type ? "text-gray-900" : "text-gray-500"
+                    filters.status ? "text-gray-900" : "text-gray-500"
                 }`}
-                onChange={handleDocumentTypeChange}
+                onChange={(e) => setFilters({ ...filters, status: e.target.value })}
                 >
-                <option value="" className="text-gray-500" disabled selected>Document Type</option>
-                {documentTypes.map((item) => (
-                    <option key={item.key} value={item.key}>
+                <option value="" className="text-gray-500" disabled selected>Status</option>
+                {statusData.map((item) => (
+                    <option key={item.value} value={item.value}>
                     {item.name}
-                    </option>
+                    </option> 
                 ))}
                 </select>
                 <DateRangePicker
@@ -404,14 +410,14 @@ export default function OutgoingRequests() {
                     onClick={() => {
                     setFilters({
                         search_query: "",
-                        document_type: null,
+                        status: null,
                         start_date: null,
                         end_date: null,
                     });
 
                     setSubmittedFilters({
                         search_query: "",
-                        document_type: null,
+                        status: null,
                         start_date: null,
                         end_date: null,
                     });
@@ -421,10 +427,10 @@ export default function OutgoingRequests() {
                 </Button>
                 </div>
             </form>
-            </CardBody>
-        </Card>
+            </div>
+        </div>
 
-        <div className="my-3 w-full shadow-none rounded-lg">
+        {/* <div className="my-3 w-full shadow-none rounded-lg">
             <div className="grid w-full grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div
                 onClick={() => {
@@ -483,7 +489,7 @@ export default function OutgoingRequests() {
                 </div>
             </div>
             </div>
-        </div>
+        </div> */}
         </section>
 
         <section className="md:px-3 md:w-full w-[98vw] mx-auto relative">
