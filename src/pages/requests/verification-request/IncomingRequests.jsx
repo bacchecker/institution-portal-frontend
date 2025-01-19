@@ -67,14 +67,20 @@ export default function IncomingRequests() {
   const [institutionId, setInstitutionId] = useState(null);
   const [filters, setFilters] = useState({
     search_query: "",
-    document_type: null,
+    status: null,
     start_date: null,
     end_date: null,
   });
   const [submittedFilters, setSubmittedFilters] = useState({});
   const [answers, setAnswers] = useState({});
   const [isSaving, setIsSaving] = useState(false);
-
+  const statusData = [
+    { value: "submitted", name: "Submitted" },
+    { value: "received", name: "Received" },
+    { value: "processing", name: "Processing" },
+    { value: "rejected", name: "Rejected" },
+    { value: "completed", name: "Completed" },
+  ];
   const handleChange = (itemId, value) => {
     setAnswers((prev) => ({
       ...prev,
@@ -91,7 +97,6 @@ export default function IncomingRequests() {
           params: {
             ...submittedFilters,
             page: currentPage,
-            status: status,
             sort_by: sortBy,
             sort_order: sortOrder,
           },
@@ -150,7 +155,7 @@ export default function IncomingRequests() {
 
   useEffect(() => {
     institutionVerificationRequests();
-  }, [submittedFilters, status, currentPage, sortBy, sortOrder]);
+  }, [submittedFilters, currentPage, sortBy, sortOrder]);
 
   const handlePageChange = (page) => {
     if (page >= 1 && page <= lastPage) {
@@ -246,10 +251,6 @@ export default function IncomingRequests() {
     setCurrentPage(1);
   };
 
-  const handleDocumentTypeChange = (event) => {
-    setFilters({ ...filters, document_type: event.target.value });
-  };
-
   const handleSubmitVerificationAnswers = async (event) => {
     event.preventDefault();
 
@@ -314,86 +315,83 @@ export default function IncomingRequests() {
     <>
       <div title="Incoming Request">
         <section className="px-3">
-          <Card className="md:w-full w-full mx-auto rounded-none shadow-none border-none">
+          <Card className="md:w-full w-full mx-auto rounded-md shadow-none border-none mb-2">
             <CardBody className="w-full bg-gray-100 p-6">
               <form
-                onSubmit={handleSubmit}
-                className="flex flex-row gap-3 items-center"
+                  onSubmit={handleSubmit}
+                  className="flex flex-row gap-3 items-center"
               >
-                <input
-                  type="text"
+                  <input 
+                  type="text" 
                   className="bg-white text-gray-900 text-sm rounded-[4px] font-[400] focus:outline-none block w-[260px] p-[9.5px] placeholder:text-gray-500"
                   name="search_query"
-                  placeholder="Search by institution name or unique code"
+                  placeholder="Search by sending institution name or unique code"
                   value={filters.search_query}
-                  onChange={(e) =>
-                    setFilters({ ...filters, search_query: e.target.value })
-                  }
-                />
-
-                <select
-                  name="document_type"
-                  value={filters.document_type || ""}
+                  onChange={(e) => setFilters({ ...filters, search_query: e.target.value })}
+  
+                  />
+                  
+                  <select
+                  name="status"
+                  value={filters.status || ""}
                   className={`bg-white text-sm rounded-[4px] focus:outline-none block w-[220px] p-[9px] ${
-                    filters.document_type ? "text-gray-900" : "text-gray-500"
+                      filters.status ? "text-gray-900" : "text-gray-500"
                   }`}
-                  onChange={handleDocumentTypeChange}
-                >
-                  <option value="" className="text-gray-500" disabled selected>
-                    Document Type
-                  </option>
-                  {documentTypes.map((item) => (
-                    <option key={item.key} value={item.key}>
+                  onChange={(e) => setFilters({ ...filters, status: e.target.value })}
+                  >
+                  <option value="" className="text-gray-500" disabled selected>Status</option>
+                  {statusData.map((item) => (
+                      <option key={item.value} value={item.value}>
                       {item.name}
-                    </option>
+                      </option> 
                   ))}
-                </select>
-                <DateRangePicker
+                  </select>
+                  <DateRangePicker
                   radius="none"
                   visibleMonths={2}
                   variant="underlined"
                   classNames={{
-                    base: "bg-white", // This sets the input background to white
+                      base: "bg-white", // This sets the input background to white
                   }}
                   style={{
-                    border: "none", // Removes the border
+                      border: "none", // Removes the border
                   }}
                   className="w-[280px] rounded-[4px] date-range-picker-input border-none bg-white"
                   onChange={(date) => {
-                    if (date) {
+                      if (date) {
                       const newStartDate = new Date(
-                        date.start.year,
-                        date.start.month - 1,
-                        date.start.day
+                          date.start.year,
+                          date.start.month - 1,
+                          date.start.day
                       )
-                        .toISOString()
-                        .split("T")[0];
+                          .toISOString()
+                          .split("T")[0];
                       const newEndDate = new Date(
-                        date.end.year,
-                        date.end.month - 1,
-                        date.end.day
+                          date.end.year,
+                          date.end.month - 1,
+                          date.end.day
                       )
-                        .toISOString()
-                        .split("T")[0];
-
+                          .toISOString()
+                          .split("T")[0];
+  
                       setFilters({
-                        ...filters,
-                        start_date: newStartDate,
-                        end_date: newEndDate,
+                          ...filters,
+                          start_date: newStartDate,
+                          end_date: newEndDate,
                       });
-                    }
+                      }
                   }}
-                />
-
-                <div className="flex space-x-2">
+                  />
+  
+                  <div className="flex space-x-2">
                   <Button
-                    startContent={<MdOutlineFilterAlt size={17} />}
-                    radius="none"
-                    size="sm"
-                    type="submit"
-                    className="rounded-[4px] bg-bChkRed text-white"
+                      startContent={<MdOutlineFilterAlt size={17} />}
+                      radius="none"
+                      size="sm"
+                      type="submit"
+                      className="rounded-[4px] bg-bChkRed text-white"
                   >
-                    Filter
+                      Filter
                   </Button>
                   <Button
                     startContent={<MdOutlineFilterAltOff size={17} />}
@@ -403,28 +401,28 @@ export default function IncomingRequests() {
                     className="rounded-[4px] bg-black text-white"
                     onClick={() => {
                       setFilters({
-                        search_query: "",
-                        document_type: null,
-                        start_date: null,
-                        end_date: null,
+                          search_query: "",
+                          status: null,
+                          start_date: null,
+                          end_date: null,
                       });
-
+  
                       setSubmittedFilters({
-                        search_query: "",
-                        document_type: null,
-                        start_date: null,
-                        end_date: null,
+                          search_query: "",
+                          status: null,
+                          start_date: null,
+                          end_date: null,
                       });
                     }}
                   >
-                    Clear
+                      Clear
                   </Button>
-                </div>
+                  </div>
               </form>
             </CardBody>
           </Card>
 
-          <div className="my-3 w-full shadow-none rounded-lg">
+          {/* <div className="my-3 w-full shadow-none rounded-lg">
             <div className="grid w-full grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4">
               <div
                 onClick={() => {
@@ -483,7 +481,7 @@ export default function IncomingRequests() {
                 </div>
               </div>
             </div>
-          </div>
+          </div> */}
         </section>
 
         <section className="md:px-3 md:w-full w-[98vw] mx-auto">
@@ -521,9 +519,9 @@ export default function IncomingRequests() {
                 </TableCell>
                 <TableCell className="font-semibold">
                   <CustomUser
-                    avatarSrc={item?.user?.photo}
-                    name={`${item?.user?.first_name} ${item?.user?.last_name}`}
-                    email={`${item?.user?.email}`}
+                      avatarSrc={`https://admin-dev.baccheck.online/storage/${item?.sending_institution?.logo}`}
+                      name={`${item?.sending_institution?.name}`}
+                      email={`${item?.sending_institution?.institution_email}`}
                   />
                 </TableCell>
                 <TableCell>
