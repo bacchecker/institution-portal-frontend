@@ -56,7 +56,7 @@ function RootLayout({ children }) {
     if (message) {
       dispatch(
         setUser({
-          user: user?.user,
+          user: institutionDetails.institutionData?.user,
           two_factor: user.two_factor,
           institution: institutionDetails.institutionData?.institution,
           selectedTemplate: user.selectedTemplate,
