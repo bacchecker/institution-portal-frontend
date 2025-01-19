@@ -6,8 +6,6 @@ import DocumentRequest from "./DocumentRequest";
 import ValidationRequest from "./ValidationRequest";
 import axios from "@/utils/axiosConfig";
 import Navbar from "@/components/Navbar";
-import VerificationRequest from "./VerficationRequests";
-import PermissionWrapper from "@/components/permissions/PermissionWrapper";
 import secureLocalStorage from "react-secure-storage";
 
 export default function ManageRequest() {

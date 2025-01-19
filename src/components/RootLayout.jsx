@@ -77,6 +77,13 @@ function RootLayout({ children }) {
   }, [institutionDetails, user, dispatch, message]);
 
   useEffect(() => {
+    const storedUser = JSON.parse(secureLocalStorage.getItem("user"));
+    if (storedUser) {
+      dispatch(setUser(storedUser));
+    }
+  }, []);
+
+  useEffect(() => {
     if (isError && error?.data?.message === "Unauthenticated.") {
       navigate("/");
     }
