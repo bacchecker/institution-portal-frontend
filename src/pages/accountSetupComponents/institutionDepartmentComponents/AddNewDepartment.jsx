@@ -26,8 +26,6 @@ function AddNewDepartment({ setOpenModal, openModal, allPermissions }) {
   }, [openModal]);
 
   useEffect(() => {
-    console.log(allPermissions);
-
     if (allPermissions) {
       const groups = allPermissions?.data?.reduce((acc, permission) => {
         const parts = permission.name.split(".");

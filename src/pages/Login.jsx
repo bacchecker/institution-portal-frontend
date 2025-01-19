@@ -107,8 +107,6 @@ function Login() {
     const selectedTemplate = data?.data?.letter_template;
     const isAdmin = data?.data?.isAdmin;
 
-    console.log(permissions);
-
     if (user?.type?.toLowerCase() !== "user") {
       if (token) {
         const twoFactorEnabled = parseInt(user?.two_factor) === 1;

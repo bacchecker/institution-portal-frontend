@@ -8,7 +8,8 @@ import {
   DateRangePicker,
   Input,
   Select,
-  Tabs, Tab,
+  Tabs,
+  Tab,
   TableCell,
   TableRow,
   Textarea,
@@ -311,413 +312,423 @@ export default function IncomingRequests() {
 
   return (
     <>
-    <div title="Incoming Request">
+      <div title="Incoming Request">
         <section className="px-3">
-        <Card className="md:w-full w-full mx-auto rounded-none shadow-none border-none">
+          <Card className="md:w-full w-full mx-auto rounded-none shadow-none border-none">
             <CardBody className="w-full bg-gray-100 p-6">
-            <form
+              <form
                 onSubmit={handleSubmit}
                 className="flex flex-row gap-3 items-center"
-            >
-                <input 
-                type="text" 
-                className="bg-white text-gray-900 text-sm rounded-[4px] font-[400] focus:outline-none block w-[260px] p-[9.5px] placeholder:text-gray-500"
-                name="search_query"
-                placeholder="Search by institution name or unique code"
-                value={filters.search_query}
-                onChange={(e) => setFilters({ ...filters, search_query: e.target.value })}
-
+              >
+                <input
+                  type="text"
+                  className="bg-white text-gray-900 text-sm rounded-[4px] font-[400] focus:outline-none block w-[260px] p-[9.5px] placeholder:text-gray-500"
+                  name="search_query"
+                  placeholder="Search by institution name or unique code"
+                  value={filters.search_query}
+                  onChange={(e) =>
+                    setFilters({ ...filters, search_query: e.target.value })
+                  }
                 />
-                
+
                 <select
-                name="document_type"
-                value={filters.document_type || ""}
-                className={`bg-white text-sm rounded-[4px] focus:outline-none block w-[220px] p-[9px] ${
+                  name="document_type"
+                  value={filters.document_type || ""}
+                  className={`bg-white text-sm rounded-[4px] focus:outline-none block w-[220px] p-[9px] ${
                     filters.document_type ? "text-gray-900" : "text-gray-500"
-                }`}
-                onChange={handleDocumentTypeChange}
+                  }`}
+                  onChange={handleDocumentTypeChange}
                 >
-                <option value="" className="text-gray-500" disabled selected>Document Type</option>
-                {documentTypes.map((item) => (
+                  <option value="" className="text-gray-500" disabled selected>
+                    Document Type
+                  </option>
+                  {documentTypes.map((item) => (
                     <option key={item.key} value={item.key}>
-                    {item.name}
+                      {item.name}
                     </option>
-                ))}
+                  ))}
                 </select>
                 <DateRangePicker
-                radius="none"
-                visibleMonths={2}
-                variant="underlined"
-                classNames={{
+                  radius="none"
+                  visibleMonths={2}
+                  variant="underlined"
+                  classNames={{
                     base: "bg-white", // This sets the input background to white
-                }}
-                style={{
+                  }}
+                  style={{
                     border: "none", // Removes the border
-                }}
-                className="w-[280px] rounded-[4px] date-range-picker-input border-none bg-white"
-                onChange={(date) => {
+                  }}
+                  className="w-[280px] rounded-[4px] date-range-picker-input border-none bg-white"
+                  onChange={(date) => {
                     if (date) {
-                    const newStartDate = new Date(
+                      const newStartDate = new Date(
                         date.start.year,
                         date.start.month - 1,
                         date.start.day
-                    )
+                      )
                         .toISOString()
                         .split("T")[0];
-                    const newEndDate = new Date(
+                      const newEndDate = new Date(
                         date.end.year,
                         date.end.month - 1,
                         date.end.day
-                    )
+                      )
                         .toISOString()
                         .split("T")[0];
 
-                    setFilters({
+                      setFilters({
                         ...filters,
                         start_date: newStartDate,
                         end_date: newEndDate,
-                    });
+                      });
                     }
-                }}
+                  }}
                 />
 
                 <div className="flex space-x-2">
-                <Button
+                  <Button
                     startContent={<MdOutlineFilterAlt size={17} />}
                     radius="none"
                     size="sm"
                     type="submit"
                     className="rounded-[4px] bg-bChkRed text-white"
-                >
+                  >
                     Filter
-                </Button>
-                <Button
+                  </Button>
+                  <Button
                     startContent={<MdOutlineFilterAltOff size={17} />}
                     radius="none"
                     size="sm"
                     type="button"
                     className="rounded-[4px] bg-black text-white"
                     onClick={() => {
-                    setFilters({
+                      setFilters({
                         search_query: "",
                         document_type: null,
                         start_date: null,
                         end_date: null,
-                    });
+                      });
 
-                    setSubmittedFilters({
+                      setSubmittedFilters({
                         search_query: "",
                         document_type: null,
                         start_date: null,
                         end_date: null,
-                    });
+                      });
                     }}
-                >
+                  >
                     Clear
-                </Button>
+                  </Button>
                 </div>
-            </form>
+              </form>
             </CardBody>
-        </Card>
+          </Card>
 
-        <div className="my-3 w-full shadow-none rounded-lg">
+          <div className="my-3 w-full shadow-none rounded-lg">
             <div className="grid w-full grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div
+              <div
                 onClick={() => {
-                setStatus("allRequests");
+                  setStatus("allRequests");
                 }}
                 className="rounded-md bg-gray-100 p-4 flex space-x-4 cursor-pointer"
-            >
+              >
                 <div className="flex items-center justify-center bg-purple-200 text-cusPurp rounded-full w-10 h-10">
-                <IoDocuments size={18} />
+                  <IoDocuments size={18} />
                 </div>
                 <div className="">
-                <p className="font-medium">Total Documents</p>
-                <p className="text-gray-500">{allRequests}</p>
+                  <p className="font-medium">Total Documents</p>
+                  <p className="text-gray-500">{allRequests}</p>
                 </div>
-            </div>
-            <div
+              </div>
+              <div
                 onClick={() => {
-                setStatus("pending");
+                  setStatus("pending");
                 }}
                 className="rounded-md bg-gray-100 p-4 flex space-x-4 cursor-pointer"
-            >
+              >
                 <div className="flex items-center justify-center bg-yellow-200 text-yellow-500 rounded-full w-10 h-10">
-                <PiQueueFill size={18} />
+                  <PiQueueFill size={18} />
                 </div>
                 <div className="">
-                <p className="font-medium">Pending</p>
-                <p className="text-gray-500">{pending}</p>
+                  <p className="font-medium">Pending</p>
+                  <p className="text-gray-500">{pending}</p>
                 </div>
-            </div>
-            <div
+              </div>
+              <div
                 onClick={() => {
-                setStatus("approved");
+                  setStatus("approved");
                 }}
                 className="rounded-md bg-gray-100 p-4 flex space-x-4 cursor-pointer"
-            >
+              >
                 <div className="flex items-center justify-center bg-green-200 text-green-600 rounded-full w-10 h-10">
-                <FaHeart size={18} />
+                  <FaHeart size={18} />
                 </div>
                 <div className="">
-                <p className="font-medium">Approved</p>
-                <p className="text-gray-500">{approved}</p>
+                  <p className="font-medium">Approved</p>
+                  <p className="text-gray-500">{approved}</p>
                 </div>
-            </div>
-            <div
+              </div>
+              <div
                 onClick={() => {
-                setStatus("rejected");
+                  setStatus("rejected");
                 }}
                 className="rounded-md bg-gray-100 p-4 flex space-x-4 cursor-pointer"
-            >
+              >
                 <div className="flex items-center justify-center bg-red-200 text-red-600 rounded-full w-10 h-10">
-                <FcCancel size={18} />
+                  <FcCancel size={18} />
                 </div>
                 <div className="">
-                <p className="font-medium">Not Approved</p>
-                <p className="text-gray-500">{rejected}</p>
+                  <p className="font-medium">Not Approved</p>
+                  <p className="text-gray-500">{rejected}</p>
                 </div>
+              </div>
             </div>
-            </div>
-        </div>
+          </div>
         </section>
 
         <section className="md:px-3 md:w-full w-[98vw] mx-auto">
-        <CustomTable
+          <CustomTable
             columns={[
-            "ID",
-            "Requested By",
-            "Date",
-            "Documents",
-            "Status",
-            "Total Amount",
-            "Actions",
+              "ID",
+              "Requested By",
+              "Date",
+              "Documents",
+              "Status",
+              "Total Amount",
+              "Actions",
             ]}
             loadingState={isLoading}
             columnSortKeys={{
-            ID: "unique_code",
-            "Requested By": "user_full_name",
-            Date: "created_at",
-            Document: "document_type_name",
-            Status: "status",
-            Amount: "total_amount",
+              ID: "unique_code",
+              "Requested By": "user_full_name",
+              Date: "created_at",
+              Document: "document_type_name",
+              Status: "status",
+              Amount: "total_amount",
             }}
             sortBy={sortBy}
             sortOrder={sortOrder}
             setSortBy={setSortBy}
             setSortOrder={setSortOrder}
-        >
+          >
             {verificationRequests?.map((item) => (
-            <TableRow
+              <TableRow
                 key={item?.id}
                 className="odd:bg-gray-100 even:bg-white border-b"
-            >
+              >
                 <TableCell className="font-semibold">
-                {item?.unique_code}
+                  {item?.unique_code}
                 </TableCell>
                 <TableCell className="font-semibold">
-                <CustomUser
+                  <CustomUser
                     avatarSrc={item?.user?.photo}
                     name={`${item?.user?.first_name} ${item?.user?.last_name}`}
                     email={`${item?.user?.email}`}
-                />
+                  />
                 </TableCell>
                 <TableCell>
-                {moment(item?.created_at).format("MMM D, YYYY")}
+                  {moment(item?.created_at).format("MMM D, YYYY")}
                 </TableCell>
                 <TableCell>
-                {item.institution_document_type
+                  {item.institution_document_type
                     ? item?.institution_document_type?.document_type?.name
                     : item?.document_type?.name}
                 </TableCell>
                 <TableCell>
-                <StatusChip status={item?.status} />
+                  <StatusChip status={item?.status} />
                 </TableCell>
                 <TableCell> GH¢ {item?.total_amount}</TableCell>
                 <TableCell className="flex items-center h-16 gap-3">
-                <Button
+                  <Button
                     size="sm"
                     radius="none"
                     color="success"
                     className="rounded-[4px] text-white"
                     onClick={async () => {
-                    if (item?.status === "processing") {
-                        await fetchVerificationChecklist(item?.document_type?.id);
-                    }
+                      if (item?.status === "processing") {
+                        await fetchVerificationChecklist(
+                          item?.document_type?.id
+                        );
+                      }
 
-                    setOpenDrawer(true);
-                    setData(item);
+                      setOpenDrawer(true);
+                      setData(item);
                     }}
-                >
+                  >
                     View
-                </Button>
+                  </Button>
                 </TableCell>
-            </TableRow>
+              </TableRow>
             ))}
-        </CustomTable>
-        <section>
+          </CustomTable>
+          <section>
             <div className="flex justify-between items-center my-1">
-            <div>
+              <div>
                 <span className="text-gray-600 font-medium text-sm">
-                Page {currentPage} of {lastPage} - ({total} entries)
+                  Page {currentPage} of {lastPage} - ({total} entries)
                 </span>
-            </div>
-            <div className="flex space-x-2">
+              </div>
+              <div className="flex space-x-2">
                 <button
-                disabled={currentPage === 1}
-                onClick={() => handlePageChange(currentPage - 1)}
-                className="px-2 bg-white text-gray-800 border rounded-lg disabled:bg-gray-300 disabled:text-white"
+                  disabled={currentPage === 1}
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  className="px-2 bg-white text-gray-800 border rounded-lg disabled:bg-gray-300 disabled:text-white"
                 >
-                <FaChevronLeft size={12} />
+                  <FaChevronLeft size={12} />
                 </button>
 
                 {renderPageNumbers()}
 
                 <button
-                disabled={currentPage === lastPage}
-                onClick={() => handlePageChange(currentPage + 1)}
-                className="px-2 bg-white text-gray-800 border rounded-lg disabled:bg-gray-300 disabled:text-white disabled:border-0"
+                  disabled={currentPage === lastPage}
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  className="px-2 bg-white text-gray-800 border rounded-lg disabled:bg-gray-300 disabled:text-white disabled:border-0"
                 >
-                <FaChevronRight size={12} />
+                  <FaChevronRight size={12} />
                 </button>
+              </div>
             </div>
-            </div>
-        </section>
+          </section>
         </section>
 
         <Drawer
-        title={
+          title={
             data?.status != "processing"
-            ? "Request Details"
-            : "Verification Questions"
-        }
-        isOpen={openDrawer}
-        setIsOpen={setOpenDrawer}
-        classNames="w-[100vw] md:w-[45vw] z-10"
+              ? "Request Details"
+              : "Verification Questions"
+          }
+          isOpen={openDrawer}
+          setIsOpen={setOpenDrawer}
+          classNames="w-[100vw] md:w-[45vw] z-10"
         >
-        <div className="h-full flex flex-col -mt-2 xl:pl-2 font-semibold justify-between">
+          <div className="h-full flex flex-col -mt-2 xl:pl-2 font-semibold justify-between">
             {data?.status != "processing" ? (
-            <div className="flex flex-col gap-2 mb-6">
+              <div className="flex flex-col gap-2 mb-6">
                 <div className="grid grid-cols-3 gap-y-4 gap-x-2 border-b pb-4">
                   <div className="text-gray-500">Request ID</div>
                   <div className="col-span-2">#{data?.unique_code}</div>
                   <div className="text-gray-500">Requested Date</div>
                   <div className="col-span-2">
-                      {moment(data?.created_at).format("Do MMMM, YYYY")}
+                    {moment(data?.created_at).format("Do MMMM, YYYY")}
                   </div>
                   <div className="text-gray-500">Status</div>
                   <div
-                      className={`col-span-2 flex items-center justify-center py-1 space-x-2 w-28 
+                    className={`col-span-2 flex items-center justify-center py-1 space-x-2 w-28 
                       ${
-                          data?.status === "cancelled" ||
-                          data?.status === "rejected"
+                        data?.status === "cancelled" ||
+                        data?.status === "rejected"
                           ? "text-red-600 bg-red-200"
                           : data?.status === "completed"
                           ? "text-green-600 bg-green-200"
                           : data?.status === "processing" ||
-                              data?.status === "received"
+                            data?.status === "received"
                           ? "text-yellow-600 bg-yellow-200"
                           : "text-gray-600 bg-gray-200"
                       }`}
                   >
-                      <div
+                    <div
                       className={`h-2 w-2 rounded-full ${
-                          data?.status === "cancelled" ||
-                          data?.status === "rejected"
+                        data?.status === "cancelled" ||
+                        data?.status === "rejected"
                           ? "bg-red-600"
                           : data?.status === "completed"
                           ? "bg-green-600"
                           : data?.status === "processing" ||
-                              data?.status === "received"
+                            data?.status === "received"
                           ? "bg-yellow-600"
                           : "bg-gray-600"
                       }`}
-                      ></div>
-                      <p>
+                    ></div>
+                    <p>
                       {data?.status.charAt(0).toUpperCase() +
-                          data?.status.slice(1)}
-                      </p>
+                        data?.status.slice(1)}
+                    </p>
                   </div>
                   <div className="text-gray-500">Document Fee</div>
                   <div className="col-span-2">GH¢ {data?.total_amount}</div>
-                  </div>
-                  <div className="p">
-                    <p className="font-semibold mb-4 text-base">
-                        Document Owner
-                    </p>
-                    <div className="grid grid-cols-3 gap-y-3 border-b pb-4">
-                        <div className="text-gray-500">Full Name</div>
-                        <div className="col-span-2">
-                        {data?.doc_owner_full_name}
-                        </div>
-                        <div className="text-gray-500">Email Addres</div>
-                        <div className="col-span-2">{data?.doc_owner_email}</div>
-                        <div className="text-gray-500">Phone Number</div>
-                        <div className="col-span-2">{data?.doc_owner_phone}</div>
-                        <div className="text-gray-500">Date of Birth</div>
-                        <div className="col-span-2">{data?.doc_owner_dob}</div>
+                </div>
+                <div className="p">
+                  <p className="font-semibold mb-4 text-base">Document Owner</p>
+                  <div className="grid grid-cols-3 gap-y-3 border-b pb-4">
+                    <div className="text-gray-500">Full Name</div>
+                    <div className="col-span-2">
+                      {data?.doc_owner_full_name}
                     </div>
-                  </div>  
-                  <div className="py-4">
+                    <div className="text-gray-500">Email Addres</div>
+                    <div className="col-span-2">{data?.doc_owner_email}</div>
+                    <div className="text-gray-500">Phone Number</div>
+                    <div className="col-span-2">{data?.doc_owner_phone}</div>
+                    <div className="text-gray-500">Date of Birth</div>
+                    <div className="col-span-2">{data?.doc_owner_dob}</div>
+                  </div>
+                </div>
+                <div className="py-4">
                   <p className="font-semibold mb-4 text-base">
-                      Verifying Institution
+                    Verifying Institution
                   </p>
                   <div className="grid grid-cols-3 gap-y-4 border-b pb-4">
-                      <div className="text-gray-500">Institution Name</div>
-                      <div className="col-span-2">
+                    <div className="text-gray-500">Institution Name</div>
+                    <div className="col-span-2">
                       {data?.receiving_institution?.name}
-                      </div>
-                      <div className="text-gray-500">Institution Email</div>
-                      <div className="col-span-2">{data?.receiving_institution?.institution_email}</div>
-                      <div className="text-gray-500">Phone Number</div>
-                      <div className="col-span-2">{data?.receiving_institution?.helpline_contact}</div>
-                      <div className="text-gray-500 mt-2">Institution Logo</div>
-                      <div className="col-span-2 w-10 h-10 rounded-full bg-gray-200">
-                      <img src={`https://admin-dev.baccheck.online/storage/${data?.receiving_institution?.logo}`} alt="" />
-                      </div>
+                    </div>
+                    <div className="text-gray-500">Institution Email</div>
+                    <div className="col-span-2">
+                      {data?.receiving_institution?.institution_email}
+                    </div>
+                    <div className="text-gray-500">Phone Number</div>
+                    <div className="col-span-2">
+                      {data?.receiving_institution?.helpline_contact}
+                    </div>
+                    <div className="text-gray-500 mt-2">Institution Logo</div>
+                    <div className="col-span-2 w-10 h-10 rounded-full bg-gray-200">
+                      <img
+                        src={`https://admin-dev.baccheck.online/storage/${data?.receiving_institution?.logo}`}
+                        alt=""
+                      />
+                    </div>
                   </div>
                 </div>
 
                 <div className="-mt-4">
-                <section className="mb-3 flex items-center justify-between">
+                  <section className="mb-3 flex items-center justify-between">
                     <div className="w-full flex gap-2 items-center">
-                    <p className="font-semibold ">Attachments</p>
+                      <p className="font-semibold ">Attachments</p>
                     </div>
 
                     <Button
-                    variant="ghost"
-                    size="sm"
-                    color="primary"
-                    isLoading={bulkDownloadLoading}
-                    isDisabled={bulkDownloadLoading}
-                    onClick={() => {
+                      variant="ghost"
+                      size="sm"
+                      color="primary"
+                      isLoading={bulkDownloadLoading}
+                      isDisabled={bulkDownloadLoading}
+                      onClick={() => {
                         setBulkDownloadLoading(true);
                         handleBulkDownload(data.files.map((f) => f.path));
-                    }}
+                      }}
                     >
-                    <FaDownload className="text-red-600" />
-                    Download all
+                      <FaDownload className="text-red-600" />
+                      Download all
                     </Button>
-                </section>
+                  </section>
 
-                <section className="grid grid-cols-1 xl:grid-cols-2 gap-2">
+                  <section className="grid grid-cols-1 xl:grid-cols-2 gap-2">
                     <div className="gap-3 p-2 rounded-lg border">
-                    <div className="w-full flex flex-col gap-1">
+                      <div className="w-full flex flex-col gap-1">
                         <p className="font-semibold">
-                        {data?.document_type?.name}
+                          {data?.document_type?.name}
                         </p>
                         <p>GH¢ {data?.total_amount}</p>
 
                         <div className="flex justify-between">
-                        <div className="flex gap-2 items-center">
+                          <div className="flex gap-2 items-center">
                             <Chip size="sm">{data?.file?.extension}</Chip>
                             <p>{filesize(data?.file?.size ?? 1000)}</p>
-                        </div>
-                        <div
+                          </div>
+                          <div
                             className="flex space-x-1 cursor-pointer py-1 px-2 rounded-md bg-primary text-white text-xs"
                             // onClick={() => downloadFile(data?.file?.name)}
                             onClick={() => {
-                            window.location.href =
+                              window.location.href =
                                 "https://admin-dev.baccheck.online/api/download-pdf?path=" +
                                 encodeURIComponent(data?.file?.path);
                             }}
@@ -727,278 +738,277 @@ export default function IncomingRequests() {
                                 "?path=" +
                                 encodeURIComponent(data?.file?.path);
                             }} */
-                        >
+                          >
                             <FaDownload />
                             <p>Download</p>
+                          </div>
                         </div>
-                        </div>
+                      </div>
                     </div>
-                    </div>
-                </section>
+                  </section>
                 </div>
 
                 <div>
-                {data?.status == "rejected" && (
+                  {data?.status == "rejected" && (
                     <div className="mt-3">
-                    <Card className="">
+                      <Card className="">
                         <CardHeader>
-                        <p className="font-bold">Rejection Reason</p>
+                          <p className="font-bold">Rejection Reason</p>
                         </CardHeader>
                         <CardBody>
-                        <p>{data?.rejection_reason}</p>
+                          <p>{data?.rejection_reason}</p>
                         </CardBody>
-                    </Card>
+                      </Card>
 
-                    <div className="mt-3">
+                      <div className="mt-3">
                         <Card className="">
-                        <CardBody className="flex-row">
+                          <CardBody className="flex-row">
                             <div className="flex-1">
-                            <p className="font-semibold">Rejected By:</p>
-                            <p className="col-span-4">
+                              <p className="font-semibold">Rejected By:</p>
+                              <p className="col-span-4">
                                 {data?.rejected_by?.first_name}{" "}
                                 {data?.rejected_by?.last_name}
-                            </p>
+                              </p>
                             </div>
 
                             <div className="flex-1">
-                            <p className="font-bold">Rejection Date</p>
-                            <p>
+                              <p className="font-bold">Rejection Date</p>
+                              <p>
                                 {moment(data?.updated_at).format(
-                                "Do MMMM, YYYY"
+                                  "Do MMMM, YYYY"
                                 )}
-                            </p>
+                              </p>
                             </div>
-                        </CardBody>
+                          </CardBody>
                         </Card>
+                      </div>
                     </div>
-                    </div>
-                )}
+                  )}
                 </div>
-            </div>
+              </div>
             ) : (
-            <div className="-mt-2">
+              <div className="-mt-2">
                 <div className="">
-                <div className="space-y-2">
+                  <div className="space-y-2">
                     {checkListSections.sections &&
                     checkListSections.sections.length > 0 ? (
-                    checkListSections.sections.map((section) => (
+                      checkListSections.sections.map((section) => (
                         <div
-                        key={section.id}
-                        className="space-y-4 pb-4 border p-3 rounded-md"
+                          key={section.id}
+                          className="space-y-4 pb-4 border p-3 rounded-md"
                         >
-                        {/* Section Header */}
-                        <h2 className="text-base">{section.name}</h2>
-                        {section.description && (
+                          {/* Section Header */}
+                          <h2 className="text-base">{section.name}</h2>
+                          {section.description && (
                             <p className="font-light text-gray-700 text-xs">
-                            {section.description}
+                              {section.description}
                             </p>
-                        )}
+                          )}
 
-                        {/* Render Items */}
-                        <div className="space-y-4">
+                          {/* Render Items */}
+                          <div className="space-y-4">
                             {section.items.map((item) => (
-                            <div key={item.id} className="space-y-2">
+                              <div key={item.id} className="space-y-2">
                                 {/* Question Text */}
                                 <p className="text-sm font-normal">
-                                {item.question_text}
+                                  {item.question_text}
                                 </p>
 
                                 {/* Input Types */}
                                 {item.input_type === "yes_no" && (
-                                <div className="flex space-x-4 text-base text-gray-600">
+                                  <div className="flex space-x-4 text-base text-gray-600">
                                     {/* Yes Option */}
                                     <div
-                                    className={`flex items-center justify-center space-x-2 cursor-pointer border pr-2 font-normal rounded-[4px] py-0.5 ${
+                                      className={`flex items-center justify-center space-x-2 cursor-pointer border pr-2 font-normal rounded-[4px] py-0.5 ${
                                         answers[item.id] === "yes"
-                                        ? "text-green-600 border-green-600"
-                                        : "text-gray-600"
-                                    }`}
-                                    onClick={() =>
+                                          ? "text-green-600 border-green-600"
+                                          : "text-gray-600"
+                                      }`}
+                                      onClick={() =>
                                         handleChange(item.id, "yes")
-                                    }
+                                      }
                                     >
-                                    <input
+                                      <input
                                         type="radio"
                                         name={item.id}
                                         value="yes"
                                         checked={answers[item.id] === "yes"}
                                         onChange={() =>
-                                        handleChange(item.id, "yes")
+                                          handleChange(item.id, "yes")
                                         }
                                         className="hidden"
-                                    />
-                                    <FaRegCircleCheck size={18} />
-                                    <span>Yes</span>
+                                      />
+                                      <FaRegCircleCheck size={18} />
+                                      <span>Yes</span>
                                     </div>
 
                                     {/* No Option */}
                                     <div
-                                    className={`flex items-center justify-center space-x-2 cursor-pointer border font-normal rounded-[4px] pr-2 py-0.5 ${
+                                      className={`flex items-center justify-center space-x-2 cursor-pointer border font-normal rounded-[4px] pr-2 py-0.5 ${
                                         answers[item.id] === "no"
-                                        ? "text-red-600 border-red-600"
-                                        : "text-gray-600"
-                                    }`}
-                                    onClick={() =>
+                                          ? "text-red-600 border-red-600"
+                                          : "text-gray-600"
+                                      }`}
+                                      onClick={() =>
                                         handleChange(item.id, "no")
-                                    }
+                                      }
                                     >
-                                    <input
+                                      <input
                                         type="radio"
                                         name={item.id}
                                         value="no"
                                         checked={answers[item.id] === "no"}
                                         onChange={() =>
-                                        handleChange(item.id, "no")
+                                          handleChange(item.id, "no")
                                         }
                                         className="hidden"
-                                    />
-                                    <GiCancel size={18} />
-                                    <span>No</span>
+                                      />
+                                      <GiCancel size={18} />
+                                      <span>No</span>
                                     </div>
-                                </div>
+                                  </div>
                                 )}
 
                                 {item.input_type === "text" && (
-                                <textarea
+                                  <textarea
                                     className="w-full border rounded p-2 text-gray-700 focus:outline-none"
                                     rows="3"
                                     placeholder="Enter your answer..."
                                     value={answers[item.id] || ""}
                                     onChange={(e) =>
-                                    handleChange(item.id, e.target.value)
+                                      handleChange(item.id, e.target.value)
                                     }
-                                ></textarea>
+                                  ></textarea>
                                 )}
 
                                 {item.input_type === "dropdown" && (
-                                <select
+                                  <select
                                     className="w-full border rounded p-2.5 text-gray-700 focus:outline-none"
                                     value={answers[item.id] || ""}
                                     onChange={(e) =>
-                                    handleChange(item.id, e.target.value)
+                                      handleChange(item.id, e.target.value)
                                     }
-                                >
+                                  >
                                     <option value="" disabled>
-                                    Select an option...
+                                      Select an option...
                                     </option>
                                     {item.options.map((option, index) => (
-                                    <option key={index} value={option}>
+                                      <option key={index} value={option}>
                                         {option}
-                                    </option>
+                                      </option>
                                     ))}
-                                </select>
+                                  </select>
                                 )}
-                            </div>
+                              </div>
                             ))}
+                          </div>
                         </div>
-                        </div>
-                    ))
+                      ))
                     ) : (
-                    <div className="md:!h-[65vh] h-[60vh] flex flex-col gap-8 items-center justify-center">
+                      <div className="md:!h-[65vh] h-[60vh] flex flex-col gap-8 items-center justify-center">
                         <img
-                        src="/assets/img/no-data.svg"
-                        alt="No data"
-                        className="w-1/4 h-auto"
+                          src="/assets/img/no-data.svg"
+                          alt="No data"
+                          className="w-1/4 h-auto"
                         />
                         <p className="text-center text-slate-500 font-montserrat font-medium text-base -mt-6">
-                        No questions available
+                          No questions available
                         </p>
-                    </div>
+                      </div>
                     )}
+                  </div>
                 </div>
-                </div>
-            </div>
+              </div>
             )}
 
             <div className="flex items-center gap-3 justify-end mt-2">
-            <Button
+              <Button
                 radius="none"
                 size="md"
                 className="w-1/4 bg-black text-white font-medium !rounded-md"
                 onClick={() => {
-                setOpenDrawer(false);
-                setData(null);
+                  setOpenDrawer(false);
+                  setData(null);
                 }}
-            >
+              >
                 Close
-            </Button>
+              </Button>
 
-            {(data?.status == "received" || data?.status == "submitted") && (
+              {(data?.status == "received" || data?.status == "submitted") && (
                 <Button
-                radius="none"
-                size="md"
-                className="w-1/2 bg-gray-300 text-gray-800 font-medium !rounded-md"
-                onClick={() => declineDisclosure.onOpen()}
+                  radius="none"
+                  size="md"
+                  className="w-1/2 bg-gray-300 text-gray-800 font-medium !rounded-md"
+                  onClick={() => declineDisclosure.onOpen()}
                 >
-                Decline Request
+                  Decline Request
                 </Button>
-            )}
+              )}
 
-            {data?.status !== "created" &&
+              {data?.status !== "created" &&
                 data?.status !== "completed" &&
                 data?.status !== "processing" && (
-                <Button
+                  <Button
                     radius="none"
                     className="bg-bChkRed text-white font-medium w-1/2 !rounded-md"
                     size="md"
                     onClick={() => changeStatusDisclosure.onOpen()}
-                >
+                  >
                     {data?.status === "submitted"
-                    ? "Acknowledge Request"
-                    : data?.status === "received"
-                    ? "Process Request"
-                    : data?.status === "rejected" || "cancelled"
-                    ? "Revert Rejection"
-                    : "Acknowledge Request"}
-                </Button>
+                      ? "Acknowledge Request"
+                      : data?.status === "received"
+                      ? "Process Request"
+                      : data?.status === "rejected" || "cancelled"
+                      ? "Revert Rejection"
+                      : "Acknowledge Request"}
+                  </Button>
                 )}
-            {data?.status === "processing" && (
+              {data?.status === "processing" && (
                 <Button
-                isLoading={isSaving}
-                radius="none"
-                className="bg-bChkRed text-white font-medium w-1/2 !rounded-md"
-                size="md"
-                onClick={handleSubmitVerificationAnswers}
-                disabled={
+                  isLoading={isSaving}
+                  radius="none"
+                  className="bg-bChkRed text-white font-medium w-1/2 !rounded-md"
+                  size="md"
+                  onClick={handleSubmitVerificationAnswers}
+                  disabled={
                     !checkListSections.sections ||
                     checkListSections.sections.length === 0
-                } // Disable if no sections
+                  } // Disable if no sections
                 >
-                Submit Verifications
+                  Submit Verifications
                 </Button>
-            )}
+              )}
             </div>
-        </div>
+          </div>
         </Drawer>
 
         <ConfirmModal
-        processing={processing}
-        disclosure={changeStatusDisclosure}
-        title="Change Request Status"
-        onButtonClick={async () => {
+          processing={processing}
+          disclosure={changeStatusDisclosure}
+          title="Change Request Status"
+          onButtonClick={async () => {
             setProcessing(true);
             await axios
-            .post(
+              .post(
                 `/institution/requests/verification-requests/${data?.id}/status`,
                 {
-                id: data?.id,
-                institution_id: data?.institution_id,
-                user_id: data?.user_id,
-                unique_code: data?.unique_code,
-                status:
+                  id: data?.id,
+                  institution_id: data?.institution_id,
+                  user_id: data?.user_id,
+                  unique_code: data?.unique_code,
+                  status:
                     data?.status == "submitted"
-                    ? "received"
-                    : data?.status == "received"
-                    ? "processing"
-                    : data?.status == "rejected" || "cancelled"
-                    ? "received"
-                    : "completed",
+                      ? "received"
+                      : data?.status == "received"
+                      ? "processing"
+                      : data?.status == "rejected" || "cancelled"
+                      ? "received"
+                      : "completed",
                 }
-            )
-            .then((res) => {
-                console.log(res);
+              )
+              .then((res) => {
                 if (data?.status == "processing") {
-                fetchVerificationChecklist();
+                  fetchVerificationChecklist();
                 }
 
                 setData(res?.data);
@@ -1007,20 +1017,20 @@ export default function IncomingRequests() {
                 institutionVerificationRequests();
                 //mutate("/institution/requests/verification-requests");
                 changeStatusDisclosure.onClose();
-            })
-            .catch((err) => {
+              })
+              .catch((err) => {
                 console.log(err);
                 toast.error(err.response.data.message);
                 setProcessing(false);
                 changeStatusDisclosure.onClose();
                 return;
-            });
-        }}
+              });
+          }}
         >
-        <p className="font-quicksand">
+          <p className="font-quicksand">
             Are you sure to change status to{" "}
             <span className="font-semibold">
-            {data?.status == "submitted"
+              {data?.status == "submitted"
                 ? "Received"
                 : data?.status == "received"
                 ? "Processing"
@@ -1028,61 +1038,58 @@ export default function IncomingRequests() {
                 ? "Received"
                 : "Complete Request"}
             </span>
-        </p>
+          </p>
         </ConfirmModal>
 
         <DeleteModal
-        disclosure={declineDisclosure}
-        processing={processing}
-        title="Decline Request"
-        onButtonClick={async () => {
+          disclosure={declineDisclosure}
+          processing={processing}
+          title="Decline Request"
+          onButtonClick={async () => {
             setProcessing(true);
             await axios
-            .post(
+              .post(
                 `/institution/requests/verification-requests/${data?.id}/status`,
                 {
-                id: data?.id,
-                institution_id: data?.institution_id,
-                user_id: data?.user_id,
-                unique_code: data?.unique_code,
-                status: "rejected",
-                rejection_reason: data?.rejection_reason,
+                  id: data?.id,
+                  institution_id: data?.institution_id,
+                  user_id: data?.user_id,
+                  unique_code: data?.unique_code,
+                  status: "rejected",
+                  rejection_reason: data?.rejection_reason,
                 }
-            )
-            .then((res) => {
-                console.log(res);
-
+              )
+              .then((res) => {
                 setData(res?.data);
                 setProcessing(false);
                 toast.success("Request declined successfully");
                 institutionVerificationRequests();
                 //mutate("/institution/requests/verification-requests");
                 declineDisclosure.onClose();
-            })
-            .catch((err) => {
+              })
+              .catch((err) => {
                 console.log(err);
                 toast.error(err.response.data.message);
                 setProcessing(false);
                 declineDisclosure.onClose();
                 return;
-            });
-        }}
+              });
+          }}
         >
-        <p className="">
+          <p className="">
             Are you sure to change status to{" "}
             <span className="font-semibold">Decline Request</span>?
-        </p>
+          </p>
 
-        <Textarea
+          <Textarea
             name="rejection_reason"
             label="Reason"
             onChange={(e) =>
-            setData((prev) => ({ ...prev, rejection_reason: e.target.value }))
+              setData((prev) => ({ ...prev, rejection_reason: e.target.value }))
             }
-        />
+          />
         </DeleteModal>
-    </div>
-      
+      </div>
     </>
   );
 }

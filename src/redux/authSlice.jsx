@@ -53,8 +53,6 @@ export const authSlice = createSlice({
       state.isAdmin = action.payload.isAdmin;
     },
     setUserPermissions: (state, action) => {
-      console.log(action.payload.permissions);
-
       secureLocalStorage.setItem(
         "userPermissions",
         JSON.stringify(action.payload.permissions)

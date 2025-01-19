@@ -20,7 +20,6 @@ function Sidebar() {
   const token = JSON?.parse(secureLocalStorage?.getItem("userToken"))?.token;
   let permissions = secureLocalStorage.getItem("userPermissions") || [];
   const isAdmin = JSON.parse(secureLocalStorage.getItem("userRole"))?.isAdmin;
-  console.log(permissions);
 
   const handleDropdownToggle = (dropdownId) => {
     setActiveDropdown(activeDropdown === dropdownId ? null : dropdownId);

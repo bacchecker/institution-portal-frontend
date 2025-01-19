@@ -240,45 +240,43 @@ export default function ValidationRequest() {
 
   const handleSubmitValidationAnswers = async (event) => {
     event.preventDefault();
-  
+
     const allChecklistItems = validationAnswers.sections.flatMap((section) =>
       section.checklist_items.map((item) => ({
         id: item.id,
       }))
     );
-  
+
     // Check if every item has an answer
     const unansweredItems = allChecklistItems.filter(
       (item) => !answers[item.id] || answers[item.id].trim() === ""
     );
-  
+
     if (unansweredItems.length > 0) {
       toast.error("Please provide answers to all questions before submitting.");
       return;
     }
-  
+
     const payload = {
       validation_request_id: data?.id,
       checklist: allChecklistItems.map((item) => ({
-        
         id: item.id, // The checklist item's id
         answer: answers[item.id], // Yes or No
       })),
     };
-  
+
     try {
       setIsSaving(true);
-  
+
       const response = await axios.post(
         "/institution/requests/confirm-request-answers",
         payload
       );
-  
+
       toast.success(response.data.message);
       setAnswers({});
       setOpenDrawer(false);
       institutionValidationRequests();
-      
     } catch (error) {
       toast.error(
         error.response?.data?.message ||
@@ -288,20 +286,17 @@ export default function ValidationRequest() {
       setIsSaving(false);
     }
   };
-  
 
   const fetchRequestAnswers = async (requestId) => {
     try {
       const url = `/institution/requests/validation-requests/answers/${requestId}`;
       const response = await axios.get(url);
-      console.log(response);
-      
+
       setValidationAnswers(response.data);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
-  console.log(validationRequests);
 
   return (
     <>
@@ -768,7 +763,8 @@ export default function ValidationRequest() {
               <div className="-mt-2">
                 <div className="">
                   <div className="space-y-2">
-                    {validationAnswers.sections && validationAnswers.sections.length > 0 ? (
+                    {validationAnswers.sections &&
+                    validationAnswers.sections.length > 0 ? (
                       validationAnswers.sections.map((section) => (
                         <div
                           key={section.section_id}
@@ -776,7 +772,11 @@ export default function ValidationRequest() {
                         >
                           {/* Section Header */}
                           <h2 className="text-base">
-                            {section.checklist_items[0]?.institutionDocumentTypeChecklistItem?.section?.name}
+                            {
+                              section.checklist_items[0]
+                                ?.institutionDocumentTypeChecklistItem?.section
+                                ?.name
+                            }
                           </h2>
                           {section.description && (
                             <p className="font-light text-gray-700 text-xs">
@@ -791,10 +791,13 @@ export default function ValidationRequest() {
                                 {/* Question Text */}
                                 <div>
                                   <h4 className="text-sm font-medium">
-                                    {item.institutionDocumentTypeChecklistItem.question_text}
+                                    {
+                                      item.institutionDocumentTypeChecklistItem
+                                        .question_text
+                                    }
                                   </h4>
                                 </div>
-                                
+
                                 {/* Answer Display */}
                                 <div className="relative w-full">
                                   {item.institutionDocumentTypeChecklistItem && (
@@ -805,7 +808,6 @@ export default function ValidationRequest() {
                                       className="w-full px-3 py-2 border border-gray-300 rounded-[3px] bg-white text-gray-400 font-normal"
                                     />
                                   )}
-                                  
                                 </div>
 
                                 {/* Yes/No Buttons */}
@@ -823,7 +825,9 @@ export default function ValidationRequest() {
                                       name={item.id}
                                       value="yes"
                                       checked={answers[item.id] === "yes"}
-                                      onChange={() => handleChange(item.id, "yes")}
+                                      onChange={() =>
+                                        handleChange(item.id, "yes")
+                                      }
                                       className="hidden"
                                     />
                                     <FaRegCircleCheck size={18} />
@@ -843,7 +847,9 @@ export default function ValidationRequest() {
                                       name={item.id}
                                       value="no"
                                       checked={answers[item.id] === "no"}
-                                      onChange={() => handleChange(item.id, "no")}
+                                      onChange={() =>
+                                        handleChange(item.id, "no")
+                                      }
                                       className="hidden"
                                     />
                                     <IoCloseCircleOutline size={22} />
@@ -869,7 +875,6 @@ export default function ValidationRequest() {
                     )}
                   </div>
                 </div>
-
               </div>
             )}
 
@@ -957,7 +962,8 @@ export default function ValidationRequest() {
                       ? "received"
                       : data?.status === "received"
                       ? "processing"
-                      : data?.status === "rejected" || data?.status === "cancelled"
+                      : data?.status === "rejected" ||
+                        data?.status === "cancelled"
                       ? "received"
                       : "completed",
                 }
@@ -973,7 +979,9 @@ export default function ValidationRequest() {
               institutionValidationRequests();
               changeStatusDisclosure.onClose();
             } catch (err) {
-              toast.error(err.response.data.message || "Failed to update status");
+              toast.error(
+                err.response.data.message || "Failed to update status"
+              );
             } finally {
               setProcessing(false);
             }
@@ -992,7 +1000,6 @@ export default function ValidationRequest() {
             </span>
           </p>
         </ConfirmModal>
-
 
         <DeleteModal
           disclosure={declineDisclosure}

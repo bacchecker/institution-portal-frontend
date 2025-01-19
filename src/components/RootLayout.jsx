@@ -16,7 +16,6 @@ function RootLayout({ children }) {
 
   const user = JSON.parse(secureLocalStorage.getItem("user"));
   const token = JSON?.parse(secureLocalStorage?.getItem("userToken"))?.token;
-  console.log(user);
 
   window.Pusher = Pusher;
   window.Echo = new Echo({
@@ -64,7 +63,6 @@ function RootLayout({ children }) {
         })
       );
     } else if (institutionDetails && user) {
-      console.log(institutionDetails.institutionData);
       dispatch(
         setUser({
           user: institutionDetails.institutionData?.user,
