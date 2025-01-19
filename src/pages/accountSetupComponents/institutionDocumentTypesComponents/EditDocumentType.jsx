@@ -41,21 +41,13 @@ function EditDocumentType({ setOpenModal, openModal, selectedDocumentType }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const {
-      base_fee,
-      printing_fee,
-      validation_fee,
-      verification_fee,
-      soft_copy,
-      hard_copy,
-      id,
-    } = userInput;
+    const { base_fee, printing_fee, validation_fee, soft_copy, hard_copy, id } =
+      userInput;
 
     if (
       base_fee === "" ||
       (hard_copy && printing_fee === "") ||
       validation_fee === "" ||
-      verification_fee === "" ||
       (!hard_copy && !soft_copy)
     ) {
       toast.error("Fill All required fields", {
@@ -69,33 +61,42 @@ function EditDocumentType({ setOpenModal, openModal, selectedDocumentType }) {
         theme: "light",
       });
     } else {
-      const result = await Swal.fire({
-        title: "Are you sure you want to update this document type?",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#febf4c",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Yes, I'm sure",
-        cancelButtonText: "No, cancel",
-      });
+      // const result = await Swal.fire({
+      //   title: "Are you sure you want to update this document type?",
+      //   icon: "warning",
+      //   showCancelButton: true,
+      //   confirmButtonColor: "#febf4c",
+      //   cancelButtonColor: "#d33",
+      //   confirmButtonText: "Yes, I'm sure",
+      //   cancelButtonText: "No, cancel",
+      // });
 
-      if (result.isConfirmed) {
-        try {
-          await updateDocumentType({
-            id,
-            body: {
-              base_fee,
-              printing_fee: !hard_copy ? 0 : printing_fee,
-              validation_fee,
-              verification_fee,
-              soft_copy,
-              hard_copy,
-            },
-          });
-        } catch (error) {
-          console.error("Error updating documnent type:", error);
-        }
+      // if (result.isConfirmed) {
+      try {
+        await updateDocumentType({
+          id,
+          body: {
+            base_fee,
+            printing_fee: !hard_copy ? 0 : printing_fee,
+            validation_fee,
+            soft_copy,
+            hard_copy,
+          },
+        });
+      } catch (error) {
+        console.error("Error updating documnent type:", error);
+        toast.error("Error updating documnent type", {
+          position: "top-right",
+          autoClose: 1202,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
       }
+      // }
     }
   };
   useEffect(() => {
@@ -231,26 +232,7 @@ function EditDocumentType({ setOpenModal, openModal, selectedDocumentType }) {
             </div>
             <h4 className="md:text-[0.8vw] text-[2.5vw] text-[#f1416c]">{`(A fee for confirming and validating the accuracy of specific information or credentials provided in institutional documents upon request.)`}</h4>
           </div>
-          <div className="md:mt-[2vw] mt-[10vw]">
-            <h4 className="md:text-[1vw] text-[4vw] mb-1">
-              Verification Request Fee<span className="text-[#f1416c]">*</span>
-            </h4>
-            <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
-              <input
-                type="text"
-                name="verification_fee"
-                value={userInput.verification_fee}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  if (/^\d{0,20}(\.\d{0,20})?$/.test(value)) {
-                    handleUserInput(e);
-                  }
-                }}
-                className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0"
-              />
-            </div>
-            <h4 className="md:text-[0.8vw] text-[2.5vw] text-[#f1416c]">{`(A fee charged for processing and verifying the authenticity of institutional documents upon request by students, alumni, or other entities.)`}</h4>
-          </div>
+
           <div className="md:mt-[2vw] mt-[10vw]">
             <h4 className="md:text-[1vw] text-[4vw] mb-1">
               Document Printing Fee

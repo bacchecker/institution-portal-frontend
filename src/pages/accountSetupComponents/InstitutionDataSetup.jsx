@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from "react";
 import secureLocalStorage from "react-secure-storage";
-import { useCreateInstitutionSetupMutation, useGetInstitutionDetailsQuery } from "../../redux/apiSlice";
+import {
+  useCreateInstitutionSetupMutation,
+  useGetInstitutionDetailsQuery,
+} from "../../redux/apiSlice";
 import Swal from "sweetalert2";
 import LoadItems from "@/components/LoadItems";
 import validateEmail from "@/components/EmailValidator";
@@ -21,8 +24,6 @@ function InstitutionDataSetup({ setActiveStep }) {
     isFetching: isInstitutionDetailsFetching,
   } = useGetInstitutionDetailsQuery();
 
-
-
   useEffect(() => {
     if (institutionDetails) {
       setUserInput(institutionDetails?.institutionData?.institution);
@@ -40,8 +41,6 @@ function InstitutionDataSetup({ setActiveStep }) {
     createInstitutionSetup,
     { data, isSuccess, isLoading, isError, error },
   ] = useCreateInstitutionSetupMutation();
-
-
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -176,7 +175,9 @@ function InstitutionDataSetup({ setActiveStep }) {
           <>
             <div className="flex flex-wrap w-full mt-[1vw] justify-between gap-y-[1.5vw]">
               <div className="w-[49%]">
-                <h4 className="md:text-[1vw] text-[4vw] mb-1">Institution Name</h4>
+                <h4 className="md:text-[1vw] text-[4vw] mb-1">
+                  Institution Name
+                </h4>
                 <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
                   <input
                     type="text"
@@ -212,7 +213,8 @@ function InstitutionDataSetup({ setActiveStep }) {
                   />
                 </div>
                 <h4 className="text-[0.7rem] text-right">
-                  <span className="text-[#ff0404]">Note:</span> Only emails with custom domains are allowed
+                  <span className="text-[#ff0404]">Note:</span> Only emails with
+                  custom domains are allowed
                 </h4>
               </div>
               <div className="w-[49%]">
@@ -250,12 +252,14 @@ function InstitutionDataSetup({ setActiveStep }) {
             <div className="w-full h-[0.1vw] bg-[#E2E2E2] mt-[2vw]"></div>
             <div className="flex flex-wrap w-full mt-[1vw] justify-between gap-y-[1.5vw]">
               <div className="w-[49%]">
-                <h4 className="md:text-[1vw] text-[4vw] mb-1">Academic Level</h4>
+                <h4 className="md:text-[1vw] text-[4vw] mb-1">
+                  Academic Level
+                </h4>
                 <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
                   <input
                     type="text"
                     value={userInput?.academic_level}
-                    className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0"
+                    className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0 capitalize"
                   />
                 </div>
               </div>
@@ -265,7 +269,7 @@ function InstitutionDataSetup({ setActiveStep }) {
                   <input
                     type="text"
                     value={userInput?.region}
-                    className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0"
+                    className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0 capitalize"
                   />
                 </div>
               </div>
@@ -280,7 +284,9 @@ function InstitutionDataSetup({ setActiveStep }) {
                 </div>
               </div>
               <div className="w-[49%]">
-                <h4 className="md:text-[1vw] text-[4vw] mb-1">Digital Address</h4>
+                <h4 className="md:text-[1vw] text-[4vw] mb-1">
+                  Digital Address
+                </h4>
                 <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
                   <input
                     type="text"
@@ -291,7 +297,8 @@ function InstitutionDataSetup({ setActiveStep }) {
               </div>
               <div className="w-[49%]">
                 <h4 className="md:text-[1vw] text-[4vw] mb-1">
-                  Institution Website URL<span className="text-[#f1416c]">*</span>
+                  Institution Website URL
+                  <span className="text-[#f1416c]">*</span>
                 </h4>
                 <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
                   <input
@@ -306,7 +313,8 @@ function InstitutionDataSetup({ setActiveStep }) {
               </div>
               <div className="w-[49%]">
                 <h4 className="md:text-[1vw] text-[4vw] mb-1">
-                  Post Office Mail Address<span className="text-[#f1416c]">*</span>
+                  Post Office Mail Address
+                  <span className="text-[#f1416c]">*</span>
                 </h4>
                 <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
                   <input
@@ -320,7 +328,9 @@ function InstitutionDataSetup({ setActiveStep }) {
                 </div>
               </div>
               <div className="w-[65%]">
-                <h4 className="md:text-[1vw] text-[4vw] mb-1">Other Contacts</h4>
+                <h4 className="md:text-[1vw] text-[4vw] mb-1">
+                  Other Contacts
+                </h4>
                 <div className="flex items-center">
                   <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
                     <input
@@ -357,14 +367,18 @@ function InstitutionDataSetup({ setActiveStep }) {
                     htmlFor="logoFile"
                     className="absolute right-[1vw] absolute-pos-items-center cursor-pointer"
                   >
-                    <img src="/assets/img/uplo.svg" alt="" className="w-[1.5vw]" />
+                    <img
+                      src="/assets/img/uplo.svg"
+                      alt=""
+                      className="w-[1.5vw]"
+                    />
                   </label>
                   <h4 className="pl-[1vw] text-[1vw] max-w-[29vw] overflow-hidden text-ellipsis">
                     {userInput?.logo
                       ? userInput?.logo
                       : selectedImage
-                        ? selectedImage?.name
-                        : "Browse to upload image"}{" "}
+                      ? selectedImage?.name
+                      : "Browse to upload image"}{" "}
                   </h4>
                 </div>
                 <h4 className="text-[0.7rem] text-right">
@@ -388,14 +402,18 @@ function InstitutionDataSetup({ setActiveStep }) {
                     htmlFor="certFile"
                     className="absolute right-[1vw] absolute-pos-items-center cursor-pointer"
                   >
-                    <img src="/assets/img/uplo.svg" alt="" className="w-[1.5vw]" />
+                    <img
+                      src="/assets/img/uplo.svg"
+                      alt=""
+                      className="w-[1.5vw]"
+                    />
                   </label>
                   <h4 className="pl-[1vw] text-[1vw] max-w-[29vw] text-nowrap overflow-hidden text-ellipsis">
                     {userInput?.operation_certificate
                       ? userInput?.operation_certificate
                       : selectedCert
-                        ? selectedCert?.name
-                        : "Browse to upload file"}{" "}
+                      ? selectedCert?.name
+                      : "Browse to upload file"}{" "}
                   </h4>
                 </div>
                 <h4 className="text-[0.7rem] text-right">
@@ -426,7 +444,9 @@ function InstitutionDataSetup({ setActiveStep }) {
             </div>
           </>
         ) : (
-          <div className="w-full h-[30vw] flex justify-center items-center"><LoadItems color={"#ff0404"} /></div>
+          <div className="w-full h-[30vw] flex justify-center items-center">
+            <LoadItems color={"#ff0404"} />
+          </div>
         )}
       </form>
     </div>

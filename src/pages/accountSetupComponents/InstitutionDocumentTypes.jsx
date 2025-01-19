@@ -174,8 +174,8 @@ function InstitutionDocumentTypes({ setActiveStep }) {
             </h1>
             <h4 className="text-[0.9vw] mt-[0.5vw]">
               Add the document types accepted by your institution to get
-              started. <br /> Select from a predefined list of common documents or
-              create custom types that align with your institution’s specific
+              started. <br /> Select from a predefined list of common documents
+              or create custom types that align with your institution’s specific
               needs.
             </h4>
           </div>
@@ -290,25 +290,7 @@ function InstitutionDocumentTypes({ setActiveStep }) {
                         </h4>
                       </div>
                     </th>
-                    <th className="md:py-[1vw] py-[3vw] md:px-[1vw] px-[3vw] border-b max-w-[10%]">
-                      <div className="flex gap-[1vw]">
-                        <div className="flex flex-col items-center justify-center md:gap-[0.1vw] gap-[0.3vw]">
-                          <img
-                            src="/assets/img/top-arr.svg"
-                            alt=""
-                            className="md:w-[0.5vw] w-[2vw]"
-                          />
-                          <img
-                            src="/assets/img/down-arr.svg"
-                            alt=""
-                            className="md:w-[0.5vw] w-[2vw]"
-                          />
-                        </div>
-                        <h4 className="md:text-[0.9vw] text-[3.5vw]">
-                          Verification Fee
-                        </h4>
-                      </div>
-                    </th>
+
                     <th className="md:py-[1vw] py-[3vw] md:px-[1vw] px-[3vw] border-b max-w-[10%]"></th>
                   </tr>
                 </thead>
@@ -370,9 +352,6 @@ function InstitutionDocumentTypes({ setActiveStep }) {
                                   </td>
                                   <td className="py-[1vw] px-[1vw] border-b max-w-[15%]">
                                     GH¢ {documentType?.validation_fee}
-                                  </td>
-                                  <td className="py-[1vw] px-[1vw] border-b max-w-[15%]">
-                                    GH¢ {documentType?.verification_fee}
                                   </td>
                                   <td className="text-end border-b">
                                     <Dropdown
