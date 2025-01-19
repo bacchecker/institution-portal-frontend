@@ -1,12 +1,13 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import secureLocalStorage from "react-secure-storage";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useGetInstitutionDetailsQuery } from "../redux/apiSlice";
 import { useEffect, useState } from "react";
 import { setUser } from "../redux/authSlice";
 import Echo from "laravel-echo";
 import Pusher from "pusher-js";
+import PropTypes from "prop-types";
 
 function RootLayout({ children }) {
   const { pathname } = useLocation();
@@ -14,9 +15,21 @@ function RootLayout({ children }) {
   const navigate = useNavigate();
   const [message, setMessage] = useState();
 
-  const user = JSON.parse(secureLocalStorage.getItem("user"));
-  const token = JSON?.parse(secureLocalStorage?.getItem("userToken"))?.token;
+  const storeUser = useSelector((state) => state.auth.user);
+  const [user, setLocalUser] = useState(
+    storeUser || JSON.parse(secureLocalStorage.getItem("user"))
+  );
+
   console.log(user);
+
+  const token = JSON?.parse(secureLocalStorage?.getItem("userToken"))?.token;
+
+  useEffect(() => {
+    if (storeUser) {
+      setLocalUser(storeUser);
+      secureLocalStorage.setItem("user", JSON.stringify(storeUser));
+    }
+  }, [storeUser]);
 
   window.Pusher = Pusher;
   window.Echo = new Echo({
@@ -54,28 +67,18 @@ function RootLayout({ children }) {
   } = useGetInstitutionDetailsQuery();
 
   useEffect(() => {
-    console.log(pathname);
+    if (institutionDetails?.institutionData) {
+      const updatedUser = {
+        user: institutionDetails.institutionData.user,
+        two_factor: user?.two_factor,
+        institution: institutionDetails.institutionData.institution,
+        selectedTemplate: user?.selectedTemplate,
+      };
 
-    // if (message) {
-    //   dispatch(
-    //     setUser({
-    //       user: institutionDetails.institutionData?.user,
-    //       two_factor: user.two_factor,
-    //       institution: institutionDetails.institutionData?.institution,
-    //       selectedTemplate: user.selectedTemplate,
-    //     })
-    //   );
-    if (institutionDetails && user) {
-      dispatch(
-        setUser({
-          user: institutionDetails?.institutionData?.user,
-          two_factor: user?.two_factor,
-          institution: institutionDetails?.institutionData?.institution,
-          selectedTemplate: user?.selectedTemplate,
-        })
-      );
+      dispatch(setUser(updatedUser));
+      secureLocalStorage.setItem("user", JSON.stringify(updatedUser));
     }
-  }, [institutionDetails, user, dispatch, message, pathname]);
+  }, [institutionDetails, dispatch, user?.two_factor, user?.selectedTemplate]);
 
   useEffect(() => {
     if (isError && error?.data?.message === "Unauthenticated.") {
@@ -108,5 +111,9 @@ function RootLayout({ children }) {
     </>
   );
 }
+
+RootLayout.propTypes = {
+  children: PropTypes.node.isRequired,
+};
 
 export default RootLayout;
