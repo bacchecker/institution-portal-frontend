@@ -58,7 +58,7 @@ function RootLayout({ children }) {
         setUser({
           user: user?.user,
           two_factor: user.two_factor,
-          institution: message?.institution,
+          institution: institutionDetails.institutionData?.institution,
           selectedTemplate: user.selectedTemplate,
         })
       );
