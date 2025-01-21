@@ -29,28 +29,7 @@ const PrivateRoute = ({ children }) => {
 
   const { isActive, isInactive, setupDone, currentStep } = accountStatus;
 
-  // Root path handling
-  if (location.pathname === "/") {
-    if (isInactive) return <Navigate to="/account-under-review" replace />;
-    if (!setupDone && currentStep !== 5)
-      return <Navigate to="/account-setup" replace />;
-    return <Navigate to="/dashboard" replace />;
-  }
-
-  // Define protected paths that require setup completion
-  const protectedPaths = [
-    "/dashboard",
-    "/manage-document",
-    "/e-check",
-    "/search-all",
-    "/user-support",
-    "/reports",
-    "/activity-logs",
-    "/subscription-plans",
-    "/payment",
-  ];
-
-  // Public paths that don't require setup
+  // Define paths that are always accessible
   const publicPaths = [
     "/account-under-review",
     "/account-setup",
@@ -59,28 +38,25 @@ const PrivateRoute = ({ children }) => {
     "/2fa-authentication-success",
   ];
 
-  const isProtectedPath = protectedPaths.includes(location.pathname);
   const isPublicPath = publicPaths.includes(location.pathname);
 
-  // Handle routing based on status
-  if (isInactive && location.pathname !== "/account-under-review") {
+  // Allow access to public paths regardless of status
+  if (isPublicPath) {
+    return children;
+  }
+
+  // Handle inactive account
+  if (isInactive) {
     return <Navigate to="/account-under-review" replace />;
   }
 
-  if (isActive && !setupDone && currentStep !== 5 && isProtectedPath) {
+  // Handle incomplete setup
+  if (isActive && !setupDone && currentStep !== 5) {
     return <Navigate to="/account-setup" replace />;
   }
 
-  if (
-    isActive &&
-    (setupDone || currentStep === 5) &&
-    location.pathname === "/account-setup"
-  ) {
-    return <Navigate to="/dashboard" replace />;
-  }
-
-  // Allow access if path is public or user has completed setup
-  if (isPublicPath || (isProtectedPath && (setupDone || currentStep === 5))) {
+  // Allow access to protected routes only if active and setup complete
+  if (isActive && (setupDone || currentStep === 5)) {
     return children;
   }
 

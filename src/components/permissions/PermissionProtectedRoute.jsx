@@ -15,7 +15,12 @@ const PermissionProtectedRoute = ({ permission, children }) => {
   const isAdmin = JSON.parse(secureLocalStorage.getItem("userRole"))?.isAdmin;
   const accountStatus = getAccountStatus();
 
-  // Check setup completion first
+  // If account is inactive, redirect to review page
+  if (accountStatus?.isInactive) {
+    return <Navigate to="/account-under-review" replace />;
+  }
+
+  // Check setup completion
   if (
     accountStatus &&
     !accountStatus.setupDone &&
@@ -23,23 +28,24 @@ const PermissionProtectedRoute = ({ permission, children }) => {
   ) {
     return <Navigate to="/account-setup" replace />;
   }
-  console.log(permissions);
+
   // Parse permissions if stored as a string
   if (typeof permissions === "string") {
     try {
       permissions = JSON.parse(permissions);
     } catch {
+      console.error("Failed to parse permissions");
       return <Navigate to="/unauthorized" replace />;
     }
   }
 
   // Ensure permissions is an array
   if (!Array.isArray(permissions)) {
+    console.error("Permissions is not an array");
     return <Navigate to="/unauthorized" replace />;
   }
 
   const hasPermission = (perm) => permissions.includes(perm);
-
   const hasRequiredPermissions = Array.isArray(permission)
     ? permission.some(hasPermission)
     : hasPermission(permission);
