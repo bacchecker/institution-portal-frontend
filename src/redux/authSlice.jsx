@@ -17,21 +17,23 @@ export const authSlice = createSlice({
   initialState,
   reducers: {
     setUser: (state, action) => {
-      secureLocalStorage.setItem(
-        "user",
-        JSON.stringify({
-          user: action.payload.user,
-          two_factor: action.payload.two_factor,
-          institution: action.payload.institution,
-          subscription: action.payload.subscription,
-          selectedTemplate: action.payload.selectedTemplate,
-        })
-      );
+      const userData = {
+        user: action.payload.user,
+        two_factor: action.payload.two_factor,
+        institution: action.payload.institution,
+        subscription: action.payload.subscription,
+        selectedTemplate: action.payload.selectedTemplate,
+      };
 
+      // Update local storage
+      secureLocalStorage.setItem("user", JSON.stringify(userData));
+
+      // Update state
       state.user = action.payload.user;
       state.two_factor = action.payload.two_factor;
       state.institution = action.payload.institution;
       state.selectedTemplate = action.payload.selectedTemplate;
+      state.subscription = action.payload.subscription;
     },
     setUserToken: (state, action) => {
       secureLocalStorage.setItem(

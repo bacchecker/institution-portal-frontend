@@ -62,6 +62,22 @@ export const baccheckerApi = createApi({
     getInstitutionDetails: builder.query({
       query: () => "/institution/institution-data",
       providesTags: ["Institution"],
+      transformResponse: (response) => {
+        if (response?.institutionData) {
+          const user = JSON.parse(secureLocalStorage.getItem("user"));
+          if (user) {
+            secureLocalStorage.setItem(
+              "user",
+              JSON.stringify({
+                ...user,
+                institution: response.institutionData.institution,
+                user: response.institutionData.user,
+              })
+            );
+          }
+        }
+        return response;
+      },
     }),
     getInstitutionRevenueGraph: builder.query({
       query: () => "/institution/revenue",
@@ -177,9 +193,6 @@ export const baccheckerApi = createApi({
       },
       providesTags: ["Validation"],
     }),
-
-
-
 
     getInstitutionDocumentTypes: builder.query({
       query: ({ page, perPage }) => {
@@ -643,5 +656,5 @@ export const {
   useInitiatePaymentMutation,
   useValidateDocumentMutation,
   useCustomizeDashboardMutation,
-  useGetInstitutionValidationRequestsQuery
+  useGetInstitutionValidationRequestsQuery,
 } = baccheckerApi;

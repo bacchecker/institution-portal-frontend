@@ -1,6 +1,7 @@
-import React from 'react';
-import { Navigate } from 'react-router-dom';
-import secureLocalStorage from 'react-secure-storage';
+import PropTypes from "prop-types";
+import { Navigate } from "react-router-dom";
+import secureLocalStorage from "react-secure-storage";
+import { getAccountStatus } from "../../utils/AccountStatus";
 
 /**
  * Protects a route based on permissions.
@@ -10,32 +11,52 @@ import secureLocalStorage from 'react-secure-storage';
  * @returns {React.ReactNode} - The children if permission is granted, or a redirect otherwise.
  */
 const PermissionProtectedRoute = ({ permission, children }) => {
-    let permissions = secureLocalStorage.getItem('userPermissions') || [];
-    const isAdmin = JSON.parse(secureLocalStorage.getItem("userRole"))?.isAdmin;
+  let permissions = secureLocalStorage.getItem("userPermissions") || [];
+  const isAdmin = JSON.parse(secureLocalStorage.getItem("userRole"))?.isAdmin;
+  const accountStatus = getAccountStatus();
 
-    // Parse permissions if stored as a string
-    if (typeof permissions === 'string') {
-        try {
-            permissions = JSON.parse(permissions);
-        } catch (error) {
-            console.error('Failed to parse permissions:', permissions);
-            return <Navigate to="/unauthorized" />;
-        }
+  // Check setup completion first
+  if (
+    accountStatus &&
+    !accountStatus.setupDone &&
+    accountStatus.currentStep !== 5
+  ) {
+    return <Navigate to="/account-setup" replace />;
+  }
+  console.log(permissions);
+  // Parse permissions if stored as a string
+  if (typeof permissions === "string") {
+    try {
+      permissions = JSON.parse(permissions);
+    } catch {
+      return <Navigate to="/unauthorized" replace />;
     }
+  }
 
-    // Ensure permissions is an array
-    if (!Array.isArray(permissions)) {
-        console.error('Permissions is not an array:', permissions);
-        return <Navigate to="/unauthorized" />;
-    }
+  // Ensure permissions is an array
+  if (!Array.isArray(permissions)) {
+    return <Navigate to="/unauthorized" replace />;
+  }
 
-    const hasPermission = (perm) => permissions.includes(perm);
+  const hasPermission = (perm) => permissions.includes(perm);
 
-    const hasRequiredPermissions = Array.isArray(permission)
-        ? permission.some(hasPermission) // At least one permission must match
-        : hasPermission(permission);
+  const hasRequiredPermissions = Array.isArray(permission)
+    ? permission.some(hasPermission)
+    : hasPermission(permission);
 
-    return hasRequiredPermissions || isAdmin ? children : <Navigate to="/unauthorized" />;
+  return hasRequiredPermissions || isAdmin ? (
+    children
+  ) : (
+    <Navigate to="/unauthorized" replace />
+  );
+};
+
+PermissionProtectedRoute.propTypes = {
+  permission: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.arrayOf(PropTypes.string),
+  ]).isRequired,
+  children: PropTypes.node.isRequired,
 };
 
 export default PermissionProtectedRoute;

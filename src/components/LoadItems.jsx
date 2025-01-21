@@ -1,14 +1,21 @@
-import { ClipLoader } from "react-spinners";
+import React from "react";
+import { Oval } from "react-loader-spinner";
 
-const LoadItems = ({ color, size }) => {
+const LoadItems = ({ color = "red", size = 30 }) => {
   return (
-    <ClipLoader
-      color={color || "#dfdede"}
-      loading={true}
-      size={size || 20}
-      aria-label="Loading Spinner"
-      data-testid="loader"
+    <Oval
+      height={size}
+      width={size}
+      color={color}
+      wrapperStyle={{}}
+      wrapperClass=""
+      visible={true}
+      ariaLabel="oval-loading"
+      secondaryColor="#ccc"
+      strokeWidth={4}
+      strokeWidthSecondary={4}
     />
   );
 };
+
 export default LoadItems;

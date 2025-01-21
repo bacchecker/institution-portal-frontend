@@ -1,30 +1,33 @@
-import React, { useEffect, useState } from "react";
-import secureLocalStorage from "react-secure-storage";
+import PropTypes from "prop-types";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { getAccountStatus } from "../utils/AccountStatus";
 
-function AccountSetupProtection({ children }) {
+const AccountSetupProtection = ({ children }) => {
   const navigate = useNavigate();
-
-  const user = JSON?.parse(secureLocalStorage?.getItem("user"));
+  const accountStatus = getAccountStatus();
 
   useEffect(() => {
-    if (
-      user?.institution?.status !== "active" &&
-      !user?.institution?.setup_done
-    ) {
-      navigate("/account-under-review");
+    if (!accountStatus) return;
+
+    const { isActive, isInactive, setupDone, currentStep } = accountStatus;
+
+    if (isInactive) {
+      navigate("/account-under-review", { replace: true });
+      return;
     }
-  }, [user]);
 
-  if (
-    user?.institution?.status === "active" &&
-    !user?.institution?.setup_done
-  ) {
-    return children;
-  }
+    if (isActive && (setupDone || currentStep === 5)) {
+      navigate("/dashboard", { replace: true });
+      return;
+    }
+  }, [accountStatus, navigate]);
 
-  navigate(-1);
-  return null;
-}
+  return children;
+};
+
+AccountSetupProtection.propTypes = {
+  children: PropTypes.node.isRequired,
+};
 
 export default AccountSetupProtection;

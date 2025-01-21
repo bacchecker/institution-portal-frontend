@@ -105,8 +105,6 @@ function AddNewUser({
       !last_name ||
       !email ||
       !phone ||
-      !address ||
-      !selectedGender?.value ||
       !selectedDepartment?.id
     ) {
       Swal.fire({
@@ -130,9 +128,7 @@ function AddNewUser({
           other_name,
           email,
           phone,
-          address,
           department_id: selectedDepartment?.id,
-          gender: selectedGender?.value,
           permissions: selectedPermissions,
         });
       } catch (error) {

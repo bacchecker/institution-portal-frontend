@@ -157,9 +157,9 @@ function InstitutionPortalUsers({ setActiveStep }) {
             </h1>
             <h4 className="text-[0.9vw] mt-[0.5vw]">
               Use this page to create and manage user accounts within your
-              institution portal. <br /> Assign each user to a department and customize
-              their roles, permissions, and access levels based on their
-              responsibilities.
+              institution portal. <br /> Assign each user to a department and
+              customize their roles, permissions, and access levels based on
+              their responsibilities.
             </h4>
           </div>
         </div>
@@ -250,25 +250,7 @@ function InstitutionPortalUsers({ setActiveStep }) {
                         </h4>
                       </div>
                     </th>
-                    <th className="md:py-[1vw] py-[3vw] md:px-[1vw] px-[3vw] border-b max-w-[15%]">
-                      <div className="flex gap-[1vw]">
-                        <div className="flex flex-col items-center justify-center md:gap-[0.1vw] gap-[0.3vw]">
-                          <img
-                            src="/assets/img/top-arr.svg"
-                            alt=""
-                            className="md:w-[0.5vw] w-[2vw]"
-                          />
-                          <img
-                            src="/assets/img/down-arr.svg"
-                            alt=""
-                            className="md:w-[0.5vw] w-[2vw]"
-                          />
-                        </div>
-                        <h4 className="md:text-[0.9vw] text-[3.5vw]">
-                          Residential Address
-                        </h4>
-                      </div>
-                    </th>
+
                     <th className="md:py-[1vw] py-[3vw] md:px-[1vw] px-[3vw] border-b max-w-[10%]"></th>
                   </tr>
                 </thead>
@@ -276,7 +258,7 @@ function InstitutionPortalUsers({ setActiveStep }) {
                   {!isFetching && !isLoading ? (
                     <>
                       {institutionUsers?.institutionUsers?.data?.length ===
-                        0 ? (
+                      0 ? (
                         <tr>
                           <td colSpan={7} rowSpan={5}>
                             <div className="w-full h-[35vw] flex flex-col justify-center items-center">
@@ -309,9 +291,6 @@ function InstitutionPortalUsers({ setActiveStep }) {
                                   </td>
                                   <td className="py-[1vw] px-[1vw] border-b max-w-[15%]">
                                     {user?.department?.name}
-                                  </td>
-                                  <td className="py-[1vw] px-[1vw] border-b max-w-[15%]">
-                                    {user?.address}
                                   </td>
                                   <td className="text-end border-b">
                                     <Dropdown

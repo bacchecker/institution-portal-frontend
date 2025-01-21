@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import secureLocalStorage from "react-secure-storage";
 import InstitutionDataSetup from "./accountSetupComponents/InstitutionDataSetup";
 import InstitutionDocumentTypes from "./accountSetupComponents/InstitutionDocumentTypes";
@@ -11,8 +11,8 @@ function AccountSetup() {
   const [activeStep, setActiveStep] = useState();
   const [openModal, setOpenModal] = useState(false);
   const navigate = useNavigate();
-  const current_step = JSON?.parse(secureLocalStorage?.getItem("user"))
-    ?.institution?.current_step;
+  const user = JSON?.parse(secureLocalStorage?.getItem("user"));
+  const current_step = user?.institution?.current_step;
 
   return (
     <>
@@ -276,14 +276,25 @@ function AccountSetup() {
                 Your institution account setup is now complete. <br />
               </span>
               Welcome to BacChecker! Your account is ready to use, and you can
-              start managing your institution’s processes seamlessly. Your
+              start managing your institution's processes seamlessly. Your
               account is all set up and ready to go.
             </h4>
           </div>
           <div className="w-full border-t px-[4vw]">
             <button
               type="button"
-              onClick={() => navigate("/dashboard")}
+              onClick={() => {
+                const updatedUser = {
+                  ...user,
+                  institution: {
+                    ...user.institution,
+                    setup_done: true,
+                    current_step: "5",
+                  },
+                };
+                secureLocalStorage.setItem("user", JSON.stringify(updatedUser));
+                navigate("/dashboard", { replace: true });
+              }}
               className="bg-[#FF0404] md:my-[2vw!important] my-[4vw!important] w-full flex justify-center items-center md:py-[0.7vw] py-[2vw] h-[fit-content] md:rounded-[0.3vw] rounded-[2vw] gap-[0.5vw] hover:bg-[#ef4545] transition-all duration-300 disabled:bg-[#fa6767]"
             >
               <h4 className="md:text-[1vw] text-[3.5vw] text-[#ffffff]">

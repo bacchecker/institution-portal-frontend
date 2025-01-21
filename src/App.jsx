@@ -1,4 +1,10 @@
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  Navigate,
+  Outlet,
+} from "react-router-dom";
 import Login from "@/pages/Login";
 import { Toaster } from "sonner";
 import ResetPassword from "@/pages/ResetPassword";
@@ -23,11 +29,13 @@ import VerificationRequest from "./pages/requests/VerficationRequests";
 import PermissionProtectedRoute from "./components/permissions/PermissionProtectedRoute";
 import Unauthorized from "./components/permissions/Unauthorized";
 import Plans from "./pages/subscription/Plans";
+import Payment from "./pages/payment/Payment";
+import { getAccountSetupStatus } from "./utils/AccountSetupStatus";
 
 function App() {
   return (
     <>
-      <Toaster richColors position="top-right"/>
+      <Toaster richColors position="top-right" />
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/reset-password" element={<ResetPassword />} />
@@ -39,6 +47,14 @@ function App() {
             <PrivateRoute>
               <RootLayout>
                 <Routes>
+                  <Route
+                    path="/2fa-authentication"
+                    element={
+                      <AuthenticationProtectedRoute>
+                        <AuthenticationPage />
+                      </AuthenticationProtectedRoute>
+                    }
+                  />
                   <Route
                     path="/account-under-review"
                     element={
@@ -60,20 +76,12 @@ function App() {
                     }
                   />
                   <Route
-                    path="/2fa-authentication"
-                    element={
-                      <AuthenticationProtectedRoute>
-                        <AuthenticationPage />
-                      </AuthenticationProtectedRoute>
-                    }
-                  />
-                  <Route
                     path="/dashboard"
                     element={
                       <AuthenticatedSuccessProtectedRoute>
-                        {/* <AccountSetupProtectedRoute> */}
-                        <Dashboard />
-                        {/* </AccountSetupProtectedRoute> */}
+                        <AccountSetupProtectedRoute>
+                          <Dashboard />
+                        </AccountSetupProtectedRoute>
                       </AuthenticatedSuccessProtectedRoute>
                     }
                   />
@@ -81,11 +89,13 @@ function App() {
                     path="/manage-document"
                     element={
                       <AuthenticatedSuccessProtectedRoute>
-                        {/* <AccountSetupProtectedRoute> */}
-                        <PermissionProtectedRoute permission={['document-requests.view']}>
-                          <ManageRequest />
-                        </PermissionProtectedRoute>
-                        {/* </AccountSetupProtectedRoute> */}
+                        <AccountSetupProtectedRoute>
+                          <PermissionProtectedRoute
+                            permission={["document-requests.view"]}
+                          >
+                            <ManageRequest />
+                          </PermissionProtectedRoute>
+                        </AccountSetupProtectedRoute>
                       </AuthenticatedSuccessProtectedRoute>
                     }
                   />
@@ -93,11 +103,11 @@ function App() {
                     path="/e-check"
                     element={
                       <AuthenticatedSuccessProtectedRoute>
-                        {/* <AccountSetupProtectedRoute> */}
-                        <PermissionProtectedRoute permission={['verification-requests.view']}>
+                        <PermissionProtectedRoute
+                          permission={["verification-requests.view"]}
+                        >
                           <VerificationRequest />
                         </PermissionProtectedRoute>
-                        {/* </AccountSetupProtectedRoute> */}
                       </AuthenticatedSuccessProtectedRoute>
                     }
                   />
@@ -105,9 +115,7 @@ function App() {
                     path="/search-all"
                     element={
                       <AuthenticatedSuccessProtectedRoute>
-                        {/* <AccountSetupProtectedRoute> */}
-                          <SearchAll />
-                        {/* </AccountSetupProtectedRoute> */}
+                        <SearchAll />
                       </AuthenticatedSuccessProtectedRoute>
                     }
                   />
@@ -115,11 +123,11 @@ function App() {
                     path="/user-support"
                     element={
                       <AuthenticatedSuccessProtectedRoute>
-                        {/* <AccountSetupProtectedRoute> */}
-                          <PermissionProtectedRoute permission={['institution.tickets.view']}>
-                            <Tickets />
-                          </PermissionProtectedRoute>
-                        {/* </AccountSetupProtectedRoute> */}
+                        <PermissionProtectedRoute
+                          permission={["institution.tickets.view"]}
+                        >
+                          <Tickets />
+                        </PermissionProtectedRoute>
                       </AuthenticatedSuccessProtectedRoute>
                     }
                   />
@@ -127,11 +135,11 @@ function App() {
                     path="/reports"
                     element={
                       <AuthenticatedSuccessProtectedRoute>
-                        {/* <AccountSetupProtectedRoute> */}
-                          <PermissionProtectedRoute permission={['institution.reports.view']}>
-                            <RevenueOverview />
-                          </PermissionProtectedRoute>
-                        {/* </AccountSetupProtectedRoute> */}
+                        <PermissionProtectedRoute
+                          permission={["institution.reports.view"]}
+                        >
+                          <RevenueOverview />
+                        </PermissionProtectedRoute>
                       </AuthenticatedSuccessProtectedRoute>
                     }
                   />
@@ -139,11 +147,11 @@ function App() {
                     path="/activity-logs"
                     element={
                       <AuthenticatedSuccessProtectedRoute>
-                        {/* <AccountSetupProtectedRoute> */}
-                          <PermissionProtectedRoute permission={['institution.activity-logs.view']}>
-                            <SystemLogs />
-                          </PermissionProtectedRoute>
-                        {/* </AccountSetupProtectedRoute> */}
+                        <PermissionProtectedRoute
+                          permission={["institution.activity-logs.view"]}
+                        >
+                          <SystemLogs />
+                        </PermissionProtectedRoute>
                       </AuthenticatedSuccessProtectedRoute>
                     }
                   />
@@ -151,11 +159,25 @@ function App() {
                     path="/subscription-plans"
                     element={
                       <AuthenticatedSuccessProtectedRoute>
-                        {/* <AccountSetupProtectedRoute> */}
-                          <PermissionProtectedRoute permission={['verification-requests.view']}>
-                            <Plans />
+                        <PermissionProtectedRoute
+                          permission={["verification-requests.view"]}
+                        >
+                          <Plans />
+                        </PermissionProtectedRoute>
+                      </AuthenticatedSuccessProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/payment"
+                    element={
+                      <AuthenticatedSuccessProtectedRoute>
+                        <AccountSetupProtectedRoute>
+                          <PermissionProtectedRoute
+                            permission={["payments.view"]}
+                          >
+                            <Payment />
                           </PermissionProtectedRoute>
-                        {/* </AccountSetupProtectedRoute> */}
+                        </AccountSetupProtectedRoute>
                       </AuthenticatedSuccessProtectedRoute>
                     }
                   />
@@ -169,5 +191,15 @@ function App() {
     </>
   );
 }
+
+const RequireSetupComplete = ({ children }) => {
+  const { isSetupComplete } = getAccountSetupStatus();
+
+  if (!isSetupComplete) {
+    return <Navigate to="/account-setup" />;
+  }
+
+  return <Outlet />;
+};
 
 export default App;

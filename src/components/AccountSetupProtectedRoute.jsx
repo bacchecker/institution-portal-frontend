@@ -1,17 +1,29 @@
-import React from "react";
-import secureLocalStorage from "react-secure-storage";
-import RedirectToAccountSetupPage from "./RedirectToAccountSetupPage";
+import PropTypes from "prop-types";
+import { Navigate } from "react-router-dom";
+import { getAccountStatus } from "../utils/AccountStatus";
 
-function AccountSetupProtectedRoute({ children }) {
-  const user = JSON?.parse(secureLocalStorage?.getItem("user"));
+const AccountSetupProtectedRoute = ({ children }) => {
+  const accountStatus = getAccountStatus();
 
-  
+  if (!accountStatus) {
+    return <Navigate to="/" replace />;
+  }
 
-  return user?.institution?.setup_done === 1 ? (
-    children
-  ) : (
-    <RedirectToAccountSetupPage />
-  );
-}
+  const { isActive, setupDone, currentStep } = accountStatus;
+
+  if (!isActive) {
+    return <Navigate to="/account-under-review" replace />;
+  }
+
+  if (!setupDone && currentStep !== 5) {
+    return <Navigate to="/account-setup" replace />;
+  }
+
+  return children;
+};
+
+AccountSetupProtectedRoute.propTypes = {
+  children: PropTypes.node.isRequired,
+};
 
 export default AccountSetupProtectedRoute;

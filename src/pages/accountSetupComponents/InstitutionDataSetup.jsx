@@ -17,7 +17,7 @@ function InstitutionDataSetup({ setActiveStep }) {
   const [userInput, setUserInput] = useState([]);
   const [selectedImage, setSelectedImage] = useState(null);
   const [selectedCert, setSelectedCert] = useState(null);
-
+  console.log(user);
   const {
     data: institutionDetails,
     isLoading: isInstitutionDetailsLoading,
@@ -57,6 +57,7 @@ function InstitutionDataSetup({ setActiveStep }) {
       digital_address,
       mailing_address,
       operation_certificate,
+      alternate_contacts,
     } = userInput;
     const validationError = validateEmail(institution_email);
     if (!operation_certificate && !selectedCert) {
@@ -86,6 +87,7 @@ function InstitutionDataSetup({ setActiveStep }) {
       formData.append("prefix", prefix);
       formData.append("digital_address", digital_address);
       formData.append("mailing_address", mailing_address);
+      formData.append("alternate_contacts", alternate_contacts);
       selectedImage && formData.append("logo", selectedImage);
       selectedCert && formData.append("operation_certificate", selectedCert);
       try {

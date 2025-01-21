@@ -6,15 +6,24 @@ import Echo from "laravel-echo";
 import Pusher from "pusher-js";
 import { setUser } from "../redux/authSlice";
 import { useDispatch } from "react-redux";
+import { useGetInstitutionDetailsQuery } from "../redux/apiSlice";
+import LoadItems from "../components/LoadItems";
 
 function AccountUnderReview() {
   const [openModal, setOpenModal] = useState(false);
   const [message, setMessage] = useState(null);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const user = JSON?.parse(secureLocalStorage?.getItem("user"));
+  const user = JSON.parse(secureLocalStorage.getItem("user"));
   const token = JSON?.parse(secureLocalStorage?.getItem("userToken"))?.token;
   const [activeFeature, setActiveFeature] = useState(0);
+
+  // Get latest institution details
+  const {
+    data: institutionDetails,
+    isLoading,
+    refetch,
+  } = useGetInstitutionDetailsQuery();
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -43,32 +52,49 @@ function AccountUnderReview() {
     console.error("WebSocket connection error:", error);
   });
 
-  // TO DO Private Implementation Later
-
   useEffect(() => {
     if (user?.institution?.id) {
       window.Echo.channel(`institution.${user?.institution?.id}`).listen(
         "InstitutionActivatedEvent",
-        (event) => {
+        async (event) => {
           setMessage(event?.institution);
-          if (event?.institution) {
-            dispatch(
-              setUser({
-                user: user?.user,
-                two_factor: user.two_factor,
-                institution: event?.institution,
-                selectedTemplate: user.selectedTemplate,
-              })
-            );
-          }
+          // Refetch latest institution details when activation event is received
+          await refetch();
         }
       );
     }
-  }, [user?.institution?.id]);
+  }, [user?.institution?.id, refetch]);
+
+  // Update local storage when institution details change
+  useEffect(() => {
+    if (institutionDetails?.institutionData) {
+      dispatch(
+        setUser({
+          user: institutionDetails.institutionData.user,
+          two_factor: user?.two_factor,
+          institution: institutionDetails.institutionData.institution,
+          selectedTemplate: user?.selectedTemplate,
+        })
+      );
+    }
+  }, [institutionDetails, dispatch, user?.two_factor, user?.selectedTemplate]);
+
+  // Show loading state while fetching data
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <LoadItems color={"#ff0404"} />
+      </div>
+    );
+  }
+
+  // Ensure we're showing the correct status
+  const isActive =
+    institutionDetails?.institutionData?.institution?.status === "active";
 
   return (
     <>
-      {message && message?.status === "active" ? (
+      {isActive ? (
         <div className="flex flex-col justify-center items-center w-full h-[100vh]">
           <div className="">
             <img src="/assets/img/success.svg" alt="" className="w-[25vw]" />
@@ -80,7 +106,7 @@ function AccountUnderReview() {
                   Dear {user?.user?.first_name} {user?.user?.other_name}{" "}
                   {user?.user?.last_name}
                 </span>
-                , Congratulations! Your institution’s profile has been
+                , Congratulations! Your institution's profile has been
                 successfully activated. You can now proceed to set up your
                 institution account and access all available features. To
                 maximize your experience with BacChecker, we recommend
@@ -123,12 +149,12 @@ function AccountUnderReview() {
                 {user?.user?.last_name}
               </span>
               , <br />
-              Thank you for signing up with BacChecker! Your institution’s
+              Thank you for signing up with BacChecker! Your institution's
               account is currently under review, which typically takes 24–48
               hours to complete.
             </h4>
             <h4 className="text-[0.9vw] text-center mt-[0.3vw]">
-              During this time, some features may be temporarily limited. We’ll
+              During this time, some features may be temporarily limited. We'll
               notify you as soon as the review is finalized.
             </h4>
             <h4 className="text-[0.9vw] text-center mt-[0.3vw]">

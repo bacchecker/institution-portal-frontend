@@ -115,16 +115,13 @@ function EditUser({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const { first_name, last_name, other_name, email, phone, address, id } =
-      userInput;
+    const { first_name, last_name, other_name, email, phone, id } = userInput;
 
     if (
       !first_name ||
       !last_name ||
       !email ||
       !phone ||
-      !address ||
-      !selectedGender?.value ||
       !selectedDepartment?.id
     ) {
       Swal.fire({
@@ -161,9 +158,7 @@ function EditUser({
               other_name,
               email,
               phone,
-              address,
               department_id: selectedDepartment?.id,
-              gender: selectedGender?.value,
               permissions: selectedPermissions,
             },
           });
