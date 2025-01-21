@@ -1,6 +1,6 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import Sidebar from "./Sidebar";
-import secureLocalStorage from "react-secure-storage";
+import { storage } from "../utils/storage";
 import { useDispatch } from "react-redux";
 import { useGetInstitutionDetailsQuery } from "../redux/apiSlice";
 import { useEffect, useState } from "react";
@@ -16,8 +16,8 @@ function RootLayout({ children }) {
   const navigate = useNavigate();
   const [message, setMessage] = useState();
 
-  const user = JSON.parse(secureLocalStorage.getItem("user"));
-  const token = JSON?.parse(secureLocalStorage?.getItem("userToken"))?.token;
+  const user = storage.getUser();
+  const token = storage.getToken()?.token;
 
   window.Pusher = Pusher;
   window.Echo = new Echo({

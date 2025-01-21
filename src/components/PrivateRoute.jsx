@@ -1,12 +1,12 @@
 import PropTypes from "prop-types";
 import { Navigate, useLocation } from "react-router-dom";
-import secureLocalStorage from "react-secure-storage";
+import { storage } from "../utils/storage";
 import { getAccountStatus } from "../utils/AccountStatus";
 import { useGetInstitutionDetailsQuery } from "../redux/apiSlice";
 import LoadItems from "./LoadItems";
 
 const PrivateRoute = ({ children }) => {
-  const token = secureLocalStorage.getItem("userToken");
+  const token = storage.getToken()?.token;
   const location = useLocation();
   const { isLoading } = useGetInstitutionDetailsQuery(undefined, {
     skip: !token,
@@ -17,7 +17,7 @@ const PrivateRoute = ({ children }) => {
   }
 
   // Only show loading on initial data fetch
-  const user = JSON.parse(secureLocalStorage.getItem("user"));
+  const user = storage.getUser();
   if (isLoading && !user?.institution) {
     return (
       <div className="flex justify-center items-center h-screen">

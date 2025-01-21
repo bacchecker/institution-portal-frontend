@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import { Navigate } from "react-router-dom";
-import secureLocalStorage from "react-secure-storage";
+import { storage } from "../../utils/storage";
 import { getAccountStatus } from "../../utils/AccountStatus";
 
 /**
@@ -11,8 +11,8 @@ import { getAccountStatus } from "../../utils/AccountStatus";
  * @returns {React.ReactNode} - The children if permission is granted, or a redirect otherwise.
  */
 const PermissionProtectedRoute = ({ permission, children }) => {
-  let permissions = secureLocalStorage.getItem("userPermissions") || [];
-  const isAdmin = JSON.parse(secureLocalStorage.getItem("userRole"))?.isAdmin;
+  let permissions = storage.getPermissions() || [];
+  const isAdmin = storage.getRole()?.isAdmin;
   const accountStatus = getAccountStatus();
 
   // If account is inactive, redirect to review page

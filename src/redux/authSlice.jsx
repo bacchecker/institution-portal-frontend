@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import secureLocalStorage from "react-secure-storage";
+import { storage } from "../utils/storage";
 
 const initialState = {
   token: null,
@@ -25,8 +25,8 @@ export const authSlice = createSlice({
         selectedTemplate: action.payload.selectedTemplate,
       };
 
-      // Update local storage
-      secureLocalStorage.setItem("user", JSON.stringify(userData));
+      // Update storage
+      storage.setUser(userData);
 
       // Update state
       state.user = action.payload.user;
@@ -36,42 +36,23 @@ export const authSlice = createSlice({
       state.subscription = action.payload.subscription;
     },
     setUserToken: (state, action) => {
-      secureLocalStorage.setItem(
-        "userToken",
-        JSON.stringify({
-          token: action.payload.token,
-        })
-      );
-
+      storage.setToken(action.payload.token);
       state.token = action.payload.token;
     },
     setIsAdmin: (state, action) => {
-      secureLocalStorage.setItem(
-        "userRole",
-        JSON.stringify({
-          isAdmin: action.payload.isAdmin,
-        })
-      );
+      storage.setRole({ isAdmin: action.payload.isAdmin });
       state.isAdmin = action.payload.isAdmin;
     },
     setUserPermissions: (state, action) => {
-      secureLocalStorage.setItem(
-        "userPermissions",
-        JSON.stringify(action.payload.permissions)
-      );
-
+      storage.setPermissions(action.payload.permissions);
       state.permissions = action.payload.permissions;
     },
     logout: (state) => {
-      secureLocalStorage.clear();
-      state.user = null;
-      state.permissions = [];
-      state.subscription = null;
-      state.token = null;
-      state.two_factor = null;
-      state.institution = null;
-      state.selectedTemplate = null;
-      state.isAdmin = null;
+      // Clear storage
+      storage.clearAll();
+
+      // Reset state
+      Object.assign(state, initialState);
     },
   },
 });
