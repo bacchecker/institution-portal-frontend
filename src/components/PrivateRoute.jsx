@@ -8,13 +8,17 @@ import LoadItems from "./LoadItems";
 const PrivateRoute = ({ children }) => {
   const token = secureLocalStorage.getItem("userToken");
   const location = useLocation();
-  const { isLoading } = useGetInstitutionDetailsQuery();
+  const { isLoading } = useGetInstitutionDetailsQuery(undefined, {
+    skip: !token,
+  });
 
   if (!token) {
     return <Navigate to="/" replace />;
   }
 
-  if (isLoading) {
+  // Only show loading on initial data fetch
+  const user = JSON.parse(secureLocalStorage.getItem("user"));
+  if (isLoading && !user?.institution) {
     return (
       <div className="flex justify-center items-center h-screen">
         <LoadItems color={"#ff0404"} />

@@ -54,22 +54,25 @@ function RootLayout({ children }) {
     isError,
     isLoading,
   } = useGetInstitutionDetailsQuery(undefined, {
-    pollingInterval: 30000,
+    pollingInterval: 60000,
+    skip: !token,
     refetchOnMountOrArgChange: true,
   });
 
   useEffect(() => {
     if (institutionDetails?.institutionData) {
-      dispatch(
-        setUser({
-          user: institutionDetails.institutionData.user,
-          two_factor: user?.two_factor,
-          institution: institutionDetails.institutionData.institution,
-          selectedTemplate: user?.selectedTemplate,
-        })
-      );
+      const updatedUser = {
+        user: institutionDetails.institutionData.user,
+        two_factor: user?.two_factor,
+        institution: institutionDetails.institutionData.institution,
+        selectedTemplate: user?.selectedTemplate,
+      };
+
+      if (JSON.stringify(user) !== JSON.stringify(updatedUser)) {
+        dispatch(setUser(updatedUser));
+      }
     }
-  }, [institutionDetails, dispatch, user?.two_factor, user?.selectedTemplate]);
+  }, [institutionDetails, dispatch, user]);
 
   useEffect(() => {
     if (isError && error?.data?.message === "Unauthenticated.") {
@@ -77,7 +80,7 @@ function RootLayout({ children }) {
     }
   }, [isError, error, navigate]);
 
-  if (isLoading) {
+  if (isLoading && !user?.institution) {
     return (
       <div className="flex justify-center items-center h-screen">
         <LoadItems color={"#ff0404"} />
