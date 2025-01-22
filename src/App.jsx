@@ -31,6 +31,8 @@ import Unauthorized from "./components/permissions/Unauthorized";
 import Plans from "./pages/subscription/Plans";
 import Payment from "./pages/payment/Payment";
 import { getAccountSetupStatus } from "./utils/AccountSetupStatus";
+import AccountSuspended from "@/pages/AccountSuspended";
+import AccountSuspendedProtection from "@/components/AccountSuspendedProtection";
 
 function App() {
   return (
@@ -62,6 +64,16 @@ function App() {
                         <AccountUnderReviewProtection>
                           <AccountUnderReview />
                         </AccountUnderReviewProtection>
+                      </AuthenticatedSuccessProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/account-suspended"
+                    element={
+                      <AuthenticatedSuccessProtectedRoute>
+                        <AccountSuspendedProtection>
+                          <AccountSuspended />
+                        </AccountSuspendedProtection>
                       </AuthenticatedSuccessProtectedRoute>
                     }
                   />
