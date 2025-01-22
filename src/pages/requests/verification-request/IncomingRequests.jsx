@@ -591,9 +591,7 @@ export default function IncomingRequests() {
 
         <Drawer
           title={
-            data?.status != "processing"
-              ? "Request Details"
-              : "Verification Questions"
+            `Request Details`
           }
           isOpen={openDrawer}
           setIsOpen={setOpenDrawer}

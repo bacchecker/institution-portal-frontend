@@ -329,14 +329,13 @@ export default function OutgoingRequests() {
                 onSubmit={handleSubmit}
                 className="flex flex-row gap-3 items-center"
             >
-                <input 
-                type="text" 
-                className="bg-white text-gray-900 text-sm rounded-[4px] font-[400] focus:outline-none block w-[260px] p-[9.5px] placeholder:text-gray-500"
-                name="search_query"
-                placeholder="Search by institution name or unique code"
-                value={filters.search_query}
-                onChange={(e) => setFilters({ ...filters, search_query: e.target.value })}
-
+                <input
+                  type="text" 
+                  className="bg-white text-gray-900 text-sm rounded-[4px] font-[400] focus:outline-none block w-[260px] p-[9.5px] placeholder:text-gray-500"
+                  name="search_query"
+                  placeholder="Search by institution name or unique code"
+                  value={filters.search_query}
+                  onChange={(e) => setFilters({ ...filters, search_query: e.target.value })}
                 />
                 
                 <select

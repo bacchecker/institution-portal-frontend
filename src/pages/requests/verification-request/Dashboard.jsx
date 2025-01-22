@@ -352,7 +352,7 @@ export default function Dashboard() {
     e.preventDefault();
     setIsSaving(true);
     if (selectedPayment === "card") {
-      if (!paymentDetails.cardNumber || !cardType) {
+      if (!paymentDetails.cardNumber) {
         toast.error("Card details are required.");
         setIsSaving(false);
         return;
@@ -372,8 +372,8 @@ export default function Dashboard() {
       payment_type: "subscription",
       amount: paymentData?.amount,
       ...(selectedPayment === "card" && {
-        payment_method: cardType,
-        VISA: paymentDetails.cardNumber,
+        payment_method: 'VISA',
+        payment_detail: paymentDetails.cardNumber,
       }),
       ...(selectedPayment === "mobile_money" && {
         payment_method: paymentDetails.mobileNetwork,
@@ -1010,7 +1010,7 @@ export default function Dashboard() {
                       name="mobileNetwork"
                       value={paymentDetails.mobileNetwork}
                       onChange={handleInputChange}
-                      className="w-full border border-gray-300 p-3 text-base rounded-md focus:outline-none"
+                      className="w-full border border-gray-300 px-3 py-2 text-sm rounded-md focus:outline-none"
                     >
                       <option value="">Select Mobile Network</option>
                       <option value="MTN">MTN</option>

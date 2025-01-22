@@ -3,6 +3,7 @@ import {Tabs, Tab, Chip} from "@nextui-org/react";
 import { IoDocuments } from "react-icons/io5";
 import DocumentRequest from "./searchComponents/DocumentRequest";
 import ValidationRequest from "./searchComponents/ValidationRequest";
+import VerificationRequest from "./searchComponents/VerificationRequest";
 import Navbar from "@/components/Navbar";
 import { useLocation } from "react-router-dom";
 import UserList from "./searchComponents/UserList";
@@ -13,7 +14,7 @@ export default function SearchAll() {
 
     const location = useLocation();
     const results = location.state?.results || {};
-    const { document_requests, validation_requests, users, departments, document_types } = results;
+    const { document_requests, validation_requests, verification_requests, users, departments, document_types } = results;
 
     const tabs = [
         {
@@ -27,6 +28,12 @@ export default function SearchAll() {
           label: "Validation Request",
           count: validation_requests.length,
           component: <ValidationRequest data={validation_requests} />,
+        },
+        {
+          key: "verification_requests",
+          label: "Verification Request",
+          count: verification_requests.length,
+          component: <VerificationRequest data={verification_requests} />,
         },
         {
           key: "users",
