@@ -148,6 +148,9 @@ function Login() {
                 navigate("/account-setup");
               }
               break;
+            case "suspended":
+              navigate("/account-suspended");
+              break;
             default:
               navigate("/account-setup");
           }
