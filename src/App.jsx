@@ -33,6 +33,7 @@ import Payment from "./pages/payment/Payment";
 import { getAccountSetupStatus } from "./utils/AccountSetupStatus";
 import AccountSuspended from "@/pages/AccountSuspended";
 import AccountSuspendedProtection from "@/components/AccountSuspendedProtection";
+import AccountSettings from "./pages/accountSettingsComponents/AccountSettings";
 
 function App() {
   return (
@@ -185,9 +186,23 @@ function App() {
                       <AuthenticatedSuccessProtectedRoute>
                         <AccountSetupProtectedRoute>
                           <PermissionProtectedRoute
-                            permission={["payments.view"]}
+                            permission={["institution.payments.view"]}
                           >
                             <Payment />
+                          </PermissionProtectedRoute>
+                        </AccountSetupProtectedRoute>
+                      </AuthenticatedSuccessProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/account-settings"
+                    element={
+                      <AuthenticatedSuccessProtectedRoute>
+                        <AccountSetupProtectedRoute>
+                          <PermissionProtectedRoute
+                            permission={["institution.settings.view"]}
+                          >
+                            <AccountSettings />
                           </PermissionProtectedRoute>
                         </AccountSetupProtectedRoute>
                       </AuthenticatedSuccessProtectedRoute>

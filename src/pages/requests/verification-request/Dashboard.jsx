@@ -210,7 +210,7 @@ export default function Dashboard() {
                 <p className="font-semibold text-base text-center">
                   GH₵ {plan?.amount}
                 </p>
-                <p className="font-light text-center -mt-1">Non-expiry</p>
+                <p className="font-light text-center -mt-1">{plan?.expires_in} Days</p>
               </div>
               <div className="my-2">
                 <p className="font-semibold text-xs">Description</p>
@@ -755,7 +755,7 @@ export default function Dashboard() {
                       <p className="font-semibold text-base text-center">
                         GH₵ {plan?.amount}
                       </p>
-                      <p className="font-light text-center -mt-1">Non-expiry</p>
+                      <p className="font-light text-center -mt-1">{plan?.expires_in} Days</p>
                     </div>
                     <div className="my-2">
                       <p className="font-semibold text-xs">Description</p>
