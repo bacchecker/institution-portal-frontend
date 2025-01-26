@@ -660,25 +660,25 @@ export default function IncomingRequests() {
                 </div>
                 <div className="py-4">
                   <p className="font-semibold mb-4 text-base">
-                    Verifying Institution
+                    Requesting Institution
                   </p>
                   <div className="grid grid-cols-3 gap-y-4 border-b pb-4">
                     <div className="text-gray-500">Institution Name</div>
                     <div className="col-span-2">
-                      {data?.receiving_institution?.name}
+                      {data?.sending_institution?.name}
                     </div>
                     <div className="text-gray-500">Institution Email</div>
                     <div className="col-span-2">
-                      {data?.receiving_institution?.institution_email}
+                      {data?.sending_institution?.institution_email}
                     </div>
                     <div className="text-gray-500">Phone Number</div>
                     <div className="col-span-2">
-                      {data?.receiving_institution?.helpline_contact}
+                      {data?.sending_institution?.helpline_contact}
                     </div>
                     <div className="text-gray-500 mt-2">Institution Logo</div>
                     <div className="col-span-2 w-10 h-10 rounded-full bg-gray-200">
                       <img
-                        src={`https://admin-dev.baccheck.online/storage/${data?.receiving_institution?.logo}`}
+                        src={`https://admin-dev.baccheck.online/storage/${data?.sending_institution?.logo}`}
                         alt=""
                       />
                     </div>
@@ -953,7 +953,7 @@ export default function IncomingRequests() {
                     {data?.status === "submitted"
                       ? "Acknowledge Request"
                       : data?.status === "received"
-                      ? "Process Request"
+                      ? "Complete Request"
                       : data?.status === "rejected" || "cancelled"
                       ? "Revert Rejection"
                       : "Acknowledge Request"}
@@ -996,7 +996,7 @@ export default function IncomingRequests() {
                     data?.status == "submitted"
                       ? "received"
                       : data?.status == "received"
-                      ? "processing"
+                      ? "completed"
                       : data?.status == "rejected" || "cancelled"
                       ? "received"
                       : "completed",
@@ -1029,7 +1029,7 @@ export default function IncomingRequests() {
               {data?.status == "submitted"
                 ? "Received"
                 : data?.status == "received"
-                ? "Processing"
+                ? "Complete Request"
                 : data?.status == "rejected" || "cancelled"
                 ? "Received"
                 : "Complete Request"}
