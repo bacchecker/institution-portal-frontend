@@ -24,6 +24,7 @@ function AdminDashboard() {
     const user = JSON.parse(secureLocalStorage.getItem("user"));
     const [currentScreen, setCurrentScreen] = useState(1);
     const dispatch = useDispatch()
+    const [openDropDownFilter, setOpenDropDownFilter] = useState(false);
     const lineRef = useRef(null);
     const [lineStyle, setLineStyle] = useState({ width: 0, left: 0 });
     const [clickedItems, setClickedItems] = useState([]);
@@ -118,6 +119,7 @@ function AdminDashboard() {
                 theme: "light",
             });
             setClickedDefaultItems(clickedItems)
+            setOpenDropDownFilter(false)
             dispatch(
                 setUser({
                     user: user?.user,
@@ -157,6 +159,8 @@ function AdminDashboard() {
                             // buttonclassName="action-button-class"
                             isClose={isCustomizing}
                             dropdownclassName="action-dropdown-class12"
+                            openDropDownFilter={openDropDownFilter}
+                            setOpenDropDownFilter={setOpenDropDownFilter}
                         >
                             <div className="action-dropdown-content">
                                 <button

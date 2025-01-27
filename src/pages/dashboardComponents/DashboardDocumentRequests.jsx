@@ -47,21 +47,23 @@ function DashboardDocumentRequests() {
     setSelectedRequest(request);
   };
 
+
+
   return (
     <>
-        <div className="flex justify-between items-center p-[1vw] content">
-          <h4 className="font-[600] md:text-[1.2vw] text-[3.5vw]">Recent Document Requests</h4>
-          <div className="relative md:w-[15vw] w-[55vw] md:h-[2.3vw] h-[10vw] md:rounded-[0.3vw!important] rounded-[1vw!important] overflow-hidden bg-white border border-[#ddd]">
-            <i className="z-[1] bx bx-search absolute top-[50%] translate-y-[-50%] md:left-[0.5vw] left-[3vw] md:text-[1vw] text-[5vw]"></i>
-            <input
-              type="text"
-              id="search"
-              onChange={(e) => setSearchValue(e.target.value)}
-              className="w-full h-full md:pl-[2vw] md:pr-[0.5vw] pl-[10vw] pr-[2vw] md:text-[0.85vw] text-[3.5vw] focus:outline-none bg-white absolute left-0 right-0 bottom-0 top-0"
-              placeholder="Search Document"
-            />
-          </div>
+      <div className="flex justify-between items-center p-[1vw] content">
+        <h4 className="font-[600] md:text-[1.2vw] text-[3.5vw]">Recent Document Requests</h4>
+        <div className="relative md:w-[15vw] w-[55vw] md:h-[2.3vw] h-[10vw] md:rounded-[0.3vw!important] rounded-[1vw!important] overflow-hidden bg-white border border-[#ddd]">
+          <i className="z-[1] bx bx-search absolute top-[50%] translate-y-[-50%] md:left-[0.5vw] left-[3vw] md:text-[1vw] text-[5vw]"></i>
+          <input
+            type="text"
+            id="search"
+            onChange={(e) => setSearchValue(e.target.value)}
+            className="w-full h-full md:pl-[2vw] md:pr-[0.5vw] pl-[10vw] pr-[2vw] md:text-[0.85vw] text-[3.5vw] focus:outline-none bg-white absolute left-0 right-0 bottom-0 top-0"
+            placeholder="Search Document"
+          />
         </div>
+      </div>
       <div className="w-full h-full gap-[3vw] overflow-auto bg-[#f8f8f8] p-[1vw] table-cover scroll-width">
         <table className="md:w-full w-[230vw] border-collapse md:text-[0.85vw] text-[3.5vw] relative">
           <thead className="bg-white sticky top-0 z-[20]">
@@ -76,21 +78,19 @@ function DashboardDocumentRequests() {
                 >
                   <div className="flex flex-col items-center justify-center md:gap-[0.01vw] gap-[0.3vw]">
                     <i
-                      className={`bx bxs-up-arrow md:text-[0.5vw] text-[2vw] ${
-                        (!sortOrder || sortOrder === "desc") &&
+                      className={`bx bxs-up-arrow md:text-[0.5vw] text-[2vw] ${(!sortOrder || sortOrder === "desc") &&
                         sortBy === "document_type_name"
-                          ? "text-[#ffffff]"
-                          : ""
-                      }`}
+                        ? "text-[#ffffff]"
+                        : ""
+                        }`}
                     ></i>
 
                     <i
-                      className={`bx bxs-down-arrow md:text-[0.5vw] text-[2vw] ${
-                        (!sortOrder || sortOrder === "asc") &&
+                      className={`bx bxs-down-arrow md:text-[0.5vw] text-[2vw] ${(!sortOrder || sortOrder === "asc") &&
                         sortBy === "document_type_name"
-                          ? "text-[#ffffff]"
-                          : ""
-                      }`}
+                        ? "text-[#ffffff]"
+                        : ""
+                        }`}
                     ></i>
                   </div>
                   <h4 className="md:text-[0.85vw] text-[3.5vw]">Document</h4>
@@ -106,20 +106,18 @@ function DashboardDocumentRequests() {
                 >
                   <div className="flex flex-col items-center justify-center md:gap-[0.1vw] gap-[0.1vw]">
                     <i
-                      className={`bx bxs-up-arrow md:text-[0.5vw] text-[2vw] ${
-                        (!sortOrder || sortOrder === "desc") &&
+                      className={`bx bxs-up-arrow md:text-[0.5vw] text-[2vw] ${(!sortOrder || sortOrder === "desc") &&
                         sortBy === "user_full_name"
-                          ? "text-[#ffffff]"
-                          : ""
-                      }`}
+                        ? "text-[#ffffff]"
+                        : ""
+                        }`}
                     ></i>
                     <i
-                      className={`bx bxs-down-arrow md:text-[0.5vw] text-[2vw] mt-[-0.1vw] ${
-                        (!sortOrder || sortOrder === "asc") &&
+                      className={`bx bxs-down-arrow md:text-[0.5vw] text-[2vw] mt-[-0.1vw] ${(!sortOrder || sortOrder === "asc") &&
                         sortBy === "user_full_name"
-                          ? "text-[#ffffff]"
-                          : ""
-                      }`}
+                        ? "text-[#ffffff]"
+                        : ""
+                        }`}
                     ></i>
                   </div>
                   <h4 className="md:text-[0.85vw] text-[3.5vw]">
@@ -137,20 +135,18 @@ function DashboardDocumentRequests() {
                 >
                   <div className="flex flex-col items-center justify-center md:gap-[0.1vw] gap-[0.3vw]">
                     <i
-                      className={`bx bxs-up-arrow md:text-[0.5vw] text-[2vw] ${
-                        (!sortOrder || sortOrder === "desc") &&
+                      className={`bx bxs-up-arrow md:text-[0.5vw] text-[2vw] ${(!sortOrder || sortOrder === "desc") &&
                         sortBy === "delivery_address"
-                          ? "text-[#ffffff]"
-                          : ""
-                      }`}
+                        ? "text-[#ffffff]"
+                        : ""
+                        }`}
                     ></i>
                     <i
-                      className={`bx bxs-down-arrow md:text-[0.5vw] text-[2vw] mt-[-0.1vw] ${
-                        (!sortOrder || sortOrder === "asc") &&
+                      className={`bx bxs-down-arrow md:text-[0.5vw] text-[2vw] mt-[-0.1vw] ${(!sortOrder || sortOrder === "asc") &&
                         sortBy === "delivery_address"
-                          ? "text-[#ffffff]"
-                          : ""
-                      }`}
+                        ? "text-[#ffffff]"
+                        : ""
+                        }`}
                     ></i>
                   </div>
                   <h4 className="md:text-[0.85vw] text-[3.5vw]">
@@ -198,20 +194,18 @@ function DashboardDocumentRequests() {
                 >
                   <div className="flex flex-col items-center justify-center md:gap-[0.1vw] gap-[0.3vw]">
                     <i
-                      className={`bx bxs-up-arrow md:text-[0.5vw] text-[2vw] ${
-                        (!sortOrder || sortOrder === "desc") &&
+                      className={`bx bxs-up-arrow md:text-[0.5vw] text-[2vw] ${(!sortOrder || sortOrder === "desc") &&
                         sortBy === "document_format"
-                          ? "text-[#ffffff]"
-                          : ""
-                      }`}
+                        ? "text-[#ffffff]"
+                        : ""
+                        }`}
                     ></i>
                     <i
-                      className={`bx bxs-down-arrow md:text-[0.5vw] text-[2vw] mt-[-0.1vw] ${
-                        (!sortOrder || sortOrder === "asc") &&
+                      className={`bx bxs-down-arrow md:text-[0.5vw] text-[2vw] mt-[-0.1vw] ${(!sortOrder || sortOrder === "asc") &&
                         sortBy === "document_format"
-                          ? "text-[#ffffff]"
-                          : ""
-                      }`}
+                        ? "text-[#ffffff]"
+                        : ""
+                        }`}
                     ></i>
                   </div>
                   <h4 className="md:text-[0.85vw] text-[3.5vw]">Format</h4>
@@ -227,20 +221,18 @@ function DashboardDocumentRequests() {
                 >
                   <div className="flex flex-col items-center justify-center md:gap-[0.1vw] gap-[0.3vw]">
                     <i
-                      className={`bx bxs-up-arrow md:text-[0.5vw] text-[2vw] ${
-                        (!sortOrder || sortOrder === "desc") &&
+                      className={`bx bxs-up-arrow md:text-[0.5vw] text-[2vw] ${(!sortOrder || sortOrder === "desc") &&
                         sortBy === "total_amount"
-                          ? "text-[#ffffff]"
-                          : ""
-                      }`}
+                        ? "text-[#ffffff]"
+                        : ""
+                        }`}
                     ></i>
                     <i
-                      className={`bx bxs-down-arrow md:text-[0.5vw] text-[2vw] mt-[-0.1vw] ${
-                        (!sortOrder || sortOrder === "asc") &&
+                      className={`bx bxs-down-arrow md:text-[0.5vw] text-[2vw] mt-[-0.1vw] ${(!sortOrder || sortOrder === "asc") &&
                         sortBy === "total_amount"
-                          ? "text-[#ffffff]"
-                          : ""
-                      }`}
+                        ? "text-[#ffffff]"
+                        : ""
+                        }`}
                     ></i>
                   </div>
                   <h4 className="md:text-[0.85vw] text-[3.5vw]">Amount</h4>
@@ -256,20 +248,18 @@ function DashboardDocumentRequests() {
                 >
                   <div className="flex flex-col items-center justify-center md:gap-[0.1vw] gap-[0.3vw]">
                     <i
-                      className={`bx bxs-up-arrow md:text-[0.5vw] text-[2vw] ${
-                        (!sortOrder || sortOrder === "desc") &&
+                      className={`bx bxs-up-arrow md:text-[0.5vw] text-[2vw] ${(!sortOrder || sortOrder === "desc") &&
                         sortBy === "status"
-                          ? "text-[#ffffff]"
-                          : ""
-                      }`}
+                        ? "text-[#ffffff]"
+                        : ""
+                        }`}
                     ></i>
                     <i
-                      className={`bx bxs-down-arrow md:text-[0.5vw] text-[2vw] mt-[-0.1vw] ${
-                        (!sortOrder || sortOrder === "asc") &&
+                      className={`bx bxs-down-arrow md:text-[0.5vw] text-[2vw] mt-[-0.1vw] ${(!sortOrder || sortOrder === "asc") &&
                         sortBy === "status"
-                          ? "text-[#ffffff]"
-                          : ""
-                      }`}
+                        ? "text-[#ffffff]"
+                        : ""
+                        }`}
                     ></i>
                   </div>
                   <h4 className="md:text-[0.85vw] text-[3.5vw]">Status</h4>
@@ -308,7 +298,10 @@ function DashboardDocumentRequests() {
                         return (
                           <tr key={i}>
                             <td className="py-[1vw] px-[1vw] border-b ">
-                              {request?.document_type?.name}
+                              {request?.institution_document_type
+                                ? request?.institution_document_type
+                                  ?.document_type?.name
+                                : request?.document_type?.name}
                             </td>
                             <td className="py-[1vw] border-b  ">
                               <div className="flex gap-[0.2vw]">
@@ -343,11 +336,10 @@ function DashboardDocumentRequests() {
                                 {moment(request?.created_at).format("ll")}
                               </td> */}
                             <td
-                              className={`py-[1vw] px-[2.5vw] border-b  ${
-                                request?.document_format === "soft_copy"
-                                  ? "text-[#FFA52D]"
-                                  : "text-[#000000]"
-                              }`}
+                              className={`py-[1vw] px-[2.5vw] border-b  ${request?.document_format === "soft_copy"
+                                ? "text-[#FFA52D]"
+                                : "text-[#000000]"
+                                }`}
                             >
                               {formatText(request?.document_format)}
                             </td>
@@ -356,43 +348,41 @@ function DashboardDocumentRequests() {
                             </td>
                             <td className="md:py-[1vw] py-[3vw] md:px-[2.5vw] px-[6vw] border-b ">
                               <div
-                                className={`md:py-[0.3vw] py-[0.5vw] md:px-[1vw] px-[3vw] w-[fit-content] border ${
-                                  request?.status?.toLowerCase() === "submitted"
-                                    ? "border-[#f8e5cc] bg-[#fbf5ee]"
-                                    : request?.status?.toLowerCase() ===
-                                      "cancelled"
+                                className={`md:py-[0.3vw] py-[0.5vw] md:px-[1vw] px-[3vw] w-[fit-content] border ${request?.status?.toLowerCase() === "submitted"
+                                  ? "border-[#f8e5cc] bg-[#fbf5ee]"
+                                  : request?.status?.toLowerCase() ===
+                                    "cancelled"
                                     ? "border-[#ffc7c7] bg-[#eaeaea]"
                                     : request?.status?.toLowerCase() ===
                                       "processing"
-                                    ? "border-[#bdbdfd] bg-[#ededfd]"
-                                    : request?.status?.toLowerCase() ===
-                                      "completed"
-                                    ? "border-[#fdd1d8] bg-[#fbecef]"
-                                    : request?.status?.toLowerCase() ===
-                                      "created"
-                                    ? "border-[#858585] bg-[#efefef]"
-                                    : "border-[#C4FFE1] bg-[#ECFFF5]"
-                                } flex items-center justify-center md:rounded-[2vw] rounded-[4vw]`}
+                                      ? "border-[#bdbdfd] bg-[#ededfd]"
+                                      : request?.status?.toLowerCase() ===
+                                        "completed"
+                                        ? "border-[#fdd1d8] bg-[#fbecef]"
+                                        : request?.status?.toLowerCase() ===
+                                          "created"
+                                          ? "border-[#858585] bg-[#efefef]"
+                                          : "border-[#C4FFE1] bg-[#ECFFF5]"
+                                  } flex items-center justify-center md:rounded-[2vw] rounded-[4vw]`}
                               >
                                 <h4
-                                  className={`md:text-[0.85vw] text-[3vw] ${
-                                    request?.status?.toLowerCase() ===
+                                  className={`md:text-[0.85vw] text-[3vw] ${request?.status?.toLowerCase() ===
                                     "submitted"
-                                      ? "text-[#FFA52D]"
-                                      : request?.status?.toLowerCase() ===
-                                        "cancelled"
+                                    ? "text-[#FFA52D]"
+                                    : request?.status?.toLowerCase() ===
+                                      "cancelled"
                                       ? "text-[#ff0404]"
                                       : request?.status?.toLowerCase() ===
                                         "processing"
-                                      ? "text-[#0000ff]"
-                                      : request?.status?.toLowerCase() ===
-                                        "completed"
-                                      ? "text-[#ffc0cb]"
-                                      : request?.status?.toLowerCase() ===
-                                        "created"
-                                      ? "text-[#000]"
-                                      : "text-[#00612D]"
-                                  } capitalize`}
+                                        ? "text-[#0000ff]"
+                                        : request?.status?.toLowerCase() ===
+                                          "completed"
+                                          ? "text-[#ffc0cb]"
+                                          : request?.status?.toLowerCase() ===
+                                            "created"
+                                            ? "text-[#000]"
+                                            : "text-[#00612D]"
+                                    } capitalize`}
                                 >
                                   {request?.status}
                                 </h4>

@@ -17,7 +17,6 @@ function InstitutionDataSetup({ setActiveStep }) {
   const [userInput, setUserInput] = useState([]);
   const [selectedImage, setSelectedImage] = useState(null);
   const [selectedCert, setSelectedCert] = useState(null);
-  console.log(user);
   const {
     data: institutionDetails,
     isLoading: isInstitutionDetailsLoading,
