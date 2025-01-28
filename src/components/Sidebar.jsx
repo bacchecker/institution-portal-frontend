@@ -298,20 +298,7 @@ function Sidebar() {
                   </li>
                 )}
 
-                <li>
-                  <Link
-                    to="/account-settings"
-                    onClick={() => handleDropdownToggle("close")}
-                    className={`flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[15vw] md:rounded-[0.3vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] ${
-                      pathname === "/profile" && "active"
-                    }`}
-                  >
-                    <i className="bx bx-user md:text-[1.3vw] text-[8vw] menu-icon"></i>
-                    <span className="md:text-[1.1vw] text-[5vw] link">
-                      Account Settings
-                    </span>
-                  </Link> 
-                </li>
+                
               </ul>
             </div>
           </div>

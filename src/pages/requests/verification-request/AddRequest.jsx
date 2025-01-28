@@ -527,7 +527,7 @@ function NewApplicationForm({
               <input
                 type="text"
                 readOnly
-                value={`${ subscription?.total_credit || 0
+                value={`${ subscription?.balance || 0
                 }`}
                 className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0 read-only:bg-[#d8d8d8]"
               />
