@@ -454,7 +454,7 @@ export default function Dashboard() {
                 </p>
                 <div className="w-full flex items-center justify-between">
                   <p className="text-black text-xl font-semibold">
-                    {subscription?.total_credit || 0} Credits
+                    {subscription?.balance || 0} Credits
                   </p>
                   <button
                     type="button"

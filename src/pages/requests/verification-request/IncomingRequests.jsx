@@ -930,7 +930,7 @@ export default function IncomingRequests() {
                 Close
               </Button>
 
-              {(data?.status == "received" || data?.status == "submitted") && (
+              {(data?.status == "received") && (
                 <Button
                   radius="none"
                   size="md"
@@ -953,7 +953,7 @@ export default function IncomingRequests() {
                     {data?.status === "submitted"
                       ? "Acknowledge Request"
                       : data?.status === "received"
-                      ? "Complete Request"
+                      ? "Verify Document"
                       : data?.status === "rejected" || "cancelled"
                       ? "Revert Rejection"
                       : "Acknowledge Request"}
@@ -996,7 +996,7 @@ export default function IncomingRequests() {
                     data?.status == "submitted"
                       ? "received"
                       : data?.status == "received"
-                      ? "completed"
+                      ? "processing"
                       : data?.status == "rejected" || "cancelled"
                       ? "received"
                       : "completed",
@@ -1029,7 +1029,7 @@ export default function IncomingRequests() {
               {data?.status == "submitted"
                 ? "Received"
                 : data?.status == "received"
-                ? "Complete Request"
+                ? "Process Request"
                 : data?.status == "rejected" || "cancelled"
                 ? "Received"
                 : "Complete Request"}
@@ -1080,6 +1080,7 @@ export default function IncomingRequests() {
           <Textarea
             name="rejection_reason"
             label="Reason"
+            radius="none"
             onChange={(e) =>
               setData((prev) => ({ ...prev, rejection_reason: e.target.value }))
             }
