@@ -8,6 +8,8 @@ import {
 import CustomTable from "@/components/CustomTable";
 import axios from "@/utils/axiosConfig";
 import { FaPlus } from "react-icons/fa";
+import { FaRegCircleUser } from "react-icons/fa6";
+import { BsTrash3 } from "react-icons/bs";
 import { MdDelete, MdEdit, MdMoreVert, MdOutlineFilterAlt } from "react-icons/md";
 import AddNewDepartment from "../accountSettingsComponents/departmentComponents/AddNewDepartment";
 import EditDepartment from "../accountSettingsComponents/departmentComponents/EditDepartment";
@@ -216,7 +218,7 @@ export default function InstitutionDepartments() {
                         "Description",
                         "Permissions Assigned",
                         "Users Assigned",
-                        "Action",
+                        "Actions",
                     ]}
                     loadingState={isLoading}
                     columnSortKeys={{
@@ -238,50 +240,54 @@ export default function InstitutionDepartments() {
                             <TableCell className="text-[13px]">{department?.name}</TableCell>
                             <TableCell className="text-[13px]">{department?.description}</TableCell>
                             <TableCell className="text-center">{department?.permissions_count}</TableCell>
-                            <TableCell className="text-center">{department?.users_count ?? 'N/A'}</TableCell>
+                            <TableCell className="text-center">{department?.users_count ?? 'N/A'} Users</TableCell>
                             <TableCell className="text-center">
                               <div className="relative inline-block">
                                 <Popover
                                   placement="bottom"
                                   showArrow
                                   radius="none"
+                                  bordered
                                   open={isPopoverOpen}
-                                  onOpenChange={setIsPopoverOpen} // Handles opening/closing state
+                                  onOpenChange={setIsPopoverOpen}
+                                  triggerType="listbox" // Handles opening/closing state
                                 >
                                   <PopoverTrigger>
                                     <button
-                                      className="flex items-center justify-center p-2 rounded-full hover:bg-gray-200"
+                                      className="w-full flex items-center justify-center p-2 rounded-full hover:bg-gray-200"
                                       onClick={() => setIsPopoverOpen((prev) => !prev)} // Toggle popover
                                     >
-                                      <MdMoreVert />
+                                      <MdMoreVert size={20}/>
                                     </button>
                                   </PopoverTrigger>
                                   <PopoverContent radius="none">
                                     <div className="flex flex-col py-1 space-y-1">
                                       <button
                                         onClick={() => {
-                                          triggerClickOutside();
-                                          handleDepartment(department);
+                                          handleOverview(department);
                                         }}
-                                        className="text-left text-sm hover:text-blue-600 border-b px-4 pb-1"
+                                        className="text-left text-sm hover:bg-bChkRed hover:text-white px-4 py-1.5 rounded-md w-full flex space-x-2 items-center text-gray-700"
                                       >
-                                        Edit
+                                        <FaRegCircleUser size={17}/>
+                                        <p>View Department</p>
                                       </button>
                                       <button
                                         onClick={() => {
-                                          handleOverview(department);
+                                          handleDepartment(department);
                                         }}
-                                        className="text-left text-sm hover:text-green-600 border-b px-4 pb-1"
+                                        className="text-left text-sm hover:bg-bChkRed hover:text-white px-4 py-1.5 rounded-md w-full flex space-x-2 items-center text-gray-700"
                                       >
-                                        Overview
+                                        <MdEdit size={17}/>
+                                        <p>Edit Department</p>
                                       </button>
                                       <button
                                         onClick={() => {
                                           handleClickDelete(department, department?.id);
                                         }}
-                                        className="text-left text-sm text-red-500 hover:text-red-700 px-4"
+                                        className="text-left text-sm hover:bg-bChkRed hover:text-white px-4 py-1.5 rounded-md w-full flex space-x-2 items-center text-gray-700"
                                       >
-                                        Delete
+                                        <BsTrash3 size={17}/>
+                                        <p>Delete Department</p>
                                       </button>
                                       
                                     </div>

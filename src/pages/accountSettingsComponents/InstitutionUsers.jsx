@@ -13,6 +13,7 @@ import AddNewUser from "../accountSettingsComponents/institutionUserComponent/Ad
 import EditUser from "../accountSettingsComponents/institutionUserComponent/EditUser";
 import Swal from "sweetalert2";
 import { toast } from "sonner";
+import { BsTrash3 } from "react-icons/bs";
 
 export default function InstitutionUsers() {
     const [currentPage, setCurrentPage] = useState(1);
@@ -262,29 +263,33 @@ export default function InstitutionUsers() {
                                       className="flex items-center justify-center p-2 rounded-full hover:bg-gray-200"
                                       onClick={() => setIsPopoverOpen((prev) => !prev)} // Toggle popover
                                     >
-                                      <MdMoreVert />
+                                      <MdMoreVert size={20}/>
                                     </button>
                                   </PopoverTrigger>
                                   <PopoverContent radius="none">
-                                    <div className="flex flex-col px-4 py-1 space-y-1">
+                                    <div className="flex flex-col py-1 space-y-1">
+                                      
                                       <button
                                         onClick={() => {
                                           handleUser(user);
                                           closePopover(); // Close popover on Edit
                                         }}
-                                        className="text-left text-[13px] hover:text-blue-500"
+                                        className="text-left text-sm hover:bg-bChkRed hover:text-white px-4 py-1.5 rounded-md w-full flex space-x-2 items-center text-gray-700"
                                       >
-                                        Edit
+                                        <MdEdit size={17}/>
+                                        <p>Edit User</p>
                                       </button>
                                       <button
                                         onClick={() => {
                                           handleClickDelete(user, user?.id);
                                           closePopover(); // Optionally close popover on Delete
                                         }}
-                                        className="text-left text-[13px] text-red-500 hover:text-red-700"
+                                        className="text-left text-sm hover:bg-bChkRed hover:text-white px-4 py-1.5 rounded-md w-full flex space-x-2 items-center text-gray-700"
                                       >
-                                        Delete
+                                        <BsTrash3 size={17}/>
+                                        <p>Delete User</p>
                                       </button>
+                                      
                                     </div>
                                   </PopoverContent>
                                 </Popover>
