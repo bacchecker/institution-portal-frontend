@@ -102,13 +102,14 @@ function EditUser({
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const { first_name, last_name, other_name, email, phone, id } = userInput;
+        const { first_name, last_name, other_name, email, phone, id, job_title } = userInput;
 
         if (
         !first_name ||
         !last_name ||
         !email ||
         !phone ||
+        !job_title ||
         !selectedDepartment?.id
         ) {
         Swal.fire({
@@ -145,6 +146,7 @@ function EditUser({
                 other_name,
                 email,
                 phone,
+                job_title,
                 department_id: selectedDepartment?.id,
                 permissions: selectedPermissions,
                 },
@@ -207,7 +209,7 @@ function EditUser({
     >
       <form
         onSubmit={handleSubmit}
-        className="md:px-[1vw] px-[5vw] w-full overflow-auto pt-[1vw]"
+        className="md:px-[1vw] px-[5vw] w-full overflow-auto"
       >
         <div className="flex flex-col">
           <div className="md:mt-[2vw] mt-[8vw]">
@@ -250,6 +252,19 @@ function EditUser({
               />
             </div>
           </div>
+          <div className="md:mt-[2vw] mt-[8vw]">
+            <h4 className="md:text-[1vw] text-[4vw] mb-1">Job Title</h4>
+            <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
+              <input
+                type="text"
+                name="job_title"
+                value={userInput?.job_title}
+                onChange={handleUserInput}
+                className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0"
+              />
+            </div>
+          </div>
+          
           <div className="md:mt-[2vw] mt-[8vw]">
             <h4 className="md:text-[1vw] text-[4vw] mb-1">
               Email<span className="text-[#f1416c]">*</span>

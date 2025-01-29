@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   TableCell,
   TableRow,
@@ -13,6 +13,7 @@ import AddNewDepartment from "../accountSettingsComponents/departmentComponents/
 import EditDepartment from "../accountSettingsComponents/departmentComponents/EditDepartment";
 import Swal from "sweetalert2";
 import { toast } from "sonner";
+import OverviewDepartment from "./departmentComponents/OverviewDepartment";
 
 export default function InstitutionDepartments() {
   const [currentPage, setCurrentPage] = useState(1);
@@ -25,10 +26,22 @@ export default function InstitutionDepartments() {
   const [sortOrder, setSortOrder] = useState("asc");
   const [openModal, setOpenModal] = useState(false);
   const [openEditModal, setOpenEditModal] = useState(false);
+  const [openOverviewModal, setOpenOverviewModal] = useState(false);
   const [selectedDepartment, setSelectedDepartment] = useState({});
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 
-  const closePopover = () => setIsPopoverOpen(false);
+  const triggerClickOutside = () => {
+    // Manually force blur on the active element (helps in some cases)
+    if (document.activeElement) {
+      document.activeElement.blur();
+    }
+  
+    // Dispatch a click event to trigger outside click detection
+    setTimeout(() => {
+      document.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    }, 50);
+  };
+
   const [filters, setFilters] = useState({
       search: "",
       start_date: null,
@@ -88,6 +101,11 @@ export default function InstitutionDepartments() {
 
   const handleDepartment = (department) => {
     setOpenEditModal(true);
+    setSelectedDepartment(department);
+  };
+
+  const handleOverview = (department) => {
+    setOpenOverviewModal(true);
     setSelectedDepartment(department);
   };
 
@@ -217,8 +235,8 @@ export default function InstitutionDepartments() {
                 >
                     {departmentData?.map((department) => (
                         <TableRow key={department?.id} className="odd:bg-gray-100 even:bg-gray-50 border-b">
-                            <TableCell>{department?.name}</TableCell>
-                            <TableCell>{department?.description}</TableCell>
+                            <TableCell className="text-[13px]">{department?.name}</TableCell>
+                            <TableCell className="text-[13px]">{department?.description}</TableCell>
                             <TableCell className="text-center">{department?.permissions_count}</TableCell>
                             <TableCell className="text-center">{department?.users_count ?? 'N/A'}</TableCell>
                             <TableCell className="text-center">
@@ -239,25 +257,33 @@ export default function InstitutionDepartments() {
                                     </button>
                                   </PopoverTrigger>
                                   <PopoverContent radius="none">
-                                    <div className="flex flex-col px-4 py-1 space-y-1">
+                                    <div className="flex flex-col py-1 space-y-1">
                                       <button
                                         onClick={() => {
+                                          triggerClickOutside();
                                           handleDepartment(department);
-                                          closePopover(); // Close popover on Edit
                                         }}
-                                        className="text-left text-[13px] hover:text-blue-500"
+                                        className="text-left text-sm hover:text-blue-600 border-b px-4 pb-1"
                                       >
                                         Edit
                                       </button>
                                       <button
                                         onClick={() => {
-                                          handleClickDelete(department, department?.id);
-                                          closePopover(); // Optionally close popover on Delete
+                                          handleOverview(department);
                                         }}
-                                        className="text-left text-[13px] text-red-500 hover:text-red-700"
+                                        className="text-left text-sm hover:text-green-600 border-b px-4 pb-1"
+                                      >
+                                        Overview
+                                      </button>
+                                      <button
+                                        onClick={() => {
+                                          handleClickDelete(department, department?.id);
+                                        }}
+                                        className="text-left text-sm text-red-500 hover:text-red-700 px-4"
                                       >
                                         Delete
                                       </button>
+                                      
                                     </div>
                                   </PopoverContent>
                                 </Popover>
@@ -279,6 +305,13 @@ export default function InstitutionDepartments() {
             <EditDepartment
               setOpenModal={setOpenEditModal}
               openModal={openEditModal}
+              selectedDepartment={selectedDepartment}
+              allPermissions={allPermissions}
+              fetchDepartmentData={fetchDepartmentData}
+            />
+            <OverviewDepartment
+              setOpenModal={setOpenOverviewModal}
+              openModal={openOverviewModal}
               selectedDepartment={selectedDepartment}
               allPermissions={allPermissions}
               fetchDepartmentData={fetchDepartmentData}

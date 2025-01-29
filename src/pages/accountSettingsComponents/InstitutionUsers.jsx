@@ -215,6 +215,7 @@ export default function InstitutionUsers() {
                         "Full Name",
                         "Email",
                         "Phone",
+                        "Job Title",
                         "Department",
                         "Permissions Assigned",
                         "Actions",
@@ -223,6 +224,7 @@ export default function InstitutionUsers() {
                     columnSortKeys={{
                         "Full Name": "user_full_name",
                         "Phone": "phone",
+                        "Job Title": "job_title",
                         "Email": "email",
                         "Department": "department",
                     }}
@@ -243,6 +245,7 @@ export default function InstitutionUsers() {
                             </TableCell>
                             <TableCell>{user?.email}</TableCell>
                             <TableCell>{user?.phone}</TableCell>
+                            <TableCell>{user?.job_title}</TableCell>
                             <TableCell>{user?.department?.name}</TableCell>
                             <TableCell className="text-center">{user?.permissions_count}</TableCell>
                             <TableCell className="text-center">
