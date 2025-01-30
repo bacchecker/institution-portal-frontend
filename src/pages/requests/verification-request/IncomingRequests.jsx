@@ -746,37 +746,42 @@ export default function IncomingRequests() {
 
                 <div>
                   {data?.status == "rejected" && (
-                    <div className="mt-3">
-                      <Card className="">
-                        <CardHeader>
-                          <p className="font-bold">Rejection Reason</p>
-                        </CardHeader>
-                        <CardBody>
-                          <p>{data?.rejection_reason}</p>
-                        </CardBody>
-                      </Card>
+                    <div className="mt-3 border rounded-md p-4">
+                      <div className="">
+                        <p className="font-semibold text-red-600">Rejection Reason</p>
+                        <p className="font-normal">{data?.rejection_reason}</p>
+                      </div>
 
                       <div className="mt-3">
-                        <Card className="">
-                          <CardBody className="flex-row">
-                            <div className="flex-1">
-                              <p className="font-semibold">Rejected By:</p>
-                              <p className="col-span-4">
-                                {data?.rejected_by?.first_name}{" "}
-                                {data?.rejected_by?.last_name}
-                              </p>
-                            </div>
+                          <div className="flex flex-row">
+                            {data?.status == 'cancelled' ? (
+                              <div className="flex-1">
+                                <p className="font-semibold text-red-600">Rejected By:</p>
+                                <p className="font-normal">
+                                  {data?.doc_owner_full_name}
+                                </p>
+                                <p className="text-[11px] font-normal">{data?.doc_owner_email}</p>
+                              </div>
+                            ):(
+                              <div className="flex-1">
+                                <p className="font-semibold text-red-600">Rejected By:</p>
+                                <p className="font-normal">
+                                  {data?.rejected_by?.first_name} {" "} {data?.rejected_by?.last_name}
+                                </p>
+                                <p className="text-[11px] font-normal">{data?.rejected_by?.email}</p>
+                              </div>
+                            )}
+                            
 
                             <div className="flex-1">
-                              <p className="font-bold">Rejection Date</p>
-                              <p>
+                              <p className="font-semibold text-red-600">Rejection Date</p>
+                              <p className="font-normal">
                                 {moment(data?.updated_at).format(
-                                  "Do MMMM, YYYY"
+                                "Do MMMM, YYYY"
                                 )}
                               </p>
                             </div>
-                          </CardBody>
-                        </Card>
+                          </div>
                       </div>
                     </div>
                   )}
@@ -930,7 +935,7 @@ export default function IncomingRequests() {
                 Close
               </Button>
 
-              {(data?.status == "received" || data?.status == "submitted") && (
+              {(data?.status == "received") && (
                 <Button
                   radius="none"
                   size="md"
@@ -953,7 +958,7 @@ export default function IncomingRequests() {
                     {data?.status === "submitted"
                       ? "Acknowledge Request"
                       : data?.status === "received"
-                      ? "Complete Request"
+                      ? "Verify Document"
                       : data?.status === "rejected" || "cancelled"
                       ? "Revert Rejection"
                       : "Acknowledge Request"}
@@ -996,7 +1001,7 @@ export default function IncomingRequests() {
                     data?.status == "submitted"
                       ? "received"
                       : data?.status == "received"
-                      ? "completed"
+                      ? "processing"
                       : data?.status == "rejected" || "cancelled"
                       ? "received"
                       : "completed",
@@ -1029,7 +1034,7 @@ export default function IncomingRequests() {
               {data?.status == "submitted"
                 ? "Received"
                 : data?.status == "received"
-                ? "Complete Request"
+                ? "Process Request"
                 : data?.status == "rejected" || "cancelled"
                 ? "Received"
                 : "Complete Request"}
@@ -1080,6 +1085,7 @@ export default function IncomingRequests() {
           <Textarea
             name="rejection_reason"
             label="Reason"
+            radius="none"
             onChange={(e) =>
               setData((prev) => ({ ...prev, rejection_reason: e.target.value }))
             }
