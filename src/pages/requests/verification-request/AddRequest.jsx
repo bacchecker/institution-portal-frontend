@@ -20,7 +20,7 @@ function NewApplicationForm({
   openModal,
   setCurrentTab,
   setSelectedStatus,
-  fetchVerificationRequests
+  fetchVerificationRequests,
 }) {
   const initialUserInput = {
     otherInstitution: "",
@@ -37,7 +37,9 @@ function NewApplicationForm({
     security_answer: "",
   };
   const [userInput, setUserInput] = useState(initialUserInput);
-  const institutionName = JSON?.parse(secureLocalStorage?.getItem("user"))?.institution;
+  const institutionName = JSON?.parse(
+    secureLocalStorage?.getItem("user")
+  )?.institution;
   const [selectedAcademicLevel, setSelectedAcademicLevel] = useState("");
   const [currentScreen, setCurrentScreen] = useState(1);
   const [allDocuments, setAllDocuments] = useState([]);
@@ -82,7 +84,7 @@ function NewApplicationForm({
 
   useEffect(() => {
     if (!openModal) {
-      fetchSubscription()
+      fetchSubscription();
       setCurrentScreen(1);
       setUserInput(initialUserInput);
       setIsChecked(false);
@@ -96,17 +98,18 @@ function NewApplicationForm({
     }
   }, [openModal]);
 
-  
   const fetchSubscription = async () => {
     setLoading(true);
     try {
-        const response = await axios.get('/institution/verification/dashboard-data');
+      const response = await axios.get(
+        "/institution/verification/dashboard-data"
+      );
 
-        setSubscription(response.data.subscription);
-        setLoading(false);
+      setSubscription(response.data.subscription);
+      setLoading(false);
     } catch (error) {
-        console.error('Error fetching plans:', error);
-        setLoading(false);
+      console.error("Error fetching plans:", error);
+      setLoading(false);
     }
   };
   const {
@@ -131,7 +134,6 @@ function NewApplicationForm({
         !selectedInstitutionType?.value,
     }
   );
-
 
   const {
     data: institutionDocuments,
@@ -171,36 +173,31 @@ function NewApplicationForm({
   useEffect(() => {
     if (userAffiliations && institutions) {
       let filteredInstitutions = institutions?.data?.institutions;
-  
+
       // Exclude the logged-in user's institution
       if (institutionName?.id) {
         filteredInstitutions = filteredInstitutions?.filter(
           (institution) => String(institution.id) !== String(institutionName.id)
         );
       }
-  
-  
+
       if (userAffiliations?.affiliations?.length > 0) {
         const institutionIds = userAffiliations?.affiliations?.map(
           (item) => item?.institution_id
         );
-  
+
         const insAffiliations = filteredInstitutions
           ?.filter((item) => institutionIds.includes(item?.id))
           .map((institution) => ({
             ...institution,
           }));
-  
+
         setAllInstitutions(insAffiliations);
       } else {
         setAllInstitutions(filteredInstitutions);
       }
     }
   }, [institutions, userAffiliations, institutionName?.id]);
-  
-  
-
-  
 
   useEffect(() => {
     if (selectedCredentialType?.value === "academic") {
@@ -229,8 +226,7 @@ function NewApplicationForm({
     const updatedItems = [...items];
     updatedItems[index].institution_document_type_id = item?.id;
     updatedItems[index].document_type_id = item?.document_type.id;
-    
-    
+
     setItems(updatedItems);
   };
 
@@ -352,7 +348,7 @@ function NewApplicationForm({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsSaving(true)
+    setIsSaving(true);
     const hasErrors = items.some((item) => {
       if (item.document_type_id === "") {
         toast.error("Document is missing", {
@@ -365,7 +361,7 @@ function NewApplicationForm({
           progress: undefined,
           theme: "light",
         });
-        setIsSaving(false)
+        setIsSaving(false);
         return true;
       }
 
@@ -380,7 +376,7 @@ function NewApplicationForm({
           progress: undefined,
           theme: "light",
         });
-        setIsSaving(false)
+        setIsSaving(false);
         return true;
       }
 
@@ -403,10 +399,9 @@ function NewApplicationForm({
         progress: undefined,
         theme: "light",
       });
-      setIsSaving(false)
+      setIsSaving(false);
       return;
-    
-    } 
+    }
 
     const formData = new FormData();
 
@@ -440,20 +435,32 @@ function NewApplicationForm({
         );
         formData.append(`documents[${index}][file]`, item.file);
       }
-      formData.append(`documents[${index}][doc_owner_email]`, userInput[`doc_owner_email_${index}`]);
-      formData.append(`documents[${index}][doc_owner_phone]`, userInput[`doc_owner_phone_${index}`]);
-      formData.append(`documents[${index}][doc_owner_institution]`, userInput[`doc_owner_institution_${index}`]);
-      formData.append(`documents[${index}][doc_owner_dob]`, userInput[`doc_owner_dob_${index}`]);
-      formData.append(`documents[${index}][doc_owner_full_name]`, userInput[`doc_owner_full_name_${index}`]);
+      formData.append(
+        `documents[${index}][doc_owner_email]`,
+        userInput[`doc_owner_email_${index}`]
+      );
+      formData.append(
+        `documents[${index}][doc_owner_phone]`,
+        userInput[`doc_owner_phone_${index}`]
+      );
+      formData.append(
+        `documents[${index}][doc_owner_institution]`,
+        userInput[`doc_owner_institution_${index}`]
+      );
+      formData.append(
+        `documents[${index}][doc_owner_dob]`,
+        userInput[`doc_owner_dob_${index}`]
+      );
+      formData.append(
+        `documents[${index}][doc_owner_full_name]`,
+        userInput[`doc_owner_full_name_${index}`]
+      );
       /* formData.append(`documents[${index}][security_question]`, userInput[`security_question_${index}`] || "");
       formData.append(`documents[${index}][security_answer]`, userInput[`security_answer_${index}`] || ""); */
     });
 
     try {
-      const response = await axios.post(
-        "/verifications",
-        formData
-      );
+      const response = await axios.post("/requests/verifications", formData);
 
       toast.success(response.data.message, {
         position: "top-right",
@@ -467,7 +474,7 @@ function NewApplicationForm({
       });
       setOpenModal(!openModal);
       fetchVerificationRequests();
-      setIsSaving(false)
+      setIsSaving(false);
     } catch (error) {
       toast.error(error.response.data.message, {
         position: "top-right",
@@ -479,11 +486,9 @@ function NewApplicationForm({
         progress: undefined,
         theme: "light",
       });
-      setIsSaving(false)
+      setIsSaving(false);
     }
   };
-
- 
 
   useEffect(() => {
     if (!openModal && (currentScreen === 2 || currentScreen === 3)) {
@@ -515,20 +520,20 @@ function NewApplicationForm({
               <input
                 type="text"
                 readOnly
-                value={`${ institutionName.name || ""
-                }`}
+                value={`${institutionName.name || ""}`}
                 className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0 read-only:bg-[#d8d8d8]"
               />
             </div>
           </div>
           <div className="md:mt-[2vw] mt-[10vw]">
-            <h4 className="md:text-[1vw] text-[4vw] mb-1">Subscription Plan (Credits)</h4>
+            <h4 className="md:text-[1vw] text-[4vw] mb-1">
+              Subscription Plan (Credits)
+            </h4>
             <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
               <input
                 type="text"
                 readOnly
-                value={`${ subscription?.balance || 0
-                }`}
+                value={`${subscription?.balance || 0}`}
                 className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0 read-only:bg-[#d8d8d8]"
               />
             </div>
@@ -933,7 +938,9 @@ function NewApplicationForm({
                 </div>
               </div>
               <div className="border rounded-md p-4 mt-4">
-                <p className="text-sm font-medium">Document Owner Information</p>
+                <p className="text-sm font-medium">
+                  Document Owner Information
+                </p>
                 <div className="md:mt-[1vw] mt-[5vw]">
                   <h4 className="md:text-[1vw] text-[4vw] mb-1">
                     Full Name
@@ -948,9 +955,13 @@ function NewApplicationForm({
                       required
                       className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0"
                     />
-                    
                   </div>
-                  <p className="text-[10px] text-bChkRed font-medium">Note: <span className="text-black">Please input surname first</span></p>
+                  <p className="text-[10px] text-bChkRed font-medium">
+                    Note:{" "}
+                    <span className="text-black">
+                      Please input surname first
+                    </span>
+                  </p>
                 </div>
                 <div className="md:mt-[1vw] mt-[5vw]">
                   <h4 className="md:text-[1vw] text-[4vw] mb-1">
