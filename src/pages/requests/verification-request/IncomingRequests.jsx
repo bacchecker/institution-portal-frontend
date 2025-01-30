@@ -102,7 +102,7 @@ export default function IncomingRequests() {
           },
         }
       );
-      console.log(response.data.allRequests);
+      console.log(response.data);
 
       const valRequest = response.data.paginatedRequests;
 
