@@ -96,17 +96,17 @@ function NewApplicationForm({
     }
   }, [openModal]);
 
-  
+
   const fetchSubscription = async () => {
     setLoading(true);
     try {
-        const response = await axios.get('/institution/verification/dashboard-data');
+      const response = await axios.get('/institution/verification/dashboard-data');
 
-        setSubscription(response.data.subscription);
-        setLoading(false);
+      setSubscription(response.data.subscription);
+      setLoading(false);
     } catch (error) {
-        console.error('Error fetching plans:', error);
-        setLoading(false);
+      console.error('Error fetching plans:', error);
+      setLoading(false);
     }
   };
   const {
@@ -117,12 +117,12 @@ function NewApplicationForm({
     {
       ...(selectedAcademicLevel !== undefined &&
         selectedAcademicLevel !== "" && {
-          academicLevel: selectedAcademicLevel,
-        }),
+        academicLevel: selectedAcademicLevel,
+      }),
       ...(selectedInstitutionType?.value !== undefined &&
         selectedInstitutionType?.value !== "" && {
-          institutionType: selectedInstitutionType?.value,
-        }),
+        institutionType: selectedInstitutionType?.value,
+      }),
     },
     {
       skip:
@@ -157,8 +157,8 @@ function NewApplicationForm({
         selectedAcademicLevel !== "" && { selectedAcademicLevel }),
       ...(selectedInstitutionType?.value !== undefined &&
         selectedInstitutionType?.value !== "" && {
-          selectedInstitutionType: selectedInstitutionType?.value,
-        }),
+        selectedInstitutionType: selectedInstitutionType?.value,
+      }),
     },
     {
       skip:
@@ -171,36 +171,36 @@ function NewApplicationForm({
   useEffect(() => {
     if (userAffiliations && institutions) {
       let filteredInstitutions = institutions?.data?.institutions;
-  
+
       // Exclude the logged-in user's institution
       if (institutionName?.id) {
         filteredInstitutions = filteredInstitutions?.filter(
           (institution) => String(institution.id) !== String(institutionName.id)
         );
       }
-  
-  
+
+
       if (userAffiliations?.affiliations?.length > 0) {
         const institutionIds = userAffiliations?.affiliations?.map(
           (item) => item?.institution_id
         );
-  
+
         const insAffiliations = filteredInstitutions
           ?.filter((item) => institutionIds.includes(item?.id))
           .map((institution) => ({
             ...institution,
           }));
-  
+
         setAllInstitutions(insAffiliations);
       } else {
         setAllInstitutions(filteredInstitutions);
       }
     }
   }, [institutions, userAffiliations, institutionName?.id]);
-  
-  
 
-  
+
+
+
 
   useEffect(() => {
     if (selectedCredentialType?.value === "academic") {
@@ -229,8 +229,8 @@ function NewApplicationForm({
     const updatedItems = [...items];
     updatedItems[index].institution_document_type_id = item?.id;
     updatedItems[index].document_type_id = item?.document_type.id;
-    
-    
+
+
     setItems(updatedItems);
   };
 
@@ -405,8 +405,8 @@ function NewApplicationForm({
       });
       setIsSaving(false)
       return;
-    
-    } 
+
+    }
 
     const formData = new FormData();
 
@@ -451,7 +451,7 @@ function NewApplicationForm({
 
     try {
       const response = await axios.post(
-        "/verifications",
+        "/institution/requests/verifications",
         formData
       );
 
@@ -483,7 +483,7 @@ function NewApplicationForm({
     }
   };
 
- 
+
 
   useEffect(() => {
     if (!openModal && (currentScreen === 2 || currentScreen === 3)) {
@@ -515,8 +515,8 @@ function NewApplicationForm({
               <input
                 type="text"
                 readOnly
-                value={`${ institutionName.name || ""
-                }`}
+                value={`${institutionName.name || ""
+                  }`}
                 className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0 read-only:bg-[#d8d8d8]"
               />
             </div>
@@ -527,8 +527,8 @@ function NewApplicationForm({
               <input
                 type="text"
                 readOnly
-                value={`${ subscription?.balance || 0
-                }`}
+                value={`${subscription?.balance || 0
+                  }`}
                 className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0 read-only:bg-[#d8d8d8]"
               />
             </div>
@@ -578,7 +578,7 @@ function NewApplicationForm({
                   {!isChecked && (
                     <>
                       {userAffiliations?.affiliations &&
-                      userAffiliations?.affiliations?.length === 1 ? (
+                        userAffiliations?.affiliations?.length === 1 ? (
                         <div className="md:mt-[1vw] mt-[5vw]">
                           <h4 className="md:text-[1vw] text-[4vw] mb-1">
                             Institution
@@ -715,7 +715,7 @@ function NewApplicationForm({
               {!isChecked && (
                 <>
                   {userAffiliations?.affiliations &&
-                  userAffiliations?.affiliations?.length === 1 ? (
+                    userAffiliations?.affiliations?.length === 1 ? (
                     <div className="md:mt-[1vw] mt-[5vw]">
                       <h4 className="md:text-[1vw] text-[4vw] mb-1">
                         Institution
@@ -948,7 +948,7 @@ function NewApplicationForm({
                       required
                       className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0"
                     />
-                    
+
                   </div>
                   <p className="text-[10px] text-bChkRed font-medium">Note: <span className="text-black">Please input surname first</span></p>
                 </div>

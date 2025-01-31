@@ -49,6 +49,7 @@ export const baccheckerApi = createApi({
     "Payment",
     "Validation",
     "Affiliation",
+    "Notification"
   ],
   endpoints: (builder) => ({
     loginUser: builder.mutation({
@@ -58,6 +59,11 @@ export const baccheckerApi = createApi({
         body,
       }),
       invalidatesTags: ["Log"],
+    }),
+    getNotifications: builder.query({
+      query: () => "/institution/notifications",
+      refetchOnFocus: true,
+      providesTags: ["Notification"]
     }),
     getInstitutionDetails: builder.query({
       query: () => "/institution/institution-data",
@@ -419,6 +425,13 @@ export const baccheckerApi = createApi({
       }),
       invalidatesTags: ["Log"],
     }),
+    updateNotification: builder.mutation({
+      query: ({ id }) => ({
+        url: `/institution/notifications/${id}`,
+        method: "POST",
+      }),
+      invalidatesTags: ["Notification"],
+    }),
     changePassword: builder.mutation({
       query: (body) => ({
         url: "/auth/change-password",
@@ -601,7 +614,7 @@ export const baccheckerApi = createApi({
     }),
     validateDocument: builder.mutation({
       query: (body) => ({
-        url: "/verifications",
+        url: "/institution/requests/verifications",
         method: "POST",
         body,
       }),
@@ -657,4 +670,6 @@ export const {
   useValidateDocumentMutation,
   useCustomizeDashboardMutation,
   useGetInstitutionValidationRequestsQuery,
+  useGetNotificationsQuery,
+  useUpdateNotificationMutation
 } = baccheckerApi;
