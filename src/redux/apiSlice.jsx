@@ -9,6 +9,7 @@ export const baccheckerApi = createApi({
 
     const result = await fetchBaseQuery({
       baseUrl: "https://admin-dev.baccheck.online/api",
+      // baseUrl: "http://127.0.0.1:8000/api",
       // baseUrl: "http://aw8kkg8ck48040oc4cgo44so.67.205.158.15.sslip.io/api",
 
       prepareHeaders: (headers) => {
