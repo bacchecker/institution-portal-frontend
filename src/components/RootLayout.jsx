@@ -9,6 +9,7 @@ import Echo from "laravel-echo";
 import Pusher from "pusher-js";
 import PropTypes from "prop-types";
 import LoadItems from "./LoadItems";
+import { setSelectedTab } from "../redux/baccheckerSlice";
 
 function RootLayout({ children }) {
   const { pathname } = useLocation();
@@ -36,6 +37,14 @@ function RootLayout({ children }) {
   });
 
   // TO DO Private Implementation Later
+
+
+  useEffect(() => {
+    if (pathname !== "/e-check") {
+      dispatch(setSelectedTab("dashboard"))
+    }
+  }, [pathname, dispatch])
+
 
   useEffect(() => {
     if (user?.institution?.id) {

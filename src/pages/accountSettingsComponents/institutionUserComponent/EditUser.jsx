@@ -16,190 +16,189 @@ function EditUser({
   fetchUserData,
   selectedUser,
 }) {
-    const [userInput, setUserInput] = useState([]);
-    const [userInitialInput, setUserInitialInput] = useState([]);
-    const [selectedDepartment, setSelectedDepartment] = useState({});
-    const [groupedPermissions, setGroupedPermissions] = useState({});
-    const [selectedPermissions, setSelectedPermissions] = useState([]);
-    
-    useEffect(() => {
-        console.log(selectedUser);
-        
-        if (selectedUser) {
-        setUserInput(selectedUser);
-        setUserInitialInput(selectedUser);
-        const department = institutionDepartments?.departments?.data?.find(
-            (item) => item?.id === selectedUser?.department_id
-        );
-        const perms = selectedUser?.permissions?.map((item) => item.id);
-        setSelectedPermissions(perms);
-        setSelectedDepartment(department);
-        }
-    }, [selectedUser]);
+  const [userInput, setUserInput] = useState([]);
+  const [userInitialInput, setUserInitialInput] = useState([]);
+  const [selectedDepartment, setSelectedDepartment] = useState({});
+  const [groupedPermissions, setGroupedPermissions] = useState({});
+  const [selectedPermissions, setSelectedPermissions] = useState([]);
 
-    const handleSeletedDepartment = (item) => {
-        setSelectedDepartment(item);
-    };
+  useEffect(() => {
 
-    const handleUserInput = (e) => {
-        setUserInput((userInput) => ({
-        ...userInput,
-        [e.target.name]: e.target.value,
-        }));
-    };
+    if (selectedUser) {
+      setUserInput(selectedUser);
+      setUserInitialInput(selectedUser);
+      const department = institutionDepartments?.departments?.data?.find(
+        (item) => item?.id === selectedUser?.department_id
+      );
+      const perms = selectedUser?.permissions?.map((item) => item.id);
+      setSelectedPermissions(perms);
+      setSelectedDepartment(department);
+    }
+  }, [selectedUser]);
 
-    const handleCheckboxChange = (id) => {
-        setSelectedPermissions((prev) => {
-        const prevArray = Array.isArray(prev) ? prev : [];
-        return prevArray.includes(id)
-            ? prevArray.filter((permId) => permId !== id)
-            : [...prevArray, id];
-        });
-    };
+  const handleSeletedDepartment = (item) => {
+    setSelectedDepartment(item);
+  };
 
-    useEffect(() => {
-        if (!openModal) {
-        setUserInput(userInitialInput);
-        const department = institutionDepartments?.departments?.data?.find(
-            (item) => item?.id === userInitialInput?.department_id
-        );
-        const perms = institutionDepartments?.permissions?.map((item) => item.id);
-        setSelectedPermissions(perms);
-        setSelectedDepartment(department);
-        }
-    }, [openModal]);
+  const handleUserInput = (e) => {
+    setUserInput((userInput) => ({
+      ...userInput,
+      [e.target.name]: e.target.value,
+    }));
+  };
 
-    useEffect(() => {
-        if (selectedDepartment?.permissions) {
-        const groups = selectedDepartment?.permissions?.reduce(
-            (acc, permission) => {
-            const parts = permission.name.split(".");
+  const handleCheckboxChange = (id) => {
+    setSelectedPermissions((prev) => {
+      const prevArray = Array.isArray(prev) ? prev : [];
+      return prevArray.includes(id)
+        ? prevArray.filter((permId) => permId !== id)
+        : [...prevArray, id];
+    });
+  };
 
-            const category = parts[0];
-            const subcategory = parts.length === 3 ? parts[1] : null;
-            const action = parts.length === 3 ? parts[2] : parts[1];
+  useEffect(() => {
+    if (!openModal) {
+      setUserInput(userInitialInput);
+      const department = institutionDepartments?.departments?.data?.find(
+        (item) => item?.id === userInitialInput?.department_id
+      );
+      const perms = institutionDepartments?.permissions?.map((item) => item.id);
+      setSelectedPermissions(perms);
+      setSelectedDepartment(department);
+    }
+  }, [openModal]);
 
-            if (!acc[category]) acc[category] = {};
-            if (subcategory) {
-                if (!acc[category][subcategory]) acc[category][subcategory] = [];
-                acc[category][subcategory].push({ id: permission.id, action });
-            } else {
-                if (!acc[category].actions) acc[category].actions = [];
-                acc[category].actions.push({ id: permission.id, action });
-            }
+  useEffect(() => {
+    if (selectedDepartment?.permissions) {
+      const groups = selectedDepartment?.permissions?.reduce(
+        (acc, permission) => {
+          const parts = permission.name.split(".");
 
-            return acc;
+          const category = parts[0];
+          const subcategory = parts.length === 3 ? parts[1] : null;
+          const action = parts.length === 3 ? parts[2] : parts[1];
+
+          if (!acc[category]) acc[category] = {};
+          if (subcategory) {
+            if (!acc[category][subcategory]) acc[category][subcategory] = [];
+            acc[category][subcategory].push({ id: permission.id, action });
+          } else {
+            if (!acc[category].actions) acc[category].actions = [];
+            acc[category].actions.push({ id: permission.id, action });
+          }
+
+          return acc;
+        },
+        {}
+      );
+
+      setGroupedPermissions(groups);
+    }
+  }, [selectedDepartment]);
+
+  const [updateUser, { data: userData, isSuccess, isLoading, isError, error }] =
+    useUpdateUserMutation();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const { first_name, last_name, other_name, email, phone, id, job_title } = userInput;
+
+    if (
+      !first_name ||
+      !last_name ||
+      !email ||
+      !phone ||
+      !job_title ||
+      !selectedDepartment?.id
+    ) {
+      Swal.fire({
+        title: "Error",
+        text: "Fill All Required Fields",
+        icon: "error",
+        button: "OK",
+      });
+    } else if (selectedPermissions?.length === 0) {
+      Swal.fire({
+        title: "Error",
+        text: "Select at least one permssion",
+        icon: "error",
+        button: "OK",
+      });
+    } else {
+      const result = await Swal.fire({
+        title: "Are you sure you want to update this user?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#febf4c",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, I'm sure",
+        cancelButtonText: "No, cancel",
+      });
+
+      if (result.isConfirmed) {
+        try {
+          await updateUser({
+            id,
+            body: {
+              first_name,
+              last_name,
+              other_name,
+              email,
+              phone,
+              job_title,
+              department_id: selectedDepartment?.id,
+              permissions: selectedPermissions,
             },
-            {}
-        );
-
-        setGroupedPermissions(groups);
+          });
+        } catch (error) {
+          toast.error("Failed to create user", {
+            position: "top-right",
+            autoClose: 1202,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+          });
         }
-    }, [selectedDepartment]);
+      }
+    }
+  };
 
-    const [updateUser, { data: userData, isSuccess, isLoading, isError, error }] =
-        useUpdateUserMutation();
+  useEffect(() => {
+    if (isSuccess && userData) {
+      toast.success("User updated successfully");
+      setOpenModal(false);
+      fetchUserData();
+    }
+  }, [isSuccess, userData]);
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        const { first_name, last_name, other_name, email, phone, id, job_title } = userInput;
+  useEffect(() => {
+    if (isError) {
+      toast.error(error?.data?.message);
+    }
+  }, [isError]);
 
-        if (
-        !first_name ||
-        !last_name ||
-        !email ||
-        !phone ||
-        !job_title ||
-        !selectedDepartment?.id
-        ) {
-        Swal.fire({
-            title: "Error",
-            text: "Fill All Required Fields",
-            icon: "error",
-            button: "OK",
-        });
-        } else if (selectedPermissions?.length === 0) {
-        Swal.fire({
-            title: "Error",
-            text: "Select at least one permssion",
-            icon: "error",
-            button: "OK",
-        });
-        } else {
-        const result = await Swal.fire({
-            title: "Are you sure you want to update this user?",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#febf4c",
-            cancelButtonColor: "#d33",
-            confirmButtonText: "Yes, I'm sure",
-            cancelButtonText: "No, cancel",
-        });
-
-        if (result.isConfirmed) {
-            try {
-            await updateUser({
-                id,
-                body: {
-                first_name,
-                last_name,
-                other_name,
-                email,
-                phone,
-                job_title,
-                department_id: selectedDepartment?.id,
-                permissions: selectedPermissions,
-                },
-            });
-            } catch (error) {
-            toast.error("Failed to create user", {
-                position: "top-right",
-                autoClose: 1202,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "light",
-            });
-            }
-        }
-        }
-    };
-
-    useEffect(() => {
-        if (isSuccess && userData) {
-              toast.success("User updated successfully");
-              setOpenModal(false);
-              fetchUserData();
-            }
-    }, [isSuccess, userData]);
-
-    useEffect(() => {
-        if (isError) {
-        toast.error(error?.data?.message);
-        }
-    }, [isError]);
-
-    EditUser.propTypes = {
-        setOpenModal: PropTypes.func.isRequired,
-        openModal: PropTypes.bool.isRequired,
-        institutionDepartments: PropTypes.shape({
-        departments: PropTypes.shape({
-            data: PropTypes.array,
-        }),
-        permissions: PropTypes.array,
-        }),
-        isDepartmentsFetching: PropTypes.bool,
-        isDepartmentsLoading: PropTypes.bool,
-        selectedUser: PropTypes.shape({
-        permissions: PropTypes.arrayOf(
-            PropTypes.shape({
-            id: PropTypes.number,
-            })
-        ),
-        }),
-    };
+  EditUser.propTypes = {
+    setOpenModal: PropTypes.func.isRequired,
+    openModal: PropTypes.bool.isRequired,
+    institutionDepartments: PropTypes.shape({
+      departments: PropTypes.shape({
+        data: PropTypes.array,
+      }),
+      permissions: PropTypes.array,
+    }),
+    isDepartmentsFetching: PropTypes.bool,
+    isDepartmentsLoading: PropTypes.bool,
+    selectedUser: PropTypes.shape({
+      permissions: PropTypes.arrayOf(
+        PropTypes.shape({
+          id: PropTypes.number,
+        })
+      ),
+    }),
+  };
 
   return (
     <SideModal
@@ -264,7 +263,7 @@ function EditUser({
               />
             </div>
           </div>
-          
+
           <div className="md:mt-[2vw] mt-[8vw]">
             <h4 className="md:text-[1vw] text-[4vw] mb-1">
               Email<span className="text-[#f1416c]">*</span>
@@ -326,12 +325,11 @@ function EditUser({
                     <div key={category} className="mb-[0.2vw]">
                       <div className="flex items-center gap-[0.5vw]">
                         <h2 className="text-[0.9vw] capitalize font-[600]">
-                          {`Manage ${
-                            category.replace("-", " ") ===
-                            "verification requests"
+                          {`Manage ${category.replace("-", " ") ===
+                              "verification requests"
                               ? "E-Check"
                               : category.replace("-", " ")
-                          }`}
+                            }`}
                         </h2>
                         <input
                           type="checkbox"

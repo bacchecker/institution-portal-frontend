@@ -50,8 +50,6 @@ const Navbar = () => {
         "ReceiveInstitutionEvent",
         async (event) => {
           if (event) {
-            console.log("event", event);
-
             await refetch()
           }
         }
