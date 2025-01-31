@@ -54,9 +54,7 @@ function RootLayout({ children }) {
     isError,
     isLoading,
   } = useGetInstitutionDetailsQuery(undefined, {
-    pollingInterval: 60000,
     skip: !token,
-    refetchOnMountOrArgChange: true,
   });
 
   useEffect(() => {
@@ -103,9 +101,8 @@ function RootLayout({ children }) {
     <div className="flex w-full relative">
       <Sidebar />
       <main
-        className={`md:pl-[17vw] w-full ${
-          pathname === "/account-settings" ? "bg-white" : "bg-[#d6d6d653]"
-        }`}
+        className={`md:pl-[17vw] w-full ${pathname === "/account-settings" ? "bg-white" : "bg-[#d6d6d653]"
+          }`}
       >
         {children}
       </main>
