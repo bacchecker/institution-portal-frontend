@@ -499,7 +499,7 @@ export default function OutgoingRequests() {
                 "Date",
                 "Documents",
                 "Status",
-                "Total Amount",
+                /* "Total Amount", */
                 "Actions",
                 ]}
                 loadingState={isLoading}
@@ -535,14 +535,12 @@ export default function OutgoingRequests() {
                     {moment(item?.created_at).format("MMM D, YYYY")}
                     </TableCell>
                     <TableCell>
-                    {item.institution_document_type
-                        ? item?.institution_document_type?.document_type?.name
-                        : item?.document_type?.name}
+                    {item?.document_type?.name}
                     </TableCell>
                     <TableCell>
                     <StatusChip status={item?.status} />
                     </TableCell>
-                    <TableCell> GH¢ {item?.total_amount}</TableCell>
+                    {/* <TableCell> GH¢ {item?.total_amount}</TableCell> */}
                     <TableCell className="flex items-center h-16 gap-3">
                     <Button
                         size="sm"
@@ -728,7 +726,7 @@ export default function OutgoingRequests() {
                         <p className="font-semibold">
                         {data?.document_type?.name}
                         </p>
-                        <p>GH¢ {data?.total_amount}</p>
+                        {/* <p>GH¢ {data?.total_amount}</p> */}
 
                         <div className="flex justify-between">
                         <div className="flex gap-2 items-center">

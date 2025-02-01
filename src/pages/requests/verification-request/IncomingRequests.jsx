@@ -81,12 +81,16 @@ export default function IncomingRequests() {
     { value: "rejected", name: "Rejected" },
     { value: "completed", name: "Completed" },
   ];
-  const handleChange = (itemId, value) => {
+  const handleChange = (itemId, isCorrect, comment = "") => {
     setAnswers((prev) => ({
       ...prev,
-      [itemId]: value,
+      [itemId]: { 
+        is_correct: isCorrect ? 1 : 0, // Convert true → 1, false → 0
+        comment: comment 
+      },
     }));
   };
+  
 
   const institutionVerificationRequests = async () => {
     setIsLoading(true);
@@ -115,6 +119,7 @@ export default function IncomingRequests() {
       setLastPage(valRequest.last_page);
       setTotal(valRequest.total);
       setIsLoading(false);
+     
     } catch (error) {
       console.error("Error fetching institution documents:", error);
       throw error;
@@ -252,65 +257,80 @@ export default function IncomingRequests() {
     setCurrentPage(1);
   };
 
-  const handleSubmitVerificationAnswers = async (event) => {
+  const handleSubmitVerification = async (event) => {
     event.preventDefault();
-
-    const allItemIds = checkListSections.sections.flatMap((section) =>
-      section.items.map((item) => item.id)
+  
+    const invalidItems = Object.entries(answers).filter(
+      ([, value]) => value.is_correct === 0 && (!value.comment || value.comment.trim() === "")
     );
-
-    // Check if every item has an answer
-    const unansweredItems = allItemIds.filter(
-      (itemId) => !answers[itemId] || answers[itemId].trim() === ""
-    );
-
-    if (unansweredItems.length > 0) {
-      // Show an error message and prevent submission
-      toast.error("Please provide answers to all questions before submitting.");
+  
+    if (invalidItems.length > 0) {
+      toast.error("Please provide comments for all 'No' selections.");
       return;
     }
-
+  
     const payload = {
-      verification_request: data?.id, // Include verification_request_id
-      checklist: Object.keys(answers).map((itemId) => ({
-        id: itemId,
-        value: answers[itemId],
+      answers: Object.keys(answers).map((itemId) => ({
+        institution_verification_checklist_item_id: itemId,
+        is_correct: answers[itemId].is_correct,
+        comment: answers[itemId].comment?.trim() || null,
       })),
     };
-
+    
     try {
       setIsSaving(true);
-
+  
       const response = await axios.post(
-        "/institution/requests/verification-request-answers",
+        `institution/requests/verification-requests/${data.id}/checklist-answers`,
         payload
       );
-
-      if (response.status === 201) {
+  
         toast.success(response.data.message);
         setAnswers({});
+        institutionVerificationRequests()
         setOpenDrawer(false);
-        institutionVerificationRequests();
-      }
     } catch (error) {
       toast.error(
-        error.response?.data?.message ||
-          "Failed to submit checklist. Please try again."
+        error.response?.data?.message || "Failed to submit checklist. Please try again."
       );
     } finally {
       setIsSaving(false);
     }
   };
+  
 
-  const fetchVerificationChecklist = async (documentTypeId) => {
+  const fetchVerificationChecklist = async (requestId) => {
     try {
-      const url = `/verification-checklist-items/${documentTypeId}`;
+      setIsLoading(true);
+      const url = `/institution/requests/verification-in-requests`;
       const response = await axios.get(url);
-      setCheckListSections(response.data.data);
+  
+      if (response?.data?.paginatedRequests?.data?.length > 0) {
+        const request = response.data.paginatedRequests.data.find(
+          (req) => req.id === requestId
+        );
+  
+        if (request?.institution_document_type?.verification_checklist_sections) {
+          const sections = request.institution_document_type.verification_checklist_sections;
+          setCheckListSections(sections);
+  
+          // Initialize answers for checklist items
+          const initialAnswers = {};
+          sections.forEach((section) => {
+            section.items.forEach((item) => {
+              initialAnswers[item.id] = "";
+            });
+          });
+          setAnswers(initialAnswers);
+        }
+      }
     } catch (error) {
-      console.error("Error fetching data:", error);
+      console.error("Error fetching checklist data:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
+  
 
   return (
     <>
@@ -498,7 +518,7 @@ export default function IncomingRequests() {
               "Date",
               "Documents",
               "Status",
-              "Total Amount",
+              /* "Total Amount", */
               "Actions",
             ]}
             loadingState={isLoading}
@@ -534,14 +554,12 @@ export default function IncomingRequests() {
                   {moment(item?.created_at).format("MMM D, YYYY")}
                 </TableCell>
                 <TableCell>
-                  {item.institution_document_type
-                    ? item?.institution_document_type?.document_type?.name
-                    : item?.document_type?.name}
+                  {item?.document_type?.name}
                 </TableCell>
                 <TableCell>
                   <StatusChip status={item?.status} />
                 </TableCell>
-                <TableCell> GH¢ {item?.total_amount}</TableCell>
+                {/* <TableCell> GH¢ {item?.total_amount}</TableCell> */}
                 <TableCell className="flex items-center h-16 gap-3">
                   <Button
                     size="sm"
@@ -550,17 +568,16 @@ export default function IncomingRequests() {
                     className="rounded-[4px] text-white"
                     onClick={async () => {
                       if (item?.status === "processing") {
-                        await fetchVerificationChecklist(
-                          item?.document_type?.id
-                        );
+                        await fetchVerificationChecklist(item?.id); // Fetch based on the request ID
                       }
 
-                      setOpenDrawer(true);
-                      setData(item);
+                      setData(item); // Set request-specific data
+                      setOpenDrawer(true); // Open modal after data is set
                     }}
                   >
                     View
                   </Button>
+
                 </TableCell>
               </TableRow>
             ))}
@@ -805,119 +822,86 @@ export default function IncomingRequests() {
               <div className="-mt-2">
                 <div className="">
                   <div className="space-y-2">
-                    {checkListSections.sections &&
-                    checkListSections.sections.length > 0 ? (
-                      checkListSections.sections.map((section) => (
+                    {checkListSections &&
+                    checkListSections.length > 0 ? (
+                      checkListSections.map((section) => (
                         <div
                           key={section.id}
-                          className="space-y-4 pb-4 border p-3 rounded-md"
+                          className="pb-4 border p-3 rounded-md"
                         >
                           {/* Section Header */}
-                          <h2 className="text-base">{section.name}</h2>
-                          {section.description && (
-                            <p className="font-light text-gray-700 text-xs">
-                              {section.description}
-                            </p>
-                          )}
+                          <div className="mb-4">
+                            <h2 className="text-base text-bChkRed">{section.name}</h2>
+                            <p className="font-light text-gray-700 text-xs">{section?.description}</p>
+                          </div>
 
                           {/* Render Items */}
                           <div className="space-y-4">
                             {section.items.map((item) => (
                               <div key={item.id} className="space-y-2">
                                 {/* Question Text */}
-                                <p className="text-sm font-normal">
-                                  {item.question_text}
-                                </p>
+                                <p className="text-sm font-normal">{item.question_text}</p>
 
-                                {/* Input Types */}
-                                {item.input_type === "yes_no" && (
-                                  <div className="flex space-x-4 text-base text-gray-600">
-                                    {/* Yes Option */}
-                                    <div
-                                      className={`flex items-center justify-center space-x-2 cursor-pointer border pr-2 font-normal rounded-[4px] py-0.5 ${
-                                        answers[item.id] === "yes"
-                                          ? "text-green-600 border-green-600"
-                                          : "text-gray-600"
-                                      }`}
-                                      onClick={() =>
-                                        handleChange(item.id, "yes")
-                                      }
-                                    >
-                                      <input
-                                        type="radio"
-                                        name={item.id}
-                                        value="yes"
-                                        checked={answers[item.id] === "yes"}
-                                        onChange={() =>
-                                          handleChange(item.id, "yes")
-                                        }
-                                        className="hidden"
-                                      />
-                                      <FaRegCircleCheck size={18} />
-                                      <span>Yes</span>
-                                    </div>
-
-                                    {/* No Option */}
-                                    <div
-                                      className={`flex items-center justify-center space-x-2 cursor-pointer border font-normal rounded-[4px] pr-2 py-0.5 ${
-                                        answers[item.id] === "no"
-                                          ? "text-red-600 border-red-600"
-                                          : "text-gray-600"
-                                      }`}
-                                      onClick={() =>
-                                        handleChange(item.id, "no")
-                                      }
-                                    >
-                                      <input
-                                        type="radio"
-                                        name={item.id}
-                                        value="no"
-                                        checked={answers[item.id] === "no"}
-                                        onChange={() =>
-                                          handleChange(item.id, "no")
-                                        }
-                                        className="hidden"
-                                      />
-                                      <GiCancel size={18} />
-                                      <span>No</span>
-                                    </div>
-                                  </div>
-                                )}
-
-                                {item.input_type === "text" && (
-                                  <textarea
-                                    className="w-full border rounded p-2 text-gray-700 focus:outline-none"
-                                    rows="3"
-                                    placeholder="Enter your answer..."
-                                    value={answers[item.id] || ""}
-                                    onChange={(e) =>
-                                      handleChange(item.id, e.target.value)
-                                    }
-                                  ></textarea>
-                                )}
-
-                                {item.input_type === "dropdown" && (
-                                  <select
-                                    className="w-full border rounded p-2.5 text-gray-700 focus:outline-none"
-                                    value={answers[item.id] || ""}
-                                    onChange={(e) =>
-                                      handleChange(item.id, e.target.value)
-                                    }
+                                {/* Yes/No Options */}
+                                <div className="flex space-x-4 text-base text-gray-600">
+                                  {/* Yes Option */}
+                                  <div
+                                    className={`flex items-center justify-center space-x-2 cursor-pointer border pr-2 font-normal rounded-[4px] py-0.5 ${
+                                      answers[item.id]?.is_correct === 1
+                                        ? "text-green-600 border-green-600"
+                                        : "text-gray-600"
+                                    }`}
+                                    onClick={() => handleChange(item.id, 1, "")} // Reset comment on Yes
                                   >
-                                    <option value="" disabled>
-                                      Select an option...
-                                    </option>
-                                    {item.options.map((option, index) => (
-                                      <option key={index} value={option}>
-                                        {option}
-                                      </option>
-                                    ))}
-                                  </select>
+                                    <input
+                                      type="radio"
+                                      name={item.id}
+                                      value="yes"
+                                      checked={answers[item.id]?.is_correct === 1}
+                                      onChange={() => handleChange(item.id, 1, "")}
+                                      className="hidden"
+                                    />
+                                    <FaRegCircleCheck size={18} />
+                                    <span>Yes</span>
+                                  </div>
+
+                                  {/* No Option */}
+                                  <div
+                                    className={`flex items-center justify-center space-x-2 cursor-pointer border font-normal rounded-[4px] pr-2 py-0.5 ${
+                                      answers[item.id]?.is_correct === 0
+                                        ? "text-red-600 border-red-600"
+                                        : "text-gray-600"
+                                    }`}
+                                    onClick={() => handleChange(item.id, 0, answers[item.id]?.comment || "")}
+                                  >
+                                    <input
+                                      type="radio"
+                                      name={item.id}
+                                      value="no"
+                                      checked={answers[item.id]?.is_correct === 0}
+                                      onChange={() => handleChange(item.id, 0, answers[item.id]?.comment || "")}
+                                      className="hidden"
+                                    />
+                                    <GiCancel size={18} />
+                                    <span>No</span>
+                                  </div>
+                                </div>
+
+                                {/* Show comment textarea only if "No" is selected */}
+                                {answers[item.id]?.is_correct === 0 && (
+                                  <textarea
+                                    className="w-full border rounded p-2 text-gray-700 focus:outline-none font-normal"
+                                    rows="3"
+                                    placeholder="Enter your comment..."
+                                    value={answers[item.id]?.comment || ""}
+                                    onChange={(e) => handleChange(item.id, 0, e.target.value)}
+                                  ></textarea>
                                 )}
                               </div>
                             ))}
                           </div>
                         </div>
+
                       ))
                     ) : (
                       <div className="md:!h-[65vh] h-[60vh] flex flex-col gap-8 items-center justify-center">
@@ -984,14 +968,12 @@ export default function IncomingRequests() {
                   radius="none"
                   className="bg-bChkRed text-white font-medium w-1/2 !rounded-md"
                   size="md"
-                  onClick={handleSubmitVerificationAnswers}
-                  disabled={
-                    !checkListSections.sections ||
-                    checkListSections.sections.length === 0
-                  } // Disable if no sections
+                  onClick={handleSubmitVerification}
+                  disabled={Object.keys(answers).length === 0}
                 >
                   Submit Verifications
                 </Button>
+              
               )}
             </div>
           </div>
