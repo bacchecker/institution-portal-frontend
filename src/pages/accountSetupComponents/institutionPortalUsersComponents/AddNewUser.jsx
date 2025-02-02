@@ -22,6 +22,7 @@ function AddNewUser({
     other_name: "",
     email: "",
     phone: "",
+    job_title: "",
     address: "",
   };
   const [userInput, setUserInput] = useState(initialUserInput);
@@ -97,7 +98,7 @@ function AddNewUser({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const { first_name, last_name, other_name, email, phone, address } =
+    const { first_name, last_name, other_name, email, phone, address, job_title } =
       userInput;
 
     if (
@@ -128,6 +129,7 @@ function AddNewUser({
           other_name,
           email,
           phone,
+          job_title,
           department_id: selectedDepartment?.id,
           permissions: selectedPermissions,
         });
@@ -219,6 +221,18 @@ function AddNewUser({
             </div>
           </div>
           <div className="md:mt-[2vw] mt-[8vw]">
+            <h4 className="md:text-[1vw] text-[4vw] mb-1">Job Title</h4>
+            <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
+              <input
+                type="text"
+                name="job_title"
+                value={userInput.job_title}
+                onChange={handleUserInput}
+                className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0"
+              />
+            </div>
+          </div>
+          <div className="md:mt-[2vw] mt-[8vw]">
             <h4 className="md:text-[1vw] text-[4vw] mb-1">
               Email<span className="text-[#f1416c]">*</span>
             </h4>
@@ -279,12 +293,11 @@ function AddNewUser({
                     <div key={category} className="mb-[0.2vw]">
                       <div className="flex items-center gap-[0.5vw]">
                         <h2 className="text-[0.9vw] capitalize font-[600]">
-                          {`Manage ${
-                            category.replace("-", " ") ==
+                          {`Manage ${category.replace("-", " ") ==
                             "verification requests"
-                              ? "E-Check"
-                              : category.replace("-", " ")
-                          }`}
+                            ? "E-Check"
+                            : category.replace("-", " ")
+                            }`}
                         </h2>
                         <input
                           type="checkbox"
