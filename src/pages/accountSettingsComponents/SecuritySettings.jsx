@@ -171,13 +171,13 @@ export default function SecuritySettings() {
                         </span>
                     </div>
                     <div className="">
-                        <p className="font-bold text-base">Your account security is {percentage}%</p>
-                        <p>Please review your account security settings regularly and update your password</p>
+                        <p className="font-bold text-base">Your account profile is {percentage}%</p>
+                        <p>Please review your account profile settings regularly and update your password</p>
                     </div>
                 </div>
             </div>
             <div className="pb-5 border-b mt-3">
-                <p className="pl-3">Basic</p>
+                <p className="pl-4">Basic</p>
             </div>
             <div className="flex justify-between items-center space-x-2 py-4 border-b pl-4">
                 <div className="">
