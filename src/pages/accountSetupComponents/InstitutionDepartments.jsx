@@ -178,20 +178,23 @@ function InstitutionDepartments({ setActiveStep }) {
               Each department represents a distinct functional or academic
               division that oversees specific operations and resources.
             </h4>
+            <h4 className="text-[0.9vw] mt-[0.5vw]"><span className="text-[#ff0404]">Note:</span> Only one department can be added at this stage</h4>
           </div>
         </div>
         <div className="w-[75%] px-[4vw] mt-[1vw] mb-[4vw]">
-          <div className="w-full flex justify-end">
-            <button
-              type="button"
-              onClick={() => setOpenModal(true)}
-              className="bg-[#000000] md:my-[2vw!important] my-[4vw!important] w-fit flex justify-center items-center md:py-[0.7vw] py-[2vw] md:px-[2vw] h-[fit-content] md:rounded-[0.3vw] rounded-[2vw] gap-[0.5vw] hover:bg-[#282727] transition-all duration-300 disabled:bg-[#282727]"
-            >
-              <h4 className="md:text-[1vw] text-[3.5vw] text-[#ffffff]">
-                Add New Department
-              </h4>
-            </button>
-          </div>
+          {institutionDepartments?.departments?.data?.length == 1 && (
+            <div className="w-full flex justify-end">
+              <button
+                type="button"
+                onClick={() => setOpenModal(true)}
+                className="bg-[#000000] md:my-[2vw!important] my-[4vw!important] w-fit flex justify-center items-center md:py-[0.7vw] py-[2vw] md:px-[2vw] h-[fit-content] md:rounded-[0.3vw] rounded-[2vw] gap-[0.5vw] hover:bg-[#282727] transition-all duration-300 disabled:bg-[#282727]"
+              >
+                <h4 className="md:text-[1vw] text-[3.5vw] text-[#ffffff]">
+                  Add New Department
+                </h4>
+              </button>
+            </div>
+          )}
 
           <div className="content">
             {!isFetching && !isLoading ? (
@@ -301,7 +304,7 @@ function InstitutionDepartments({ setActiveStep }) {
                                   className=" border bg-[#D6D6D6] w-fit text-[0.8vw] flex justify-center items-center md:py-[0.3vw] py-[2vw] md:px-[1vw] h-[fit-content] md:rounded-[0.3vw] rounded-[2vw] gap-[0.5vw] hover:bg-[#D6D6D6] transition-all duration-300 disabled:bg-[#9b9a9a]"
                                 >
                                   {isDeleteDepartmentLoading &&
-                                  deletingIndex === i ? (
+                                    deletingIndex === i ? (
                                     <div className="flex items-center justify-center gap-2">
                                       <LoadItems color={"#3f4254"} size={12} />
                                       <h4 className="text-[0.8vw]">
