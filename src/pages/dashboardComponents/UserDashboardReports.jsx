@@ -35,6 +35,8 @@ function UserDashboardReports({ permissions }) {
             setCurrentScreen1(1)
         } else if (!permissions.includes("document-requests.view") && !permissions.includes("validation-requests.view")) {
             setCurrentScreen1(2)
+        } else if (!permissions.includes("document-requests.view") && permissions.includes("validation-requests.view")) {
+            setCurrentScreen1(2)
         }
     }, [permissions])
 
