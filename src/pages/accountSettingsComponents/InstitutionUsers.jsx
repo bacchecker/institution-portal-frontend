@@ -7,7 +7,7 @@ import {
 } from "@nextui-org/react";
 import CustomTable from "@/components/CustomTable";
 import axios from "@/utils/axiosConfig";
-import { FaPlus } from "react-icons/fa";
+import { FaChevronLeft, FaChevronRight, FaPlus } from "react-icons/fa";
 import { MdDelete, MdEdit, MdMoreVert, MdOutlineFilterAlt } from "react-icons/md";
 import AddNewUser from "../accountSettingsComponents/institutionUserComponent/AddNewUser";
 import EditUser from "../accountSettingsComponents/institutionUserComponent/EditUser";
@@ -133,6 +133,32 @@ export default function InstitutionUsers() {
         // Error feedback
         toast.error(error.response?.data?.message || "Failed to delete user.", "error");
         }
+    };
+
+    const handlePageChange = (page) => {
+      if (page >= 1 && page <= lastPage) {
+        setCurrentPage(page);
+      }
+    };
+
+    const renderPageNumbers = () => {
+      const pages = [];
+      for (let i = 1; i <= lastPage; i++) {
+          pages.push(
+          <button
+              key={i}
+              onClick={() => handlePageChange(i)}
+              className={`py-1.5 px-2.5 border rounded-lg ${
+              currentPage === i
+                  ? "bg-bChkRed text-white"
+                  : "bg-white text-gray-800"
+              }`}
+          >
+              {i}
+          </button>
+          );
+      }
+      return pages;
     };
 
     return (
@@ -298,6 +324,34 @@ export default function InstitutionUsers() {
                         </TableRow>
                     ))}
                 </CustomTable>
+                <section>
+                  <div className="flex justify-between items-center my-1">
+                      <div>
+                      <span className="text-gray-600 font-medium text-sm">
+                          Page {currentPage} of {lastPage} - ({total} entries)
+                      </span>
+                      </div>
+                      <div className="flex space-x-2">
+                      <button
+                          disabled={currentPage === 1}
+                          onClick={() => handlePageChange(currentPage - 1)}
+                          className="px-2 bg-white text-gray-800 border rounded-lg disabled:bg-gray-300 disabled:text-white"
+                      >
+                          <FaChevronLeft size={12} />
+                      </button>
+      
+                      {renderPageNumbers()}
+      
+                      <button
+                          disabled={currentPage === lastPage}
+                          onClick={() => handlePageChange(currentPage + 1)}
+                          className="px-2 bg-white text-gray-800 border rounded-lg disabled:bg-gray-300 disabled:text-white disabled:border-0"
+                      >
+                          <FaChevronRight size={12} />
+                      </button>
+                      </div>
+                  </div>
+              </section>
             </section>
             <AddNewUser
                 openModal={openModal}
