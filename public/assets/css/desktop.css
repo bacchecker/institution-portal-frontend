@@ -229,7 +229,10 @@
     top: 50%;
     transform: translateY(-50%) rotate(180deg);
   }
-  .active-button {
+  .active-button,
+  .active-button1,
+  .active-button2,
+  .active-button3 {
     color: #ff0404;
   }
   input[type="checkbox"]:checked {

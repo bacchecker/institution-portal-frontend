@@ -6,7 +6,7 @@ import DashboardValidationRequestReports from "./DashboardValidationRequestRepor
 
 function UserDashboardReports({ permissions }) {
     const [currentScreen1, setCurrentScreen1] = useState(1);
-    const lineRef1 = useRef(null);
+    const lineRef3 = useRef(null);
     const [lineStyle, setLineStyle] = useState({ width: 0, left: 0 });
 
     const user = JSON.parse(secureLocalStorage.getItem("user"));
@@ -19,7 +19,7 @@ function UserDashboardReports({ permissions }) {
         });
     };
     useEffect(() => {
-        const activeButton = document.querySelector(".active-button");
+        const activeButton = document.querySelector(".active-button3");
         if (activeButton) {
             setLineStyle({
                 width: activeButton.offsetWidth,
@@ -53,7 +53,7 @@ function UserDashboardReports({ permissions }) {
                     {(permissions.includes("document-requests.view") && permissions.includes("validation-requests.view")) && (
                         <div className="w-full border-b border-[#d5d6d6] flex md:gap-[2vw] gap-[6vw] relative ">
                             <button
-                                className={`md:text-[1vw] text-[3.5vw] tab_button py-[0.3vw] ${currentScreen1 === 1 && "active-button"
+                                className={`md:text-[1vw] text-[3.5vw] tab_button py-[0.3vw] ${currentScreen1 === 1 && "active-button3"
                                     }`}
                                 onClick={(e) => {
                                     handleTabClick(e);
@@ -63,7 +63,7 @@ function UserDashboardReports({ permissions }) {
                                 Document Requests Report
                             </button>
                             <button
-                                className={`md:text-[1vw] text-[3.5vw] tab_button py-[0.3vw] ${currentScreen1 === 2 && "active-button"
+                                className={`md:text-[1vw] text-[3.5vw] tab_button py-[0.3vw] ${currentScreen1 === 2 && "active-button3"
                                     }`}
                                 onClick={(e) => {
                                     handleTabClick(e);
@@ -84,7 +84,7 @@ function UserDashboardReports({ permissions }) {
                         </button> */}
                             <div
                                 className="line"
-                                ref={lineRef1}
+                                ref={lineRef3}
                                 style={{
                                     width: `${lineStyle.width}px`,
                                     left: `${lineStyle.left}px`,

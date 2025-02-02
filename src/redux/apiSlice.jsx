@@ -90,6 +90,10 @@ export const baccheckerApi = createApi({
       query: () => "/institution/revenue",
       providesTags: ["DocumentRequest"],
     }),
+    getInstitutionVerificationData: builder.query({
+      query: () => "/institution/verification/dashboard-data",
+      providesTags: ["DocumentRequest"],
+    }),
     getAllPermissions: builder.query({
       query: () => "/institution/institution-permissions",
     }),
@@ -122,7 +126,82 @@ export const baccheckerApi = createApi({
       },
       providesTags: ["Department"],
     }),
+    getInstitutionVericationRequestsReceived: builder.query({
+      query: ({
+        page,
+        searchValue,
+        selectedFrom,
+        selectedTo,
+        selectedDocumentType,
+        sortBy,
+        sortOrder,
+        selectedStatus,
+      }) => {
+        let queryString = `/institution/requests/verification-in-requests?page=${page}`;
+        if (searchValue) {
+          queryString += `&search_query=${searchValue}`;
+        }
+        if (selectedFrom) {
+          queryString += `&start_date=${selectedFrom}`;
+        }
+        if (selectedTo) {
+          queryString += `&end_date=${selectedTo}`;
+        }
+        if (selectedDocumentType) {
+          queryString += `&document_type=${selectedDocumentType}`;
+        }
+        if (sortBy) {
+          queryString += `&sort_by=${sortBy}`;
+        }
+        if (sortOrder) {
+          queryString += `&sort_order=${sortOrder}`;
+        }
+        if (selectedStatus) {
+          queryString += `&status=${selectedStatus}`;
+        }
 
+        return queryString;
+      },
+      // providesTags: ["DocumentRequest"],
+    }),
+    getInstitutionVericationRequestsSent: builder.query({
+      query: ({
+        page,
+        searchValue,
+        selectedFrom,
+        selectedTo,
+        selectedDocumentType,
+        sortBy,
+        sortOrder,
+        selectedStatus,
+      }) => {
+        let queryString = `/institution/requests/verification-out-requests?page=${page}`;
+        if (searchValue) {
+          queryString += `&search_query=${searchValue}`;
+        }
+        if (selectedFrom) {
+          queryString += `&start_date=${selectedFrom}`;
+        }
+        if (selectedTo) {
+          queryString += `&end_date=${selectedTo}`;
+        }
+        if (selectedDocumentType) {
+          queryString += `&document_type=${selectedDocumentType}`;
+        }
+        if (sortBy) {
+          queryString += `&sort_by=${sortBy}`;
+        }
+        if (sortOrder) {
+          queryString += `&sort_order=${sortOrder}`;
+        }
+        if (selectedStatus) {
+          queryString += `&status=${selectedStatus}`;
+        }
+
+        return queryString;
+      },
+      // providesTags: ["DocumentRequest"],
+    }),
     getInstitutionDocumentRequests: builder.query({
       query: ({
         page,
@@ -672,5 +751,8 @@ export const {
   useCustomizeDashboardMutation,
   useGetInstitutionValidationRequestsQuery,
   useGetNotificationsQuery,
-  useUpdateNotificationMutation
+  useUpdateNotificationMutation,
+  useGetInstitutionVerificationDataQuery,
+  useGetInstitutionVericationRequestsSentQuery,
+  useGetInstitutionVericationRequestsReceivedQuery
 } = baccheckerApi;
