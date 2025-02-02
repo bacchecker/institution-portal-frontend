@@ -8,6 +8,7 @@ import InstitutionUsers from "./InstitutionUsers";
 import { FaBuilding, FaUsers } from "react-icons/fa";
 import SecuritySettings from "./SecuritySettings";
 import InstitutionProfile from "./InstitutionProfile";
+import { BsBuildingsFill } from "react-icons/bs";
 
 export default function AccountSettings() { 
 
@@ -32,7 +33,7 @@ export default function AccountSettings() {
               key="profile"
               title={
                 <div className="flex items-center space-x-2">
-                  <IoSettingsOutline size={18} />
+                  <BsBuildingsFill size={18} />
                   <span>Institution Profile</span>
                 </div>
               }
