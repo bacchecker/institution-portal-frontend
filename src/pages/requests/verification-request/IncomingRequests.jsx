@@ -998,31 +998,31 @@ export default function IncomingRequests() {
                       ? "received"
                       : data?.status == "received"
                       ? "processing"
-                      : data?.status == "rejected" || "cancelled"
+                      : data?.status == "rejected" || data?.status == "cancelled"
                       ? "received"
                       : "completed",
                 }
               )
-              .then((res) => {
-                if (data?.status == "processing") {
-                  fetchVerificationChecklist();
+              .then(async (res) => {
+                // ✅ Use the updated status from the response
+                if (res?.data?.status === "processing") {
+                  await fetchVerificationChecklist(data?.id);
                 }
-
+          
                 setData(res?.data);
                 setProcessing(false);
                 toast.success("Request status updated successfully");
                 institutionVerificationRequests();
-                //mutate("/institution/requests/verification-requests");
                 changeStatusDisclosure.onClose();
               })
               .catch((err) => {
                 console.log(err);
-                toast.error(err.response.data.message);
+                toast.error(err.response?.data?.message || "An error occurred");
                 setProcessing(false);
                 changeStatusDisclosure.onClose();
-                return;
               });
           }}
+          
         >
           <p className="font-quicksand">
             Are you sure to change status to{" "}
