@@ -182,7 +182,7 @@ function InstitutionDepartments({ setActiveStep }) {
           </div>
         </div>
         <div className="w-[75%] px-[4vw] mt-[1vw] mb-[4vw]">
-          {institutionDepartments?.departments?.data?.length == 1 && (
+          {institutionDepartments?.departments?.data?.length === 1 && (
             <div className="w-full flex justify-end">
               <button
                 type="button"
