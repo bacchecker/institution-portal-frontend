@@ -15,7 +15,9 @@ const AccountSetupProtectedRoute = ({ children }) => {
     return <Navigate to="/account-under-review" replace />;
   }
 
-  if (!setupDone && currentStep !== 5) {
+  // Consider setup complete if either setup_done is true OR currentStep is 5
+  const isSetupComplete = setupDone || currentStep === 5;
+  if (!isSetupComplete) {
     return <Navigate to="/account-setup" replace />;
   }
 
