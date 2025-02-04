@@ -1,6 +1,7 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { useNavigate } from "react-router-dom";
 import secureLocalStorage from "react-secure-storage";
+import { setUser } from "./authSlice";
 
 export const baccheckerApi = createApi({
   reducerPath: "baccheckerApi",
@@ -8,9 +9,8 @@ export const baccheckerApi = createApi({
     const token = JSON?.parse(secureLocalStorage?.getItem("userToken"))?.token;
 
     const result = await fetchBaseQuery({
-      baseUrl: "https://admin-dev.baccheck.online/api",
-      // baseUrl: "http://127.0.0.1:8000/api",
-      // baseUrl: "http://aw8kkg8ck48040oc4cgo44so.67.205.158.15.sslip.io/api",
+      baseUrl:
+        import.meta.env.VITE_BACCHECKER_API_URL || "http://127.0.0.1:8000/api",
 
       prepareHeaders: (headers) => {
         if (token) {
@@ -50,7 +50,7 @@ export const baccheckerApi = createApi({
     "Payment",
     "Validation",
     "Affiliation",
-    "Notification"
+    "Notification",
   ],
   endpoints: (builder) => ({
     loginUser: builder.mutation({
@@ -64,26 +64,31 @@ export const baccheckerApi = createApi({
     getNotifications: builder.query({
       query: () => "/institution/notifications",
       refetchOnFocus: true,
-      providesTags: ["Notification"]
+      providesTags: ["Notification"],
     }),
     getInstitutionDetails: builder.query({
       query: () => "/institution/institution-data",
       providesTags: ["Institution"],
-      transformResponse: (response) => {
-        if (response?.institutionData) {
-          const user = JSON.parse(secureLocalStorage.getItem("user"));
-          if (user) {
-            secureLocalStorage.setItem(
-              "user",
-              JSON.stringify({
+      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          if (data?.institutionData) {
+            const user = JSON.parse(secureLocalStorage.getItem("user"));
+            if (user) {
+              const updatedUser = {
                 ...user,
-                institution: response.institutionData.institution,
-                user: response.institutionData.user,
-              })
-            );
+                institution: data.institutionData.institution,
+                user: data.institutionData.user,
+              };
+              // Update local storage
+              secureLocalStorage.setItem("user", JSON.stringify(updatedUser));
+              // Update Redux store
+              dispatch(setUser(updatedUser));
+            }
           }
+        } catch (err) {
+          console.error("Failed to update user data:", err);
         }
-        return response;
       },
     }),
     getInstitutionRevenueGraph: builder.query({
@@ -754,5 +759,5 @@ export const {
   useUpdateNotificationMutation,
   useGetInstitutionVerificationDataQuery,
   useGetInstitutionVericationRequestsSentQuery,
-  useGetInstitutionVericationRequestsReceivedQuery
+  useGetInstitutionVericationRequestsReceivedQuery,
 } = baccheckerApi;

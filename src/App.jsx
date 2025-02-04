@@ -21,7 +21,6 @@ import Tickets from "@/pages/support/Tickets";
 import Dashboard from "@/pages/Dashboard";
 import AccountSetupProtectedRoute from "@/components/AccountSetupProtectedRoute";
 import AccountUnderReviewProtection from "@/components/AccountUnderReviewProtection";
-import AccountSetupProtection from "@/components/AccountSetupProtection";
 import RevenueOverview from "@/pages/reports/RevenueOverview";
 import SystemLogs from "./pages/SystemLogs";
 import SearchAll from "./pages/SearchAll";
@@ -82,9 +81,9 @@ function App() {
                     path="/account-setup"
                     element={
                       <AuthenticatedSuccessProtectedRoute>
-                        <AccountSetupProtection>
+                        <AccountSetupProtectedRoute>
                           <AccountSetup />
-                        </AccountSetupProtection>
+                        </AccountSetupProtectedRoute>
                       </AuthenticatedSuccessProtectedRoute>
                     }
                   />
