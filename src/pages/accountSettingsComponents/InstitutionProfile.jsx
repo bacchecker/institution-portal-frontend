@@ -2,16 +2,13 @@ import React, { useState, useEffect } from "react";
 import {
   TableCell,
   TableRow,
-  useDisclosure, PopoverTrigger, PopoverContent,
-  Button,
+  useDisclosure,
 } from "@nextui-org/react";
 import CustomTable from "@/components/CustomTable";
 import ConfirmModal from "@/components/confirm-modal";
 import axios from "@/utils/axiosConfig";
-import { FaChevronLeft, FaChevronRight, FaPlus, FaRegCheckCircle, FaUsers } from "react-icons/fa";
-import {UAParser} from "ua-parser-js";
+import { FaRegCheckCircle, FaUsers } from "react-icons/fa";
 import moment from "moment";
-import secureLocalStorage from "react-secure-storage";
 import { toast } from "sonner";
 import { MdFileDownload, MdOutlinePending } from "react-icons/md";
 
@@ -20,21 +17,15 @@ export default function InstitutionProfile() {
     const changeStatusDisclosure = useDisclosure();
     const [processing, setProcessing] = useState(false);
     const [profileData, setProfileData] = useState(0);
-    
     const [currentPage, setCurrentPage] = useState(1);
     const [lastPage, setLastPage] = useState(1);
     const [total, setTotal] = useState(0);
-    const [subCurrentPage, setSubCurrentPage] = useState(1);
-    const [subLastPage, setSubLastPage] = useState(1);
-    const [subTotal, setSubTotal] = useState(0);
     const [isLoading, setIsLoading] = useState(false);
     const [sortBy, setSortBy] = useState(null);
     const [pdfPath, setPdfPath] = useState(null);
     const [sortOrder, setSortOrder] = useState("asc");
-    const [userData, setUserData] = useState([]);
     const [departments, setDepartments] = useState([]);
     const [institutionPayments, setInstitutionPayments] = useState([]);
-    const [institutionSubscriptions, setInstitutionSubscritions] = useState([]);
     const [submittedFilters, setSubmittedFilters] = useState({});
     const [formData, setFormData] = useState({
         old_password: "",
@@ -71,81 +62,10 @@ export default function InstitutionProfile() {
         }
     };
 
-    const fetchInstitutionSubscriptions = async () => {
-        try {
-            const response = await axios.get(`institution/subscriptions`);
-            const instSubscritions = response.data.data
-
-            setInstitutionSubscritions(instSubscritions.data)
-            setSubCurrentPage(instSubscritions.current_page);
-            setSubLastPage(instSubscritions.last_page);
-            setSubTotal(instSubscritions.total);
-          
-        } catch (error) {
-          console.error("Error fetching location:", error);
-          return null;
-        }
-    };
-      
-    const handlePageChange = (page) => {
-        if (page >= 1 && page <= lastPage) {
-          setCurrentPage(page);
-        }
-    };
-
-    const handleSubPageChange = (page) => {
-        if (page >= 1 && page <= subLastPage) {
-          setCurrentPage(page);
-        }
-    };
-
-    const renderPageNumbers = () => {
-        const pages = [];
-        for (let i = 1; i <= lastPage; i++) {
-            pages.push(
-            <button
-                key={i}
-                onClick={() => handlePageChange(i)}
-                className={`py-1.5 px-2.5 border rounded-lg ${
-                currentPage === i
-                    ? "bg-bChkRed text-white"
-                    : "bg-white text-gray-800"
-                }`}
-            >
-                {i}
-            </button>
-            );
-        }
-        return pages;
-    };
-    const renderSubPageNumbers = () => {
-        const pages = [];
-        for (let i = 1; i <= subLastPage; i++) {
-            pages.push(
-            <button
-                key={i}
-                onClick={() => handleSubPageChange(i)}
-                className={`py-1.5 px-2.5 border rounded-lg ${
-                subCurrentPage === i
-                    ? "bg-bChkRed text-white"
-                    : "bg-white text-gray-800"
-                }`}
-            >
-                {i}
-            </button>
-            );
-        }
-        return pages;
-    };
-
     useEffect(() => {
         fetchInstitutionPayments()
-        fetchInstitutionSubscriptions()
         fetchInstitutionProfile()
-            
     }, [submittedFilters, currentPage, sortBy, sortOrder]);
-
-
    
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -156,9 +76,14 @@ export default function InstitutionProfile() {
             
             <div className="bg-white rounded-md p-4 border grid grid-cols-2 lg:grid-cols-4 items-center gap-4 mb-4">
                 <div className="col-span-2 flex space-x-3 items-center">
-                    <div className="w-24 h-24 border rounded-md flex items-center justify-center">
-                        <img src={`https://admin-dev.baccheck.online/storage/${profileData?.institution?.logo}`} alt="" className="rounded-md"/>
+                    <div className="w-24 h-24 border rounded-md flex items-center justify-center overflow-hidden">
+                        <img 
+                            src={`https://admin-dev.baccheck.online/storage/${profileData?.institution?.logo}`} 
+                            alt="Institution Logo" 
+                            className="rounded-md w-full h-full object-contain"
+                        />
                     </div>
+
                     <div className="">
                         <div className="">
                             <p className="font-semibold text-2xl">{profileData?.institution?.name} <span>{profileData?.institution?.prefix}</span></p>
@@ -306,114 +231,7 @@ export default function InstitutionProfile() {
                         </TableRow>
                     ))}
                 </CustomTable>
-                <section>
-                    <div className="flex justify-between items-center my-1">
-                        <div>
-                        <span className="text-gray-600 font-medium text-sm">
-                            Page {currentPage} of {lastPage} - ({total} entries)
-                        </span>
-                        </div>
-                        <div className="flex space-x-2">
-                        <button
-                            disabled={currentPage === 1}
-                            onClick={() => handlePageChange(currentPage - 1)}
-                            className="px-2 bg-white text-gray-800 border rounded-lg disabled:bg-gray-300 disabled:text-white"
-                        >
-                            <FaChevronLeft size={12} />
-                        </button>
-        
-                        {renderPageNumbers()}
-        
-                        <button
-                            disabled={currentPage === lastPage}
-                            onClick={() => handlePageChange(currentPage + 1)}
-                            className="px-2 bg-white text-gray-800 border rounded-lg disabled:bg-gray-300 disabled:text-white disabled:border-0"
-                        >
-                            <FaChevronRight size={12} />
-                        </button>
-                        </div>
-                    </div>
-                </section>
             </section>
-            {/* <section className="md:w-full w-[98vw] mx-auto pl-4 border rounded-md">
-                <div className=" py-4">
-                    <p className="font-semibold">Institution Subscriptions</p>
-                    <p>All subscription plans purchased by this institution</p>
-                </div>
-                <CustomTable
-                    columns={[
-                        "ID",
-                        "Date",
-                        "User",
-                        "Payment Type",
-                        "Amount",
-                        "Payment Method",
-                    ]}
-                    loadingState={isLoading}
-                    columnSortKeys={{
-                        "Full Name": "user_full_name",
-                        "Phone": "phone",
-                        "Job Title": "job_title",
-                        "Email": "email",
-                        "Department": "department",
-                    }}
-                    sortBy={sortBy}
-                    sortOrder={sortOrder}
-                    setSortBy={setSortBy}
-                    setSortOrder={setSortOrder}
-                    currentPage={currentPage}
-                    lastPage={lastPage}
-                    total={total}
-                    handlePageChange={setCurrentPage}
-                >
-                    {institutionPayments?.map((payment) => (
-                        <TableRow key={payment?.id} className="odd:bg-gray-100 even:bg-gray-50 border-b">
-                            <TableCell>{payment.unique_code || "N/A"}</TableCell>
-                            <TableCell className="text-left">
-                            {payment?.created_at ? moment(payment.created_at).format("MMM D, YYYY HH:mm") : "N/A"}
-                            </TableCell>
-                            <TableCell>{payment?.user?.first_name}{" "}{payment?.user?.last_name}</TableCell>
-                            <TableCell>
-                            {payment?.payment_type
-                                ? payment.payment_type.charAt(0).toUpperCase() + payment.payment_type.slice(1)
-                                : "N/A"}
-                            </TableCell>
-                            <TableCell className="">{payment?.amount}</TableCell>
-                            <TableCell className="">{payment?.payment_method?.method}</TableCell>
-                            
-                            
-                        </TableRow>
-                    ))}
-                </CustomTable>
-                <section>
-                    <div className="flex justify-between items-center my-1">
-                        <div>
-                        <span className="text-gray-600 font-medium text-sm">
-                            Page {currentPage} of {lastPage} - ({total} entries)
-                        </span>
-                        </div>
-                        <div className="flex space-x-2">
-                        <button
-                            disabled={currentPage === 1}
-                            onClick={() => handlePageChange(currentPage - 1)}
-                            className="px-2 bg-white text-gray-800 border rounded-lg disabled:bg-gray-300 disabled:text-white"
-                        >
-                            <FaChevronLeft size={12} />
-                        </button>
-        
-                        {renderPageNumbers()}
-        
-                        <button
-                            disabled={currentPage === lastPage}
-                            onClick={() => handlePageChange(currentPage + 1)}
-                            className="px-2 bg-white text-gray-800 border rounded-lg disabled:bg-gray-300 disabled:text-white disabled:border-0"
-                        >
-                            <FaChevronRight size={12} />
-                        </button>
-                        </div>
-                    </div>
-                </section>
-            </section> */}
             <ConfirmModal
                 processing={processing}
                 disclosure={changeStatusDisclosure}

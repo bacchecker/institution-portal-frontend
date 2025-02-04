@@ -447,67 +447,6 @@ export default function IncomingRequests() {
               </form>
             </CardBody>
           </Card>
-
-          {/* <div className="my-3 w-full shadow-none rounded-lg">
-            <div className="grid w-full grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div
-                onClick={() => {
-                  setStatus("allRequests");
-                }}
-                className="rounded-md bg-gray-100 p-4 flex space-x-4 cursor-pointer"
-              >
-                <div className="flex items-center justify-center bg-purple-200 text-cusPurp rounded-full w-10 h-10">
-                  <IoDocuments size={18} />
-                </div>
-                <div className="">
-                  <p className="font-medium">Total Documents</p>
-                  <p className="text-gray-500">{allRequests}</p>
-                </div>
-              </div>
-              <div
-                onClick={() => {
-                  setStatus("pending");
-                }}
-                className="rounded-md bg-gray-100 p-4 flex space-x-4 cursor-pointer"
-              >
-                <div className="flex items-center justify-center bg-yellow-200 text-yellow-500 rounded-full w-10 h-10">
-                  <PiQueueFill size={18} />
-                </div>
-                <div className="">
-                  <p className="font-medium">Pending</p>
-                  <p className="text-gray-500">{pending}</p>
-                </div>
-              </div>
-              <div
-                onClick={() => {
-                  setStatus("approved");
-                }}
-                className="rounded-md bg-gray-100 p-4 flex space-x-4 cursor-pointer"
-              >
-                <div className="flex items-center justify-center bg-green-200 text-green-600 rounded-full w-10 h-10">
-                  <FaHeart size={18} />
-                </div>
-                <div className="">
-                  <p className="font-medium">Approved</p>
-                  <p className="text-gray-500">{approved}</p>
-                </div>
-              </div>
-              <div
-                onClick={() => {
-                  setStatus("rejected");
-                }}
-                className="rounded-md bg-gray-100 p-4 flex space-x-4 cursor-pointer"
-              >
-                <div className="flex items-center justify-center bg-red-200 text-red-600 rounded-full w-10 h-10">
-                  <FcCancel size={18} />
-                </div>
-                <div className="">
-                  <p className="font-medium">Not Approved</p>
-                  <p className="text-gray-500">{rejected}</p>
-                </div>
-              </div>
-            </div>
-          </div> */}
         </section>
 
         <section className="md:px-3 md:w-full w-[98vw] mx-auto">
@@ -534,6 +473,10 @@ export default function IncomingRequests() {
             sortOrder={sortOrder}
             setSortBy={setSortBy}
             setSortOrder={setSortOrder}
+            currentPage={currentPage}
+            lastPage={lastPage}
+            total={total}
+            handlePageChange={setCurrentPage}
           >
             {verificationRequests?.map((item) => (
               <TableRow
@@ -582,34 +525,6 @@ export default function IncomingRequests() {
               </TableRow>
             ))}
           </CustomTable>
-          <section>
-            <div className="flex justify-between items-center my-1">
-              <div>
-                <span className="text-gray-600 font-medium text-sm">
-                  Page {currentPage} of {lastPage} - ({total} entries)
-                </span>
-              </div>
-              <div className="flex space-x-2">
-                <button
-                  disabled={currentPage === 1}
-                  onClick={() => handlePageChange(currentPage - 1)}
-                  className="px-2 bg-white text-gray-800 border rounded-lg disabled:bg-gray-300 disabled:text-white"
-                >
-                  <FaChevronLeft size={12} />
-                </button>
-
-                {renderPageNumbers()}
-
-                <button
-                  disabled={currentPage === lastPage}
-                  onClick={() => handlePageChange(currentPage + 1)}
-                  className="px-2 bg-white text-gray-800 border rounded-lg disabled:bg-gray-300 disabled:text-white disabled:border-0"
-                >
-                  <FaChevronRight size={12} />
-                </button>
-              </div>
-            </div>
-          </section>
         </section>
 
         <Drawer
@@ -851,7 +766,7 @@ export default function IncomingRequests() {
                                         ? "text-green-600 border-green-600"
                                         : "text-gray-600"
                                     }`}
-                                    onClick={() => handleChange(item.id, 1, "")} // Reset comment on Yes
+                                    onClick={() => handleChange(item.id, 1, "")}
                                   >
                                     <input
                                       type="radio"
@@ -889,6 +804,7 @@ export default function IncomingRequests() {
 
                                 {/* Show comment textarea only if "No" is selected */}
                                 {answers[item.id]?.is_correct === 0 && (
+                                  <>
                                   <textarea
                                     className="w-full border rounded p-2 text-gray-700 focus:outline-none font-normal"
                                     rows="3"
@@ -896,6 +812,9 @@ export default function IncomingRequests() {
                                     value={answers[item.id]?.comment || ""}
                                     onChange={(e) => handleChange(item.id, 0, e.target.value)}
                                   ></textarea>
+                                  <p className="text-right text-[10px] font-medium text-bChkRed">Note: <span className="text-black">It is required to provide a reason</span></p>
+                                  </>
+                                  
                                 )}
                               </div>
                             ))}
@@ -933,7 +852,7 @@ export default function IncomingRequests() {
                 Close
               </Button>
 
-              {data?.status == "received" && (
+              {data?.status == "processing" && (
                 <Button
                   radius="none"
                   size="md"
@@ -957,8 +876,6 @@ export default function IncomingRequests() {
                       ? "Acknowledge Request"
                       : data?.status === "received"
                       ? "Verify Document"
-                      : data?.status === "rejected" || "cancelled"
-                      ? "Revert Rejection"
                       : "Acknowledge Request"}
                   </Button>
                 )}
