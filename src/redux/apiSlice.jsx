@@ -708,7 +708,7 @@ export const baccheckerApi = createApi({
     completeAccountSetup: builder.mutation({
       query: () => ({
         url: "/institution/complete-setup",
-        method: "POST"
+        method: "POST",
       }),
       invalidatesTags: ["Institution"],
       async onQueryStarted(arg, { dispatch, queryFulfilled }) {
