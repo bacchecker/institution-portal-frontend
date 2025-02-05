@@ -140,7 +140,8 @@ export default function InstitutionUsers() {
             const response = await axios.delete(`/institution/users/${user?.id}`);
 
             toast.success(response.data.message);
-            fetchUserData()
+            fetchUserData();
+            fetchCanUser();
         }
         } catch (error) {
         // Error feedback
@@ -180,30 +181,6 @@ export default function InstitutionUsers() {
                         >
                           Filter
                         </Button>
-                        {/* <Button
-                          startContent={<MdOutlineFilterAltOff size={17} />}
-                          radius="none"
-                          size="sm"
-                          type="button"
-                          className="rounded-[4px] bg-black text-white"
-                          onClick={() => {
-                            setFilters({
-                              search: "",
-                              document_type: null,
-                              start_date: null,
-                              end_date: null,
-                            });
-
-                            setSubmittedFilters({
-                              search: "",
-                              document_type: null,
-                              start_date: null,
-                              end_date: null,
-                            });
-                          }}
-                        >
-                          Clear
-                        </Button> */}
                       </div>
                     </form>
                     {canAddUser ? (
@@ -223,8 +200,8 @@ export default function InstitutionUsers() {
                       <div className="absolute z-50 top-1 right-1  flex flex-col rounded-sm py-4 px-6 bg-white shadow-md">
                         <MdMailLock size={28} className="text-bChkRed"/>
                         <div className="text-xs font-medium mb-2">
-                          <p>Subscribe to a Plan</p>
-                          <p>To add more Users</p>
+                          <p>Upgrade your subscrition plan</p>
+                          <p>To add new users to your institution</p>
                         </div>
                         
                         <NavLink to={`/e-check`} className="bg-bChkRed text-white text-center rounded-sm w-full py-1.5">Subscribe</NavLink>
@@ -329,6 +306,7 @@ export default function InstitutionUsers() {
                 openModal={openModal}
                 setOpenModal={setOpenModal}
                 fetchUserData={fetchUserData}
+                fetchCanUser={fetchCanUser}
                 institutionDepartments={institutionDepartments}
                 allPermissions={allPermissions}
             />

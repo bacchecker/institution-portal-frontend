@@ -129,7 +129,8 @@ export default function InstitutionDepartments() {
         const response = await axios.delete(`/institution/departments/${department?.id}`);
 
         toast.success(response.data.message);
-        fetchDepartmentData()
+        fetchDepartmentData();
+        fetchCanAddDepartment();
       }
     } catch (error) {
       // Error feedback
@@ -211,14 +212,14 @@ export default function InstitutionDepartments() {
                           Add Department
                       </Button>
                     ):(
-                      <div className="absolute z-50 top-1 right-2  flex flex-col rounded-sm p-4 bg-white shadow-md">
-                        <MdMailLock size={28} className="text-bChkRed"/>
-                        <div className="text-xs font-medium mb-2">
-                          <p>Subscribe to a Plan</p>
-                          <p>To add more Departmens</p>
+                      <div className="absolute z-50 top-1 right-1  flex flex-col rounded-sm p-4 bg-white shadow-md">
+                        <MdMailLock size={30} className="text-bChkRed mb-1"/>
+                        <div className="text-[13px] font-medium mb-2">
+                          <p>Upgrade your subscription plan</p>
+                          <p>To add more Departments</p>
                         </div>
                         
-                        <NavLink to={`/e-check`} className="bg-bChkRed text-white rounded-sm w-full py-1.5 text-center">Subscribe</NavLink>
+                        <NavLink to={`/e-check`} className="bg-bChkRed text-white rounded-sm w-full py-1.5 text-center">Upgrade</NavLink>
                       </div>
                     )}
                         
@@ -322,6 +323,7 @@ export default function InstitutionDepartments() {
               openModal={openModal}
               setOpenModal={setOpenModal}
               fetchDepartmentData={fetchDepartmentData}
+              fetchCanAddDepartment={fetchCanAddDepartment}
               allPermissions={allPermissions}
             />
             <EditDepartment

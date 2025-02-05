@@ -6,7 +6,7 @@ import axios from "@/utils/axiosConfig";
 import LoadItems from "@/components/LoadItems";
 import { toast } from "sonner";
 
-function AddNewDepartment({ setOpenModal, openModal, allPermissions, fetchDepartmentData }) {
+function AddNewDepartment({ setOpenModal, openModal, allPermissions, fetchDepartmentData, fetchCanAddDepartment }) {
   const initialUserInput = {
     name: "",
     description: "",
@@ -100,6 +100,7 @@ function AddNewDepartment({ setOpenModal, openModal, allPermissions, fetchDepart
         setUserInput({ name: "", description: "" });
         setSelectedPermissions([]);
         if (fetchDepartmentData) fetchDepartmentData();
+        fetchCanAddDepartment();
       } catch (error) {
         setIsLoading(false)
         toast.error(error.response?.data?.message || "Failed to create department", {

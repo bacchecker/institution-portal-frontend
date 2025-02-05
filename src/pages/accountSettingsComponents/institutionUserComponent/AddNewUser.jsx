@@ -12,7 +12,8 @@ function AddNewUser({
   institutionDepartments,
   isDepartmentsFetching,
   isDepartmentsLoading,
-  fetchUserData
+  fetchUserData,
+  fetchCanUser
 }) {
   const initialUserInput = {
     first_name: "",
@@ -126,6 +127,7 @@ function AddNewUser({
             autoClose: 3000,
         });
         fetchUserData();
+        fetchCanUser();
         setOpenModal(false);
         setUserInput({ first_name: "", last_name: "", other_name: "", email: "", phone: "", job_title: "", selectedDepartment: {}, selectedPermissions: [] });
         setSelectedPermissions([]);

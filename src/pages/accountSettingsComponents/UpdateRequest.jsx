@@ -74,7 +74,7 @@ const UpdateRequest = () => {
   return (
     <>
     <Navbar />
-    <div className="flex flex-col lg:flex-row gap-3 p-2">
+    <div className="flex flex-col lg:flex-row items-start gap-3 p-2">
         <div className="w-full lg:w-1/2 shadow-md bg-white">
             <h2 className="text-lg font-semibold bg-black px-4 py-3 text-white">Current Institution Profile</h2>
             {isLoading ? (
@@ -150,7 +150,7 @@ const UpdateRequest = () => {
         </div>
 
         {/* Right Panel: Requested Updates */}
-        <div className="w-full lg:w-1/2 shadow-md border bg-white">
+        <div className="w-full lg:w-1/2 shadow-md border bg-white min-h-60">
             <h2 className="text-lg font-semibold bg-black text-white px-4 py-3">Requested Updates</h2>
             {Object.keys(updates).length == 0 ? (
                 <div className="md:!h-[35vh] h-[30vh] flex flex-col gap-8 items-center justify-center">
@@ -224,17 +224,17 @@ const UpdateRequest = () => {
                         </div>
                     );
                 })}
-                
+                {/* Submit Button */}
+                <div className="w-full flex justify-end bottom-4 right-4">
+                    {Object.keys(updates).length > 0 && (
+                    <button onClick={handleSubmit} className="bg-bChkRed text-white rounded-md py-2 px-4 text-sm">
+                        Submit Updates
+                    </button>
+                    )}
+                </div>
             </div> 
             )}
-            {/* Submit Button */}
-            <div className="absolute bottom-4 right-4">
-                {Object.keys(updates).length > 0 && (
-                <button onClick={handleSubmit} className="bg-bChkRed text-white rounded-md py-2 px-4">
-                    Submit Updates
-                </button>
-                )}
-            </div>
+            
         </div>
     </div>
     </>
