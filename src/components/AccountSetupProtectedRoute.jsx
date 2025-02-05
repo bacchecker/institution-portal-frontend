@@ -5,17 +5,23 @@ import { useGetInstitutionDetailsQuery } from "../redux/apiSlice";
 
 const AccountSetupProtectedRoute = ({ children }) => {
   const location = useLocation();
-  // Fetch latest institution data
-  const { data: institutionData, isLoading } = useGetInstitutionDetailsQuery(undefined, {
+  const { isLoading } = useGetInstitutionDetailsQuery(undefined, {
     // Refetch on mount to ensure we have latest data
-    refetchOnMountOrArgChange: true
+    refetchOnMountOrArgChange: true,
+    // Skip refetch if we're navigating away from account setup
+    skip: location.pathname === "/dashboard" && getAccountStatus()?.setupDone
   });
   
-  // Get current status from local storage (will be updated by the query above)
+  // Get current status from local storage
   const accountStatus = getAccountStatus();
 
-  if (isLoading || !accountStatus) {
-    return null; // Or a loading spinner
+  // During loading, maintain current route to prevent flicker
+  if (isLoading) {
+    return children;
+  }
+
+  if (!accountStatus) {
+    return <Navigate to="/" replace />;
   }
 
   const { isActive, setupDone, currentStep } = accountStatus;

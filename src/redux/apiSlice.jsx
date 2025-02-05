@@ -705,6 +705,35 @@ export const baccheckerApi = createApi({
       }),
       invalidatesTags: ["Log"],
     }),
+    completeAccountSetup: builder.mutation({
+      query: () => ({
+        url: "/institution/complete-setup",
+        method: "POST"
+      }),
+      invalidatesTags: ["Institution"],
+      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+        try {
+          await queryFulfilled;
+          const user = JSON.parse(secureLocalStorage.getItem("user"));
+          if (user) {
+            const updatedUser = {
+              ...user,
+              institution: {
+                ...user.institution,
+                setup_done: true,
+                current_step: "5",
+              },
+            };
+            // Update local storage
+            secureLocalStorage.setItem("user", JSON.stringify(updatedUser));
+            // Update Redux store
+            dispatch(setUser(updatedUser));
+          }
+        } catch (err) {
+          console.error("Failed to complete account setup:", err);
+        }
+      },
+    }),
   }),
 });
 
@@ -760,4 +789,5 @@ export const {
   useGetInstitutionVerificationDataQuery,
   useGetInstitutionVericationRequestsSentQuery,
   useGetInstitutionVericationRequestsReceivedQuery,
+  useCompleteAccountSetupMutation,
 } = baccheckerApi;

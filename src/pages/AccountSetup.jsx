@@ -4,15 +4,29 @@ import InstitutionDataSetup from "./accountSetupComponents/InstitutionDataSetup"
 import InstitutionDocumentTypes from "./accountSetupComponents/InstitutionDocumentTypes";
 import InstitutionDepartments from "./accountSetupComponents/InstitutionDepartments";
 import InstitutionPortalUsers from "./accountSetupComponents/InstitutionPortalUsers";
-import { useNavigate } from "react-router-dom";
 import IssueTicket from "./accountUnderReviewComponents/IssueTicket";
+import { useNavigate } from "react-router-dom";
+import { useCompleteAccountSetupMutation } from "../redux/apiSlice";
+import { useDispatch } from "react-redux";
 
 function AccountSetup() {
   const [activeStep, setActiveStep] = useState();
   const [openModal, setOpenModal] = useState(false);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const user = JSON?.parse(secureLocalStorage?.getItem("user"));
   const current_step = user?.institution?.current_step;
+  const [completeSetup, { isLoading }] = useCompleteAccountSetupMutation();
+
+  const handleCompleteSetup = async () => {
+    try {
+      await completeSetup().unwrap();
+      // Navigation will happen automatically through the protected route
+      // once the state is updated by the mutation
+    } catch (err) {
+      console.error("Failed to complete setup:", err);
+    }
+  };
 
   return (
     <>
@@ -265,22 +279,12 @@ function AccountSetup() {
           <div className="w-full border-t px-[4vw]">
             <button
               type="button"
-              onClick={() => {
-                const updatedUser = {
-                  ...user,
-                  institution: {
-                    ...user.institution,
-                    setup_done: true,
-                    current_step: "5",
-                  },
-                };
-                secureLocalStorage.setItem("user", JSON.stringify(updatedUser));
-                navigate("/dashboard", { replace: true });
-              }}
+              disabled={isLoading}
+              onClick={handleCompleteSetup}
               className="bg-[#FF0404] md:my-[2vw!important] my-[4vw!important] w-full flex justify-center items-center md:py-[0.7vw] py-[2vw] h-[fit-content] md:rounded-[0.3vw] rounded-[2vw] gap-[0.5vw] hover:bg-[#ef4545] transition-all duration-300 disabled:bg-[#fa6767]"
             >
               <h4 className="md:text-[1vw] text-[3.5vw] text-[#ffffff]">
-                Continue
+                {isLoading ? "Please wait..." : "Continue"}
               </h4>
             </button>
           </div>
