@@ -147,7 +147,7 @@ const CustomTable = ({
       </Table>
 
         {/* Pagination */}
-        <section className="flex justify-between items-center my-1">
+        <section className="flex justify-between items-center my-1 px-2">
           <div>
             <span className="text-gray-600 font-medium text-sm">
               Page {currentPage} of {lastPage} - ({total} entries)

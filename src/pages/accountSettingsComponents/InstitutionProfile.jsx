@@ -75,8 +75,8 @@ export default function InstitutionProfile() {
     return (
         <div className="flex flex-col px-2">
             <div className="flex justify-end mb-4">
-                <NavLink to={`/account-settings/update-request`} className="bg-bChkRed text-white rounded-md px-4 py-1.5 text-sm">
-                    Request Profile Update
+                <NavLink to={`/account-settings/update-request`} className="bg-bChkRed text-white rounded-md px-4 py-2 text-sm">
+                    <p>Institution Profile Update</p>
                 </NavLink>
             </div>
             
@@ -93,7 +93,7 @@ export default function InstitutionProfile() {
 
                     <div className="">
                         <div className="">
-                            <p className="font-semibold text-2xl">{profileData?.institution?.name} <span>{profileData?.institution?.prefix}</span></p>
+                            <p className="font-semibold text-xl text-black">{profileData?.institution?.name} <span className="text-sm">({profileData?.institution?.prefix})</span></p>
                             <p>{profileData?.institution?.address}{", "}{profileData?.institution?.mailing_address}</p>
                             <p>{profileData?.institution?.institution_email}</p>
                         </div>
