@@ -9,6 +9,7 @@ import Echo from "laravel-echo";
 import Pusher from "pusher-js";
 import PropTypes from "prop-types";
 import LoadItems from "./LoadItems";
+import { setSelectedTab } from "../redux/baccheckerSlice";
 
 function RootLayout({ children }) {
   const { pathname } = useLocation();
@@ -37,6 +38,14 @@ function RootLayout({ children }) {
 
   // TO DO Private Implementation Later
 
+
+  useEffect(() => {
+    if (pathname !== "/e-check") {
+      dispatch(setSelectedTab("dashboard"))
+    }
+  }, [pathname, dispatch])
+
+
   useEffect(() => {
     if (user?.institution?.id) {
       window.Echo.channel(`institution.${user?.institution?.id}`).listen(
@@ -54,9 +63,7 @@ function RootLayout({ children }) {
     isError,
     isLoading,
   } = useGetInstitutionDetailsQuery(undefined, {
-    pollingInterval: 60000,
     skip: !token,
-    refetchOnMountOrArgChange: true,
   });
 
   useEffect(() => {
@@ -103,9 +110,8 @@ function RootLayout({ children }) {
     <div className="flex w-full relative">
       <Sidebar />
       <main
-        className={`md:pl-[17vw] w-full ${
-          pathname === "/account-settings" ? "bg-white" : "bg-[#d6d6d653]"
-        }`}
+        className={`md:pl-[17vw] w-full ${pathname === "/account-settings" ? "bg-white" : "bg-[#d6d6d653]"
+          }`}
       >
         {children}
       </main>

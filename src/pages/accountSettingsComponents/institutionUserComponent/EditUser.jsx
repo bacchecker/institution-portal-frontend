@@ -1,43 +1,40 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import SideModal from "@/components/SideModal";
 import SelectInput from "@/components/SelectInput";
 import Swal from "sweetalert2";
-import {
-  useCreateInstitutionDocumentTypeMutation,
-  useCreateInstitutionUserMutation,
-} from "../../../redux/apiSlice";
+import { useUpdateUserMutation } from "../../../redux/apiSlice";
 import LoadItems from "@/components/LoadItems";
 import { toast } from "sonner";
+import PropTypes from "prop-types";
 
-function AddNewUser({
+function EditUser({
   setOpenModal,
   openModal,
   institutionDepartments,
   isDepartmentsFetching,
   isDepartmentsLoading,
+  fetchUserData,
+  selectedUser,
 }) {
-  const initialUserInput = {
-    first_name: "",
-    last_name: "",
-    other_name: "",
-    email: "",
-    phone: "",
-    job_title: "",
-    address: "",
-  };
-  const [userInput, setUserInput] = useState(initialUserInput);
-  const [selectedGender, setSelectedGender] = useState("");
+  const [userInput, setUserInput] = useState([]);
+  const [userInitialInput, setUserInitialInput] = useState([]);
   const [selectedDepartment, setSelectedDepartment] = useState({});
   const [groupedPermissions, setGroupedPermissions] = useState({});
   const [selectedPermissions, setSelectedPermissions] = useState([]);
-  const data = [
-    { title: "Male", value: "male" },
-    { title: "Female", value: "female" },
-  ];
 
-  const handleSeletedGender = (item) => {
-    setSelectedGender(item);
-  };
+  useEffect(() => {
+
+    if (selectedUser) {
+      setUserInput(selectedUser);
+      setUserInitialInput(selectedUser);
+      const department = institutionDepartments?.departments?.data?.find(
+        (item) => item?.id === selectedUser?.department_id
+      );
+      const perms = selectedUser?.permissions?.map((item) => item.id);
+      setSelectedPermissions(perms);
+      setSelectedDepartment(department);
+    }
+  }, [selectedUser]);
 
   const handleSeletedDepartment = (item) => {
     setSelectedDepartment(item);
@@ -51,15 +48,23 @@ function AddNewUser({
   };
 
   const handleCheckboxChange = (id) => {
-    setSelectedPermissions((prev) =>
-      prev.includes(id) ? prev.filter((permId) => permId !== id) : [...prev, id]
-    );
+    setSelectedPermissions((prev) => {
+      const prevArray = Array.isArray(prev) ? prev : [];
+      return prevArray.includes(id)
+        ? prevArray.filter((permId) => permId !== id)
+        : [...prevArray, id];
+    });
   };
 
   useEffect(() => {
     if (!openModal) {
-      setUserInput(initialUserInput);
-      setSelectedPermissions([]);
+      setUserInput(userInitialInput);
+      const department = institutionDepartments?.departments?.data?.find(
+        (item) => item?.id === userInitialInput?.department_id
+      );
+      const perms = institutionDepartments?.permissions?.map((item) => item.id);
+      setSelectedPermissions(perms);
+      setSelectedDepartment(department);
     }
   }, [openModal]);
 
@@ -91,21 +96,19 @@ function AddNewUser({
     }
   }, [selectedDepartment]);
 
-  const [
-    createInstitutionUser,
-    { data: userData, isSuccess, isLoading, isError, error },
-  ] = useCreateInstitutionUserMutation();
+  const [updateUser, { data: userData, isSuccess, isLoading, isError, error }] =
+    useUpdateUserMutation();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const { first_name, last_name, other_name, email, phone, address, job_title } =
-      userInput;
+    const { first_name, last_name, other_name, email, phone, id, job_title } = userInput;
 
     if (
       !first_name ||
       !last_name ||
       !email ||
       !phone ||
+      !job_title ||
       !selectedDepartment?.id
     ) {
       Swal.fire({
@@ -122,45 +125,52 @@ function AddNewUser({
         button: "OK",
       });
     } else {
-      try {
-        await createInstitutionUser({
-          first_name,
-          last_name,
-          other_name,
-          email,
-          phone,
-          job_title,
-          department_id: selectedDepartment?.id,
-          permissions: selectedPermissions,
-        });
-      } catch (error) {
-        toast.error("Failed to create user", {
-          position: "top-right",
-          autoClose: 1202,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        });
+      const result = await Swal.fire({
+        title: "Are you sure you want to update this user?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#febf4c",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, I'm sure",
+        cancelButtonText: "No, cancel",
+      });
+
+      if (result.isConfirmed) {
+        try {
+          await updateUser({
+            id,
+            body: {
+              first_name,
+              last_name,
+              other_name,
+              email,
+              phone,
+              job_title,
+              department_id: selectedDepartment?.id,
+              permissions: selectedPermissions,
+            },
+          });
+        } catch (error) {
+          toast.error("Failed to create user", {
+            position: "top-right",
+            autoClose: 1202,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+          });
+        }
       }
     }
   };
 
   useEffect(() => {
     if (isSuccess && userData) {
-      Swal.fire({
-        title: "Success",
-        text: "User created successfully",
-        icon: "success",
-        button: "OK",
-        confirmButtonColor: "#00b17d",
-      }).then((isOkay) => {
-        if (isOkay) {
-          setOpenModal(!openModal);
-        }
-      });
+      toast.success("User updated successfully");
+      setOpenModal(false);
+      fetchUserData();
     }
   }, [isSuccess, userData]);
 
@@ -169,6 +179,27 @@ function AddNewUser({
       toast.error(error?.data?.message);
     }
   }, [isError]);
+
+  EditUser.propTypes = {
+    setOpenModal: PropTypes.func.isRequired,
+    openModal: PropTypes.bool.isRequired,
+    institutionDepartments: PropTypes.shape({
+      departments: PropTypes.shape({
+        data: PropTypes.array,
+      }),
+      permissions: PropTypes.array,
+    }),
+    isDepartmentsFetching: PropTypes.bool,
+    isDepartmentsLoading: PropTypes.bool,
+    selectedUser: PropTypes.shape({
+      permissions: PropTypes.arrayOf(
+        PropTypes.shape({
+          id: PropTypes.number,
+        })
+      ),
+    }),
+  };
+
   return (
     <SideModal
       title={"User Details"}
@@ -177,7 +208,7 @@ function AddNewUser({
     >
       <form
         onSubmit={handleSubmit}
-        className="md:px-[1vw] px-[5vw] w-full overflow-auto pt-[1vw]"
+        className="md:px-[1vw] px-[5vw] w-full overflow-auto"
       >
         <div className="flex flex-col">
           <div className="md:mt-[2vw] mt-[8vw]">
@@ -226,12 +257,13 @@ function AddNewUser({
               <input
                 type="text"
                 name="job_title"
-                value={userInput.job_title}
+                value={userInput?.job_title}
                 onChange={handleUserInput}
                 className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0"
               />
             </div>
           </div>
+
           <div className="md:mt-[2vw] mt-[8vw]">
             <h4 className="md:text-[1vw] text-[4vw] mb-1">
               Email<span className="text-[#f1416c]">*</span>
@@ -269,25 +301,6 @@ function AddNewUser({
               />
             </div>
           </div>
-
-          <div className="md:mt-[2vw] mt-[8vw]">
-            <h4 className="md:text-[1vw] text-[4vw] mb-1">Job Title</h4>
-            <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
-              <input
-                type="text"
-                name="job_title"
-                value={userInput.job_title}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  if (/^\d{0,20}(\.\d{0,20})?$/.test(value)) {
-                    handleUserInput(e);
-                  }
-                }}
-                className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0"
-              />
-            </div>
-          </div>
-
           <div className="md:mt-[2vw] mt-[8vw]">
             <h4 className="md:text-[1vw] text-[4vw] mb-1">
               Department<span className="text-[#f1416c]">*</span>
@@ -312,10 +325,10 @@ function AddNewUser({
                     <div key={category} className="mb-[0.2vw]">
                       <div className="flex items-center gap-[0.5vw]">
                         <h2 className="text-[0.9vw] capitalize font-[600]">
-                          {`Manage ${category.replace("-", " ") ==
-                            "verification requests"
-                            ? "E-Check"
-                            : category.replace("-", " ")
+                          {`Manage ${category.replace("-", " ") ===
+                              "verification requests"
+                              ? "E-Check"
+                              : category.replace("-", " ")
                             }`}
                         </h2>
                         <input
@@ -327,20 +340,28 @@ function AddNewUser({
                               .filter((item) => typeof item === "object")
                               .map((item) => item.id);
                             if (e.target.checked) {
-                              setSelectedPermissions((prev) => [
-                                ...new Set([...prev, ...ids]),
-                              ]);
+                              setSelectedPermissions((prev) => {
+                                const prevArray = Array.isArray(prev)
+                                  ? prev
+                                  : [];
+                                return [...new Set([...prevArray, ...ids])];
+                              });
                             } else {
-                              setSelectedPermissions((prev) =>
-                                prev.filter((id) => !ids.includes(id))
-                              );
+                              setSelectedPermissions((prev) => {
+                                const prevArray = Array.isArray(prev)
+                                  ? prev
+                                  : [];
+                                return prevArray.filter(
+                                  (id) => !ids.includes(id)
+                                );
+                              });
                             }
                           }}
                           checked={Object.values(subcategories)
                             .flat()
                             .filter((item) => typeof item === "object")
                             .every((item) =>
-                              selectedPermissions.includes(item.id)
+                              selectedPermissions?.includes(item.id)
                             )}
                         />
                       </div>
@@ -356,7 +377,7 @@ function AddNewUser({
                                   <input
                                     type="checkbox"
                                     className="checkbox-design1"
-                                    checked={selectedPermissions.includes(id)}
+                                    checked={selectedPermissions?.includes(id)}
                                     onChange={() => handleCheckboxChange(id)}
                                   />
                                   {`Can ${action.replace("-", " ")}`}
@@ -383,12 +404,12 @@ function AddNewUser({
             <div className="flex items-center justify-center gap-2">
               <LoadItems color={"#ffffff"} size={15} />
               <h4 className="md:text-[1vw] text-[3.5vw] text-[#ffffff]">
-                Submitting...
+                Updating...
               </h4>
             </div>
           ) : (
             <h4 className="md:text-[1vw] text-[3.5vw] text-[#ffffff]">
-              Submit
+              Update
             </h4>
           )}
         </button>
@@ -397,4 +418,4 @@ function AddNewUser({
   );
 }
 
-export default AddNewUser;
+export default EditUser;

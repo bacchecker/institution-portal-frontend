@@ -8,9 +8,12 @@ export const getAccountSetupStatus = () => {
   const setupDone = user?.institution?.setup_done;
   const currentStep = parseInt(user?.institution?.current_step);
 
+  // Consider setup complete if either setup_done is true OR currentStep is 5
+  const isSetupComplete = setupDone === true || currentStep === 5;
+
   return {
-    isSetupComplete: setupDone === true,
+    isSetupComplete,
     currentStep: currentStep || 1,
-    needsSetup: !setupDone,
+    needsSetup: !isSetupComplete,
   };
 };

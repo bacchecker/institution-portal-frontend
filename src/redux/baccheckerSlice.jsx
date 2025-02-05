@@ -6,6 +6,7 @@ const initialState = {
   institutionCurrentScreen: 1,
   inputValues: {},
   institutionInputValues: {},
+  selectedTab: null,
   selectedFrontImage: null,
   selectedBackImage: null,
 };
@@ -16,6 +17,9 @@ const baccheckerSlice = createSlice({
   reducers: {
     setCurrentRegScreen: (state, action) => {
       state.currentRegScreen = action.payload;
+    },
+    setSelectedTab: (state, action) => {
+      state.selectedTab = action.payload;
     },
     setApplicantCurrentScreen: (state, action) => {
       state.applicantCurrentScreen = action.payload;
@@ -70,6 +74,7 @@ export const {
   setInstitutionCurrentScreen,
   setInstitutionInputValue,
   resetInstitutionInputValues,
+  setSelectedTab
 } = baccheckerSlice.actions;
 
 export default baccheckerSlice.reducer;

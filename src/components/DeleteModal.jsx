@@ -10,11 +10,11 @@ import {
 const DeleteModal = ({ title, children, disclosure, onButtonClick, processing }) => {
   return (
     <Modal
-    radius="sm"
+    radius="none"
       backdrop={"opaque"}
       isOpen={disclosure.isOpen}
       onClose={disclosure.onClose}
-      className="border-[1px] w-full md:w-1/2"
+      className="border-[1px] w-full md:w-1/2 rounded-sm"
       size="md"
       motionProps={{
         variants: {
@@ -43,7 +43,7 @@ const DeleteModal = ({ title, children, disclosure, onButtonClick, processing })
             <ModalHeader className="flex flex-col gap-1 text-red-500 font-bold">
               {title}
             </ModalHeader>
-            <ModalBody>{children}</ModalBody>
+            <ModalBody className="rounded-none">{children}</ModalBody>
             <ModalFooter>
               <Button
                 className="font-medium"

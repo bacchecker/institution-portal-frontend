@@ -84,6 +84,12 @@ function InstitutionPortalUsers({ setActiveStep }) {
       });
     } catch (error) {
       console.error("Error moving to next page:", error);
+      Swal.fire({
+        title: "Error",
+        text: "Failed to complete setup. Please try again.",
+        icon: "error",
+        button: "OK",
+      });
     }
   };
 
@@ -98,6 +104,13 @@ function InstitutionPortalUsers({ setActiveStep }) {
         top: 0,
         behavior: "smooth",
       });
+      
+      // Update local storage and Redux in one go to prevent flicker
+      secureLocalStorage.setItem("user", JSON.stringify({
+        ...user,
+        institution: updatedInstitution,
+      }));
+      
       dispatch(
         setUser({
           user: user?.user,
@@ -106,7 +119,9 @@ function InstitutionPortalUsers({ setActiveStep }) {
           selectedTemplate: user.selectedTemplate,
         })
       );
-      setActiveStep(5);
+      
+      // Set active step last to prevent premature navigation
+      setTimeout(() => setActiveStep(5), 100);
     }
   }, [isSuccess]);
 

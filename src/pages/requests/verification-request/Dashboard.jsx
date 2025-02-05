@@ -210,7 +210,7 @@ export default function Dashboard() {
                 <p className="font-semibold text-base text-center">
                   GH₵ {plan?.amount}
                 </p>
-                <p className="font-light text-center -mt-1">Non-expiry</p>
+                <p className="font-light text-center -mt-1">{plan?.expires_in} Days</p>
               </div>
               <div className="my-2">
                 <p className="font-semibold text-xs">Description</p>
@@ -454,7 +454,7 @@ export default function Dashboard() {
                 </p>
                 <div className="w-full flex items-center justify-between">
                   <p className="text-black text-xl font-semibold">
-                    {subscription?.total_credit || 0} Credits
+                    {subscription?.balance || 0} Credits
                   </p>
                   <button
                     type="button"
@@ -755,7 +755,7 @@ export default function Dashboard() {
                       <p className="font-semibold text-base text-center">
                         GH₵ {plan?.amount}
                       </p>
-                      <p className="font-light text-center -mt-1">Non-expiry</p>
+                      <p className="font-light text-center -mt-1">{plan?.expires_in} Days</p>
                     </div>
                     <div className="my-2">
                       <p className="font-semibold text-xs">Description</p>

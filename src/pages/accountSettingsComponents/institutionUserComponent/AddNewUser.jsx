@@ -2,10 +2,7 @@ import React, { useEffect, useState } from "react";
 import SideModal from "@/components/SideModal";
 import SelectInput from "@/components/SelectInput";
 import Swal from "sweetalert2";
-import {
-  useCreateInstitutionDocumentTypeMutation,
-  useCreateInstitutionUserMutation,
-} from "../../../redux/apiSlice";
+import axios from "@/utils/axiosConfig";
 import LoadItems from "@/components/LoadItems";
 import { toast } from "sonner";
 
@@ -15,6 +12,7 @@ function AddNewUser({
   institutionDepartments,
   isDepartmentsFetching,
   isDepartmentsLoading,
+  fetchUserData
 }) {
   const initialUserInput = {
     first_name: "",
@@ -26,18 +24,10 @@ function AddNewUser({
     address: "",
   };
   const [userInput, setUserInput] = useState(initialUserInput);
-  const [selectedGender, setSelectedGender] = useState("");
   const [selectedDepartment, setSelectedDepartment] = useState({});
   const [groupedPermissions, setGroupedPermissions] = useState({});
   const [selectedPermissions, setSelectedPermissions] = useState([]);
-  const data = [
-    { title: "Male", value: "male" },
-    { title: "Female", value: "female" },
-  ];
-
-  const handleSeletedGender = (item) => {
-    setSelectedGender(item);
-  };
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSeletedDepartment = (item) => {
     setSelectedDepartment(item);
@@ -91,14 +81,10 @@ function AddNewUser({
     }
   }, [selectedDepartment]);
 
-  const [
-    createInstitutionUser,
-    { data: userData, isSuccess, isLoading, isError, error },
-  ] = useCreateInstitutionUserMutation();
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const { first_name, last_name, other_name, email, phone, address, job_title } =
+    setIsLoading(true)
+    const { first_name, last_name, other_name, email, phone, job_title } =
       userInput;
 
     if (
@@ -106,6 +92,7 @@ function AddNewUser({
       !last_name ||
       !email ||
       !phone ||
+      !job_title ||
       !selectedDepartment?.id
     ) {
       Swal.fire({
@@ -122,53 +109,37 @@ function AddNewUser({
         button: "OK",
       });
     } else {
-      try {
-        await createInstitutionUser({
-          first_name,
-          last_name,
-          other_name,
-          email,
-          phone,
-          job_title,
-          department_id: selectedDepartment?.id,
-          permissions: selectedPermissions,
+        try {
+        await axios.post("/institution/store-users", {
+            first_name,
+            last_name,
+            other_name,
+            email,
+            phone,
+            job_title,
+            department_id: selectedDepartment?.id,
+            permissions: selectedPermissions,
         });
-      } catch (error) {
-        toast.error("Failed to create user", {
-          position: "top-right",
-          autoClose: 1202,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
+        setIsLoading(false)
+        toast.success("User account created successfully", {
+            position: "top-right",
+            autoClose: 3000,
         });
-      }
+        fetchUserData();
+        setOpenModal(false);
+        setUserInput({ first_name: "", last_name: "", other_name: "", email: "", phone: "", job_title: "", selectedDepartment: {}, selectedPermissions: [] });
+        setSelectedPermissions([]);
+        if (fetchUserData) fetchUserData();
+        } catch (error) {
+        setIsLoading(false)
+        toast.error(error.response?.data?.message || "Failed to create user", {
+            position: "top-right",
+            autoClose: 3000,
+        });
+        }
     }
   };
 
-  useEffect(() => {
-    if (isSuccess && userData) {
-      Swal.fire({
-        title: "Success",
-        text: "User created successfully",
-        icon: "success",
-        button: "OK",
-        confirmButtonColor: "#00b17d",
-      }).then((isOkay) => {
-        if (isOkay) {
-          setOpenModal(!openModal);
-        }
-      });
-    }
-  }, [isSuccess, userData]);
-
-  useEffect(() => {
-    if (isError) {
-      toast.error(error?.data?.message);
-    }
-  }, [isError]);
   return (
     <SideModal
       title={"User Details"}
@@ -177,10 +148,10 @@ function AddNewUser({
     >
       <form
         onSubmit={handleSubmit}
-        className="md:px-[1vw] px-[5vw] w-full overflow-auto pt-[1vw]"
+        className="md:px-[1vw] px-[5vw] w-full overflow-auto"
       >
         <div className="flex flex-col">
-          <div className="md:mt-[2vw] mt-[8vw]">
+          <div className="mt-4">
             <h4 className="md:text-[1vw] text-[4vw] mb-1">
               First Name<span className="text-[#f1416c]">*</span>
             </h4>
@@ -269,25 +240,6 @@ function AddNewUser({
               />
             </div>
           </div>
-
-          <div className="md:mt-[2vw] mt-[8vw]">
-            <h4 className="md:text-[1vw] text-[4vw] mb-1">Job Title</h4>
-            <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
-              <input
-                type="text"
-                name="job_title"
-                value={userInput.job_title}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  if (/^\d{0,20}(\.\d{0,20})?$/.test(value)) {
-                    handleUserInput(e);
-                  }
-                }}
-                className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0"
-              />
-            </div>
-          </div>
-
           <div className="md:mt-[2vw] mt-[8vw]">
             <h4 className="md:text-[1vw] text-[4vw] mb-1">
               Department<span className="text-[#f1416c]">*</span>
@@ -312,11 +264,12 @@ function AddNewUser({
                     <div key={category} className="mb-[0.2vw]">
                       <div className="flex items-center gap-[0.5vw]">
                         <h2 className="text-[0.9vw] capitalize font-[600]">
-                          {`Manage ${category.replace("-", " ") ==
+                          {`Manage ${
+                            category.replace("-", " ") ==
                             "verification requests"
-                            ? "E-Check"
-                            : category.replace("-", " ")
-                            }`}
+                              ? "E-Check"
+                              : category.replace("-", " ")
+                          }`}
                         </h2>
                         <input
                           type="checkbox"

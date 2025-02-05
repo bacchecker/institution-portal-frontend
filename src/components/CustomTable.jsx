@@ -6,7 +6,7 @@ import {
   TableColumn,
   TableHeader,
 } from "@nextui-org/react";
-import { FaSort, FaSortDown, FaSortUp } from "react-icons/fa6";
+import { FaChevronLeft, FaChevronRight, FaSort, FaSortDown, FaSortUp } from "react-icons/fa6";
 // import noDataIllustration from "@/Assets/illustrations/no-data.svg";
 
 const CustomTable = ({
@@ -18,9 +18,10 @@ const CustomTable = ({
   setSortOrder,
   loadingState,
   children,
-  page,
-  setPage,
-  totalPages,
+  currentPage,
+  lastPage,
+  total,
+  handlePageChange,
   customHeightClass,
 }) => {
   const getSortIcon = (column) => {
@@ -29,6 +30,56 @@ const CustomTable = ({
     if (sortOrder === "asc") return <FaSortUp />; // Ascending sort icon
     if (sortOrder === "desc") return <FaSortDown />; // Descending sort icon
   };
+  const renderPageNumbers = () => {
+    const pageLimit = 5; // Maximum number of visible pages
+    const startPage = Math.max(currentPage - Math.floor(pageLimit / 2), 1);
+    const endPage = Math.min(startPage + pageLimit - 1, lastPage);
+
+    const pageNumbers = [];
+    for (let i = startPage; i <= endPage; i++) {
+      pageNumbers.push(i);
+    }
+    return (
+      <>
+        {currentPage > 1 && startPage > 1 && (
+          <>
+            <button
+              onClick={() => handlePageChange(1)}
+              className="py-1.5 px-2.5 border rounded-lg bg-white text-gray-800"
+            >
+              1
+            </button>
+            {startPage > 2 && <span className="py-1.5 px-2.5">...</span>}
+          </>
+        )}
+
+        {pageNumbers.map((page) => (
+          <button
+            key={page}
+            onClick={() => handlePageChange(page)}
+            className={`py-1.5 px-2.5 border rounded-lg ${
+              currentPage === page ? "bg-bChkRed text-white" : "bg-white text-gray-800"
+            }`}
+          >
+            {page}
+          </button>
+        ))}
+
+        {endPage < lastPage && (
+          <>
+            {endPage < lastPage - 1 && <span className="py-1.5 px-2.5">...</span>}
+            <button
+              onClick={() => handlePageChange(lastPage)}
+              className="py-1.5 px-2.5 border rounded-lg bg-white text-gray-800"
+            >
+              {lastPage}
+            </button>
+          </>
+        )}
+      </>
+    );
+  };
+
   return (
     <div className="flex flex-col gap-1">
       <Table
@@ -95,25 +146,32 @@ const CustomTable = ({
         </TableBody>
       </Table>
 
+        {/* Pagination */}
+        <section className="flex justify-between items-center my-1">
+          <div>
+            <span className="text-gray-600 font-medium text-sm">
+              Page {currentPage} of {lastPage} - ({total} entries)
+            </span>
+          </div>
+          <div className="flex space-x-2">
+            <button
+              disabled={currentPage === 1}
+              onClick={() => handlePageChange(currentPage - 1)}
+              className="px-2 bg-white text-gray-800 border rounded-lg disabled:bg-gray-300 disabled:text-white"
+            >
+              <FaChevronLeft size={12} />
+            </button>
+            {renderPageNumbers()}
+            <button
+              disabled={currentPage === lastPage}
+              onClick={() => handlePageChange(currentPage + 1)}
+              className="px-2 bg-white text-gray-800 border rounded-lg disabled:bg-gray-300 disabled:text-white disabled:border-0"
+            >
+              <FaChevronRight size={12} />
+            </button>
+          </div>
+        </section>
 
-      <div className="flex w-full items-center justify-between">
-        {totalPages > 1 && (
-          <Pagination
-            page={page}
-            total={totalPages}
-            onChange={(page) => setPage(page)}
-            color="danger"
-            showControls
-            showShadow
-            size="sm"
-            classNames={{
-              item: "font-montserrat font-semibold bg-white",
-              next: "font-montserrat font-semibold bg-white",
-              prev: "font-montserrat font-semibold bg-white",
-            }}
-          />
-        )}
-      </div>
     </div>
   );
 };

@@ -7,6 +7,7 @@ import {
     useCustomizeDashboardMutation,
     useGetDashboardAnalyticsQuery,
     useGetInstitutionRevenueGraphQuery,
+    useGetInstitutionVerificationDataQuery,
     useGetRevenuePercentageQuery,
 } from "../redux/apiSlice";
 import RevenueGraph from "./dashboardComponents/RevenueGraph";
@@ -19,10 +20,12 @@ import { useDispatch } from "react-redux";
 import DashboardValidationRequest from "./dashboardComponents/DashboardValidationRequest";
 import DashboardSupportTickets from "./dashboardComponents/DashboardSupportTickets";
 import DashboardReports from "./dashboardComponents/DashboardReports";
+import DashboardVerificationRequest from "./dashboardComponents/DashboardVerificationRequest";
 
 function AdminDashboard() {
     const user = JSON.parse(secureLocalStorage.getItem("user"));
     const [currentScreen, setCurrentScreen] = useState(1);
+    const [openDropDownFilter, setOpenDropDownFilter] = useState(false);
     const dispatch = useDispatch()
     const lineRef = useRef(null);
     const [lineStyle, setLineStyle] = useState({ width: 0, left: 0 });
@@ -79,6 +82,12 @@ function AdminDashboard() {
     } = useGetDashboardAnalyticsQuery();
 
     const {
+        data: verificationData,
+
+    } = useGetInstitutionVerificationDataQuery();
+
+
+    const {
         data: revenuePercentage,
         isLoading: isRevenuePercentageLoading,
         isFetching: isRevenuePercentageFetching,
@@ -117,6 +126,7 @@ function AdminDashboard() {
                 progress: undefined,
                 theme: "light",
             });
+            setOpenDropDownFilter(false)
             setClickedDefaultItems(clickedItems)
             dispatch(
                 setUser({
@@ -133,7 +143,6 @@ function AdminDashboard() {
             toast.error(error?.data?.message);
         }
     }, [isError]);
-
 
 
     return (
@@ -157,6 +166,8 @@ function AdminDashboard() {
                             // buttonclassName="action-button-class"
                             isClose={isCustomizing}
                             dropdownclassName="action-dropdown-class12"
+                            openDropDownFilter={openDropDownFilter}
+                            setOpenDropDownFilter={setOpenDropDownFilter}
                         >
                             <div className="action-dropdown-content">
                                 <button
@@ -226,7 +237,7 @@ function AdminDashboard() {
                     </div>
                 </div>
                 <div className="flex flex-sm-col justify-between items-center mt-[2vw] gap-[4vw] md:gap-0">
-                    <div className="md:w-[32%] w-full bg-[#f8f8f8] md:p-[0.2vw] p-[1vw] md:rounded-[0.4vw] rounded-[1.1vw] border border-[#0000000f]">
+                    <div className="md:w-[23%] w-full bg-[#f8f8f8] md:p-[0.2vw] p-[1vw] md:rounded-[0.4vw] rounded-[1.1vw] border border-[#0000000f]">
                         <div className="w-full bg-[#ffffff] border border-[#0000000f] md:rounded-[0.3vw] rounded-[1vw] flex md:p-[0.5vw] p-[2vw] items-center md:gap-[0.5vw] gap-[1vw]">
                             <div className="md:w-[3vw] md:h-[3vw] w-[10vw] h-[10vw] bg-[#ff0404] md:rounded-[0.2vw] rounded-[0.8vw] flex items-center justify-center">
                                 <img src="/assets/img/docx.svg" alt="" className="md:w-[1.5vw] w-[5vw]" />
@@ -255,7 +266,7 @@ function AdminDashboard() {
                             Total Document Request
                         </h4>
                     </div>
-                    <div className="md:w-[32%] w-full bg-[#f8f8f8] md:p-[0.2vw] p-[1vw] md:rounded-[0.4vw] rounded-[1.1vw] border border-[#0000000f]">
+                    <div className="md:w-[23%] w-full bg-[#f8f8f8] md:p-[0.2vw] p-[1vw] md:rounded-[0.4vw] rounded-[1.1vw] border border-[#0000000f]">
                         <div className="w-full bg-[#ffffff] border border-[#0000000f] md:rounded-[0.3vw] rounded-[1vw] flex md:p-[0.5vw] p-[2vw] items-center md:gap-[0.5vw] gap-[1vw]">
                             <div className="md:w-[3vw] md:h-[3vw] w-[10vw] h-[10vw] bg-[#EC7AFF] md:rounded-[0.2vw] rounded-[0.8vw] flex items-center justify-center">
                                 <img src="/assets/img/docx.svg" alt="" className="md:w-[1.5vw] w-[5vw]" />
@@ -286,42 +297,42 @@ function AdminDashboard() {
                             Total Validation Request
                         </h4>
                     </div>
-                    <div className="md:w-[32%] w-full bg-[#f8f8f8] md:p-[0.2vw] p-[1vw] md:rounded-[0.4vw] rounded-[1.1vw] border border-[#0000000f]">
+                    <div className="md:w-[23%] w-full bg-[#f8f8f8] md:p-[0.2vw] p-[1vw] md:rounded-[0.4vw] rounded-[1.1vw] border border-[#0000000f]">
                         <div className="w-full bg-[#ffffff] border border-[#0000000f] md:rounded-[0.3vw] rounded-[1vw] flex md:p-[0.5vw] p-[2vw] items-center md:gap-[0.5vw] gap-[1vw]">
                             <div className="md:w-[3vw] md:h-[3vw] w-[10vw] h-[10vw] bg-[#FFC130] md:rounded-[0.2vw] rounded-[0.8vw] flex items-center justify-center">
                                 <img src="/assets/img/docx.svg" alt="" className="md:w-[1.5vw] w-[5vw]" />
                             </div>
                             <div className="flex flex-col">
-                                <h4 className="md:text-[1.5vw] text-[4vw] font-[600]">0</h4>
+                                <h4 className="md:text-[1.5vw] text-[4vw] font-[600]">{parseInt(
+                                    verificationData?.sent_requests ?? 0
+                                ).toLocaleString()}</h4>
                                 <h4 className="md:text-[0.8vw] text-[3.5vw] text-[#27CA40]">
                                     0.00% Previous Month
                                 </h4>
                             </div>
                         </div>
                         <h4 className="md:text-[0.9vw] text-[3vw] md:mt-[0.5vw] mt-[1vw] mb-[0.3vw]">
-                            Total Verification Request
+                            Total Verification Requests Sent
                         </h4>
                     </div>
-                    {/* <div className="w-[23%] bg-[#f8f8f8] p-[0.2vw] rounded-[0.4vw] border border-[#0000000f]">
-            <div className="w-full bg-[#ffffff] border border-[#0000000f] rounded-[0.3vw] flex p-[0.5vw] items-center gap-[0.5vw]">
-              <div className="w-[3vw] h-[3vw] bg-[#ff0404] rounded-[0.2vw] flex items-center justify-center">
-                <img src="/assets/img/docx.svg" alt="" className="w-[1.5vw]" />
-              </div>
-              <div className="flex flex-col">
-                <h4 className="text-[1.5vw] font-[600]">
-                  {parseInt(
-                    analytics?.documentRequests?.pending ?? 0
-                  ).toLocaleString()}
-                </h4>
-                <h4 className="text-[0.8vw] text-[#ff0404]">
-                  -83.2% Previous Month
-                </h4>
-              </div>
-            </div>
-            <h4 className="text-[0.9vw] mt-[0.5vw] mb-[0.3vw]">
-              Total Pending Document Request
-            </h4>
-          </div> */}
+                    <div className="md:w-[23%] w-full bg-[#f8f8f8] md:p-[0.2vw] p-[1vw] md:rounded-[0.4vw] rounded-[1.1vw] border border-[#0000000f]">
+                        <div className="w-full bg-[#ffffff] border border-[#0000000f] md:rounded-[0.3vw] rounded-[1vw] flex md:p-[0.5vw] p-[2vw] items-center md:gap-[0.5vw] gap-[1vw]">
+                            <div className="md:w-[3vw] md:h-[3vw] w-[10vw] h-[10vw] bg-[#ff0404] md:rounded-[0.2vw] rounded-[0.8vw] flex items-center justify-center">
+                                <img src="/assets/img/docx.svg" alt="" className="md:w-[1.5vw] w-[5vw]" />
+                            </div>
+                            <div className="flex flex-col">
+                                <h4 className="md:text-[1.5vw] text-[4vw] font-[600]">{parseInt(
+                                    verificationData?.received_requests ?? 0
+                                ).toLocaleString()}</h4>
+                                <h4 className="md:text-[0.8vw] text-[3.5vw] text-[#27CA40]">
+                                    0.00% Previous Month
+                                </h4>
+                            </div>
+                        </div>
+                        <h4 className="md:text-[0.9vw] text-[3vw] md:mt-[0.5vw] mt-[1vw] mb-[0.3vw]">
+                            Total Verification Requests Received
+                        </h4>
+                    </div>
                 </div>
                 <div className="flex flex-sm-col w-full md:mt-[2vw] mt-[6vw] justify-between">
                     <div className="md:w-[58%] w-full md:h-[26vw] border md:rounded-[0.4vw] rounded-[1.1vw] border-[#0000000f]">
@@ -386,6 +397,9 @@ function AdminDashboard() {
                     <div className="w-full md:h-[40vw] mt-[6vw] h-[100vw] md:mt-[2vw] border md:rounded-[0.4vw] rounded-[1.1vw] border-[#0000000f] overflow-hidden">
                         <DashboardReports clickedDefaultItems={clickedDefaultItems} dashboardScreens={dashboardScreens} />
                     </div>
+                )}
+                {(clickedDefaultItems.includes("verification") || dashboardScreens.includes("verification")) && (
+                    <DashboardVerificationRequest />
                 )}
             </div>
         </>

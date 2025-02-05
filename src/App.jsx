@@ -21,7 +21,6 @@ import Tickets from "@/pages/support/Tickets";
 import Dashboard from "@/pages/Dashboard";
 import AccountSetupProtectedRoute from "@/components/AccountSetupProtectedRoute";
 import AccountUnderReviewProtection from "@/components/AccountUnderReviewProtection";
-import AccountSetupProtection from "@/components/AccountSetupProtection";
 import RevenueOverview from "@/pages/reports/RevenueOverview";
 import SystemLogs from "./pages/SystemLogs";
 import SearchAll from "./pages/SearchAll";
@@ -33,6 +32,7 @@ import Payment from "./pages/payment/Payment";
 import { getAccountSetupStatus } from "./utils/AccountSetupStatus";
 import AccountSuspended from "@/pages/AccountSuspended";
 import AccountSuspendedProtection from "@/components/AccountSuspendedProtection";
+import AccountSettings from "./pages/accountSettingsComponents/AccountSettings";
 
 function App() {
   return (
@@ -81,9 +81,9 @@ function App() {
                     path="/account-setup"
                     element={
                       <AuthenticatedSuccessProtectedRoute>
-                        <AccountSetupProtection>
+                        <AccountSetupProtectedRoute>
                           <AccountSetup />
-                        </AccountSetupProtection>
+                        </AccountSetupProtectedRoute>
                       </AuthenticatedSuccessProtectedRoute>
                     }
                   />
@@ -185,9 +185,23 @@ function App() {
                       <AuthenticatedSuccessProtectedRoute>
                         <AccountSetupProtectedRoute>
                           <PermissionProtectedRoute
-                            permission={["payments.view"]}
+                            permission={["institution.payments.view"]}
                           >
                             <Payment />
+                          </PermissionProtectedRoute>
+                        </AccountSetupProtectedRoute>
+                      </AuthenticatedSuccessProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/account-settings"
+                    element={
+                      <AuthenticatedSuccessProtectedRoute>
+                        <AccountSetupProtectedRoute>
+                          <PermissionProtectedRoute
+                            permission={["institution.settings.view"]}
+                          >
+                            <AccountSettings />
                           </PermissionProtectedRoute>
                         </AccountSetupProtectedRoute>
                       </AuthenticatedSuccessProtectedRoute>

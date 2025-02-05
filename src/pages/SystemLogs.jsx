@@ -115,7 +115,7 @@ function SystemLogs() {
                 id="search"
                 onChange={(e) => setSearchValue(e.target.value)}
                 className="w-full h-full md:pl-[2vw] md:pr-[0.5vw] pl-[10vw] pr-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0"
-                placeholder="Search by IP Address"
+                placeholder="Search by IP Address or User"
               />
             </div>
           </div>
@@ -219,6 +219,25 @@ function SystemLogs() {
                         />
                       </div>
                       <h4 className="md:text-[1vw] text-[3.5vw]">
+                        User
+                      </h4>
+                    </div>
+                  </th>
+                  <th className="md:py-[1vw] py-[3vw] md:px-[1vw] px-[3vw] border-b">
+                    <div className="flex gap-[1vw]">
+                      <div className="flex flex-col items-center justify-center md:gap-[0.1vw] gap-[0.3vw]">
+                        <img
+                          src="/assets/img/top-arr.svg"
+                          alt=""
+                          className="md:w-[0.5vw] w-[2vw]"
+                        />
+                        <img
+                          src="/assets/img/down-arr.svg"
+                          alt=""
+                          className="md:w-[0.5vw] w-[2vw]"
+                        />
+                      </div>
+                      <h4 className="md:text-[1vw] text-[3.5vw]">
                         Date & Time
                       </h4>
                     </div>
@@ -299,6 +318,9 @@ function SystemLogs() {
                         {systemLogs?.activityLogs?.data?.map((systemlog, i) => {
                           return (
                             <tr key={i}>
+                              <td className="py-[1vw] px-[2.5vw] border-b">
+                                {systemlog?.user?.first_name} {systemlog?.user?.last_name}
+                              </td>
                               <td className="py-[1vw] px-[1vw] border-b w-[15%]">
                                 {moment(systemlog?.created_at).format(
                                   "YYYY-MM-DD h:mm a"
