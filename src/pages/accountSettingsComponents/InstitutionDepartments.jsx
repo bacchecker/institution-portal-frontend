@@ -10,12 +10,13 @@ import axios from "@/utils/axiosConfig";
 import { FaChevronLeft, FaChevronRight, FaPlus } from "react-icons/fa";
 import { FaRegCircleUser } from "react-icons/fa6";
 import { BsTrash3 } from "react-icons/bs";
-import { MdDelete, MdEdit, MdMoreVert, MdOutlineFilterAlt } from "react-icons/md";
+import { MdDelete, MdEdit, MdMailLock, MdMoreVert, MdOutlineFilterAlt } from "react-icons/md";
 import AddNewDepartment from "../accountSettingsComponents/departmentComponents/AddNewDepartment";
 import EditDepartment from "../accountSettingsComponents/departmentComponents/EditDepartment";
 import Swal from "sweetalert2";
 import { toast } from "sonner";
 import OverviewDepartment from "./departmentComponents/OverviewDepartment";
+import { NavLink } from "react-router-dom";
 
 export default function InstitutionDepartments() {
   const [currentPage, setCurrentPage] = useState(1);
@@ -141,7 +142,7 @@ export default function InstitutionDepartments() {
     return (
         <div>
             <section className="mb-4">
-                <div className="md:w-full flex bg-gray-100 justify-between items-center w-full mx-auto rounded-none shadow-none border-none p-4">
+                <div className="relative md:w-full flex bg-gray-100 justify-between items-center w-full mx-auto rounded-none shadow-none border-none p-4">
                     <div className="w-full flex items-center justify-between">
                     <form
                       onSubmit={handleSubmit}
@@ -210,10 +211,14 @@ export default function InstitutionDepartments() {
                           Add Department
                       </Button>
                     ):(
-                      <div className="border flex flex-col rounded-md border-bChkRed p-3 bg-white">
-                        <p>Select a Subscription Plan</p>
-                        <p>To add a new Department</p>
+                      <div className="absolute z-50 top-1 right-2  flex flex-col rounded-sm p-4 bg-white shadow-md">
+                        <MdMailLock size={28} className="text-bChkRed"/>
+                        <div className="text-xs font-medium mb-2">
+                          <p>Subscribe to a Plan</p>
+                          <p>To add more Departmens</p>
+                        </div>
                         
+                        <NavLink to={`/e-check`} className="bg-bChkRed text-white rounded-sm w-full py-1.5 text-center">Subscribe</NavLink>
                       </div>
                     )}
                         

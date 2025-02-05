@@ -8,12 +8,13 @@ import {
 import CustomTable from "@/components/CustomTable";
 import axios from "@/utils/axiosConfig";
 import { FaChevronLeft, FaChevronRight, FaPlus } from "react-icons/fa";
-import { MdDelete, MdEdit, MdMoreVert, MdOutlineFilterAlt } from "react-icons/md";
+import { MdDelete, MdEdit, MdMailLock, MdMoreVert, MdOutlineFilterAlt } from "react-icons/md";
 import AddNewUser from "../accountSettingsComponents/institutionUserComponent/AddNewUser";
 import EditUser from "../accountSettingsComponents/institutionUserComponent/EditUser";
 import Swal from "sweetalert2";
 import { toast } from "sonner";
 import { BsTrash3 } from "react-icons/bs";
+import { NavLink } from "react-router-dom";
 
 export default function InstitutionUsers() {
     const [currentPage, setCurrentPage] = useState(1);
@@ -150,7 +151,7 @@ export default function InstitutionUsers() {
     return (
         <div>
             <section className="mb-4">
-                <div className="md:w-full flex bg-gray-100 justify-between items-center w-full mx-auto rounded-none shadow-none border-none p-4">
+                <div className="relative md:w-full flex bg-gray-100 justify-between items-center w-full mx-auto rounded-none shadow-none border-none p-4">
                     <div className="w-full flex items-center justify-between">
                     <form
                       onSubmit={handleSubmit}
@@ -219,7 +220,15 @@ export default function InstitutionUsers() {
                           Add User
                         </Button>
                     ):(
-                      <div className="">Subscribe to a plan</div>
+                      <div className="absolute z-50 top-1 right-1  flex flex-col rounded-sm py-4 px-6 bg-white shadow-md">
+                        <MdMailLock size={28} className="text-bChkRed"/>
+                        <div className="text-xs font-medium mb-2">
+                          <p>Subscribe to a Plan</p>
+                          <p>To add more Users</p>
+                        </div>
+                        
+                        <NavLink to={`/e-check`} className="bg-bChkRed text-white text-center rounded-sm w-full py-1.5">Subscribe</NavLink>
+                      </div>
                     )}
                         
                        
