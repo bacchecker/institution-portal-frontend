@@ -74,62 +74,67 @@ const UpdateRequest = () => {
   return (
     <>
     <Navbar />
-    <div className="flex flex-col lg:flex-col gap-3 p-2">
+    <div className="flex flex-col lg:flex-row gap-3 p-2">
         <div className="w-full lg:w-1/2 shadow-md bg-white">
             <h2 className="text-lg font-semibold bg-black px-4 py-3 text-white">Current Institution Profile</h2>
-            <div className="space-y-3 px-4 pb-4">
-            {Object.entries(institution).map(([key, value]) => {
-                // Exclude certain fields that should not be updated
-                const excludedFields = [
-                "id",
-                "user_id",
-                "user",
-                "current_step",
-                "activated_at",
-                "activated_by",
-                "sector",
-                "sector_id",
-                "is_verified",
-                "verified_at",
-                "verified_by",
-                "status",
-                "created_at",
-                "updated_at",
-                "setup_done",
-                "setup_completed_at",
-                "terms",
-                "template_screens",
-                "dashboard_screens",
-                "deleted_at",
-                "has_pending_update_request"
-                ];
-                if (excludedFields.includes(key)) return null;
+            {isLoading ? (
+                <div className=""></div>
+            ):(
+                <div className="space-y-3 px-4 pb-4">
+                    {Object.entries(institution).map(([key, value]) => {
+                        // Exclude certain fields that should not be updated
+                        const excludedFields = [
+                        "id",
+                        "user_id",
+                        "user",
+                        "current_step",
+                        "activated_at",
+                        "activated_by",
+                        "sector",
+                        "sector_id",
+                        "is_verified",
+                        "verified_at",
+                        "verified_by",
+                        "status",
+                        "created_at",
+                        "updated_at",
+                        "setup_done",
+                        "setup_completed_at",
+                        "terms",
+                        "template_screens",
+                        "dashboard_screens",
+                        "deleted_at",
+                        "has_pending_update_request"
+                        ];
+                        if (excludedFields.includes(key)) return null;
 
-                return (
-                    <div key={key} className="mt-4">
-                    <h4 className="md:text-[1vw] text-[4vw] mb-1 capitalize">
-                        {key.replace(/_/g, " ")}
-                        <span className="text-[#f1416c]">*</span>
-                    </h4>
-                    <div className="relative w-full md:h-[2.7vw] h-[12vw] overflow-hidden border-[1.5px] border-[#E5E5E5]">
-                        <input
-                        type="text"
-                        readOnly
-                        value={value || ""}
-                        className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0"
-                        />
-                        <button
-                        onClick={() => handleUpdateRequest(key)}
-                        disabled={disabledFields[key]}
-                        className="absolute right-2 top-1/2 text-black transform -translate-y-1/2 text-sm"
-                        >
-                        <MdOutlineEditNote size={28}/>
-                        </button>
-                    </div>
-                    </div>
-                );
-            })}
-            </div>
+                        return (
+                            <div key={key} className="mt-4">
+                            <h4 className="md:text-[1vw] text-[4vw] mb-1 capitalize">
+                                {key.replace(/_/g, " ")}
+                                <span className="text-[#f1416c]">*</span>
+                            </h4>
+                            <div className="relative w-full md:h-[2.7vw] h-[12vw] overflow-hidden border-[1.5px] border-[#E5E5E5]">
+                                <input
+                                type="text"
+                                readOnly
+                                value={value || ""}
+                                className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0"
+                                />
+                                <button
+                                onClick={() => handleUpdateRequest(key)}
+                                disabled={disabledFields[key]}
+                                className="absolute right-2 top-1/2 text-black transform -translate-y-1/2 text-sm"
+                                >
+                                <MdOutlineEditNote size={28}/>
+                                </button>
+                            </div>
+                            </div>
+                        );
+                    })}
+                </div>
+            )}
+            
         </div>
 
         {/* Right Panel: Requested Updates */}

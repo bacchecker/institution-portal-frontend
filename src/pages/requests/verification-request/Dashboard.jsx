@@ -548,7 +548,7 @@ export default function Dashboard() {
           </div>
           <div className="col-span-3 xl:col-span-2 p-4 rounded-md border border-gray-200">
             <p className="text-base font-medium text-black">
-              Recent Validation Received
+              Recent Verification Received
             </p>
 
             <div className="relative overflow-x-auto mt-4">

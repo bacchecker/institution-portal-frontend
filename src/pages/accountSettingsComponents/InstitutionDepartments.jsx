@@ -10,12 +10,13 @@ import axios from "@/utils/axiosConfig";
 import { FaChevronLeft, FaChevronRight, FaPlus } from "react-icons/fa";
 import { FaRegCircleUser } from "react-icons/fa6";
 import { BsTrash3 } from "react-icons/bs";
-import { MdDelete, MdEdit, MdMoreVert, MdOutlineFilterAlt } from "react-icons/md";
+import { MdDelete, MdEdit, MdMailLock, MdMoreVert, MdOutlineFilterAlt } from "react-icons/md";
 import AddNewDepartment from "../accountSettingsComponents/departmentComponents/AddNewDepartment";
 import EditDepartment from "../accountSettingsComponents/departmentComponents/EditDepartment";
 import Swal from "sweetalert2";
 import { toast } from "sonner";
 import OverviewDepartment from "./departmentComponents/OverviewDepartment";
+import { NavLink } from "react-router-dom";
 
 export default function InstitutionDepartments() {
   const [currentPage, setCurrentPage] = useState(1);
@@ -31,18 +32,7 @@ export default function InstitutionDepartments() {
   const [openOverviewModal, setOpenOverviewModal] = useState(false);
   const [selectedDepartment, setSelectedDepartment] = useState({});
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
-
-  const triggerClickOutside = () => {
-    // Manually force blur on the active element (helps in some cases)
-    if (document.activeElement) {
-      document.activeElement.blur();
-    }
-  
-    // Dispatch a click event to trigger outside click detection
-    setTimeout(() => {
-      document.dispatchEvent(new MouseEvent("click", { bubbles: true }));
-    }, 50);
-  };
+  const [canAddDepartment, setCanAddDepartment] = useState(0);
 
   const [filters, setFilters] = useState({
       search: "",
@@ -77,6 +67,16 @@ export default function InstitutionDepartments() {
       }
   };
 
+  const fetchCanAddDepartment = async () => {
+    try {
+        const response = await axios.get('/institution/subscriptions/user-dept');
+        const responseData = response.data.data;
+        setCanAddDepartment(responseData.can_add_department);
+    } catch (error) {
+        console.error('Error fetching tickets:', error);
+    }
+  };
+
   useEffect(() => {
       fetchDepartmentData();
   }, [submittedFilters, currentPage, sortBy, sortOrder]);
@@ -89,33 +89,8 @@ export default function InstitutionDepartments() {
 
   useEffect(() => {
     fetchPermissions();
+    fetchCanAddDepartment();
   }, []);
-
-  const handlePageChange = (page) => {
-    if (page >= 1 && page <= lastPage) {
-      setCurrentPage(page);
-    }
-  };
-
-  const renderPageNumbers = () => {
-    const pages = [];
-    for (let i = 1; i <= lastPage; i++) {
-        pages.push(
-        <button
-            key={i}
-            onClick={() => handlePageChange(i)}
-            className={`py-1.5 px-2.5 border rounded-lg ${
-            currentPage === i
-                ? "bg-bChkRed text-white"
-                : "bg-white text-gray-800"
-            }`}
-        >
-            {i}
-        </button>
-        );
-    }
-    return pages;
-  };
 
   const fetchPermissions = async () => {
     try {
@@ -167,7 +142,7 @@ export default function InstitutionDepartments() {
     return (
         <div>
             <section className="mb-4">
-                <div className="md:w-full flex bg-gray-100 justify-between items-center w-full mx-auto rounded-none shadow-none border-none p-4">
+                <div className="relative md:w-full flex bg-gray-100 justify-between items-center w-full mx-auto rounded-none shadow-none border-none p-4">
                     <div className="w-full flex items-center justify-between">
                     <form
                       onSubmit={handleSubmit}
@@ -222,7 +197,8 @@ export default function InstitutionDepartments() {
                         </Button> */}
                       </div>
                     </form>
-                        <Button
+                    {canAddDepartment ? (
+                      <Button
                           startContent={<FaPlus size={13} />}
                           radius="none"
                           size="sm"
@@ -233,7 +209,19 @@ export default function InstitutionDepartments() {
                           }}
                         >
                           Add Department
-                        </Button>
+                      </Button>
+                    ):(
+                      <div className="absolute z-50 top-1 right-2  flex flex-col rounded-sm p-4 bg-white shadow-md">
+                        <MdMailLock size={28} className="text-bChkRed"/>
+                        <div className="text-xs font-medium mb-2">
+                          <p>Subscribe to a Plan</p>
+                          <p>To add more Departmens</p>
+                        </div>
+                        
+                        <NavLink to={`/e-check`} className="bg-bChkRed text-white rounded-sm w-full py-1.5 text-center">Subscribe</NavLink>
+                      </div>
+                    )}
+                        
                        
                     </div>
                 </div>
@@ -329,40 +317,12 @@ export default function InstitutionDepartments() {
                         </TableRow>
                     ))}
                 </CustomTable>
-                <section>
-                  <div className="flex justify-between items-center my-1">
-                      <div>
-                      <span className="text-gray-600 font-medium text-sm">
-                          Page {currentPage} of {lastPage} - ({total} entries)
-                      </span>
-                      </div>
-                      <div className="flex space-x-2">
-                      <button
-                          disabled={currentPage === 1}
-                          onClick={() => handlePageChange(currentPage - 1)}
-                          className="px-2 bg-white text-gray-800 border rounded-lg disabled:bg-gray-300 disabled:text-white"
-                      >
-                          <FaChevronLeft size={12} />
-                      </button>
-      
-                      {renderPageNumbers()}
-      
-                      <button
-                          disabled={currentPage === lastPage}
-                          onClick={() => handlePageChange(currentPage + 1)}
-                          className="px-2 bg-white text-gray-800 border rounded-lg disabled:bg-gray-300 disabled:text-white disabled:border-0"
-                      >
-                          <FaChevronRight size={12} />
-                      </button>
-                      </div>
-                  </div>
-              </section>
             </section>
             <AddNewDepartment
-                openModal={openModal}
-                setOpenModal={setOpenModal}
-                fetchDepartmentData={fetchDepartmentData}
-                allPermissions={allPermissions}
+              openModal={openModal}
+              setOpenModal={setOpenModal}
+              fetchDepartmentData={fetchDepartmentData}
+              allPermissions={allPermissions}
             />
             <EditDepartment
               setOpenModal={setOpenEditModal}
