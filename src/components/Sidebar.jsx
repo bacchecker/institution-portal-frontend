@@ -164,7 +164,7 @@ function Sidebar() {
                       to="/manage-document"
                       onClick={() => handleDropdownToggle("close")}
                       className={`flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[15vw] md:rounded-[0.3vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] ${
-                        pathname.startsWith("manage-document") && "active"
+                        pathname.startsWith("/manage-document") && "active"
                       }`}
                     >
                       <i class="bx bxs-file md:text-[1.3vw] text-[5vw] menu-icon"></i>
