@@ -167,7 +167,7 @@ export default function InstitutionProfile() {
                     <button className="border px-3 py-1 text-xs rounded-md">See all</button>
                 </div>
                 
-                <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                     {departments?.map((department) => (
                         <div className="border p-3 rounded-md">
                             <p className="font-semibold">{department?.name}</p>
