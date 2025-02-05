@@ -33,6 +33,7 @@ import { getAccountSetupStatus } from "./utils/AccountSetupStatus";
 import AccountSuspended from "@/pages/AccountSuspended";
 import AccountSuspendedProtection from "@/components/AccountSuspendedProtection";
 import AccountSettings from "./pages/accountSettingsComponents/AccountSettings";
+import UpdateRequest from "./pages/accountSettingsComponents/UpdateRequest";
 
 function App() {
   return (
@@ -123,6 +124,7 @@ function App() {
                       </AuthenticatedSuccessProtectedRoute>
                     }
                   />
+                  
                   <Route
                     path="/search-all"
                     element={
@@ -202,6 +204,20 @@ function App() {
                             permission={["institution.settings.view"]}
                           >
                             <AccountSettings />
+                          </PermissionProtectedRoute>
+                        </AccountSetupProtectedRoute>
+                      </AuthenticatedSuccessProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/account-settings/update-request"
+                    element={
+                      <AuthenticatedSuccessProtectedRoute>
+                        <AccountSetupProtectedRoute>
+                          <PermissionProtectedRoute
+                            permission={["institution.settings.view"]}
+                          >
+                            <UpdateRequest />
                           </PermissionProtectedRoute>
                         </AccountSetupProtectedRoute>
                       </AuthenticatedSuccessProtectedRoute>

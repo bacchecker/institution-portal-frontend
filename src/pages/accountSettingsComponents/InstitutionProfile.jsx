@@ -11,6 +11,7 @@ import { FaRegCheckCircle, FaUsers } from "react-icons/fa";
 import moment from "moment";
 import { toast } from "sonner";
 import { MdFileDownload, MdOutlinePending } from "react-icons/md";
+import { NavLink } from "react-router-dom";
 
 
 export default function InstitutionProfile() {
@@ -72,9 +73,15 @@ export default function InstitutionProfile() {
     };
 
     return (
-        <div className="px-2">
+        <div className="flex flex-col px-2">
+            <div className="flex justify-end mb-4">
+                <NavLink to={`/account-settings/update-request`} className="bg-bChkRed text-white rounded-md px-4 py-1.5 text-sm">
+                    Request Profile Update
+                </NavLink>
+            </div>
             
             <div className="bg-white rounded-md p-4 border grid grid-cols-2 lg:grid-cols-4 items-center gap-4 mb-4">
+                
                 <div className="col-span-2 flex space-x-3 items-center">
                     <div className="w-24 h-24 border rounded-md flex items-center justify-center overflow-hidden">
                         <img 

@@ -39,16 +39,16 @@ export default function InstitutionUsers() {
     const [submittedFilters, setSubmittedFilters] = useState({});
 
     const fetchUserData = async () => {
-        setIsLoading(true)
-        try {
-        const response = await axios.get("/institution/users", {
-            params: {
-            ...submittedFilters,
-            page: currentPage,
-            sort_by: sortBy,
-            sort_order: sortOrder,
-            },
-        });
+      setIsLoading(true)
+      try {
+      const response = await axios.get("/institution/users", {
+          params: {
+          ...submittedFilters,
+          page: currentPage,
+          sort_by: sortBy,
+          sort_order: sortOrder,
+          },
+      });
 
         const userData = response.data.institutionUsers;
 

@@ -55,7 +55,7 @@ export default function SecuritySettings() {
     const fetchUserLogs = async () => {
         setIsLoading(true);
         try {
-          const response = await axios.get("/institution/system-logs", {
+          const response = await axios.get("/institution/user-system-logs", {
             params: {
               ...submittedFilters,
               page: currentPage,

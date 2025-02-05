@@ -159,20 +159,21 @@ function Sidebar() {
                 {((permissions?.includes("document-requests.view") ||
                   permissions.includes("validation-requests.view")) ||
                   isAdmin) && (
-                    <li>
-                      <Link
-                        to="/manage-document"
-                        onClick={() => handleDropdownToggle("close")}
-                        className={`flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[15vw] md:rounded-[0.3vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] ${pathname.includes("manage-document") && "active"
-                          }`}
-                      >
-                        <i class="bx bxs-file md:text-[1.3vw] text-[5vw] menu-icon"></i>
-                        <span className="md:text-[1.1vw] text-[4vw] link">
-                          Manage Document
-                        </span>
-                      </Link>
-                    </li>
-                  )}
+                  <li>
+                    <Link
+                      to="/manage-document"
+                      onClick={() => handleDropdownToggle("close")}
+                      className={`flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[15vw] md:rounded-[0.3vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] ${
+                        pathname.startsWith("manage-document") && "active"
+                      }`}
+                    >
+                      <i class="bx bxs-file md:text-[1.3vw] text-[5vw] menu-icon"></i>
+                      <span className="md:text-[1.1vw] text-[4vw] link">
+                        Manage Document
+                      </span>
+                    </Link>
+                  </li>
+                )}
                 {/* <PermissionWrapper permission={['verification-requests.view']}>
                   <li>
                     <Link
@@ -260,20 +261,21 @@ function Sidebar() {
 
                 {(permissions?.includes("institution.settings.view") ||
                   isAdmin) && (
-                    <li>
-                      <Link
-                        to="/account-settings"
-                        onClick={() => handleDropdownToggle("close")}
-                        className={`flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[15vw] md:rounded-[0.3vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] ${pathname === "/account-settings" && "active"
-                          }`}
-                      >
-                        <i className="bx bx-cog md:text-[1.3vw] text-[5vw] menu-icon"></i>
-                        <span className="md:text-[1.1vw] text-[4vw] link">
-                          Account Settings
-                        </span>
-                      </Link>
-                    </li>
-                  )}
+                  <li>
+                    <Link
+                      to="/account-settings"
+                      onClick={() => handleDropdownToggle("close")}
+                      className={`flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[15vw] md:rounded-[0.3vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] ${
+                        pathname.startsWith("/account-settings") && "active"
+                      }`}
+                    >
+                      <i className="bx bx-cog md:text-[1.3vw] text-[5vw] menu-icon"></i>
+                      <span className="md:text-[1.1vw] text-[4vw] link">
+                        Account Settings
+                      </span>
+                    </Link>
+                  </li>
+                )}
                 {(permissions?.includes("institution.activity-logs.view") ||
                   isAdmin) && (
                     <li>
