@@ -21,6 +21,8 @@ function Sidebar() {
   let permissions = secureLocalStorage.getItem("userPermissions") || [];
   const isAdmin = JSON.parse(secureLocalStorage.getItem("userRole"))?.isAdmin;
 
+  
+
   const handleDropdownToggle = (dropdownId) => {
     setActiveDropdown(activeDropdown === dropdownId ? null : dropdownId);
   };
@@ -156,7 +158,7 @@ function Sidebar() {
                   </Link>
                 </li>
 
-                {((permissions?.includes("document-requests.view") &&
+                {((permissions?.includes("document-requests.view") ||
                   permissions.includes("validation-requests.view")) ||
                   isAdmin) && (
                   <li>

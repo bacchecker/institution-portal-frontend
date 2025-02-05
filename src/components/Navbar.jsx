@@ -52,6 +52,9 @@ const Navbar = () => {
           if (event) {
             await refetch()
           }
+          if (event?.data?.type === "user_permissions") {
+            navigate("/")
+          }
         }
       );
     }
@@ -115,7 +118,7 @@ const Navbar = () => {
             placeholder="Search something here"
             name="search"
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)} 
+            onChange={(e) => setSearchQuery(e.target.value)}
           />
           {isLoading ? (
             <button
@@ -176,7 +179,7 @@ const Navbar = () => {
                             onClick={() => {
                               navigate("/e-check");
                               dispatch(setSelectedTab("document"))
-                              handleSubmit(notification) 
+                              handleSubmit(notification)
                             }}
                             className='w-full p-[0.5vw] border-b hover:bg-[#E5E5E5] cursor-pointer'>
                             <h4 className='text-[1vw]'>{notification?.message}</h4>
