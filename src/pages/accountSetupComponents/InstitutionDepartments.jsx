@@ -164,7 +164,6 @@ function InstitutionDepartments({ setActiveStep }) {
     }
   }, [isDeleteDepartmentSuccess]);
 
-  console.log("err", institutionDepartments?.departments?.data?.length);
 
 
   return (
