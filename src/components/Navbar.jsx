@@ -44,6 +44,7 @@ const Navbar = () => {
     console.error("WebSocket connection error:", error);
   });
 
+
   useEffect(() => {
     if (institution?.id) {
       window.Echo.channel(`institution.${institution?.id}`).listen(
@@ -52,7 +53,7 @@ const Navbar = () => {
           if (event) {
             await refetch()
           }
-          if (event?.data?.type === "user_permissions") {
+          if (event?.data?.type === "user_permissions" && event?.data?.content?.user_id === user?.id) {
             navigate("/")
           }
         }
