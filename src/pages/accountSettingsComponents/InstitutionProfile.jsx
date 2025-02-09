@@ -34,14 +34,16 @@ export default function InstitutionProfile() {
         new_password_confirmation: "",
     });
     
-    const fetchInstitutionProfile = async (ip) => {
+    const fetchInstitutionProfile = async () => {
+        setIsLoading(true)
         try {
           const response = await axios.get(`institution/institution-profile`);
           setProfileData(response.data)
           setDepartments(response.data.departments)
           setPdfPath(response.data?.institution?.operation_certificate)
-          
+          setIsLoading(false)
         } catch (error) {
+            setIsLoading(false)
           console.error("Error fetching location:", error);
           return null;
         }
@@ -76,70 +78,122 @@ export default function InstitutionProfile() {
         <div className="flex flex-col px-2">
             <div className="flex justify-end mb-4">
                 <NavLink to={`/account-settings/update-request`} className="bg-bChkRed text-white rounded-md px-4 py-2 text-sm">
-                    <p>Institution Profile Update</p>
+                    <p>Update Institution Profile</p>
                 </NavLink>
             </div>
-            
-            <div className="bg-white rounded-md p-4 border grid grid-cols-2 lg:grid-cols-4 items-center gap-4 mb-4">
-                
+            {isLoading ? (
+                <div className="bg-white rounded-md p-4 border grid grid-cols-2 lg:grid-cols-4 items-center gap-4 mb-4 animate-pulse">
+      
+                {/* Left Section - Logo and Name */}
                 <div className="col-span-2 flex space-x-3 items-center">
-                    <div className="w-24 h-24 border rounded-md flex items-center justify-center overflow-hidden">
-                        <img 
-                            src={`https://admin-dev.baccheck.online/storage/${profileData?.institution?.logo}`} 
-                            alt="Institution Logo" 
-                            className="rounded-md w-full h-full object-contain"
-                        />
-                    </div>
+                  {/* Skeleton Logo */}
+                  <div className="w-24 h-24 border rounded-md flex items-center justify-center bg-gray-300">
+                    <svg
+                      className="w-10 h-10 text-gray-200"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="currentColor"
+                      viewBox="0 0 16 20"
+                    >
+                      <path d="M14.066 0H7v5a2 2 0 0 1-2 2H0v11a1.97 1.97 0 0 0 1.934 2h12.132A1.97 1.97 0 0 0 16 18V2a1.97 1.97 0 0 0-1.934-2ZM10.5 6a1.5 1.5 0 1 1 0 2.999A1.5 1.5 0 0 1 10.5 6Zm2.221 10.515a1 1 0 0 1-.858.485h-8a1 1 0 0 1-.9-1.43L5.6 10.039a.978.978 0 0 1 .936-.57 1 1 0 0 1 .9.632l1.181 2.981.541-1a.945.945 0 0 1 .883-.522 1 1 0 0 1 .879.529l1.832 3.438a1 1 0 0 1-.031.988Z"/>
+                    </svg>
+                  </div>
+          
+                  {/* Skeleton Text (Institution Name, Address, Email) */}
+                  <div className="space-y-2">
+                    <div className="h-5 bg-gray-200 rounded-full w-48"></div>
+                    <div className="h-4 bg-gray-200 rounded-full w-56"></div>
+                    <div className="h-4 bg-gray-200 rounded-full w-40"></div>
+                  </div>
+                </div>
+          
+                {/* Account Type and Setup Status */}
+                <div className="flex flex-col space-y-2">
+                  <div>
+                    <div className="h-4 bg-gray-200 rounded-full w-32 mb-1"></div>
+                    <div className="h-4 bg-gray-200 rounded-full w-24"></div>
+                  </div>
+                  <div>
+                    <div className="h-4 bg-gray-200 rounded-full w-32 mb-1"></div>
+                    <div className="h-4 bg-gray-200 rounded-full w-24"></div>
+                  </div>
+                </div>
+          
+                {/* Member Since and Terms & Conditions */}
+                <div className="flex flex-col space-y-2">
+                  <div>
+                    <div className="h-4 bg-gray-200 rounded-full w-32 mb-1"></div>
+                    <div className="h-4 bg-gray-200 rounded-full w-24"></div>
+                  </div>
+                  <div>
+                    <div className="h-4 bg-gray-200 rounded-full w-32 mb-1"></div>
+                    <div className="h-4 bg-gray-200 rounded-full w-24"></div>
+                  </div>
+                </div>
+          
+              </div>
+            ):(
+                <div className="bg-white rounded-md p-4 border grid grid-cols-2 lg:grid-cols-4 items-center gap-4 mb-4">
+                    
+                    <div className="col-span-2 flex space-x-3 items-center">
+                        <div className="w-24 h-24 border rounded-md flex items-center justify-center overflow-hidden">
+                            <img 
+                                src={`https://admin-dev.baccheck.online/storage/${profileData?.institution?.logo}`} 
+                                alt="Institution Logo" 
+                                className="rounded-md w-full h-full object-contain"
+                            />
+                        </div>
 
-                    <div className="">
                         <div className="">
-                            <p className="font-semibold text-xl text-black">{profileData?.institution?.name} <span className="text-sm">({profileData?.institution?.prefix})</span></p>
-                            <p>{profileData?.institution?.address}{", "}{profileData?.institution?.mailing_address}</p>
-                            <p>{profileData?.institution?.institution_email}</p>
+                            <div className="">
+                                <p className="font-semibold text-xl text-black">{profileData?.institution?.name} <span className="text-sm">({profileData?.institution?.prefix})</span></p>
+                                <p>{profileData?.institution?.address}{", "}{profileData?.institution?.mailing_address}</p>
+                                <p>{profileData?.institution?.institution_email}</p>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div className="flex flex-col space-y-2">
-                    <div className="">
-                        <p className="font-semibold">Account Type</p>
-                        <p>{profileData?.institution?.type || "N/A"}</p>
+                    <div className="flex flex-col space-y-2">
+                        <div className="">
+                            <p className="font-semibold">Account Type</p>
+                            <p>{profileData?.institution?.type || "N/A"}</p>
+                        </div>
+                        <div className="">
+                            <p className="font-semibold">Setup Complete</p>
+                            <p className={`flex items-center gap-2 ${profileData?.institution?.setup_done == 1 ? "text-green-600" : "text-gray-500"}`}>
+                                {profileData?.institution?.setup_done == 1 ? (
+                                    <>
+                                    <FaRegCheckCircle /> Completed
+                                    </>
+                                ) : (
+                                    <>
+                                    <MdOutlinePending /> Incomplete
+                                    </>
+                                )}
+                            </p>
+                        </div>
                     </div>
-                    <div className="">
-                        <p className="font-semibold">Setup Complete</p>
-                        <p className={`flex items-center gap-2 ${profileData?.institution?.setup_done == 1 ? "text-green-600" : "text-gray-500"}`}>
-                            {profileData?.institution?.setup_done == 1 ? (
-                                <>
-                                <FaRegCheckCircle /> Completed
-                                </>
-                            ) : (
-                                <>
-                                <MdOutlinePending /> Incomplete
-                                </>
-                            )}
-                        </p>
+                    <div className="flex flex-col space-y-1">
+                        <div className="">
+                            <p className="font-semibold">Member Since</p>
+                            <p>{profileData?.institution?.created_at || "N/A"}</p>
+                        </div>
+                        <div className="">
+                            <p className="font-semibold">Terms and Condition</p>
+                            <p className={`flex items-center gap-2 ${profileData?.institution?.terms == 1 ? "text-green-600" : "text-gray-500"}`}>
+                                {profileData?.institution?.terms == 1 ? (
+                                    <>
+                                    <FaRegCheckCircle /> Agreed
+                                    </>
+                                ) : (
+                                    <>
+                                    <MdOutlinePending /> Not Agreed
+                                    </>
+                                )}
+                            </p>
+                        </div>
                     </div>
-                </div>
-                <div className="flex flex-col space-y-1">
-                    <div className="">
-                        <p className="font-semibold">Member Since</p>
-                        <p>{profileData?.institution?.created_at || "N/A"}</p>
-                    </div>
-                    <div className="">
-                        <p className="font-semibold">Terms and Condition</p>
-                        <p className={`flex items-center gap-2 ${profileData?.institution?.terms == 1 ? "text-green-600" : "text-gray-500"}`}>
-                            {profileData?.institution?.terms == 1 ? (
-                                <>
-                                <FaRegCheckCircle /> Agreed
-                                </>
-                            ) : (
-                                <>
-                                <MdOutlinePending /> Not Agreed
-                                </>
-                            )}
-                        </p>
-                    </div>
-                </div>
-            </div>
+                </div> 
+            )}
+            
             <div className="bg-white rounded-md p-4 border mb-4">
                 <p className="font-semibold mb-2">Operation Certificate</p>
                 <div className="w-full h-72 border rounded-lg overflow-hidden relative">

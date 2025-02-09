@@ -70,30 +70,7 @@ export default function Tickets() {
     useEffect(() => {
         fetchTickets();
     }, [submittedFilters, currentPage, sortBy, sortOrder]);
-
-    // Handle page change
-    const handlePageChange = (page) => {
-        setCurrentPage(page);
-    };
-
-    // Render page numbers
-    const renderPageNumbers = () => {
-        const pageNumbers = [];
-        for (let i = 1; i <= lastPage; i++) {
-            pageNumbers.push(
-                <button
-                    key={i}
-                    onClick={() => handlePageChange(i)}
-                    className={`p-2 rounded-lg ${
-                        i === currentPage ? 'bg-bChkRed text-white' : 'bg-white text-gray-800 border'
-                    }`}
-                >
-                    {i}
-                </button>
-            );
-        }
-        return pageNumbers;
-    };
+    
     const handleStatusChange = (event) => {
       setFilters({ ...filters, status: event.target.value });
     };
@@ -268,6 +245,10 @@ export default function Tickets() {
               sortOrder={sortOrder}
               setSortBy={setSortBy}
               setSortOrder={setSortOrder}
+              currentPage={currentPage}
+              lastPage={lastPage}
+              total={total}
+              handlePageChange={setCurrentPage}
             >
               {tickets?.map((item) => (
                 <TableRow key={item?.id} className="odd:bg-gray-100 even:bg-white border-b">
@@ -330,35 +311,6 @@ export default function Tickets() {
               ))}
               
             </CustomTable>
-            <section>
-              {/* Pagination Controls */}
-              <div className="flex justify-between items-center mt-4">
-                <div>
-                    <span className="text-gray-600 font-medium text-sm">
-                        Page {currentPage} of {lastPage}
-                    </span>
-                </div>
-                <div className="flex space-x-2">
-                    <button
-                        disabled={currentPage === 1}
-                        onClick={() => handlePageChange(currentPage - 1)}
-                        className="p-2 bg-white text-gray-800 border rounded-lg disabled:bg-gray-300 disabled:text-white"
-                    >
-                        <FaChevronLeft size={12} />
-                    </button>
-
-                    {renderPageNumbers()}
-
-                    <button
-                        disabled={currentPage === lastPage}
-                        onClick={() => handlePageChange(currentPage + 1)}
-                        className="p-2 bg-white text-gray-800 border rounded-lg disabled:bg-gray-300 disabled:text-white disabled:border-0"
-                    >
-                        <FaChevronRight size={12} />
-                    </button>
-                </div>
-              </div>
-            </section>
       </section>
       
     </div>
