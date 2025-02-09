@@ -33,7 +33,7 @@ import { getAccountSetupStatus } from "./utils/AccountSetupStatus";
 import AccountSuspended from "@/pages/AccountSuspended";
 import AccountSuspendedProtection from "@/components/AccountSuspendedProtection";
 import AccountSettings from "./pages/accountSettingsComponents/AccountSettings";
-import UpdateRequest from "./pages/accountSettingsComponents/UpdateRequest";
+import MainRequests from "./pages/accountSettingsComponents/updateRequestComponents/MainRequests";
 
 function App() {
   return (
@@ -217,7 +217,7 @@ function App() {
                           <PermissionProtectedRoute
                             permission={["institution.settings.view"]}
                           >
-                            <UpdateRequest />
+                            <MainRequests />
                           </PermissionProtectedRoute>
                         </AccountSetupProtectedRoute>
                       </AuthenticatedSuccessProtectedRoute>

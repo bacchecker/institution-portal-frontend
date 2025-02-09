@@ -4,6 +4,7 @@ import Navbar from "@/components/Navbar";
 import { toast } from "sonner";
 import { MdOutlineEditNote } from "react-icons/md";
 import { BsFillTrash3Fill } from "react-icons/bs";
+import LoadItems from "../../../components/LoadItems";
 
 const UpdateRequest = () => {
   const [institution, setInstitution] = useState({});
@@ -12,6 +13,7 @@ const UpdateRequest = () => {
   const [disabledFields, setDisabledFields] = useState({});
   const [selectedFiles, setSelectedFiles] = useState({});
   const [pendingRequest, setPendingRequest] = useState(null);
+  const [isSaving, setIsSaving] = useState(null);
 
   useEffect(() => {
     const fetchInstitutionData = async () => {
@@ -70,6 +72,7 @@ const UpdateRequest = () => {
   };
 
   const handleSubmit = async () => {
+    setIsSaving(true);
     const formData = new FormData();
 
     Object.entries(updates).forEach(([key, value]) => {
@@ -90,7 +93,7 @@ const UpdateRequest = () => {
         formData
       );
       toast.success(response.data.message);
-      
+      setIsSaving(false)
       // Refresh pending request data
       const pendingRequestResponse = await axios.get("/institution/pending-update-request");
       if (pendingRequestResponse.data.data) {
@@ -99,12 +102,12 @@ const UpdateRequest = () => {
       }
     } catch (error) {
       toast.error(error.response?.data?.message || "Error submitting update request");
+      setIsSaving(false)
     }
   };
 
   return (
     <>
-      <Navbar />
       <div className="flex flex-col lg:flex-row items-start gap-3 p-2">
         <div className="w-full lg:w-1/2 shadow-md bg-white">
           <h2 className="text-lg font-semibold bg-black px-4 py-3 text-white">
@@ -300,7 +303,18 @@ const UpdateRequest = () => {
                     onClick={handleSubmit}
                     className="bg-bChkRed text-white rounded-md py-2 px-4 text-sm"
                   >
-                    Submit Updates
+                    {isSaving ? (
+                      <div className="flex items-center justify-center gap-2">
+                        <LoadItems color={"#ffffff"} size={15} />
+                        <h4 className="md:text-[1vw] text-[3.5vw] text-[#ffffff]">
+                          Submitting...
+                        </h4>
+                      </div>
+                    ) : (
+                      <h4 className="md:text-[1vw] text-[3.5vw] text-[#ffffff]">
+                        Submit Updates
+                      </h4>
+                    )}
                   </button>
                 )}
               </div>

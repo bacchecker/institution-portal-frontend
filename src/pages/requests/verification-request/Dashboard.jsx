@@ -219,14 +219,21 @@ export default function Dashboard() {
                 </p>
               </div>
               <div className="flex flex-col space-y-1 mt-4 text-xs">
-                <p className="font-semibold">Features</p>
-                <div className="flex space-x-2 text-xs">
-                  <p>{plan?.credit} Credits</p>
+                <p className="font-semibold">Package Benefits</p>
+                <div className="flex space-x-1.5 text-xs">
+                  <IoIosStar className="text-yellow-500" />
+                  <p>{plan?.number_of_departments} Departments {plan?.number_of_users} Users</p>
                 </div>
-                <div className="flex space-x-2 text-xs">
+                <div className="flex space-x-1.5 text-xs">
+                    <IoIosStar className="text-yellow-500" />
+                    <p>{data?.credit} Credits</p>
+                </div>
+                <div className="flex space-x-1.5 text-xs">
+                  <IoIosStar className="text-yellow-500" />
                   <p>{plan?.bonus} Bonus</p>
                 </div>
-                <div className="flex space-x-2 text-xs">
+                <div className="flex space-x-1.5 text-xs">
+                  <IoIosStar className="text-yellow-500" />
                   <p>{plan?.total_credit} Total Credits</p>
                 </div>
               </div>
@@ -620,7 +627,7 @@ export default function Dashboard() {
             </div>
 
             {/* Indicators and Navigation */}
-            <div className="w-full absolute bottom-0 left-0 bg-white py-4">
+            <div className="w-full absolute bottom-0 left-0 bg-white py-4 mt-2">
               <div className="flex justify-between items-center px-4">
                 {/* Previous Button */}
                 {currentPage - 1 == 0 && <div className=""></div>}
@@ -764,14 +771,21 @@ export default function Dashboard() {
                       </p>
                     </div>
                     <div className="flex flex-col space-y-1 mt-4 text-xs">
-                      <p className="font-semibold">Features</p>
-                      <div className="flex space-x-2 text-xs">
-                        <p>{plan?.credit} Credits</p>
+                      <p className="font-semibold">Package Benefits</p>
+                      <div className="flex space-x-1.5 text-xs">
+                        <IoIosStar className="text-yellow-500" />
+                        <p>{plan?.number_of_departments} Departments {plan?.number_of_users} Users</p>
                       </div>
-                      <div className="flex space-x-2 text-xs">
+                      <div className="flex space-x-1.5 text-xs">
+                          <IoIosStar className="text-yellow-500" />
+                          <p>{data?.credit} Credits</p>
+                      </div>
+                      <div className="flex space-x-1.5 text-xs">
+                        <IoIosStar className="text-yellow-500" />
                         <p>{plan?.bonus} Bonus</p>
                       </div>
-                      <div className="flex space-x-2 text-xs">
+                      <div className="flex space-x-1.5 text-xs">
+                        <IoIosStar className="text-yellow-500" />
                         <p>{plan?.total_credit} Total Credits</p>
                       </div>
                     </div>
@@ -790,7 +804,7 @@ export default function Dashboard() {
                 ))}
               </div>
             )}
-            <div className="w-full absolute bottom-0 left-0 bg-white">
+            <div className="w-full absolute bottom-0 left-0 bg-white mt-2">
               <div className="flex justify-between items-center px-4">
                 {/* Previous Button */}
                 <button
