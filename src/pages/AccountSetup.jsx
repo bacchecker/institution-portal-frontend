@@ -70,10 +70,10 @@ function AccountSetup() {
   // Determine if we should show the completion modal
   const showCompletionModal =
     isCompleting || activeStep === "5" || user?.institution?.setup_done;
-  console.log({
-    activeStep,
-    showCompletionModal,
-  });
+  // console.log({
+  //   activeStep,
+  //   showCompletionModal,
+  // });
 
   return (
     <>

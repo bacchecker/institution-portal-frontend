@@ -7,8 +7,8 @@ import Dropdown from "./Dropdown";
 import { useGetNotificationsQuery, useUpdateNotificationMutation } from "../redux/apiSlice";
 import Echo from "laravel-echo";
 import Pusher from "pusher-js";
-import { useDispatch } from "react-redux";
-import { setSelectedTab } from "../redux/baccheckerSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { setMessage, setSelectedTab } from "../redux/baccheckerSlice";
 
 const Navbar = () => {
   const user = JSON?.parse(secureLocalStorage?.getItem("user"))?.user;
@@ -21,6 +21,9 @@ const Navbar = () => {
   let permissions = secureLocalStorage.getItem("userPermissions") || [];
   const isAdmin = JSON.parse(secureLocalStorage.getItem("userRole"))?.isAdmin;
   const { data: notifications, refetch } = useGetNotificationsQuery();
+
+  let message = useSelector((state) => state.bacchecker.message);
+
 
   const navigate = useNavigate();
 
@@ -52,6 +55,7 @@ const Navbar = () => {
         async (event) => {
           if (event) {
             await refetch()
+            dispatch(setMessage(event))
           }
           if (event?.data?.type === "user_permissions" && event?.data?.content?.user_id === user?.id) {
             navigate("/")
@@ -79,8 +83,14 @@ const Navbar = () => {
 
   const [updateNotification, { data, isSuccess, isError, error }] =
     useUpdateNotificationMutation();
-
   const handleSubmit = async (notification) => {
+    navigate("/e-check");
+    if (message?.data?.type === "verification_request" && message?.data?.content?.sending_institution === institution?.name) {
+      dispatch(setSelectedTab("music"));
+    } else {
+      dispatch(setSelectedTab("document"));
+    }
+
     try {
       await updateNotification({
         id: notification.id,
@@ -177,11 +187,7 @@ const Navbar = () => {
                         return (
                           <div
                             key={i}
-                            onClick={() => {
-                              navigate("/e-check");
-                              dispatch(setSelectedTab("document"))
-                              handleSubmit(notification)
-                            }}
+                            onClick={() => handleSubmit(notification)}
                             className='w-full p-[0.5vw] border-b hover:bg-[#E5E5E5] cursor-pointer'>
                             <h4 className='text-[1vw]'>{notification?.message}</h4>
                           </div>
