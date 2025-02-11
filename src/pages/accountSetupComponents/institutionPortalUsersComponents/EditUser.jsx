@@ -115,7 +115,7 @@ function EditUser({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const { first_name, last_name, other_name, email, phone, id } = userInput;
+    const { first_name, last_name, other_name, email, phone, id, job_title } = userInput;
 
     if (
       !first_name ||
@@ -164,6 +164,8 @@ function EditUser({
             },
           });
         } catch (error) {
+          console.log("error", error);
+          
           toast.error("Failed to create user", {
             position: "top-right",
             autoClose: 1202,

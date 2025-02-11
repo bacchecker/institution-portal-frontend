@@ -133,7 +133,7 @@ div:where(.swal2-container) h2:where(.swal2-title) {
 div:where(.swal2-container) button:where(.swal2-styled):where(.swal2-cancel) {
   border: 1px solid #ff0404 !important;
   font-size: 1vw !important;
-  color: #ff0404;
+  color: #ff0404 !important;
   background: transparent !important;
 }
 
