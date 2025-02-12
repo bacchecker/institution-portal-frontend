@@ -52,18 +52,12 @@ export default function IncomingRequests() {
   const [currentPage, setCurrentPage] = useState(1);
   const [lastPage, setLastPage] = useState(1);
   const [total, setTotal] = useState(0);
-  const [dateRange, setDateRange] = useState({});
   const [verificationRequests, setVerificationRequests] = useState([]);
   const [sortBy, setSortBy] = useState(null);
   const [sortOrder, setSortOrder] = useState("asc");
   const user = JSON?.parse(secureLocalStorage?.getItem("user"))?.user;
   const [documentTypes, setDocumentTypes] = useState([]);
   const [checkListSections, setCheckListSections] = useState([]);
-  const [allRequests, setAllRequests] = useState(0);
-  const [pending, setPending] = useState(0);
-  const [rejected, setRejected] = useState(0);
-  const [approved, setApproved] = useState(0);
-  const [status, setStatus] = useState(null);
   const [institutionId, setInstitutionId] = useState(null);
   const [filters, setFilters] = useState({
     search_query: "",
@@ -81,6 +75,64 @@ export default function IncomingRequests() {
     { value: "rejected", name: "Rejected" },
     { value: "completed", name: "Completed" },
   ];
+  
+  const reasonMappings = {
+    // Document Authenticity
+    "tampering": ["Signs of tampering (erasures, mismatched fonts, corrections)", "Ink inconsistencies", "Document appears altered"],
+    "format": ["Format does not match institution standards", "Unrecognized document template", "Incorrect document type"],
+    "valid timeframe": ["Document is expired", "Issued date is missing", "Document issued before/after allowed timeframe"],
+  
+    // Document Owner Identity
+    "name on the document": ["Name mismatch with institution records", "Multiple names found", "Name not legible"],
+    "student ID": ["Student ID does not exist", "Mismatch with institution records", "Invalid ID format"],
+    "photo": ["Photo is missing", "Photo does not match records", "Photo quality is too low to verify identity"],
+  
+    // Institution Legitimacy
+    "accreditation": ["Institution is not recognized by accreditation bodies", "Accreditation expired", "Accreditation body not verified"],
+    "official database": ["Institution not listed in official directories", "Mismatch with official data", "Verification unavailable"],
+    "website and contact": ["Website not found", "Invalid contact details", "Institution website is down"],
+  
+    // Academic Content
+    "degree/program": ["Degree/program mismatch with records", "Degree not recognized", "Incorrect program title"],
+    "dates": ["Enrollment/graduation dates do not match", "Date format error", "Missing date information"],
+    "curriculum": ["Inconsistent academic details", "Course content mismatch", "Unrecognized curriculum"],
+  
+    // Grades and Credentials
+    "grades": ["Grades do not match records", "Grade format error", "Missing grades"],
+    "courses": ["Course list mismatch with curriculum", "Course code discrepancies", "Courses missing from transcript"],
+    "GPA": ["GPA is inaccurate", "Cumulative score not matching", "Invalid GPA format"],
+  
+    // Security Features
+    "watermark": ["Watermark not found", "Watermark inconsistent with standard", "Faded or unclear watermark"],
+    "seal or signature": ["Official seal missing", "Signature mismatch", "Seal appears altered"],
+  
+    // Authorized Signatory
+    "authorized person": ["Unauthorized signatory", "Name/signature does not match records", "Signature missing"],
+    "stamped": ["Document not stamped", "Department stamp missing", "Approval not clear"],
+  };
+  
+  
+  const getPossibleReasons = (questionText) => {
+    const reasons = [];
+    Object.keys(reasonMappings).forEach((keyword) => {
+      if (questionText.toLowerCase().includes(keyword)) {
+        reasons.push(...reasonMappings[keyword]);
+      }
+    });
+    return [...new Set(reasons), "Other (please specify)"]; // Remove duplicates and add "Other"
+  };
+  
+  const [showCustomReason, setShowCustomReason] = useState({});
+  const handleReasonChange = (id, value) => {
+    if (value === "Other (please specify)") {
+      setShowCustomReason((prev) => ({ ...prev, [id]: true }));
+      handleChange(id, 0, ""); // Allow custom input
+    } else {
+      setShowCustomReason((prev) => ({ ...prev, [id]: false }));
+      handleChange(id, 0, value);
+    }
+  };
+  
   const handleChange = (itemId, isCorrect, comment = "") => {
     setAnswers((prev) => ({
       ...prev,
@@ -90,7 +142,6 @@ export default function IncomingRequests() {
       },
     }));
   };
-  
 
   const institutionVerificationRequests = async () => {
     setIsLoading(true);
@@ -109,11 +160,6 @@ export default function IncomingRequests() {
       console.log(response.data);
 
       const valRequest = response.data.paginatedRequests;
-
-      setAllRequests(response.data.allRequests);
-      setPending(response.data.pending);
-      setApproved(response.data.approved);
-      setRejected(response.data.rejected);
       setVerificationRequests(valRequest.data);
       setCurrentPage(valRequest.current_page);
       setLastPage(valRequest.last_page);
@@ -531,7 +577,7 @@ export default function IncomingRequests() {
           title={`Request Details`}
           isOpen={openDrawer}
           setIsOpen={setOpenDrawer}
-          classNames="w-[100vw] md:w-[45vw] z-10"
+          classNames="w-[100vw] md:w-[45vw] xl:w-[38vw] z-10"
         >
           <div className="h-full flex flex-col -mt-2 xl:pl-2 font-semibold justify-between">
             {data?.status != "processing" ? (
@@ -752,19 +798,19 @@ export default function IncomingRequests() {
 
                           {/* Render Items */}
                           <div className="space-y-4">
-                            {section.items.map((item) => (
-                              <div key={item.id} className="space-y-2">
-                                {/* Question Text */}
+                          {section.items.map((item) => {
+                            const possibleReasons = getPossibleReasons(item.question_text);
+
+                            return (
+                              <div key={item.id} className="space-y-1">
                                 <p className="text-sm font-normal">{item.question_text}</p>
 
                                 {/* Yes/No Options */}
                                 <div className="flex space-x-4 text-base text-gray-600">
                                   {/* Yes Option */}
                                   <div
-                                    className={`flex items-center justify-center space-x-2 cursor-pointer border pr-2 font-normal rounded-[4px] py-0.5 ${
-                                      answers[item.id]?.is_correct === 1
-                                        ? "text-green-600 border-green-600"
-                                        : "text-gray-600"
+                                    className={`flex items-center justify-center space-x-2 cursor-pointer border pr-2 font-normal rounded-[4px] py-1 text-[13px] ${
+                                      answers[item.id]?.is_correct === 1 ? "text-green-600 border-green-600" : "text-gray-500"
                                     }`}
                                     onClick={() => handleChange(item.id, 1, "")}
                                   >
@@ -782,10 +828,8 @@ export default function IncomingRequests() {
 
                                   {/* No Option */}
                                   <div
-                                    className={`flex items-center justify-center space-x-2 cursor-pointer border font-normal rounded-[4px] pr-2 py-0.5 ${
-                                      answers[item.id]?.is_correct === 0
-                                        ? "text-red-600 border-red-600"
-                                        : "text-gray-600"
+                                    className={`flex items-center justify-center space-x-2 cursor-pointer border font-normal rounded-[4px] pr-2 py-1 text-[13px] ${
+                                      answers[item.id]?.is_correct === 0 ? "text-red-600 border-red-600" : "text-gray-500"
                                     }`}
                                     onClick={() => handleChange(item.id, 0, answers[item.id]?.comment || "")}
                                   >
@@ -802,22 +846,42 @@ export default function IncomingRequests() {
                                   </div>
                                 </div>
 
-                                {/* Show comment textarea only if "No" is selected */}
+                                {/* Show dropdown and textarea when "No" is selected */}
                                 {answers[item.id]?.is_correct === 0 && (
                                   <>
-                                  <textarea
-                                    className="w-full border rounded p-2 text-gray-700 focus:outline-none font-normal"
-                                    rows="3"
-                                    placeholder="Enter your comment..."
-                                    value={answers[item.id]?.comment || ""}
-                                    onChange={(e) => handleChange(item.id, 0, e.target.value)}
-                                  ></textarea>
-                                  <p className="text-right text-[10px] font-medium text-bChkRed">Note: <span className="text-black">It is required to provide a reason</span></p>
+                                    <select
+                                      className="w-full border rounded p-2 text-gray-700 focus:outline-none font-normal"
+                                      value={answers[item.id]?.comment || ""}
+                                      onChange={(e) => handleReasonChange(item.id, e.target.value)}
+                                    >
+                                      <option value="" disabled>Select a reason...</option>
+                                      {possibleReasons.map((reason, index) => (
+                                        <option key={index} value={reason}>
+                                          {reason}
+                                        </option>
+                                      ))}
+                                    </select>
+
+                                    {/* Show textarea if "Other" is selected */}
+                                    {showCustomReason[item.id] && (
+                                      <textarea
+                                        className="w-full border rounded p-2 text-gray-700 focus:outline-none font-normal mt-2"
+                                        rows="3"
+                                        placeholder="Enter your custom reason..."
+                                        value={answers[item.id]?.comment || ""}
+                                        onChange={(e) => handleChange(item.id, 0, e.target.value)}
+                                      ></textarea>
+                                    )}
+
+                                    <p className="text-right text-[10px] font-medium text-bChkRed">
+                                      Note: <span className="text-black">It is required to provide a reason</span>
+                                    </p>
                                   </>
-                                  
                                 )}
                               </div>
-                            ))}
+                            );
+                          })}
+
                           </div>
                         </div>
 
@@ -865,6 +929,7 @@ export default function IncomingRequests() {
 
               {data?.status !== "created" &&
                 data?.status !== "completed" &&
+                data?.status !== "rejected" &&
                 data?.status !== "processing" && (
                   <Button
                     radius="none"
@@ -921,7 +986,6 @@ export default function IncomingRequests() {
                 }
               )
               .then(async (res) => {
-                // ✅ Use the updated status from the response
                 if (res?.data?.status === "processing") {
                   await fetchVerificationChecklist(data?.id);
                 }

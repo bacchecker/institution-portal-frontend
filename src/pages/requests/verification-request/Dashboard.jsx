@@ -4,6 +4,7 @@ import {
   FaChevronLeft,
   FaChevronRight,
   FaCreditCard,
+  FaCrown,
   FaRegCircleCheck,
 } from "react-icons/fa6";
 import { FaFilePdf } from "react-icons/fa";
@@ -22,13 +23,15 @@ import {
 } from "recharts";
 import Modal from "@/components/Modal";
 import { fetchSubscription } from "../../subscription/fetchSubscription";
-import LoadItems from "../../../components/LoadItems";
+import LoadItems from "@/components/LoadItems";
 import { toast } from "sonner";
+import { GiUpgrade } from "react-icons/gi";
 
 export default function Dashboard() {
   const [receivedRequest, setReceivedRequest] = useState(0);
   const [sentRequest, setSentRequest] = useState(0);
   const [subscription, setSubscription] = useState("");
+  const [currentPackage, setCurrentPackage] = useState("");
   const [tab, setTab] = useState("day");
   const [plans, setPlans] = useState([]);
   const [data, setData] = useState([]);
@@ -226,7 +229,7 @@ export default function Dashboard() {
                 </div>
                 <div className="flex space-x-1.5 text-xs">
                     <IoIosStar className="text-yellow-500" />
-                    <p>{data?.credit} Credits</p>
+                    <p>{plan?.credit} Credits</p>
                 </div>
                 <div className="flex space-x-1.5 text-xs">
                   <IoIosStar className="text-yellow-500" />
@@ -284,6 +287,7 @@ export default function Dashboard() {
         setSentRequest(response.data.sent_requests);
         setReceivedRequest(response.data.received_requests);
         setSubscription(response.data.subscription);
+        setCurrentPackage(response.data.current_package);
         const resData = response.data.results;
         if (tab === "day") {
           setData(
@@ -450,14 +454,25 @@ export default function Dashboard() {
               </div>
             </div>
           </div>
-          <div className="flex flex-col justify-center bg-purple-200 rounded-md p-8">
+          <div className="flex flex-col justify-center bg-purple-200 rounded-md px-8 py-6">
+            <div className="w-full flex justify-end mb-2">
+              <div className="flex items-center space-x-2 text-green-600 bg-green-100 border border-green-600 rounded-full px-4 py-1">
+                <p>
+                  {currentPackage.split(' ').pop() === 'Package' 
+                    ? currentPackage 
+                    : `${currentPackage} Package`}
+                </p>
+                <FaCrown size={20} className="text-yellow-400"/>
+              </div>
+            </div>
+              
             <div className="flex space-x-4">
               <div className="bg-purple-300 text-purple-500 h-10 w-12 rounded-full flex items-center justify-center">
                 <FaCreditCard size={16} />
               </div>
               <div className="flex flex-col space-y-1">
                 <p className="font-medium">
-                  Remaining E-check subscription balance
+                  E-check subscription balance
                 </p>
                 <div className="w-full flex items-center justify-between">
                   <p className="text-black text-xl font-semibold">
@@ -468,9 +483,11 @@ export default function Dashboard() {
                     onClick={() => {
                       setOpenSubDrawer(true);
                     }}
-                    className="bg-green-100 rounded-xl px-2 py-1 uppercase text-xs text-green-600 border border-green-600"
+                    className="bg-black flex space-x-1 items-center rounded-xl px-2 py-1 uppercase text-xs text-white"
                   >
-                    Upgrade
+                    <GiUpgrade />
+                    <p>Upgrade</p>
+
                   </button>
                 </div>
               </div>
@@ -778,7 +795,7 @@ export default function Dashboard() {
                       </div>
                       <div className="flex space-x-1.5 text-xs">
                           <IoIosStar className="text-yellow-500" />
-                          <p>{data?.credit} Credits</p>
+                          <p>{plan?.credit} Credits</p>
                       </div>
                       <div className="flex space-x-1.5 text-xs">
                         <IoIosStar className="text-yellow-500" />

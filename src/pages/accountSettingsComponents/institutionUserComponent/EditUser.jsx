@@ -130,7 +130,7 @@ function EditUser({
         icon: "warning",
         showCancelButton: true,
         confirmButtonColor: "#febf4c",
-        cancelButtonColor: "#d33",
+        cancelButtonColor: "#dd3333",
         confirmButtonText: "Yes, I'm sure",
         cancelButtonText: "No, cancel",
       });
@@ -398,7 +398,7 @@ function EditUser({
         <button
           type="submit"
           disabled={isLoading}
-          className="bg-[#FF0404] md:my-[2vw!important] my-[4vw!important] w-full flex justify-center items-center md:py-[0.7vw] py-[2vw] h-[fit-content] md:rounded-[0.3vw] rounded-[2vw] gap-[0.5vw] hover:bg-[#ef4545] transition-all duration-300 disabled:bg-[#fa6767]"
+          className="bg-[#FF0404] mt-6 w-full flex justify-center items-center md:py-[0.7vw] py-[2vw] h-[fit-content] md:rounded-[0.3vw] rounded-[2vw] gap-[0.5vw] hover:bg-[#ef4545] transition-all duration-300 disabled:bg-[#fa6767]"
         >
           {isLoading ? (
             <div className="flex items-center justify-center gap-2">
