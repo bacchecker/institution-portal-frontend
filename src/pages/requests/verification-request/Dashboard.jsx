@@ -570,14 +570,14 @@ export default function Dashboard() {
           <div className="flex flex-col justify-center bg-purple-200 rounded-md px-8 py-6">
             <div className="w-full flex justify-end mb-2">
               <div className="flex items-center space-x-2 text-green-600 bg-green-100 border border-green-600 rounded-full px-4 py-1">
-                <p>
-                {currentPackage && currentPackage !== 'No Package' 
-                  ? currentPackage.split(' ').pop() === 'Package' 
-                    ? currentPackage 
+              <p>
+                {typeof currentPackage === 'string' && currentPackage !== 'No Package'
+                  ? currentPackage.split(' ').pop() === 'Package'
+                    ? currentPackage
                     : `${currentPackage} Package`
-                  : 'No Package'
-                }
-                </p>
+                  : 'No Package'}
+              </p>
+
                 <FaCrown size={20} className="text-yellow-400"/>
               </div>
             </div>
