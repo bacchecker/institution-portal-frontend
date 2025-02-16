@@ -919,9 +919,8 @@ export default function ValidationRequest() {
                 }
               );
 
-              // Use the updated status from the response
               if (res?.data?.status === "processing") {
-                await fetchRequestAnswers(data?.id); // Fetch answers only after the status is confirmed updated
+                await fetchRequestAnswers(data?.id);
               }
 
               setData(res?.data);

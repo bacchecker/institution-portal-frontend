@@ -7,7 +7,7 @@ import {
   FaCrown,
   FaRegCircleCheck,
 } from "react-icons/fa6";
-import { FaFilePdf } from "react-icons/fa";
+import { RiAddBoxFill, RiAlarmWarningFill } from "react-icons/ri";
 import { HiMiniUsers } from "react-icons/hi2";
 import { IoIosStar, IoMdTrendingUp } from "react-icons/io";
 import moment from "moment";
@@ -22,6 +22,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import Modal from "@/components/Modal";
+import SideModal from "@/components/SideModal";
 import { fetchSubscription } from "../../subscription/fetchSubscription";
 import LoadItems from "@/components/LoadItems";
 import { toast } from "sonner";
@@ -32,6 +33,7 @@ export default function Dashboard() {
   const [sentRequest, setSentRequest] = useState(0);
   const [subscription, setSubscription] = useState("");
   const [currentPackage, setCurrentPackage] = useState("");
+  const [creditValue, setCreditValue] = useState(0);
   const [tab, setTab] = useState("day");
   const [plans, setPlans] = useState([]);
   const [data, setData] = useState([]);
@@ -40,6 +42,7 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [openDrawer, setOpenDrawer] = useState(false);
   const [openSubDrawer, setOpenSubDrawer] = useState(false);
+  const [openTopUpDrawer, setOpenTopUpDrawer] = useState(false);
   const [openPaymentDrawer, setOpenPaymentDrawer] = useState(false);
   // Payment States
   const [selectedPayment, setSelectedPayment] = useState("card");
@@ -51,6 +54,8 @@ export default function Dashboard() {
     cvv: "",
     mobileMoneyNumber: "",
     mobileNetwork: "",
+    numberOfCredits: 0,
+    bonus_amount: 0,
   });
   const [isSaving, setIsSaving] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -240,18 +245,29 @@ export default function Dashboard() {
                   <p>{plan?.total_credit} Total Credits</p>
                 </div>
               </div>
-              <button
-                type="button"
-                onClick={() => {
-                  setPaymentData(plan);
+              {currentPackage == plan?.name ? (
+                <div className="border border-bChkRed rounded-md text-xs p-2 text-gray-700 font-medium">
+                  <div className="flex space-x-2 items-center text-xs">
+                    <RiAlarmWarningFill />
+                    Note
+                  </div>
+                  You are subscribed to this package, you cannot choose the same plan
+                </div>
+              ):(
+                <button
+                  type="button"
+                  onClick={() => {
+                    setPaymentData(plan);
 
-                  setOpenPaymentDrawer(true);
-                  setOpenSubDrawer(false);
-                }}
-                className="w-full hover:text-white text-gray-500 hover:bg-gray-500 bg-gray-300 rounded-md mt-6 py-2 text-xs"
-              >
-                Choose Plan
-              </button>
+                    setOpenPaymentDrawer(true);
+                    setOpenSubDrawer(false);
+                  }}
+                  className="w-full hover:text-white text-gray-500 hover:bg-gray-500 bg-gray-300 rounded-md mt-6 py-2 text-xs"
+                >
+                  Choose Plan
+                </button>
+              )}
+              
             </div>
           ))}
         </div>
@@ -287,7 +303,12 @@ export default function Dashboard() {
         setSentRequest(response.data.sent_requests);
         setReceivedRequest(response.data.received_requests);
         setSubscription(response.data.subscription);
-        setCurrentPackage(response.data.current_package);
+        const currentPackage = typeof response.data.current_package === 'string'
+          ? response.data.current_package
+          : response.data.current_package?.name;
+
+        setCurrentPackage(currentPackage);
+        setCreditValue(response.data.current_package?.topup_credit_value);
         const resData = response.data.results;
         if (tab === "day") {
           setData(
@@ -308,7 +329,7 @@ export default function Dashboard() {
         } else if (tab === "month") {
           setData(
             resData.month.map((item) => ({
-              name: moment(item.month, "YYYY-MM").format("MMM"), // Parse "YYYY-MM" and format to "MMM"
+              name: moment(item.month, "YYYY-MM").format("MMM"),
               Receiving: item.receiving,
               Sending: item.sending,
             }))
@@ -359,6 +380,23 @@ export default function Dashboard() {
     fetchPlans();
   }, []);
 
+  const handleCreditChange = (e) => {
+    const { name, value } = e.target;
+    
+    // Ensure that only numbers are entered for credits
+    if (name === 'numberOfCredits' && !/^\d*$/.test(value)) {
+      return; // Prevent non-numeric input
+    }
+  
+    setPaymentDetails((prevDetails) => ({
+      ...prevDetails,
+      [name]: value,
+      ...(name === 'numberOfCredits' && {
+        amount: value ? value * creditValue : 0, // Multiply credits by creditValue
+      }),
+    }));
+  };
+
   const handleFormSubmit = async (e) => {
     e.preventDefault();
     setIsSaving(true);
@@ -404,6 +442,53 @@ export default function Dashboard() {
     }
   };
 
+  const handleTopupSubmit = async (e) => {
+    e.preventDefault();
+    setIsSaving(true);
+    if (selectedPayment === "card") {
+      if (!paymentDetails.cardNumber) {
+        toast.error("Card details are required.");
+        setIsSaving(false);
+        return;
+      }
+    }
+
+    if (selectedPayment === "mobile_money") {
+      if (!paymentDetails.mobileNetwork || !paymentDetails.mobileNumber) {
+        toast.error("Mobile money details are required.");
+        setIsSaving(false);
+        return;
+      }
+    }
+    const payload = {
+      subscription_plan_id: paymentData?.id,
+      channel: selectedPayment,
+      payment_type: "subscription-top-up",
+      amount: paymentDetails?.amount,
+      bonus_amount: paymentDetails?.bonus_amount,
+      credit_amount: paymentDetails?.numberOfCredits,
+      ...(selectedPayment === "card" && {
+        payment_method: 'VISA',
+        payment_detail: paymentDetails.cardNumber,
+      }),
+      ...(selectedPayment === "mobile_money" && {
+        payment_method: paymentDetails.mobileNetwork,
+        payment_detail: paymentDetails.mobileNumber,
+      }),
+    };
+
+    try {
+      const response = await axios.post("/payments/initiate", payload);
+      if (response.data.status == "success") {
+        window.location.href = response?.data?.authorization_url;
+      }
+      setIsSaving(false);
+    } catch (error) {
+      console.error("Error:", error.response?.data || error.message);
+      setIsSaving(false);
+    }
+  };
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setPaymentDetails((prevDetails) => ({
@@ -415,6 +500,34 @@ export default function Dashboard() {
   return (
     <>
       <div className="bg-white text-sm w-full">
+        <div className="w- full justify-end flex space-x-2 pr-2">
+          <button
+            type="button"
+            onClick={() => {
+              setOpenSubDrawer(true);
+            }}
+            className="bg-black flex space-x-1 items-center rounded-md px-3 py-1 uppercase text-sm text-white"
+          >
+            <GiUpgrade size={16}/>
+            <p>
+              {currentPackage == "No Package" ? "Subscribe to a Package" : "Upgrade Package"}
+            </p>
+
+          </button>
+          {currentPackage != "No Package" &&(
+            <button
+              type="button"
+              onClick={() => {
+                setOpenTopUpDrawer(true);
+              }}
+              className="bg-bChkRed flex space-x-1 items-center rounded-md px-3 py-1 uppercase text-sm text-white"
+            >
+              <RiAddBoxFill size={21}/>
+              <p>Top Up Credits</p>
+            </button>
+          )}
+          
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 text-black gap-2 lg:gap-4 p-2">
           <div className="flex flex-col justify-center bg-yellow-100 rounded-md p-8">
             <div className="flex space-x-4">
@@ -458,9 +571,12 @@ export default function Dashboard() {
             <div className="w-full flex justify-end mb-2">
               <div className="flex items-center space-x-2 text-green-600 bg-green-100 border border-green-600 rounded-full px-4 py-1">
                 <p>
-                  {currentPackage.split(' ').pop() === 'Package' 
+                {currentPackage && currentPackage !== 'No Package' 
+                  ? currentPackage.split(' ').pop() === 'Package' 
                     ? currentPackage 
-                    : `${currentPackage} Package`}
+                    : `${currentPackage} Package`
+                  : 'No Package'
+                }
                 </p>
                 <FaCrown size={20} className="text-yellow-400"/>
               </div>
@@ -478,18 +594,8 @@ export default function Dashboard() {
                   <p className="text-black text-xl font-semibold">
                     {subscription?.balance || 0} Credits
                   </p>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setOpenSubDrawer(true);
-                    }}
-                    className="bg-black flex space-x-1 items-center rounded-xl px-2 py-1 uppercase text-xs text-white"
-                  >
-                    <GiUpgrade />
-                    <p>Upgrade</p>
-
-                  </button>
                 </div>
+                
               </div>
             </div>
           </div>
@@ -631,7 +737,7 @@ export default function Dashboard() {
         <Modal
           isOpen={openDrawer}
           setIsOpen={setOpenDrawer}
-          classNames="w-[98vw] md:w-[80vw] xl:w-[60vw] z-10 rounded-md"
+          classNames="w-[98vw] md:w-[80vw] xl:w-[70vw] z-10 rounded-md"
         >
           <div className="h-full flex flex-col relative">
             <div className="w-full mx-auto p-2 rounded-md flex-1 overflow-y-auto">
@@ -698,7 +804,7 @@ export default function Dashboard() {
         <Modal
           isOpen={openSubDrawer}
           setIsOpen={setOpenSubDrawer}
-          classNames="w-[98vw] md:w-[80vw] xl:w-[60vw] z-10 rounded-md"
+          classNames="w-[98vw] md:w-[80vw] xl:w-[70vw] z-10 rounded-md"
         >
           <div className="h-full flex flex-col relative p-4 text-black">
             <div className="w-full flex justify-end">
@@ -720,7 +826,7 @@ export default function Dashboard() {
               </p>
             </div>
             {loading ? (
-              <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 lg:gap-5 mt-4 lg:mt-8">
+              <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 lg:gap-5 mt-4 lg:mt-6">
                 {[...Array(3)].map((_, index) => (
                   <div
                     key={index}
@@ -787,7 +893,7 @@ export default function Dashboard() {
                         {plan?.description}
                       </p>
                     </div>
-                    <div className="flex flex-col space-y-1 mt-4 text-xs">
+                    <div className="flex flex-col space-y-1 mt-2 text-xs">
                       <p className="font-semibold">Package Benefits</p>
                       <div className="flex space-x-1.5 text-xs">
                         <IoIosStar className="text-yellow-500" />
@@ -806,7 +912,16 @@ export default function Dashboard() {
                         <p>{plan?.total_credit} Total Credits</p>
                       </div>
                     </div>
-                    <button
+                    {currentPackage == plan?.name ? (
+                      <div className="border border-bChkRed rounded-md text-xs p-2 text-gray-700 font-medium">
+                        <div className="flex space-x-1 text-sm text-bChkRed font-semibold">
+                          <RiAlarmWarningFill size={16}/>
+                          <p className="self">Notice</p>
+                        </div>
+                        You are subscribed to this package, you cannot choose the same plan
+                      </div>
+                    ):(
+                      <button
                       type="button"
                       onClick={() => {
                         setPaymentData(plan);
@@ -817,6 +932,10 @@ export default function Dashboard() {
                     >
                       Choose Plan
                     </button>
+                    )
+
+                    }
+                    
                   </div>
                 ))}
               </div>
@@ -866,6 +985,230 @@ export default function Dashboard() {
             </div>
           </div>
         </Modal>
+        <SideModal
+          title={"Top Up Subscription Credits"}
+          setOpenModal={setOpenTopUpDrawer}
+          openModal={openTopUpDrawer}
+          classNames="w-[98vw] md:w-[80vw] xl:w-[60vw] z-10 rounded-md"
+        >
+          <div className="h-full flex flex-col relative p-4 text-black">
+            
+            <form
+              onSubmit={handleTopupSubmit}
+              className="relative space-y-4 h-[85dvh] text-sm"
+            >
+              <div className="flex flex-col font-semibold py-2">
+                <div className="">
+                  <h4 className="md:text-[1vw] text-[4vw] mb-1">
+                    Number of Credits
+                  </h4>
+                  <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
+                    <input
+                      type="number"
+                      name="numberOfCredits"
+                      value={paymentDetails.numberOfCredits}
+                      onChange={handleCreditChange}
+                      className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-white absolute left-0 right-0 bottom-0 top-0"
+                    />
+                  </div>
+                </div>
+                <div className=" mt-4">
+                  <h4 className="md:text-[1vw] text-[4vw]">
+                    Bonus Credits
+                  </h4>
+                  <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
+                    <input
+                      type="text"
+                      readOnly
+                      value={paymentDetails.bonus_amount}
+                      className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0 read-only:bg-[#d8d8d8]"
+                    />
+                  </div>
+                </div>
+                <div className=" mt-4">
+                  <h4 className="md:text-[1vw] text-[4vw]">
+                    Amount to be Paid
+                  </h4>
+                  <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
+                    <input
+                      type="text"
+                      readOnly
+                      value={paymentDetails.amount}
+                      className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0 read-only:bg-[#d8d8d8]"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex flex-row space-x-4 mt-4">
+                  <div className="flex items-center">
+                    <input
+                      id="card-option"
+                      type="radio"
+                      name="payment"
+                      value="card"
+                      checked={selectedPayment === "card"}
+                      onChange={() => setSelectedPayment("card")}
+                      className="w-5 h-5 bg-gray-100 border-gray-300"
+                    />
+                    <label
+                      for="card-option"
+                      className="ms-2 text-base font-medium text-gray-900 dark:text-gray-300"
+                    >
+                      Debit Card
+                    </label>
+                  </div>
+
+                  <div className="flex items-center">
+                    <input
+                      id="mobile-money-option"
+                      type="radio"
+                      name="payment"
+                      value="mobile_money"
+                      checked={selectedPayment === "mobile_money"}
+                      onChange={() => setSelectedPayment("mobile_money")}
+                      className="w-5 h-5 bg-gray-100 border-gray-300"
+                    />
+                    <label
+                      for="mobile-money-option"
+                      className="ms-2 text-base font-medium text-gray-900 dark:text-gray-300"
+                    >
+                      Mobile Wallet
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              {/* Additional Fields for Card Payment */}
+              {selectedPayment === "card" && (
+                <div className="">
+                  <div className="mb-4">
+                    <h4 className="md:text-[1vw] text-[4vw] mb-1">
+                      Card Number
+                    </h4>
+                    <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
+                      <input
+                        type="text"
+                        name="cardNumber"
+                        value={paymentDetails.cardNumber}
+                        onChange={handleInputChange}
+                        className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-white absolute left-0 right-0 bottom-0 top-0"
+                      />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    {/* <div className="">
+                      <h4 className="md:text-[1vw] text-[4vw] mb-1">
+                        First Name
+                      </h4>
+                      <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
+                        <input
+                          type="text"
+                          name="firstName"
+                          value={paymentDetails.firstName}
+                          onChange={handleInputChange}
+                          className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-white absolute left-0 right-0 bottom-0 top-0"
+                        />
+                      </div>
+                    </div>
+                    <div className="">
+                      <h4 className="md:text-[1vw] text-[4vw] mb-1">
+                        Last Name
+                      </h4>
+                      <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
+                        <input
+                          type="text"
+                          name="lastName"
+                          value={paymentDetails.lastName}
+                          onChange={handleInputChange}
+                          className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-white absolute left-0 right-0 bottom-0 top-0"
+                        />
+                      </div>
+                    </div> */}
+                    <div className="">
+                      <h4 className="md:text-[1vw] text-[4vw] mb-1">
+                        Expiration Date
+                      </h4>
+                      <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
+                        <input
+                          type="text"
+                          name="expirationDate"
+                          value={paymentDetails.expirationDate}
+                          onChange={handleInputChange}
+                          className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-white absolute left-0 right-0 bottom-0 top-0"
+                        />
+                      </div>
+                    </div>
+                    <div className="">
+                      <h4 className="md:text-[1vw] text-[4vw] mb-1">CVV</h4>
+                      <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
+                        <input
+                          type="text"
+                          name="cvv"
+                          value={paymentDetails.cvv}
+                          onChange={handleInputChange}
+                          className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-white absolute left-0 right-0 bottom-0 top-0"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Additional Fields for Mobile Money */}
+              {selectedPayment === "mobile_money" && (
+                <div className="space-y-6">
+                  <div className="mt-4">
+                    <h4 className="md:text-[1vw] text-[4vw] mb-1">
+                      Mobile Network
+                    </h4>
+                    <select
+                      name="mobileNetwork"
+                      value={paymentDetails.mobileNetwork}
+                      onChange={handleInputChange}
+                      className="w-full border border-gray-300 px-3 py-2 text-sm rounded-md focus:outline-none"
+                    >
+                      <option value="">Select Mobile Network</option>
+                      <option value="MTN">MTN</option>
+                      <option value="Telecel">Telecel</option>
+                    </select>
+                  </div>
+
+                  <div className="md:mt-[2vw] mt-[10vw]">
+                    <h4 className="md:text-[1vw] text-[4vw] mb-1">
+                      Mobile Number
+                    </h4>
+                    <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
+                      <input
+                        type="text"
+                        name="mobileNumber"
+                        value={paymentDetails.mobileNumber}
+                        onChange={handleInputChange}
+                        className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-white absolute left-0 right-0 bottom-0 top-0"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div className="w-full absolute flex items-center space-x-2 justify-between pt-2 text-sm bottom-0">
+               
+                <button
+                  type="submit"
+                  className="w-full bg-bChkRed text-white py-2 rounded-md hover:bg-red-700"
+                >
+                  {isSaving ? (
+                    <div className="flex items-center justify-center gap-2">
+                      <LoadItems color={"#ffffff"} size={15} />
+                      <h4 className=" text-[#ffffff]">Completing...</h4>
+                    </div>
+                  ) : (
+                    <h4 className=" text-[#ffffff]">Complete Top-up</h4>
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </SideModal>
         <Modal
           title="Payment Details"
           isOpen={openPaymentDrawer}
@@ -878,32 +1221,6 @@ export default function Dashboard() {
               className="relative space-y-4 h-full text-sm"
             >
               <div className="flex flex-col font-semibold py-2">
-                {/* <div className="text-sm border-2 border-green-600 rounded-md p-4">
-                    <div className="flex items-center justify-between space-x-2 ">
-                        <div className="flex space-x-3 items-center text-green-700">
-                        <FaRegCircleCheck size={24}/>
-                        <div className="text-lg">
-                            <p>{paymentData?.name}</p>
-                        </div>
-                        </div>
-                        <div className="text-lg"><span className="text-sm font-normal">GH₵ </span>{paymentData?.amount}</div>
-                    </div>
-                    <div className="flex space-x-2 mt-4 justify-end">
-                        <div className="flex space-x-1 text-xs">
-                            <IoIosStar className="text-yellow-500" />
-                            <p>{paymentData?.credit} Credits</p>
-                        </div>
-                        <div className="flex space-x-1 text-xs">
-                            <IoIosStar className="text-yellow-500" />
-                            <p>{paymentData?.bonus} Bonus</p>
-                        </div>
-                        <div className="flex space-x-1 text-xs">
-                            <IoIosStar className="text-yellow-500" />
-                            <p>{paymentData?.total_credit} Total Credit</p>
-                        </div>
-                    </div>
-                
-                </div> */}
                 <div className="">
                   <p className="font-semibold text-black text-base">
                     Add a billing method
