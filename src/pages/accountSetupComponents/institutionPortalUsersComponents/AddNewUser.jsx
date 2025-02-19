@@ -7,7 +7,9 @@ import {
   useCreateInstitutionUserMutation,
 } from "../../../redux/apiSlice";
 import LoadItems from "@/components/LoadItems";
+import axios from "@/utils/axiosConfig";
 import { toast } from "sonner";
+import axiosRaw from 'axios'
 
 function AddNewUser({
   setOpenModal,
@@ -26,18 +28,44 @@ function AddNewUser({
     address: "",
   };
   const [userInput, setUserInput] = useState(initialUserInput);
-  const [selectedGender, setSelectedGender] = useState("");
   const [selectedDepartment, setSelectedDepartment] = useState({});
   const [groupedPermissions, setGroupedPermissions] = useState({});
   const [selectedPermissions, setSelectedPermissions] = useState([]);
-  const data = [
-    { title: "Male", value: "male" },
-    { title: "Female", value: "female" },
-  ];
+  const [countryCodes, setCountryCodes] = useState([]);
+  const [selectedCode, setSelectedCode] = useState("233");
 
-  const handleSeletedGender = (item) => {
-    setSelectedGender(item);
-  };
+  useEffect(() => {
+    // Fetch country codes
+    axios
+      .get("https://restcountries.com/v3.1/all?fields=cca2,idd,name")
+      .then((res) => {
+        const codes = res.data
+          .map((country) => ({
+            name: country.name.common,
+            code: `+${(country.idd?.root?.replace("+", "") || "")}${country.idd?.suffixes?.[0] || ""}`,
+            cca2: country.cca2,
+          }))
+          .filter((c) => c.code !== "+")
+          .sort((a, b) => a.name.localeCompare(b.name));
+
+        setCountryCodes(codes);
+
+        // ✅ Get the user's country from IP and set default country code
+        axiosRaw.get("https://ip-api.com/json")
+          .then((response) => {
+            const userCountryCode = response.data.countryCode;
+            console.log(userCountryCode);
+            
+            const matchedCountry = codes.find((c) => c.cca2 === userCountryCode);
+
+            if (matchedCountry) {
+              setSelectedCode(matchedCountry.code); // Set detected country code
+            }
+          })
+          .catch((err) => console.error("Error fetching user location:", err));
+      })
+      .catch((err) => console.error("Error fetching country codes:", err));
+  }, []);
 
   const handleSeletedDepartment = (item) => {
     setSelectedDepartment(item);
@@ -128,7 +156,7 @@ function AddNewUser({
           last_name,
           other_name,
           email,
-          phone,
+          phone: `${selectedCode}${phone}`,
           job_title,
           department_id: selectedDepartment?.id,
           permissions: selectedPermissions,
@@ -254,18 +282,34 @@ function AddNewUser({
             <h4 className="md:text-[1vw] text-[4vw] mb-1">
               Phone<span className="text-[#f1416c]">*</span>
             </h4>
-            <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
+            <div className="relative w-full md:h-[2.7vw] h-[12vw] flex items-center border-[1.5px] border-[#E5E5E5] overflow-hidden bg-[#f7f7f7]">
+              {/* Country Code Selector */}
+              <select
+              className="px-1 md:h-[2.7vw] h-[12vw] w-2/5 md:text-[1vw] text-[3.5vw] bg-white border-r border-gray-300 focus:outline-none"
+              value={selectedCode}
+              onChange={(e) => setSelectedCode(e.target.value)}
+            >
+              {countryCodes.map((country) => (
+                <option key={country.cca2} value={country.code}>
+                  {country.name} ({country.code})
+                </option>
+              ))}
+            </select>
+
+
+              {/* Phone Number Input */}
               <input
                 type="text"
                 name="phone"
                 value={userInput.phone}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  if (/^\d{0,20}(\.\d{0,20})?$/.test(value)) {
-                    handleUserInput(e);
-                  }
-                }}
-                className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0"
+                onChange={(e) =>
+                  setUserInput((prev) => ({
+                    ...prev,
+                    phone: e.target.value,
+                  }))
+                }
+                className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-transparent"
+                placeholder="Enter phone number"
               />
             </div>
           </div>

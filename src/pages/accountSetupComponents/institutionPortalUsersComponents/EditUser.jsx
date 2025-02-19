@@ -6,6 +6,7 @@ import { useUpdateUserMutation } from "../../../redux/apiSlice";
 import LoadItems from "@/components/LoadItems";
 import { toast } from "sonner";
 import PropTypes from "prop-types";
+import axios from "@/utils/axiosConfig";
 
 function EditUser({
   setOpenModal,
@@ -21,11 +22,54 @@ function EditUser({
   const [selectedDepartment, setSelectedDepartment] = useState({});
   const [groupedPermissions, setGroupedPermissions] = useState({});
   const [selectedPermissions, setSelectedPermissions] = useState([]);
+  const [countryCodes, setCountryCodes] = useState([]);
+  const [selectedCode, setSelectedCode] = useState("+233");
   const data = [
     { title: "Male", value: "male" },
     { title: "Female", value: "female" },
   ];
 
+  useEffect(() => {
+    // Fetch country codes
+    axios
+      .get("https://restcountries.com/v3.1/all?fields=cca2,idd,name")
+      .then((res) => {
+        const codes = res.data
+          .map((country) => ({
+            name: country.name.common,
+            code: `+${country.idd?.root?.replace("+", "") || ""}${country.idd?.suffixes?.[0] || ""}`,
+            cca2: country.cca2,
+          }))
+          .filter((c) => c.code !== "+") // Remove invalid entries
+          .sort((a, b) => a.name.localeCompare(b.name)); // Sort alphabetically
+        setCountryCodes(codes);
+          console.log(codes);
+          
+        if (selectedUser?.phone) {
+          const foundCode = codes.find((c) => selectedUser.phone.startsWith(c.code));
+          
+          if (foundCode) {
+            setSelectedCode(foundCode.code); // Set country code
+            setUserInput((prev) => ({
+              ...prev,
+              phone: selectedUser.phone.replace(foundCode.code, ""), // Remove code from phone
+            }));
+          } else {
+            setUserInput((prev) => ({
+              ...prev,
+              phone: selectedUser.phone, // Keep the original if no match
+            }));
+          }
+        } else {
+          // Default to Ghana if no existing user
+          const ghana = codes.find((c) => c.cca2 === "GH");
+          if (ghana) {
+            setSelectedCode(ghana.code);
+          }
+        }
+      })
+      .catch((err) => console.error("Error fetching country codes:", err));
+  }, [selectedUser]);
   useEffect(() => {
     if (selectedUser) {
       setUserInput(selectedUser);
@@ -157,7 +201,7 @@ function EditUser({
               last_name,
               other_name,
               email,
-              phone,
+              phone: `${selectedCode}${phone}`,
               job_title,
               department_id: selectedDepartment?.id,
               permissions: selectedPermissions,
@@ -309,19 +353,33 @@ function EditUser({
             <h4 className="md:text-[1vw] text-[4vw] mb-1">
               Phone<span className="text-[#f1416c]">*</span>
             </h4>
-            <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
+            <div className="relative w-full md:h-[2.7vw] h-[12vw] flex items-center border-[1.5px] border-[#E5E5E5] overflow-hidden bg-[#f7f7f7]">
+              
+              {/* Country Code Selector */}
+              <select
+                className="px-1 md:h-[2.7vw] h-[12vw] w-2/5 md:text-[1vw] text-[3.5vw] bg-white border-r border-gray-300 focus:outline-none"
+                value={selectedCode}
+                onChange={(e) => setSelectedCode(e.target.value)}
+              >
+                {countryCodes.map((country) => (
+                  <option key={country.cca2} value={country.code}>
+                    {country.name} ({country.code})
+                  </option>
+                ))}
+              </select>
+
               <input
-                disabled
                 type="text"
                 name="phone"
                 value={userInput.phone}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  if (/^\d{0,20}(\.\d{0,20})?$/.test(value)) {
-                    handleUserInput(e);
-                  }
-                }}
-                className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0"
+                onChange={(e) =>
+                  setUserInput((prev) => ({
+                    ...prev,
+                    phone: e.target.value,
+                  }))
+                }
+                className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-transparent"
+                placeholder="Enter phone number"
               />
             </div>
           </div>
