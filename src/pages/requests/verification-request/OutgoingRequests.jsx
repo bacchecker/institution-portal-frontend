@@ -26,21 +26,15 @@ import ConfirmModal from "@/components/confirm-modal";
 import DeleteModal from "@/components/DeleteModal";
 import { toast } from "sonner";
 import {
-  FaChevronLeft,
-  FaChevronRight,
   FaDownload,
-  FaHeart,
   FaPlus,
-  FaRegCircleCheck,
 } from "react-icons/fa6";
-import { IoDocuments } from "react-icons/io5";
-import { PiQueueFill } from "react-icons/pi";
-import { FcCancel } from "react-icons/fc";
-import { GiCancel } from "react-icons/gi";
 import { MdOutlineFilterAlt, MdOutlineFilterAltOff } from "react-icons/md";
 import secureLocalStorage from "react-secure-storage";
 import AddRequest from "./AddRequest";
 import PermissionWrapper from "../../../components/permissions/PermissionWrapper";
+import { FaFilePdf } from "react-icons/fa";
+import { IoIosOpen } from "react-icons/io";
 
 export default function OutgoingRequests() {
   const changeStatusDisclosure = useDisclosure();
@@ -49,6 +43,7 @@ export default function OutgoingRequests() {
   const [bulkDownloadLoading, setBulkDownloadLoading] = useState(false);
   const [openDrawer, setOpenDrawer] = useState(false);
   const [openAddDrawer, setOpenAddDrawer] = useState(false);
+  const [isFetching, setIsFetching] = useState(false);
   const [processing, setProcessing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [data, setData] = useState(null);
@@ -68,6 +63,9 @@ export default function OutgoingRequests() {
   const [approved, setApproved] = useState(0);
   const [status, setStatus] = useState(null);
   const [institutionId, setInstitutionId] = useState(null);
+  const [verificationReport, setVerificationReport] = useState("");
+  const [requestLetter, setRequestLetter] = useState("");
+  const [authLetter, setAuthLetter] = useState("");
   const [filters, setFilters] = useState({
     search_query: "",
     status: null,
@@ -91,6 +89,30 @@ export default function OutgoingRequests() {
       [itemId]: value,
     }));
   };
+
+  useEffect(() => {
+    if (!data?.id) return;
+    setIsFetching(true)
+    const fetchReports = async () => {
+      try {
+        const [response, authLetter, reqLetter] = await Promise.all([
+          axios.get(`/pdf/verification-report/${data.id}`, { responseType: "blob" }),
+          axios.get(`/pdf/authorization-letter/${data.id}`, { responseType: "blob" }),
+          axios.get(`/pdf/request-letter/${data.id}`, { responseType: "blob" }),
+        ]);
+  
+        setVerificationReport(URL.createObjectURL(response.data));
+        setAuthLetter(URL.createObjectURL(authLetter.data));
+        setRequestLetter(URL.createObjectURL(reqLetter.data));
+        setIsFetching(false)
+      } catch (error) {
+        console.error("Error fetching reports:", error);
+        setIsFetching(false)
+      }
+    };
+  
+    fetchReports();
+  }, [data?.id]); 
 
   const institutionVerificationRequests = async () => {
     setIsLoading(true);
@@ -704,6 +726,83 @@ export default function OutgoingRequests() {
                         </div>
                     </div>
                     </div>
+                </section>
+                <section className="flex flex-col mt-2">
+                  <p className="uppercase font-semibold py-2 text-bChkRed">Verification Request Letters</p>
+
+                  <div className="grid grid-cols-2 gap-2">
+                    {/* Show Loading Spinner */}
+                    {isFetching ? (
+                      <div className="flex justify-center items-center col-span-2">
+                        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-gray-900"></div>
+                      </div>
+                    ) : (
+                      <>
+                        {/* Display Reports if available */}
+                        {authLetter && (
+                          <div className="gap-3 p-2 rounded-lg border">
+                            <div className="w-full flex space-x-2 items-center">
+                              <FaFilePdf size={36} className="text-bChkRed" />
+                              <div className="flex flex-col space-y-1">
+                                <p>Authorization Letter</p>
+                                <div
+                                  className="flex space-x-1 items-center cursor-pointer py-1 px-2 rounded-md bg-primary text-white text-xs w-20"
+                                  onClick={() => window.open(authLetter, "_blank")}
+                                >
+                                  <IoIosOpen size={16} />
+                                  <p>Open</p>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {requestLetter && (
+                          <div className="gap-3 p-2 rounded-lg border">
+                            <div className="w-full flex space-x-2 items-center">
+                              <FaFilePdf size={36} className="text-bChkRed" />
+                              <div className="flex flex-col space-y-1">
+                                <p>Request Letter</p>
+                                <div
+                                  className="flex space-x-1 items-center cursor-pointer py-1 px-2 rounded-md bg-primary text-white text-xs w-20"
+                                  onClick={() => window.open(requestLetter, "_blank")}
+                                >
+                                  <IoIosOpen size={16} />
+                                  <p>Open</p>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {verificationReport && (
+                          <div className="gap-3 p-2 rounded-lg border">
+                            <div className="w-full flex space-x-2 items-center">
+                              <FaFilePdf size={36} className="text-bChkRed" />
+                              <div className="flex flex-col space-y-1">
+                                <p>Verification Report</p>
+                                <div
+                                  className="flex space-x-1 items-center cursor-pointer py-1 px-2 rounded-md bg-primary text-white text-xs w-20"
+                                  onClick={() => window.open(verificationReport, "_blank")}
+                                >
+                                  <IoIosOpen size={16} />
+                                  <p>Open</p>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* No Reports Found Message */}
+                        {!authLetter && !requestLetter && !verificationReport && (
+                          <div className="col-span-2 text-center text-gray-500 text-sm py-4">
+                            No reports found.
+                          </div>
+                        )}
+                      </>
+                    )}
+                  </div>
+
                 </section>
                 </div>
 

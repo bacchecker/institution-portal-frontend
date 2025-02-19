@@ -9,7 +9,6 @@ import {
 import LoadItems from "@/components/LoadItems";
 import axios from "@/utils/axiosConfig";
 import { toast } from "sonner";
-import axiosRaw from 'axios'
 
 function AddNewUser({
   setOpenModal,
@@ -32,37 +31,21 @@ function AddNewUser({
   const [groupedPermissions, setGroupedPermissions] = useState({});
   const [selectedPermissions, setSelectedPermissions] = useState([]);
   const [countryCodes, setCountryCodes] = useState([]);
-  const [selectedCode, setSelectedCode] = useState("233");
+  const [selectedCode, setSelectedCode] = useState("+233");
 
   useEffect(() => {
-    // Fetch country codes
     axios
       .get("https://restcountries.com/v3.1/all?fields=cca2,idd,name")
       .then((res) => {
         const codes = res.data
           .map((country) => ({
             name: country.name.common,
-            code: `+${(country.idd?.root?.replace("+", "") || "")}${country.idd?.suffixes?.[0] || ""}`,
+            code: `+${country.idd?.root?.replace("+", "") || ""}${country.idd?.suffixes?.[0] || ""}`,
             cca2: country.cca2,
           }))
           .filter((c) => c.code !== "+")
           .sort((a, b) => a.name.localeCompare(b.name));
-
         setCountryCodes(codes);
-
-        // ✅ Get the user's country from IP and set default country code
-        axiosRaw.get("https://ip-api.com/json")
-          .then((response) => {
-            const userCountryCode = response.data.countryCode;
-            console.log(userCountryCode);
-            
-            const matchedCountry = codes.find((c) => c.cca2 === userCountryCode);
-
-            if (matchedCountry) {
-              setSelectedCode(matchedCountry.code); // Set detected country code
-            }
-          })
-          .catch((err) => console.error("Error fetching user location:", err));
       })
       .catch((err) => console.error("Error fetching country codes:", err));
   }, []);

@@ -9,7 +9,7 @@ import {
 } from "react-icons/fa6";
 import { RiAddBoxFill, RiAlarmWarningFill } from "react-icons/ri";
 import { HiMiniUsers } from "react-icons/hi2";
-import { IoIosStar, IoMdTrendingUp } from "react-icons/io";
+import { IoIosArrowDroprightCircle, IoIosStar, IoMdTrendingUp } from "react-icons/io";
 import moment from "moment";
 import {
   LineChart,
@@ -348,9 +348,10 @@ export default function Dashboard() {
     const handleECheckModal = async () => {
       const subscription = await fetchSubscription();
 
-      const totalCredit = subscription?.total_credit || 0;
-
-      if (totalCredit < 1) {
+      const totalCredit = subscription?.subscription?.total_credit || 0;
+      const inRequest = subscription?.received_requests || 0;
+      
+      if (totalCredit < 1 && inRequest < 1) {
         setOpenDrawer(true);
       } else {
         setOpenDrawer(false);
@@ -500,32 +501,49 @@ export default function Dashboard() {
   return (
     <>
       <div className="bg-white text-sm w-full">
-        <div className="w- full justify-end flex space-x-2 pr-2">
+        
+        <div className="w-full flex justify-between pl-2">
           <button
             type="button"
             onClick={() => {
-              setOpenSubDrawer(true);
+              setOpenDrawer(true);
             }}
-            className="bg-black flex space-x-1 items-center rounded-md px-3 py-1 uppercase text-sm text-white"
+            className="border-2 border-gray-400 flex space-x-1 items-center rounded-full px-3 py-1 uppercase text-sm text-gray-600"
           >
-            <GiUpgrade size={16}/>
+            
             <p>
-              {currentPackage == "No Package" ? "Subscribe to a Package" : "Upgrade Package"}
+              Learn More
             </p>
-
+            <IoIosArrowDroprightCircle size={20}/>
           </button>
-          {currentPackage != "No Package" &&(
+          <div className=" flex justify-end pr-2 space-x-2">
             <button
               type="button"
               onClick={() => {
-                setOpenTopUpDrawer(true);
+                setOpenSubDrawer(true);
               }}
-              className="bg-bChkRed flex space-x-1 items-center rounded-md px-3 py-1 uppercase text-sm text-white"
+              className="bg-black flex space-x-1 items-center rounded-md px-3 py-1 uppercase text-sm text-white"
             >
-              <RiAddBoxFill size={21}/>
-              <p>Top Up Credits</p>
+              <GiUpgrade size={16}/>
+              <p>
+                {currentPackage == "No Package" ? "Subscribe to a Package" : "Upgrade Package"}
+              </p>
+
             </button>
-          )}
+            {currentPackage != "No Package" &&(
+              <button
+                type="button"
+                onClick={() => {
+                  setOpenTopUpDrawer(true);
+                }}
+                className="bg-bChkRed flex space-x-1 items-center rounded-md px-3 py-1 uppercase text-sm text-white"
+              >
+                <RiAddBoxFill size={21}/>
+                <p>Top Up Credits</p>
+              </button>
+            )}
+          </div>
+          
           
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 text-black gap-2 lg:gap-4 p-2">
@@ -739,68 +757,74 @@ export default function Dashboard() {
           setIsOpen={setOpenDrawer}
           classNames="w-[98vw] md:w-[80vw] xl:w-[70vw] z-10 rounded-md"
         >
-          <div className="h-full flex flex-col relative">
-            <div className="w-full mx-auto p-2 rounded-md flex-1 overflow-y-auto">
-              <div className="w-full rounded-lg overflow-hidden flex justify-center items-center">
-                {/* Content */}
-                <div className="w-full font-semibold text-gray-700">
-                  {pages[currentPage - 1]}
+          {/* Overlay to detect outside clicks */}
+          <div
+            className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center"
+            onClick={() => setOpenDrawer(false)} // Close modal when clicking outside
+          >
+            {/* Prevent click inside modal from closing it */}
+            <div className="h-[90vh] flex flex-col relative bg-white rounded-lg w-[98vw] md:w-[80vw] xl:w-[70vw] p-4" onClick={(e) => e.stopPropagation()}>
+              
+              {/* Modal Content */}
+              <div className="w-full mx-auto p-2 rounded-md flex-1 overflow-y-auto">
+                <div className="w-full rounded-lg overflow-hidden flex justify-center items-center">
+                  <div className="w-full font-semibold text-gray-700">
+                    {pages[currentPage - 1]}
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* Indicators and Navigation */}
-            <div className="w-full absolute bottom-0 left-0 bg-white py-4 mt-2">
-              <div className="flex justify-between items-center px-4">
-                {/* Previous Button */}
-                {currentPage - 1 == 0 && <div className=""></div>}
-                {currentPage - 1 > 0 && (
-                  <button
-                    className="bg-bChkRed text-white px-6 py-1 rounded-sm text-xs hover:bg-red-500"
-                    onClick={handlePrevious}
-                  >
-                    Previous
-                  </button>
-                )}
+              {/* Indicators and Navigation */}
+              <div className="w-full absolute bottom-0 left-0 bg-white py-4 mt-2">
+                <div className="flex justify-between items-center px-4">
+                  {/* Previous Button */}
+                  {currentPage - 1 > 0 ? (
+                    <button
+                      className="bg-bChkRed text-white px-6 py-1 rounded-sm text-xs hover:bg-red-500"
+                      onClick={handlePrevious}
+                    >
+                      Previous
+                    </button>
+                  ) : (
+                    <div></div>
+                  )}
 
-                {/* Indicators */}
-                <div className="flex space-x-2">
-                  {pages.map((_, index) => (
-                    <div
-                      key={index}
-                      className={`w-8 h-1 transition-all rounded-xl ${
-                        currentPage - 1 === index ? "bg-bChkRed" : "bg-gray-200"
-                      }`}
-                    ></div>
-                  ))}
+                  {/* Indicators */}
+                  <div className="flex space-x-2">
+                    {pages.map((_, index) => (
+                      <div
+                        key={index}
+                        className={`w-8 h-1 transition-all rounded-xl ${
+                          currentPage - 1 === index ? "bg-bChkRed" : "bg-gray-200"
+                        }`}
+                      ></div>
+                    ))}
+                  </div>
+
+                  {/* Next Button */}
+                  {currentPage - 1 < pages.length - 1 ? (
+                    <button
+                      type="button"
+                      className="bg-bChkRed text-white px-6 py-1 rounded-sm text-xs hover:bg-red-500"
+                      onClick={handleNext}
+                    >
+                      Next
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      className="bg-bChkRed text-white px-6 py-1 rounded-sm text-xs hover:bg-red-500"
+                      onClick={() => setOpenDrawer(false)}
+                    >
+                      Continue
+                    </button>
+                  )}
                 </div>
-
-                {/* Next Button */}
-                {currentPage - 1 < pages.length - 1 && (
-                  <button
-                    type="button"
-                    className="bg-bChkRed text-white px-6 py-1 rounded-sm text-xs hover:bg-red-500"
-                    onClick={handleNext}
-                  >
-                    Next
-                  </button>
-                )}
-                {/* Close Button */}
-                {currentPage - 1 === pages.length - 1 && (
-                  <button
-                    type="button"
-                    className="bg-bChkRed text-white px-6 py-1 rounded-sm text-xs hover:bg-red-500"
-                    onClick={() => {
-                      setOpenDrawer(false);
-                    }}
-                  >
-                    Continue
-                  </button>
-                )}
               </div>
             </div>
           </div>
         </Modal>
+
         <Modal
           isOpen={openSubDrawer}
           setIsOpen={setOpenSubDrawer}

@@ -43,7 +43,6 @@ function EditUser({
           .filter((c) => c.code !== "+") // Remove invalid entries
           .sort((a, b) => a.name.localeCompare(b.name)); // Sort alphabetically
         setCountryCodes(codes);
-          console.log(codes);
           
         if (selectedUser?.phone) {
           const foundCode = codes.find((c) => selectedUser.phone.startsWith(c.code));
