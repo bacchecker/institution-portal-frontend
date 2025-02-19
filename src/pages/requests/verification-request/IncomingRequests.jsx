@@ -757,7 +757,7 @@ export default function IncomingRequests() {
                       ) : (
                         <>
                           {/* Display Reports if available */}
-                          {authLetter && data?.status == "submitted" (
+                          {authLetter && (
                             <div className="gap-3 p-2 rounded-lg border">
                               <div className="w-full flex space-x-2 items-center">
                                 <FaFilePdf size={36} className="text-bChkRed" />
@@ -775,7 +775,7 @@ export default function IncomingRequests() {
                             </div>
                           )}
   
-                          {requestLetter && data?.status === "submitted" (
+                          {requestLetter && (
                             <div className="gap-3 p-2 rounded-lg border">
                               <div className="w-full flex space-x-2 items-center">
                                 <FaFilePdf size={36} className="text-bChkRed" />
@@ -793,7 +793,7 @@ export default function IncomingRequests() {
                             </div>
                           )}
   
-                          {verificationReport && data?.status == "completed"(
+                          {verificationReport && (
                             <div className="gap-3 p-2 rounded-lg border">
                               <div className="w-full flex space-x-2 items-center">
                                 <FaFilePdf size={36} className="text-bChkRed" />
