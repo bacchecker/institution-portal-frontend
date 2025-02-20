@@ -10,6 +10,7 @@ import React from "react";
 
 const ConfirmModal = ({
   title,
+  size,
   children,
   disclosure,
   onButtonClick,
@@ -20,8 +21,9 @@ const ConfirmModal = ({
       backdrop={"opaque"}
       isOpen={disclosure.isOpen}
       onClose={disclosure.onClose}
-      className="border-[1px]  w-full md:w-1/2"
-      size="md"
+      className="border-[1px]  w-full"
+      size={size}
+      radius="sm"
       motionProps={{
         variants: {
           enter: {
@@ -55,6 +57,7 @@ const ConfirmModal = ({
                 className="font-medium"
                 color="default"
                 variant="flat"
+                radius="sm"
                 onPress={onCloseModal}
               >
                 Cancel
@@ -64,6 +67,7 @@ const ConfirmModal = ({
                 className="font-medium"
                 color="success"
                 type="submit"
+                radius="sm"
                 form="form"
                 onClick={onButtonClick}
               >

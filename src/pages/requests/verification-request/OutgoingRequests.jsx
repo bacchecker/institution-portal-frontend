@@ -91,28 +91,55 @@ export default function OutgoingRequests() {
   };
 
   useEffect(() => {
-    if (!data?.id) return;
-    setIsFetching(true)
+    if (!data?.id || !data?.status) return; // Ensure ID and status exist
+  
+    setIsFetching(true);
+  
     const fetchReports = async () => {
       try {
-        const [response, authLetter, reqLetter] = await Promise.all([
-          axios.get(`/pdf/verification-report/${data.id}`, { responseType: "blob" }),
-          axios.get(`/pdf/authorization-letter/${data.id}`, { responseType: "blob" }),
-          axios.get(`/pdf/request-letter/${data.id}`, { responseType: "blob" }),
-        ]);
+        const requests = [];
   
-        setVerificationReport(URL.createObjectURL(response.data));
-        setAuthLetter(URL.createObjectURL(authLetter.data));
-        setRequestLetter(URL.createObjectURL(reqLetter.data));
-        setIsFetching(false)
+        // ✅ Fetch Request Letter (for all statuses)
+        requests.push(
+          axios.get(`/pdf/request-letter/${data.id}`, { responseType: "blob" })
+        );
+  
+        // ✅ Fetch Authorization Letter (Only if status is NOT "created" or "rejected")
+        if (!["created", "rejected"].includes(data.status)) {
+          requests.push(
+            axios.get(`/pdf/authorization-letter/${data.id}`, { responseType: "blob" })
+          );
+        } else {
+          requests.push(Promise.resolve(null)); // Placeholder to maintain order
+        }
+  
+        // ✅ Fetch Verification Report (Only if status is "completed")
+        if (data.status === "completed") {
+          requests.push(
+            axios.get(`/pdf/verification-report/${data.id}`, { responseType: "blob" })
+          );
+        } else {
+          requests.push(Promise.resolve(null)); // Placeholder to maintain order
+        }
+  
+        // Execute all API requests
+        const [reqLetter, authLetter, verificationReport] = await Promise.all(requests);
+  
+        // Convert blobs to URLs only if response is valid
+        setRequestLetter(reqLetter ? URL.createObjectURL(reqLetter.data) : null);
+        setAuthLetter(authLetter ? URL.createObjectURL(authLetter.data) : null);
+        setVerificationReport(verificationReport ? URL.createObjectURL(verificationReport.data) : null);
+  
+        setIsFetching(false);
       } catch (error) {
+        setIsFetching(false);
         console.error("Error fetching reports:", error);
-        setIsFetching(false)
       }
     };
   
     fetchReports();
-  }, [data?.id]); 
+  }, [data?.id, data?.status]); // ✅ Runs when `data.id` or `data.status` changes
+   
 
   const institutionVerificationRequests = async () => {
     setIsLoading(true);
@@ -167,83 +194,9 @@ export default function OutgoingRequests() {
     fetchInstitutionDocs();
   }, []);
 
-  /* useEffect(() => {
-    const fetchPercentage = async () => {
-      try {
-        const response = await axios.get("/institution/requests/monthly-percentage");
-        
-      } catch (error) {
-        console.error(error);
-      }
-    };
-    fetchPercentage();
-  }, []); */
-
   useEffect(() => {
     institutionVerificationRequests();
   }, [submittedFilters, currentPage, sortBy, sortOrder]);
-
-  const downloadFile = async (fileName) => {
-    try {
-      const response = await axios.get(`/download-pdf/`, {
-        responseType: "blob",
-      });
-
-      // Create a temporary link to download the file
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute("download", fileName);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    } catch (error) {
-      console.error("Error downloading the file", error);
-      toast.error(error.response.data.message);
-    }
-  };
-
-  const handleBulkDownload = async (filePaths) => {
-    try {
-      const csrfTokenMeta = document?.querySelector('meta[name="csrf-token"]');
-      const csrfToken = csrfTokenMeta?.getAttribute("content");
-
-      const headers = {
-        "Content-Type": "application/json",
-      };
-
-      // Only add X-CSRF-TOKEN if the token exists
-      if (csrfToken) {
-        headers["X-CSRF-TOKEN"] = csrfToken;
-      }
-
-      const response = await fetch(
-        "https://backend.baccheck.online/api/document/bulk-download",
-        {
-          method: "POST",
-          headers: headers,
-          body: JSON.stringify({ files: filePaths }),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "bulk_download.zip";
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      window.URL.revokeObjectURL(url);
-      setBulkDownloadLoading(false);
-    } catch (error) {
-      console.error("Error downloading files:", error);
-    }
-  };
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -673,10 +626,10 @@ export default function OutgoingRequests() {
                 <div className="-mt-4">
                 <section className="mb-3 flex items-center justify-between">
                     <div className="w-full flex gap-2 items-center">
-                    <p className="font-semibold ">Attachments</p>
+                    <p className="font-semibold uppercase text-bChkRed">RequestAttachment</p>
                     </div>
 
-                    <Button
+                    {/* <Button
                     variant="ghost"
                     size="sm"
                     color="primary"
@@ -689,11 +642,11 @@ export default function OutgoingRequests() {
                     >
                     <FaDownload className="text-red-600" />
                     Download all
-                    </Button>
+                    </Button> */}
                 </section>
 
                 <section className="grid grid-cols-1 gap-2">
-                    <div className="gap-3 p-2 rounded-lg border">
+                    <div className="gap-3 p-2 rounded-md border">
                     <div className="w-full flex flex-col gap-1">
                         <p className="font-semibold">
                         {data?.document_type?.name}
@@ -706,19 +659,12 @@ export default function OutgoingRequests() {
                             <p>{filesize(data?.file?.size ?? 1000)}</p>
                         </div>
                         <div
-                            className="flex space-x-1 cursor-pointer py-1 px-2 rounded-md bg-primary text-white text-xs"
-                            // onClick={() => downloadFile(data?.file?.name)}
+                            className="flex space-x-1 cursor-pointer py-1 px-2 rounded-sm bg-primary text-white text-xs"
                             onClick={() => {
                             window.location.href =
                                 "https://admin-dev.baccheck.online/api/download-pdf?path=" +
                                 encodeURIComponent(data?.file?.path);
                             }}
-                            /* onClick={() => {
-                            window.location.href =
-                                "https://admin-dev.baccheck.online/api/document/download" +
-                                "?path=" +
-                                encodeURIComponent(data?.file?.path);
-                            }} */
                         >
                             <FaDownload />
                             <p>Download</p>
@@ -728,9 +674,9 @@ export default function OutgoingRequests() {
                     </div>
                 </section>
                 <section className="flex flex-col mt-2">
-                  <p className="uppercase font-semibold py-2 text-bChkRed">Verification Request Letters</p>
+                  <p className="uppercase font-semibold py-2 text-bChkRed">Verification Request Documents</p>
 
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="flex flex-col space-y-2">
                     {/* Show Loading Spinner */}
                     {isFetching ? (
                       <div className="flex justify-center items-center col-span-2">
@@ -739,55 +685,72 @@ export default function OutgoingRequests() {
                     ) : (
                       <>
                         {/* Display Reports if available */}
-                        {authLetter && (
-                          <div className="gap-3 p-2 rounded-lg border">
-                            <div className="w-full flex space-x-2 items-center">
-                              <FaFilePdf size={36} className="text-bChkRed" />
-                              <div className="flex flex-col space-y-1">
-                                <p>Authorization Letter</p>
-                                <div
-                                  className="flex space-x-1 items-center cursor-pointer py-1 px-2 rounded-md bg-primary text-white text-xs w-20"
-                                  onClick={() => window.open(authLetter, "_blank")}
-                                >
-                                  <IoIosOpen size={16} />
-                                  <p>Open</p>
+                        {requestLetter && (
+                          <div className="gap-3 p-2 rounded-md border">
+                            <div className="w-full flex justify-between">
+                              <div className="w-full flex space-x-2 items-center">
+                                <FaFilePdf size={36} className="text-bChkRed" />
+                                <div className="flex flex-col space-y-1">
+                                  <p>Request Letter</p>
+                                  <div className="text-xs font-semibold -mt-1">
+                                    <p>From: <span className="font-normal text-gray-500">{data?.sending_institution?.name}</span></p>
+                                  </div>
                                 </div>
+                              </div>
+                              
+                              <div
+                                className="flex self-end space-x-1 items-center cursor-pointer py-1 px-2 rounded-sm bg-blue-600 text-white text-xs w-20"
+                                onClick={() => window.open(requestLetter, "_blank")}
+                              >
+                                <IoIosOpen size={16} />
+                                <p>Open</p>
                               </div>
                             </div>
                           </div>
                         )}
-
-                        {requestLetter && (
-                          <div className="gap-3 p-2 rounded-lg border">
-                            <div className="w-full flex space-x-2 items-center">
-                              <FaFilePdf size={36} className="text-bChkRed" />
-                              <div className="flex flex-col space-y-1">
-                                <p>Request Letter</p>
-                                <div
-                                  className="flex space-x-1 items-center cursor-pointer py-1 px-2 rounded-md bg-primary text-white text-xs w-20"
-                                  onClick={() => window.open(requestLetter, "_blank")}
-                                >
-                                  <IoIosOpen size={16} />
-                                  <p>Open</p>
+                        {authLetter && (
+                          <div className="gap-3 p-2 rounded-md border">
+                            <div className="w-full flex justify-between">
+                              <div className="w-full flex space-x-2 items-center">
+                                <FaFilePdf size={36} className="text-bChkRed" />
+                                <div className="flex flex-col space-y-1">
+                                  <p>Authorisation Letter</p>
+                                  <div className="text-xs font-semibold -mt-1">
+                                    <p>From: <span className="font-normal text-gray-500">{data?.doc_owner_full_name}</span></p>
+                                  </div>
                                 </div>
+                              </div>
+                              
+                              <div
+                                className="flex self-end space-x-1 items-center cursor-pointer py-1 px-2 rounded-sm bg-blue-600 text-white text-xs w-20"
+                                onClick={() => window.open(authLetter, "_blank")}
+                              >
+                                <IoIosOpen size={16} />
+                                <p>Open</p>
                               </div>
                             </div>
                           </div>
                         )}
 
                         {verificationReport && (
-                          <div className="gap-3 p-2 rounded-lg border">
-                            <div className="w-full flex space-x-2 items-center">
-                              <FaFilePdf size={36} className="text-bChkRed" />
-                              <div className="flex flex-col space-y-1">
-                                <p>Verification Report</p>
-                                <div
-                                  className="flex space-x-1 items-center cursor-pointer py-1 px-2 rounded-md bg-primary text-white text-xs w-20"
-                                  onClick={() => window.open(verificationReport, "_blank")}
-                                >
-                                  <IoIosOpen size={16} />
-                                  <p>Open</p>
+                          <div className="gap-3 p-2 rounded-md border">
+                            <div className="w-full flex justify-between">
+                              <div className="w-full flex space-x-2 items-center">
+                                <FaFilePdf size={36} className="text-bChkRed" />
+                                <div className="flex flex-col space-y-1">
+                                  <p>Verification Report</p>
+                                  <div className="text-xs font-semibold">
+                                    <p>From: <span className="font-normal text-gray-500">Bacchecker</span></p>
+                                  </div>
                                 </div>
+                              </div>
+                              
+                              <div
+                                className="flex self-end space-x-1 items-center cursor-pointer py-1 px-2 rounded-sm bg-blue-600 text-white text-xs w-20"
+                                onClick={() => window.open(verificationReport, "_blank")}
+                              >
+                                <IoIosOpen size={16} />
+                                <p>Open</p>
                               </div>
                             </div>
                           </div>
