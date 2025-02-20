@@ -301,7 +301,7 @@ export default function Plans() {
                 value="card"
                 checked={selectedPayment === "card"}
                 onChange={handlePaymentChange}
-                className="hidden"
+                className="hidden accent-bChkRed"
               />
               <div className="flex items-center space-x-4">
                 <p>Card</p>
@@ -328,7 +328,7 @@ export default function Plans() {
                 value="mobile_money"
                 checked={selectedPayment === "mobile_money"}
                 onChange={handlePaymentChange}
-                className="hidden"
+                className="hidden accent-bChkRed"
               />
               <div className="flex space-x-4 items-center">
                 <p>Mobile Money</p>

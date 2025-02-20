@@ -1265,7 +1265,7 @@ export default function Dashboard() {
                       value="card"
                       checked={selectedPayment === "card"}
                       onChange={() => setSelectedPayment("card")}
-                      className="w-5 h-5 bg-gray-100 border-gray-300"
+                      className="w-5 h-5 bg-gray-100 border-gray-300 accent-bChkRed"
                     />
                     <label
                       for="card-option"
@@ -1283,7 +1283,7 @@ export default function Dashboard() {
                       value="mobile_money"
                       checked={selectedPayment === "mobile_money"}
                       onChange={() => setSelectedPayment("mobile_money")}
-                      className="w-5 h-5 bg-gray-100 border-gray-300"
+                      className="w-5 h-5 bg-gray-100 border-gray-300 accent-bChkRed"
                     />
                     <label
                       for="mobile-money-option"
