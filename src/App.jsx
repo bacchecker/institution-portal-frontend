@@ -117,7 +117,7 @@ function App() {
                     element={
                       <AuthenticatedSuccessProtectedRoute>
                         <PermissionProtectedRoute
-                          permission={["verification-requests.view"]}
+                          permission={["e-check.view"]}
                         >
                           <VerificationRequest />
                         </PermissionProtectedRoute>
@@ -174,7 +174,7 @@ function App() {
                     element={
                       <AuthenticatedSuccessProtectedRoute>
                         <PermissionProtectedRoute
-                          permission={["verification-requests.view"]}
+                          permission={["e-check.view"]}
                         >
                           <Plans />
                         </PermissionProtectedRoute>

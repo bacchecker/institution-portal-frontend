@@ -515,7 +515,7 @@ export default function OutgoingRequests() {
                 </TableRow>
                 ))}
             </CustomTable>
-            <PermissionWrapper permission={['verification-requests.create']}>
+            <PermissionWrapper permission={['e-check.create']}>
               <button
                 type="button"
                 onClick={() => {
@@ -814,7 +814,7 @@ export default function OutgoingRequests() {
             >
                 Close
             </Button>
-                <PermissionWrapper permission={['verification-requests.create']}>
+                <PermissionWrapper permission={['e-check.create']}>
                   {data?.status === "created" && data?.token != null && new Date(data?.token_expires_at) < new Date() && (
                     <Button
                     radius="none"

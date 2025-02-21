@@ -36,6 +36,8 @@ import { MdOutlineFilterAlt, MdOutlineFilterAltOff } from "react-icons/md";
 import secureLocalStorage from "react-secure-storage";
 import { IoIosOpen } from "react-icons/io";
 import { BsFillInfoCircleFill } from "react-icons/bs";
+import PermissionProtectedRoute from "../../../components/permissions/PermissionProtectedRoute";
+import PermissionWrapper from "../../../components/permissions/PermissionWrapper";
 
 export default function IncomingRequests() {
   const changeStatusDisclosure = useDisclosure();
@@ -949,20 +951,27 @@ export default function IncomingRequests() {
               </Button>
 
               {data?.status == "processing" && (
-                <Button
-                  radius="none"
-                  size="md"
-                  className="w-1/2 bg-gray-300 text-gray-800 font-medium !rounded-md"
-                  onClick={() => declineDisclosure.onOpen()}
+                <PermissionWrapper
+                  permission={["e-check.cancel"]}
                 >
-                  Decline Request
-                </Button>
+                  <Button
+                    radius="none"
+                    size="md"
+                    className="w-1/2 bg-gray-300 text-gray-800 font-medium !rounded-md"
+                    onClick={() => declineDisclosure.onOpen()}
+                  >
+                    Decline Request
+                  </Button>
+                </PermissionWrapper>
               )}
 
               {data?.status !== "created" &&
                 data?.status !== "completed" &&
                 data?.status !== "rejected" &&
                 data?.status !== "processing" && (
+                <PermissionWrapper
+                  permission={["e-check.process"]}
+                >
                   <Button
                     radius="none"
                     className="bg-bChkRed text-white font-medium w-1/2 !rounded-md"
@@ -975,19 +984,24 @@ export default function IncomingRequests() {
                       ? "Verify Document"
                       : "Acknowledge Request"}
                   </Button>
+                </PermissionWrapper>
+                  
                 )}
               {data?.status === "processing" && (
-                <Button
-                  isLoading={isSaving}
-                  radius="none"
-                  className="bg-bChkRed text-white font-medium w-1/2 !rounded-md"
-                  size="md"
-                  onClick={handleSubmitVerification}
-                  disabled={Object.keys(answers).length === 0}
+                <PermissionWrapper
+                  permission={["e-check.process"]}
                 >
-                  Submit Verifications
-                </Button>
-              
+                  <Button
+                    isLoading={isSaving}
+                    radius="none"
+                    className="bg-bChkRed text-white font-medium w-1/2 !rounded-md"
+                    size="md"
+                    onClick={handleSubmitVerification}
+                    disabled={Object.keys(answers).length === 0}
+                  >
+                    Submit Verifications
+                  </Button>
+                </PermissionWrapper>
               )}
             </div>
           </div>

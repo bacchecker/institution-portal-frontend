@@ -174,7 +174,7 @@ function Sidebar() {
                     </Link>
                   </li>
                 )}
-                {/* <PermissionWrapper permission={['verification-requests.view']}>
+                {/* <PermissionWrapper permission={['e-check.view']}>
                   <li>
                     <Link
                       onClick={() => {

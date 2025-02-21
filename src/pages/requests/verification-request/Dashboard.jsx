@@ -508,7 +508,7 @@ export default function Dashboard() {
             onClick={() => {
               setOpenDrawer(true);
             }}
-            className="border-2 border-gray-400 flex space-x-1 items-center rounded-full px-3 py-1 uppercase text-sm text-gray-600"
+            className="border border-gray-400 flex space-x-1 items-center rounded-full px-3 py-1 uppercase text-sm text-gray-600"
           >
             
             <p>
