@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import {Tabs, Tab, Chip} from "@nextui-org/react";
-import { IoDocuments, IoSettingsOutline, IoShieldCheckmark } from "react-icons/io5";
+import { IoDocuments, IoSettingsOutline } from "react-icons/io5";
 import Navbar from "@/components/Navbar";
 import secureLocalStorage from "react-secure-storage";
 import InstitutionDepartments from "./InstitutionDepartments";
@@ -9,6 +9,7 @@ import { FaBuilding, FaUsers } from "react-icons/fa";
 import SecuritySettings from "./SecuritySettings";
 import InstitutionProfile from "./InstitutionProfile";
 import { BsBuildingsFill } from "react-icons/bs";
+import InstitutionDocTypes from "./InstitutionDocTypes";
 
 export default function AccountSettings() { 
 
@@ -54,6 +55,21 @@ export default function AccountSettings() {
               }
             >
               <SecuritySettings />
+            </Tab>
+          )}
+
+          {(secureLocalStorage.getItem('userPermissions')?.includes('institution.settings.view') || 
+            JSON.parse(secureLocalStorage.getItem('userRole'))?.isAdmin) && (
+            <Tab
+              key="docTypes"
+              title={
+                <div className="flex items-center space-x-2">
+                  <IoDocuments size={18} />
+                  <span>Document Types</span>
+                </div>
+              }
+            >
+              <InstitutionDocTypes />
             </Tab>
           )}
 

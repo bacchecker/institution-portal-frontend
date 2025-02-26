@@ -67,6 +67,11 @@ function NewApplicationForm({
     { title: "Academic Credentials", value: "academic" },
     { title: "Non-Academic Credentials", value: "non-academic" },
   ];
+
+  const purposeTypes = [
+    { title: "Educational", value: "Educational" },
+    { title: "Employment", value: "Employment" },
+  ];
   const academicLevels = [
     { title: "tertiary" },
     { title: "secondary" },
@@ -550,6 +555,7 @@ function NewApplicationForm({
               className="custom-dropdown-class display-md-none"
             />
           </div>
+          
           {selectedCredentialType?.value === "non-academic" && (
             <div className="md:mt-[2vw] mt-[8vw]">
               <h4 className="md:text-[1vw] text-[4vw] mb-1">

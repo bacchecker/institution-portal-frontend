@@ -685,7 +685,7 @@ export default function OutgoingRequests() {
                     ) : (
                       <>
                         {/* Display Reports if available */}
-                        {requestLetter && (
+                        {/* {requestLetter && (
                           <div className="gap-3 p-2 rounded-md border">
                             <div className="w-full flex justify-between">
                               <div className="w-full flex space-x-2 items-center">
@@ -707,8 +707,8 @@ export default function OutgoingRequests() {
                               </div>
                             </div>
                           </div>
-                        )}
-                        {authLetter && (
+                        )} */}
+                        {/* {authLetter && (
                           <div className="gap-3 p-2 rounded-md border">
                             <div className="w-full flex justify-between">
                               <div className="w-full flex space-x-2 items-center">
@@ -730,7 +730,7 @@ export default function OutgoingRequests() {
                               </div>
                             </div>
                           </div>
-                        )}
+                        )} */}
 
                         {verificationReport && (
                           <div className="gap-3 p-2 rounded-md border">
