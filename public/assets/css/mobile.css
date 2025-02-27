@@ -21,10 +21,10 @@
     flex-wrap: wrap;
     gap: 4vw;
   }
-  .flex-sm-col{
+  .flex-sm-col {
     flex-direction: column;
   }
-  .jus-sm{
+  .jus-sm {
     justify-content: end;
   }
   .content {
@@ -121,7 +121,10 @@
   .flex-direct-sm {
     flex-direction: column !important;
   }
-  .active-button {
+  .active-button,
+  .active-button1,
+  .active-button2,
+  .active-button3 {
     color: #ff0404;
   }
   input[type="checkbox"]:checked {

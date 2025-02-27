@@ -17,7 +17,6 @@ function InstitutionDataSetup({ setActiveStep }) {
   const [userInput, setUserInput] = useState([]);
   const [selectedImage, setSelectedImage] = useState(null);
   const [selectedCert, setSelectedCert] = useState(null);
-  console.log(user);
   const {
     data: institutionDetails,
     isLoading: isInstitutionDetailsLoading,
@@ -184,7 +183,8 @@ function InstitutionDataSetup({ setActiveStep }) {
                   <input
                     type="text"
                     value={userInput?.name}
-                    className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0"
+                    readOnly
+                    className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0 read-only:bg-[#d8d8d8]"
                   />
                 </div>
               </div>
@@ -196,7 +196,8 @@ function InstitutionDataSetup({ setActiveStep }) {
                   <input
                     type="text"
                     value={userInput?.prefix}
-                    className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0"
+                    readOnly
+                    className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0 read-only:bg-[#d8d8d8]"
                   />
                 </div>
               </div>
@@ -261,7 +262,8 @@ function InstitutionDataSetup({ setActiveStep }) {
                   <input
                     type="text"
                     value={userInput?.academic_level}
-                    className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0 capitalize"
+                    readOnly
+                    className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0 capitalize read-only:bg-[#d8d8d8]"
                   />
                 </div>
               </div>
@@ -271,17 +273,19 @@ function InstitutionDataSetup({ setActiveStep }) {
                   <input
                     type="text"
                     value={userInput?.region}
-                    className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0 capitalize"
+                    readOnly
+                    className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0 capitalize read-only:bg-[#d8d8d8]"
                   />
                 </div>
               </div>
               <div className="w-[49%]">
-                <h4 className="md:text-[1vw] text-[4vw] mb-1">Address</h4>
+                <h4 className="md:text-[1vw] text-[4vw] mb-1">Location</h4>
                 <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
                   <input
                     type="text"
                     value={userInput?.address}
-                    className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0"
+                    readOnly
+                    className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0 read-only:bg-[#d8d8d8]"
                   />
                 </div>
               </div>
@@ -293,7 +297,8 @@ function InstitutionDataSetup({ setActiveStep }) {
                   <input
                     type="text"
                     value={userInput?.digital_address}
-                    className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0"
+                    readOnly
+                    className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0 read-only:bg-[#d8d8d8]"
                   />
                 </div>
               </div>

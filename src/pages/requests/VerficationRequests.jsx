@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import { Tabs, Tab } from "@nextui-org/react";
 import IncomingRequests from "../requests/verification-request/IncomingRequests"
 import OutgoingRequests from "./verification-request/OutgoingRequests";
@@ -10,39 +10,60 @@ import { MdDashboard } from "react-icons/md";
 import { HiMiniUsers } from "react-icons/hi2";
 import { IoMdTrendingUp } from "react-icons/io";
 import Dashboard from "./verification-request/Dashboard";
+import { useDispatch, useSelector } from "react-redux";
+import { setSelectedTab } from "../../redux/baccheckerSlice";
 
 export default function VerificationRequest() {
-
+  const dispatch = useDispatch()
   const [receivedRequest, setReceivedRequest] = useState(0);
   const [sentRequest, setSentRequest] = useState(0);
   const [subscription, setSubscription] = useState("");
+  const [selectedCurrentTab, setSelectedCurrentTab] = useState("");
   const navigate = useNavigate();
+
+  let selectedTab = useSelector((state) => state.bacchecker.selectedTab);
+
+
+  useEffect(() => {
+    if (selectedTab) {
+      setSelectedCurrentTab(selectedTab)
+    }
+  }, [selectedTab])
+
+
   useEffect(() => {
     const fetchDashboardStats = async () => {
-        try {
-            const response = await axios.get("/institution/verification/dashboard-data");
-            setReceivedRequest(response.data.received_requests || 0); // Fallback to 0 if undefined
-            setSentRequest(response.data.sent_requests || 0);
-            setSubscription(response.data.subscription || {});
-        } catch (error) {
-            console.error("Error fetching data:", error);
-        }
+      try {
+        const response = await axios.get("/institution/verification/dashboard-data");
+        setReceivedRequest(response.data.received_requests || 0);
+        setSentRequest(response.data.sent_requests || 0);
+        setSubscription(response.data.subscription || {});
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
     };
 
     fetchDashboardStats();
   }, []);
 
+  const handleTabSelect = (key) => {
+    dispatch(setSelectedTab(key))
+    setSelectedCurrentTab(key);
+  };
+
   const handleNavigation = () => {
-    navigate("/subscription-plans"); // Navigate to the desired page
+    navigate("/subscription-plans");
   };
   return (
     <>
-    <div className="bg-white text-sm w-full">
+      <div className="bg-white text-sm w-full">
         <Navbar />
-        
+
         <div className="flex w-full flex-col">
           <Tabs
             aria-label="Options"
+            defaultSelectedKey={selectedTab}
+            onSelectionChange={handleTabSelect}
             classNames={{
               tabList: "gap-6 w-full relative rounded-none p-0 border-b border-divider",
               cursor: "w-full bg-bChkRed",
@@ -56,7 +77,7 @@ export default function VerificationRequest() {
               key="dashboard"
               title={
                 <div className="flex items-center space-x-2">
-                  <MdDashboard size={20}/>
+                  <MdDashboard size={20} />
                   <span>Dashboard</span>
                   {/* <Chip size="sm" variant="faded">
                     {docRequest}
@@ -66,12 +87,12 @@ export default function VerificationRequest() {
             >
               <Dashboard />
             </Tab>
-            
+
             <Tab
               key="music"
               title={
                 <div className="flex items-center space-x-2">
-                  <FaCircleArrowDown style={{ transform: 'rotate(-135deg)' }} size={20}/>
+                  <FaCircleArrowDown style={{ transform: 'rotate(-135deg)' }} size={20} />
                   <span>Verification Request Sent</span>
                   {/* <Chip size="sm" variant="faded">
                     {docRequest}
@@ -85,7 +106,7 @@ export default function VerificationRequest() {
               key="document"
               title={
                 <div className="flex items-center space-x-2">
-                  <FaCircleArrowDown className="rotate-45" size={20}/>
+                  <FaCircleArrowDown className="rotate-45" size={20} />
                   <span>Verification Request Received</span>
                   {/* <Chip size="sm" variant="faded">
                     {docRequest}
@@ -93,13 +114,13 @@ export default function VerificationRequest() {
                 </div>
               }
             >
-              <IncomingRequests />   
+              <IncomingRequests />
             </Tab>
           </Tabs>
         </div>
-        
+
       </div>
-      
+
     </>
   );
 }

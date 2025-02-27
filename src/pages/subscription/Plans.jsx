@@ -213,6 +213,10 @@ export default function Plans() {
                   <div className="flex flex-col space-y-1 mt-4">
                     <div className="flex space-x-2 text-xs">
                       <IoIosStar className="text-yellow-500" />
+                      <p>{plan?.number_of_departments} Departments {plan?.number_of_users} Users</p>
+                    </div>
+                    <div className="flex space-x-2 text-xs">
+                      <IoIosStar className="text-yellow-500" />
                       <p>{plan?.credit} Credits</p>
                     </div>
                     <div className="flex space-x-2 text-xs">
@@ -265,6 +269,10 @@ export default function Plans() {
               <div className="flex space-x-2 mt-4 justify-end">
                 <div className="flex space-x-1 text-xs">
                     <IoIosStar className="text-yellow-500" />
+                    <p>{plan?.number_of_departments} Departments {plan?.number_of_users} Users</p>
+                </div>
+                <div className="flex space-x-1 text-xs">
+                    <IoIosStar className="text-yellow-500" />
                     <p>{data?.credit} Credits</p>
                 </div>
                 <div className="flex space-x-1 text-xs">
@@ -273,7 +281,7 @@ export default function Plans() {
                 </div>
                 <div className="flex space-x-1 text-xs">
                     <IoIosStar className="text-yellow-500" />
-                    <p>{data?.total_credit} Total Credit</p>
+                    <p>{data?.total_credit} Total Credits</p>
                 </div>
               </div>
               
@@ -293,7 +301,7 @@ export default function Plans() {
                 value="card"
                 checked={selectedPayment === "card"}
                 onChange={handlePaymentChange}
-                className="hidden"
+                className="hidden accent-bChkRed"
               />
               <div className="flex items-center space-x-4">
                 <p>Card</p>
@@ -320,7 +328,7 @@ export default function Plans() {
                 value="mobile_money"
                 checked={selectedPayment === "mobile_money"}
                 onChange={handlePaymentChange}
-                className="hidden"
+                className="hidden accent-bChkRed"
               />
               <div className="flex space-x-4 items-center">
                 <p>Mobile Money</p>

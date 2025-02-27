@@ -40,13 +40,13 @@ function RevenueOverview() {
   });
 
   useEffect(() => {
-    if (permissions.includes("document-requests.view") && (!permissions.includes("validation-requests.view") || !permissions.includes("verification-requests.view"))) {
+    if (permissions.includes("document-requests.view") && (!permissions.includes("validation-requests.view") || !permissions.includes("e-check.view"))) {
       setCurrentScreen(1)
-    } else if (permissions.includes("document-requests.view") && permissions.includes("validation-requests.view") && permissions.includes("verification-requests.view")) {
+    } else if (permissions.includes("document-requests.view") && permissions.includes("validation-requests.view") && permissions.includes("e-check.view")) {
       setCurrentScreen(1)
-    } else if ((!permissions.includes("document-requests.view") || !permissions.includes("verification-requests.view")) && permissions.includes("validation-requests.view")) {
+    } else if ((!permissions.includes("document-requests.view") || !permissions.includes("e-check.view")) && permissions.includes("validation-requests.view")) {
       setCurrentScreen(2)
-    } else if (!permissions.includes("document-requests.view") && !permissions.includes("validation-requests.view") && permissions.includes("verification-requests.view")) {
+    } else if (!permissions.includes("document-requests.view") && !permissions.includes("validation-requests.view") && permissions.includes("e-check.view")) {
       setCurrentScreen(3)
     }
   }, [permissions])
@@ -56,7 +56,7 @@ function RevenueOverview() {
     <>
       <Navbar />
       <div className="bg-white p-[1vw]">
-        {((permissions?.includes("document-requests.view") && permissions?.includes("verification-requests.view") && permissions?.includes("validation-requests.view")) || isAdmin) ? (
+        {((permissions?.includes("document-requests.view") && permissions?.includes("e-check.view") && permissions?.includes("validation-requests.view")) || isAdmin) ? (
           <div className="flex justify-between items-center">
             <div className="w-[23%] bg-[#f8f8f8] p-[0.2vw] rounded-[0.4vw] border border-[#0000000f]">
               <div className="w-full bg-[#ffffff] border border-[#0000000f] rounded-[0.3vw] flex p-[0.5vw] items-center gap-[0.5vw]">
@@ -170,7 +170,7 @@ function RevenueOverview() {
                 </h4>
               </div>
             )}
-            {permissions?.includes("verification-requests.view") && (
+            {permissions?.includes("e-check.view") && (
               <div className="w-[32%] bg-[#f8f8f8] p-[0.2vw] rounded-[0.4vw] border border-[#0000000f]">
                 <div className="w-full bg-[#ffffff] border border-[#0000000f] rounded-[0.3vw] flex p-[0.5vw] items-center gap-[0.5vw]">
                   <div className="w-[3vw] h-[3vw] bg-[#ff0404] rounded-[0.2vw] flex items-center justify-center">
@@ -189,10 +189,10 @@ function RevenueOverview() {
 
         )}
         <div className="bg-white pt-[1vw]">
-          {((!permissions?.includes("document-requests.view") && permissions?.includes("verification-requests.view") && permissions?.includes("validation-requests.view")) ||
-            (permissions?.includes("document-requests.view") && !permissions?.includes("verification-requests.view") && permissions?.includes("validation-requests.view")) ||
-            (permissions?.includes("document-requests.view") && permissions?.includes("verification-requests.view") && !permissions?.includes("validation-requests.view")) ||
-            (permissions?.includes("document-requests.view") && permissions?.includes("verification-requests.view") && permissions?.includes("validation-requests.view"))) && (
+          {((!permissions?.includes("document-requests.view") && permissions?.includes("e-check.view") && permissions?.includes("validation-requests.view")) ||
+            (permissions?.includes("document-requests.view") && !permissions?.includes("e-check.view") && permissions?.includes("validation-requests.view")) ||
+            (permissions?.includes("document-requests.view") && permissions?.includes("e-check.view") && !permissions?.includes("validation-requests.view")) ||
+            (permissions?.includes("document-requests.view") && permissions?.includes("e-check.view") && permissions?.includes("validation-requests.view"))) && (
               <div className="w-full border-b border-[#d5d6d6] flex md:mt-[3vw] mt-[8vw] md:gap-[2vw] gap-[6vw] relative ">
                 {permissions?.includes("document-requests.view") && (
                   <button
@@ -218,7 +218,7 @@ function RevenueOverview() {
                     Validation Requests
                   </button>
                 )}
-                {permissions?.includes("verification-requests.view") && (
+                {permissions?.includes("e-check.view") && (
                   <button
                     className={`md:text-[1vw] text-[3.5vw] tab_button py-[0.3vw] ${currentScreen === 3 && "active-button"
                       }`}

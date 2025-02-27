@@ -27,43 +27,40 @@ import ConfirmModal from "@/components/confirm-modal";
 import DeleteModal from "@/components/DeleteModal";
 import { toast } from "sonner";
 import {
-  FaChevronLeft,
-  FaChevronRight,
   FaDownload,
-  FaHeart,
   FaRegCircleCheck,
 } from "react-icons/fa6";
-import { IoDocuments } from "react-icons/io5";
-import { PiQueueFill } from "react-icons/pi";
-import { FcCancel } from "react-icons/fc";
+import { FaFilePdf } from "react-icons/fa";
 import { GiCancel } from "react-icons/gi";
 import { MdOutlineFilterAlt, MdOutlineFilterAltOff } from "react-icons/md";
 import secureLocalStorage from "react-secure-storage";
+import { IoIosOpen } from "react-icons/io";
+import { BsFillInfoCircleFill } from "react-icons/bs";
+import PermissionProtectedRoute from "../../../components/permissions/PermissionProtectedRoute";
+import PermissionWrapper from "../../../components/permissions/PermissionWrapper";
 
 export default function IncomingRequests() {
   const changeStatusDisclosure = useDisclosure();
   const declineDisclosure = useDisclosure();
 
-  const [bulkDownloadLoading, setBulkDownloadLoading] = useState(false);
   const [openDrawer, setOpenDrawer] = useState(false);
   const [processing, setProcessing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isFetching, setIsFetching] = useState(false);
   const [data, setData] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [lastPage, setLastPage] = useState(1);
   const [total, setTotal] = useState(0);
-  const [dateRange, setDateRange] = useState({});
   const [verificationRequests, setVerificationRequests] = useState([]);
   const [sortBy, setSortBy] = useState(null);
   const [sortOrder, setSortOrder] = useState("asc");
   const user = JSON?.parse(secureLocalStorage?.getItem("user"))?.user;
   const [documentTypes, setDocumentTypes] = useState([]);
+  const [verificationReport, setVerificationReport] = useState(null);
+  const [requestLetter, setRequestLetter] = useState(null);
+  const [authLetter, setAuthLetter] = useState(null);
   const [checkListSections, setCheckListSections] = useState([]);
-  const [allRequests, setAllRequests] = useState(0);
-  const [pending, setPending] = useState(0);
-  const [rejected, setRejected] = useState(0);
-  const [approved, setApproved] = useState(0);
-  const [status, setStatus] = useState(null);
+  const [isChecked, setIsChecked] = useState(false);
   const [institutionId, setInstitutionId] = useState(null);
   const [filters, setFilters] = useState({
     search_query: "",
@@ -81,10 +78,71 @@ export default function IncomingRequests() {
     { value: "rejected", name: "Rejected" },
     { value: "completed", name: "Completed" },
   ];
-  const handleChange = (itemId, value) => {
+  
+  const reasonMappings = {
+    // Document Authenticity
+    "tampering": ["Signs of tampering (erasures, mismatched fonts, corrections)", "Ink inconsistencies", "Document appears altered"],
+    "format": ["Format does not match institution standards", "Unrecognized document template", "Incorrect document type"],
+    "valid timeframe": ["Document is expired", "Issued date is missing", "Document issued before/after allowed timeframe"],
+  
+    // Document Owner Identity
+    "name on the document": ["Name mismatch with institution records", "Multiple names found", "Name not legible"],
+    "student ID": ["Student ID does not exist", "Mismatch with institution records", "Invalid ID format"],
+    "photo": ["Photo is missing", "Photo does not match records", "Photo quality is too low to verify identity"],
+  
+    // Institution Legitimacy
+    "accreditation": ["Institution is not recognized by accreditation bodies", "Accreditation expired", "Accreditation body not verified"],
+    "official database": ["Institution not listed in official directories", "Mismatch with official data", "Verification unavailable"],
+    "website and contact": ["Website not found", "Invalid contact details", "Institution website is down"],
+  
+    // Academic Content
+    "degree/program": ["Degree/program mismatch with records", "Degree not recognized", "Incorrect program title"],
+    "dates": ["Enrollment/graduation dates do not match", "Date format error", "Missing date information"],
+    "curriculum": ["Inconsistent academic details", "Course content mismatch", "Unrecognized curriculum"],
+  
+    // Grades and Credentials
+    "grades": ["Grades do not match records", "Grade format error", "Missing grades"],
+    "courses": ["Course list mismatch with curriculum", "Course code discrepancies", "Courses missing from transcript"],
+    "GPA": ["GPA is inaccurate", "Cumulative score not matching", "Invalid GPA format"],
+  
+    // Security Features
+    "watermark": ["Watermark not found", "Watermark inconsistent with standard", "Faded or unclear watermark"],
+    "seal or signature": ["Official seal missing", "Signature mismatch", "Seal appears altered"],
+  
+    // Authorized Signatory
+    "authorized person": ["Unauthorized signatory", "Name/signature does not match records", "Signature missing"],
+    "stamped": ["Document not stamped", "Department stamp missing", "Approval not clear"],
+  };
+  
+  
+  const getPossibleReasons = (questionText) => {
+    const reasons = [];
+    Object.keys(reasonMappings).forEach((keyword) => {
+      if (questionText.toLowerCase().includes(keyword)) {
+        reasons.push(...reasonMappings[keyword]);
+      }
+    });
+    return [...new Set(reasons), "Other (please specify)"]; // Remove duplicates and add "Other"
+  };
+  
+  const [showCustomReason, setShowCustomReason] = useState({});
+  const handleReasonChange = (id, value) => {
+    if (value === "Other (please specify)") {
+      setShowCustomReason((prev) => ({ ...prev, [id]: true }));
+      handleChange(id, 0, ""); // Allow custom input
+    } else {
+      setShowCustomReason((prev) => ({ ...prev, [id]: false }));
+      handleChange(id, 0, value);
+    }
+  };
+  
+  const handleChange = (itemId, isCorrect, comment = "") => {
     setAnswers((prev) => ({
       ...prev,
-      [itemId]: value,
+      [itemId]: { 
+        is_correct: isCorrect ? 1 : 0, // Convert true → 1, false → 0
+        comment: comment 
+      },
     }));
   };
 
@@ -104,16 +162,12 @@ export default function IncomingRequests() {
       );
 
       const valRequest = response.data.paginatedRequests;
-
-      setAllRequests(response.data.allRequests);
-      setPending(response.data.pending);
-      setApproved(response.data.approved);
-      setRejected(response.data.rejected);
       setVerificationRequests(valRequest.data);
       setCurrentPage(valRequest.current_page);
       setLastPage(valRequest.last_page);
       setTotal(valRequest.total);
       setIsLoading(false);
+     
     } catch (error) {
       console.error("Error fetching institution documents:", error);
       throw error;
@@ -141,109 +195,54 @@ export default function IncomingRequests() {
     fetchInstitutionDocs();
   }, []);
 
-  /* useEffect(() => {
-    const fetchPercentage = async () => {
+  useEffect(() => {
+    if (!data?.id || !data?.status) return;
+    setIsFetching(true);
+  
+    const fetchReports = async () => {
       try {
-        const response = await axios.get("/institution/requests/monthly-percentage");
-        
+        const requests = [];
+  
+        requests.push(
+          axios.get(`/pdf/request-letter/${data.id}`, { responseType: "blob" })
+        );
+  
+        if (!["created", "rejected"].includes(data.status)) {
+          requests.push(
+            axios.get(`/pdf/authorization-letter/${data.id}`, { responseType: "blob" })
+          );
+        } else {
+          requests.push(Promise.resolve(null));
+        }
+  
+        if (data.status === "completed") {
+          requests.push(
+            axios.get(`/pdf/verification-report/${data.id}`, { responseType: "blob" })
+          );
+        } else {
+          requests.push(Promise.resolve(null));
+        }
+  
+        const [reqLetter, authLetter, verificationReport] = await Promise.all(requests);
+  
+        setRequestLetter(reqLetter ? URL.createObjectURL(reqLetter.data) : null);
+        setAuthLetter(authLetter ? URL.createObjectURL(authLetter.data) : null);
+        setVerificationReport(verificationReport ? URL.createObjectURL(verificationReport.data) : null);
+  
+        setIsFetching(false);
       } catch (error) {
-        console.error(error);
+        setIsFetching(false);
+        console.error("Error fetching reports:", error);
       }
     };
-    fetchPercentage();
-  }, []); */
+  
+    fetchReports();
+  }, [data?.id, data?.status]);
+  
 
   useEffect(() => {
     institutionVerificationRequests();
   }, [submittedFilters, currentPage, sortBy, sortOrder]);
-
-  const handlePageChange = (page) => {
-    if (page >= 1 && page <= lastPage) {
-      setCurrentPage(page);
-    }
-  };
-
-  const renderPageNumbers = () => {
-    const pages = [];
-    for (let i = 1; i <= lastPage; i++) {
-      pages.push(
-        <button
-          key={i}
-          onClick={() => handlePageChange(i)}
-          className={`py-1.5 px-2.5 border rounded-lg ${
-            currentPage === i
-              ? "bg-bChkRed text-white"
-              : "bg-white text-gray-800"
-          }`}
-        >
-          {i}
-        </button>
-      );
-    }
-    return pages;
-  };
-
-  const downloadFile = async (fileName) => {
-    try {
-      const response = await axios.get(`/download-pdf/`, {
-        responseType: "blob",
-      });
-
-      // Create a temporary link to download the file
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute("download", fileName);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    } catch (error) {
-      console.error("Error downloading the file", error);
-      toast.error(error.response.data.message);
-    }
-  };
-
-  const handleBulkDownload = async (filePaths) => {
-    try {
-      const csrfTokenMeta = document?.querySelector('meta[name="csrf-token"]');
-      const csrfToken = csrfTokenMeta?.getAttribute("content");
-
-      const headers = {
-        "Content-Type": "application/json",
-      };
-
-      // Only add X-CSRF-TOKEN if the token exists
-      if (csrfToken) {
-        headers["X-CSRF-TOKEN"] = csrfToken;
-      }
-
-      const response = await fetch(
-        "https://backend.baccheck.online/api/document/bulk-download",
-        {
-          method: "POST",
-          headers: headers,
-          body: JSON.stringify({ files: filePaths }),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "bulk_download.zip";
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      window.URL.revokeObjectURL(url);
-      setBulkDownloadLoading(false);
-    } catch (error) {
-      console.error("Error downloading files:", error);
-    }
-  };
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -251,65 +250,80 @@ export default function IncomingRequests() {
     setCurrentPage(1);
   };
 
-  const handleSubmitVerificationAnswers = async (event) => {
+  const handleSubmitVerification = async (event) => {
     event.preventDefault();
-
-    const allItemIds = checkListSections.sections.flatMap((section) =>
-      section.items.map((item) => item.id)
+  
+    const invalidItems = Object.entries(answers).filter(
+      ([, value]) => value.is_correct === 0 && (!value.comment || value.comment.trim() === "")
     );
-
-    // Check if every item has an answer
-    const unansweredItems = allItemIds.filter(
-      (itemId) => !answers[itemId] || answers[itemId].trim() === ""
-    );
-
-    if (unansweredItems.length > 0) {
-      // Show an error message and prevent submission
-      toast.error("Please provide answers to all questions before submitting.");
+  
+    if (invalidItems.length > 0) {
+      toast.error("Please provide comments for all 'No' selections.");
       return;
     }
-
+  
     const payload = {
-      verification_request: data?.id, // Include verification_request_id
-      checklist: Object.keys(answers).map((itemId) => ({
-        id: itemId,
-        value: answers[itemId],
+      answers: Object.keys(answers).map((itemId) => ({
+        institution_verification_checklist_item_id: itemId,
+        is_correct: answers[itemId].is_correct,
+        comment: answers[itemId].comment?.trim() || null,
       })),
     };
-
+    
     try {
       setIsSaving(true);
-
+  
       const response = await axios.post(
-        "/institution/requests/verification-request-answers",
+        `institution/requests/verification-requests/${data.id}/checklist-answers`,
         payload
       );
-
-      if (response.status === 201) {
+  
         toast.success(response.data.message);
         setAnswers({});
+        institutionVerificationRequests()
         setOpenDrawer(false);
-        institutionVerificationRequests();
-      }
     } catch (error) {
       toast.error(
-        error.response?.data?.message ||
-          "Failed to submit checklist. Please try again."
+        error.response?.data?.message || "Failed to submit checklist. Please try again."
       );
     } finally {
       setIsSaving(false);
     }
   };
+  
 
-  const fetchVerificationChecklist = async (documentTypeId) => {
+  const fetchVerificationChecklist = async (requestId) => {
     try {
-      const url = `/verification-checklist-items/${documentTypeId}`;
+      setIsLoading(true);
+      const url = `/institution/requests/verification-in-requests`;
       const response = await axios.get(url);
-      setCheckListSections(response.data.data);
+  
+      if (response?.data?.paginatedRequests?.data?.length > 0) {
+        const request = response.data.paginatedRequests.data.find(
+          (req) => req.id === requestId
+        );
+  
+        if (request?.institution_document_type?.verification_checklist_sections) {
+          const sections = request.institution_document_type.verification_checklist_sections;
+          setCheckListSections(sections);
+  
+          // Initialize answers for checklist items
+          const initialAnswers = {};
+          sections.forEach((section) => {
+            section.items.forEach((item) => {
+              initialAnswers[item.id] = "";
+            });
+          });
+          setAnswers(initialAnswers);
+        }
+      }
     } catch (error) {
-      console.error("Error fetching data:", error);
+      console.error("Error fetching checklist data:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
+  
 
   return (
     <>
@@ -318,80 +332,85 @@ export default function IncomingRequests() {
           <Card className="md:w-full w-full mx-auto rounded-md shadow-none border-none mb-2">
             <CardBody className="w-full bg-gray-100 p-6">
               <form
-                  onSubmit={handleSubmit}
-                  className="flex flex-row gap-3 items-center"
+                onSubmit={handleSubmit}
+                className="flex flex-row gap-3 items-center"
               >
-                  <input 
-                  type="text" 
+                <input
+                  type="text"
                   className="bg-white text-gray-900 text-sm rounded-[4px] font-[400] focus:outline-none block w-[260px] p-[9.5px] placeholder:text-gray-500"
                   name="search_query"
                   placeholder="Search by sending institution name or unique code"
                   value={filters.search_query}
-                  onChange={(e) => setFilters({ ...filters, search_query: e.target.value })}
-  
-                  />
-                  
-                  <select
+                  onChange={(e) =>
+                    setFilters({ ...filters, search_query: e.target.value })
+                  }
+                />
+
+                <select
                   name="status"
                   value={filters.status || ""}
                   className={`bg-white text-sm rounded-[4px] focus:outline-none block w-[220px] p-[9px] ${
-                      filters.status ? "text-gray-900" : "text-gray-500"
+                    filters.status ? "text-gray-900" : "text-gray-500"
                   }`}
-                  onChange={(e) => setFilters({ ...filters, status: e.target.value })}
-                  >
-                  <option value="" className="text-gray-500" disabled selected>Status</option>
+                  onChange={(e) =>
+                    setFilters({ ...filters, status: e.target.value })
+                  }
+                >
+                  <option value="" className="text-gray-500" disabled selected>
+                    Status
+                  </option>
                   {statusData.map((item) => (
-                      <option key={item.value} value={item.value}>
+                    <option key={item.value} value={item.value}>
                       {item.name}
-                      </option> 
+                    </option>
                   ))}
-                  </select>
-                  <DateRangePicker
+                </select>
+                <DateRangePicker
                   radius="none"
                   visibleMonths={2}
                   variant="underlined"
                   classNames={{
-                      base: "bg-white", // This sets the input background to white
+                    base: "bg-white", // This sets the input background to white
                   }}
                   style={{
-                      border: "none", // Removes the border
+                    border: "none", // Removes the border
                   }}
                   className="w-[280px] rounded-[4px] date-range-picker-input border-none bg-white"
                   onChange={(date) => {
-                      if (date) {
+                    if (date) {
                       const newStartDate = new Date(
-                          date.start.year,
-                          date.start.month - 1,
-                          date.start.day
+                        date.start.year,
+                        date.start.month - 1,
+                        date.start.day
                       )
-                          .toISOString()
-                          .split("T")[0];
+                        .toISOString()
+                        .split("T")[0];
                       const newEndDate = new Date(
-                          date.end.year,
-                          date.end.month - 1,
-                          date.end.day
+                        date.end.year,
+                        date.end.month - 1,
+                        date.end.day
                       )
-                          .toISOString()
-                          .split("T")[0];
-  
+                        .toISOString()
+                        .split("T")[0];
+
                       setFilters({
-                          ...filters,
-                          start_date: newStartDate,
-                          end_date: newEndDate,
+                        ...filters,
+                        start_date: newStartDate,
+                        end_date: newEndDate,
                       });
-                      }
+                    }
                   }}
-                  />
-  
-                  <div className="flex space-x-2">
+                />
+
+                <div className="flex space-x-2">
                   <Button
-                      startContent={<MdOutlineFilterAlt size={17} />}
-                      radius="none"
-                      size="sm"
-                      type="submit"
-                      className="rounded-[4px] bg-bChkRed text-white"
+                    startContent={<MdOutlineFilterAlt size={17} />}
+                    radius="none"
+                    size="sm"
+                    type="submit"
+                    className="rounded-[4px] bg-bChkRed text-white"
                   >
-                      Filter
+                    Filter
                   </Button>
                   <Button
                     startContent={<MdOutlineFilterAltOff size={17} />}
@@ -401,87 +420,26 @@ export default function IncomingRequests() {
                     className="rounded-[4px] bg-black text-white"
                     onClick={() => {
                       setFilters({
-                          search_query: "",
-                          status: null,
-                          start_date: null,
-                          end_date: null,
+                        search_query: "",
+                        status: null,
+                        start_date: null,
+                        end_date: null,
                       });
-  
+
                       setSubmittedFilters({
-                          search_query: "",
-                          status: null,
-                          start_date: null,
-                          end_date: null,
+                        search_query: "",
+                        status: null,
+                        start_date: null,
+                        end_date: null,
                       });
                     }}
                   >
-                      Clear
+                    Clear
                   </Button>
-                  </div>
+                </div>
               </form>
             </CardBody>
           </Card>
-
-          {/* <div className="my-3 w-full shadow-none rounded-lg">
-            <div className="grid w-full grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div
-                onClick={() => {
-                  setStatus("allRequests");
-                }}
-                className="rounded-md bg-gray-100 p-4 flex space-x-4 cursor-pointer"
-              >
-                <div className="flex items-center justify-center bg-purple-200 text-cusPurp rounded-full w-10 h-10">
-                  <IoDocuments size={18} />
-                </div>
-                <div className="">
-                  <p className="font-medium">Total Documents</p>
-                  <p className="text-gray-500">{allRequests}</p>
-                </div>
-              </div>
-              <div
-                onClick={() => {
-                  setStatus("pending");
-                }}
-                className="rounded-md bg-gray-100 p-4 flex space-x-4 cursor-pointer"
-              >
-                <div className="flex items-center justify-center bg-yellow-200 text-yellow-500 rounded-full w-10 h-10">
-                  <PiQueueFill size={18} />
-                </div>
-                <div className="">
-                  <p className="font-medium">Pending</p>
-                  <p className="text-gray-500">{pending}</p>
-                </div>
-              </div>
-              <div
-                onClick={() => {
-                  setStatus("approved");
-                }}
-                className="rounded-md bg-gray-100 p-4 flex space-x-4 cursor-pointer"
-              >
-                <div className="flex items-center justify-center bg-green-200 text-green-600 rounded-full w-10 h-10">
-                  <FaHeart size={18} />
-                </div>
-                <div className="">
-                  <p className="font-medium">Approved</p>
-                  <p className="text-gray-500">{approved}</p>
-                </div>
-              </div>
-              <div
-                onClick={() => {
-                  setStatus("rejected");
-                }}
-                className="rounded-md bg-gray-100 p-4 flex space-x-4 cursor-pointer"
-              >
-                <div className="flex items-center justify-center bg-red-200 text-red-600 rounded-full w-10 h-10">
-                  <FcCancel size={18} />
-                </div>
-                <div className="">
-                  <p className="font-medium">Not Approved</p>
-                  <p className="text-gray-500">{rejected}</p>
-                </div>
-              </div>
-            </div>
-          </div> */}
         </section>
 
         <section className="md:px-3 md:w-full w-[98vw] mx-auto">
@@ -492,7 +450,7 @@ export default function IncomingRequests() {
               "Date",
               "Documents",
               "Status",
-              "Total Amount",
+              /* "Total Amount", */
               "Actions",
             ]}
             loadingState={isLoading}
@@ -508,6 +466,10 @@ export default function IncomingRequests() {
             sortOrder={sortOrder}
             setSortBy={setSortBy}
             setSortOrder={setSortOrder}
+            currentPage={currentPage}
+            lastPage={lastPage}
+            total={total}
+            handlePageChange={setCurrentPage}
           >
             {verificationRequests?.map((item) => (
               <TableRow
@@ -519,23 +481,21 @@ export default function IncomingRequests() {
                 </TableCell>
                 <TableCell className="font-semibold">
                   <CustomUser
-                      avatarSrc={`https://admin-dev.baccheck.online/storage/${item?.sending_institution?.logo}`}
-                      name={`${item?.sending_institution?.name}`}
-                      email={`${item?.sending_institution?.institution_email}`}
+                    avatarSrc={`https://admin-dev.baccheck.online/storage/${item?.sending_institution?.logo}`}
+                    name={`${item?.sending_institution?.name}`}
+                    email={`${item?.sending_institution?.institution_email}`}
                   />
                 </TableCell>
                 <TableCell>
                   {moment(item?.created_at).format("MMM D, YYYY")}
                 </TableCell>
                 <TableCell>
-                  {item.institution_document_type
-                    ? item?.institution_document_type?.document_type?.name
-                    : item?.document_type?.name}
+                  {item?.document_type?.name}
                 </TableCell>
                 <TableCell>
                   <StatusChip status={item?.status} />
                 </TableCell>
-                <TableCell> GH¢ {item?.total_amount}</TableCell>
+                {/* <TableCell> GH¢ {item?.total_amount}</TableCell> */}
                 <TableCell className="flex items-center h-16 gap-3">
                   <Button
                     size="sm"
@@ -544,58 +504,27 @@ export default function IncomingRequests() {
                     className="rounded-[4px] text-white"
                     onClick={async () => {
                       if (item?.status === "processing") {
-                        await fetchVerificationChecklist(
-                          item?.document_type?.id
-                        );
+                        await fetchVerificationChecklist(item?.id); // Fetch based on the request ID
                       }
 
-                      setOpenDrawer(true);
-                      setData(item);
+                      setData(item); // Set request-specific data
+                      setOpenDrawer(true); // Open modal after data is set
                     }}
                   >
                     View
                   </Button>
+
                 </TableCell>
               </TableRow>
             ))}
           </CustomTable>
-          <section>
-            <div className="flex justify-between items-center my-1">
-              <div>
-                <span className="text-gray-600 font-medium text-sm">
-                  Page {currentPage} of {lastPage} - ({total} entries)
-                </span>
-              </div>
-              <div className="flex space-x-2">
-                <button
-                  disabled={currentPage === 1}
-                  onClick={() => handlePageChange(currentPage - 1)}
-                  className="px-2 bg-white text-gray-800 border rounded-lg disabled:bg-gray-300 disabled:text-white"
-                >
-                  <FaChevronLeft size={12} />
-                </button>
-
-                {renderPageNumbers()}
-
-                <button
-                  disabled={currentPage === lastPage}
-                  onClick={() => handlePageChange(currentPage + 1)}
-                  className="px-2 bg-white text-gray-800 border rounded-lg disabled:bg-gray-300 disabled:text-white disabled:border-0"
-                >
-                  <FaChevronRight size={12} />
-                </button>
-              </div>
-            </div>
-          </section>
         </section>
 
         <Drawer
-          title={
-            `Request Details`
-          }
+          title={`Request Details`}
           isOpen={openDrawer}
           setIsOpen={setOpenDrawer}
-          classNames="w-[100vw] md:w-[45vw] z-10"
+          classNames="w-[100vw] md:w-[45vw] xl:w-[38vw] z-10"
         >
           <div className="h-full flex flex-col -mt-2 xl:pl-2 font-semibold justify-between">
             {data?.status != "processing" ? (
@@ -640,8 +569,8 @@ export default function IncomingRequests() {
                         data?.status.slice(1)}
                     </p>
                   </div>
-                  <div className="text-gray-500">Document Fee</div>
-                  <div className="col-span-2">GH¢ {data?.total_amount}</div>
+                  {/* <div className="text-gray-500">Document Fee</div>
+                  <div className="col-span-2">GH¢ {data?.total_amount}</div> */}
                 </div>
                 <div className="p">
                   <p className="font-semibold mb-4 text-base">Document Owner</p>
@@ -660,25 +589,25 @@ export default function IncomingRequests() {
                 </div>
                 <div className="py-4">
                   <p className="font-semibold mb-4 text-base">
-                    Verifying Institution
+                    Requesting Institution
                   </p>
                   <div className="grid grid-cols-3 gap-y-4 border-b pb-4">
                     <div className="text-gray-500">Institution Name</div>
                     <div className="col-span-2">
-                      {data?.receiving_institution?.name}
+                      {data?.sending_institution?.name}
                     </div>
                     <div className="text-gray-500">Institution Email</div>
                     <div className="col-span-2">
-                      {data?.receiving_institution?.institution_email}
+                      {data?.sending_institution?.institution_email}
                     </div>
                     <div className="text-gray-500">Phone Number</div>
                     <div className="col-span-2">
-                      {data?.receiving_institution?.helpline_contact}
+                      {data?.sending_institution?.helpline_contact}
                     </div>
                     <div className="text-gray-500 mt-2">Institution Logo</div>
                     <div className="col-span-2 w-10 h-10 rounded-full bg-gray-200">
                       <img
-                        src={`https://admin-dev.baccheck.online/storage/${data?.receiving_institution?.logo}`}
+                        src={`https://admin-dev.baccheck.online/storage/${data?.sending_institution?.logo}`}
                         alt=""
                       />
                     </div>
@@ -688,10 +617,10 @@ export default function IncomingRequests() {
                 <div className="-mt-4">
                   <section className="mb-3 flex items-center justify-between">
                     <div className="w-full flex gap-2 items-center">
-                      <p className="font-semibold ">Attachments</p>
+                      <p className="font-semibold uppercase text-bChkRed">Request Attachment</p>
                     </div>
 
-                    <Button
+                    {/* <Button
                       variant="ghost"
                       size="sm"
                       color="primary"
@@ -704,16 +633,16 @@ export default function IncomingRequests() {
                     >
                       <FaDownload className="text-red-600" />
                       Download all
-                    </Button>
+                    </Button> */}
                   </section>
 
-                  <section className="grid grid-cols-1 xl:grid-cols-2 gap-2">
-                    <div className="gap-3 p-2 rounded-lg border">
+                  <section className="grid grid-cols-1 gap-2">
+                    <div className="gap-3 p-2 rounded-md border">
                       <div className="w-full flex flex-col gap-1">
                         <p className="font-semibold">
                           {data?.document_type?.name}
                         </p>
-                        <p>GH¢ {data?.total_amount}</p>
+                        {/* <p>GH¢ {data?.total_amount}</p> */}
 
                         <div className="flex justify-between">
                           <div className="flex gap-2 items-center">
@@ -721,19 +650,13 @@ export default function IncomingRequests() {
                             <p>{filesize(data?.file?.size ?? 1000)}</p>
                           </div>
                           <div
-                            className="flex space-x-1 cursor-pointer py-1 px-2 rounded-md bg-primary text-white text-xs"
+                            className="flex space-x-1 cursor-pointer py-1 px-2 rounded-sm bg-primary text-white text-xs"
                             // onClick={() => downloadFile(data?.file?.name)}
                             onClick={() => {
                               window.location.href =
                                 "https://admin-dev.baccheck.online/api/download-pdf?path=" +
                                 encodeURIComponent(data?.file?.path);
                             }}
-                            /* onClick={() => {
-                            window.location.href =
-                                "https://admin-dev.baccheck.online/api/document/download" +
-                                "?path=" +
-                                encodeURIComponent(data?.file?.path);
-                            }} */
                           >
                             <FaDownload />
                             <p>Download</p>
@@ -741,42 +664,150 @@ export default function IncomingRequests() {
                         </div>
                       </div>
                     </div>
+                    
+                  </section>
+                  <section className="flex flex-col mt-2">
+                    <p className="uppercase font-semibold py-2 text-bChkRed">Verification Request Documents</p>
+                    <div className="flex flex-col space-y-2">
+                      {/* Show Loading Spinner */}
+                      {isFetching ? (
+                        <div className="flex justify-center items-center col-span-2">
+                          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-gray-900"></div>
+                        </div>
+                      ) : (
+                        <>
+                          {/* Display Reports if available */}
+                          {requestLetter && (
+                            <div className="gap-3 p-2 rounded-md border">
+                              <div className="w-full flex justify-between">
+                                <div className="w-full flex space-x-2 items-center">
+                                  <FaFilePdf size={36} className="text-bChkRed" />
+                                  <div className="flex flex-col space-y-1">
+                                    <p>Request Letter</p>
+                                    <div className="text-xs font-semibold -mt-1">
+                                      <p>From: <span className="font-normal text-gray-500">{data?.sending_institution?.name}</span></p>
+                                    </div>
+                                  </div>
+                                </div>
+                                
+                                <div
+                                  className="flex self-end space-x-1 items-center cursor-pointer py-1 px-2 rounded-sm bg-blue-600 text-white text-xs w-20"
+                                  onClick={() => window.open(requestLetter, "_blank")}
+                                >
+                                  <IoIosOpen size={16} />
+                                  <p>Open</p>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                          {authLetter && (
+                            <div className="gap-3 p-2 rounded-md border">
+                              <div className="w-full flex justify-between">
+                                <div className="w-full flex space-x-2 items-center">
+                                  <FaFilePdf size={36} className="text-bChkRed" />
+                                  <div className="flex flex-col space-y-1">
+                                    <p>Authorisation Letter</p>
+                                    <div className="text-xs font-semibold -mt-1">
+                                      <p>From: <span className="font-normal text-gray-500">{data?.doc_owner_full_name}</span></p>
+                                    </div>
+                                  </div>
+                                </div>
+                                
+                                <div
+                                  className="flex self-end space-x-1 items-center cursor-pointer py-1 px-2 rounded-sm bg-blue-600 text-white text-xs w-20"
+                                  onClick={() => window.open(authLetter, "_blank")}
+                                >
+                                  <IoIosOpen size={16} />
+                                  <p>Open</p>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+  
+                          {verificationReport && (
+                            <div className="gap-3 p-2 rounded-md border">
+                              <div className="w-full flex justify-between">
+                                <div className="w-full flex space-x-2 items-center">
+                                  <FaFilePdf size={36} className="text-bChkRed" />
+                                  <div className="flex flex-col space-y-1">
+                                    <p>Verification Report</p>
+                                    <div className="text-xs font-semibold">
+                                      <p>From: <span className="font-normal text-gray-500">Bacchecker</span></p>
+                                    </div>
+                                  </div>
+                                </div>
+                                
+                                <div
+                                  className="flex self-end space-x-1 items-center cursor-pointer py-1 px-2 rounded-sm bg-blue-600 text-white text-xs w-20"
+                                  onClick={() => window.open(verificationReport, "_blank")}
+                                >
+                                  <IoIosOpen size={16} />
+                                  <p>Open</p>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+  
+                          {/* No Reports Found Message */}
+                          {!authLetter && !requestLetter && !verificationReport && (
+                            <div className="col-span-2 text-center text-gray-500 text-sm py-4">
+                              No reports found.
+                            </div>
+                          )}
+                        </>
+                      )}
+                    </div>
                   </section>
                 </div>
 
                 <div>
                   {data?.status == "rejected" && (
-                    <div className="mt-3">
-                      <Card className="">
-                        <CardHeader>
-                          <p className="font-bold">Rejection Reason</p>
-                        </CardHeader>
-                        <CardBody>
-                          <p>{data?.rejection_reason}</p>
-                        </CardBody>
-                      </Card>
+                    <div className="mt-3 border rounded-md p-4">
+                      <div className="">
+                        <p className="font-semibold text-red-600">
+                          Rejection Reason
+                        </p>
+                        <p className="font-normal">{data?.rejection_reason}</p>
+                      </div>
 
                       <div className="mt-3">
-                        <Card className="">
-                          <CardBody className="flex-row">
+                        <div className="flex flex-row">
+                          {data?.status == "cancelled" ? (
                             <div className="flex-1">
-                              <p className="font-semibold">Rejected By:</p>
-                              <p className="col-span-4">
+                              <p className="font-semibold text-red-600">
+                                Rejected By:
+                              </p>
+                              <p className="font-normal">
+                                {data?.doc_owner_full_name}
+                              </p>
+                              <p className="text-[11px] font-normal">
+                                {data?.doc_owner_email}
+                              </p>
+                            </div>
+                          ) : (
+                            <div className="flex-1">
+                              <p className="font-semibold text-red-600">
+                                Rejected By:
+                              </p>
+                              <p className="font-normal">
                                 {data?.rejected_by?.first_name}{" "}
                                 {data?.rejected_by?.last_name}
                               </p>
-                            </div>
-
-                            <div className="flex-1">
-                              <p className="font-bold">Rejection Date</p>
-                              <p>
-                                {moment(data?.updated_at).format(
-                                  "Do MMMM, YYYY"
-                                )}
+                              <p className="text-[11px] font-normal">
+                                {data?.rejected_by?.email}
                               </p>
                             </div>
-                          </CardBody>
-                        </Card>
+                          )}
+
+                          <div className="flex-1">
+                            <p className="font-semibold text-red-600">
+                              Rejection Date
+                            </p>
+                            <p className="font-normal">
+                              {moment(data?.updated_at).format("Do MMMM, YYYY")}
+                            </p>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   )}
@@ -786,119 +817,108 @@ export default function IncomingRequests() {
               <div className="-mt-2">
                 <div className="">
                   <div className="space-y-2">
-                    {checkListSections.sections &&
-                    checkListSections.sections.length > 0 ? (
-                      checkListSections.sections.map((section) => (
+                    {checkListSections &&
+                    checkListSections.length > 0 ? (
+                      checkListSections.map((section) => (
                         <div
                           key={section.id}
-                          className="space-y-4 pb-4 border p-3 rounded-md"
+                          className="pb-4 border p-3 rounded-md"
                         >
                           {/* Section Header */}
-                          <h2 className="text-base">{section.name}</h2>
-                          {section.description && (
-                            <p className="font-light text-gray-700 text-xs">
-                              {section.description}
-                            </p>
-                          )}
+                          <div className="mb-4">
+                            <h2 className="text-base text-bChkRed">{section.name}</h2>
+                            <p className="font-light text-gray-700 text-xs">{section?.description}</p>
+                          </div>
 
                           {/* Render Items */}
                           <div className="space-y-4">
-                            {section.items.map((item) => (
-                              <div key={item.id} className="space-y-2">
-                                {/* Question Text */}
-                                <p className="text-sm font-normal">
-                                  {item.question_text}
-                                </p>
+                          {section.items.map((item) => {
+                            const possibleReasons = getPossibleReasons(item.question_text);
 
-                                {/* Input Types */}
-                                {item.input_type === "yes_no" && (
-                                  <div className="flex space-x-4 text-base text-gray-600">
-                                    {/* Yes Option */}
-                                    <div
-                                      className={`flex items-center justify-center space-x-2 cursor-pointer border pr-2 font-normal rounded-[4px] py-0.5 ${
-                                        answers[item.id] === "yes"
-                                          ? "text-green-600 border-green-600"
-                                          : "text-gray-600"
-                                      }`}
-                                      onClick={() =>
-                                        handleChange(item.id, "yes")
-                                      }
-                                    >
-                                      <input
-                                        type="radio"
-                                        name={item.id}
-                                        value="yes"
-                                        checked={answers[item.id] === "yes"}
-                                        onChange={() =>
-                                          handleChange(item.id, "yes")
-                                        }
-                                        className="hidden"
-                                      />
-                                      <FaRegCircleCheck size={18} />
-                                      <span>Yes</span>
-                                    </div>
+                            return (
+                              <div key={item.id} className="space-y-1">
+                                <p className="text-sm font-normal">{item.question_text}</p>
 
-                                    {/* No Option */}
-                                    <div
-                                      className={`flex items-center justify-center space-x-2 cursor-pointer border font-normal rounded-[4px] pr-2 py-0.5 ${
-                                        answers[item.id] === "no"
-                                          ? "text-red-600 border-red-600"
-                                          : "text-gray-600"
-                                      }`}
-                                      onClick={() =>
-                                        handleChange(item.id, "no")
-                                      }
-                                    >
-                                      <input
-                                        type="radio"
-                                        name={item.id}
-                                        value="no"
-                                        checked={answers[item.id] === "no"}
-                                        onChange={() =>
-                                          handleChange(item.id, "no")
-                                        }
-                                        className="hidden"
-                                      />
-                                      <GiCancel size={18} />
-                                      <span>No</span>
-                                    </div>
-                                  </div>
-                                )}
-
-                                {item.input_type === "text" && (
-                                  <textarea
-                                    className="w-full border rounded p-2 text-gray-700 focus:outline-none"
-                                    rows="3"
-                                    placeholder="Enter your answer..."
-                                    value={answers[item.id] || ""}
-                                    onChange={(e) =>
-                                      handleChange(item.id, e.target.value)
-                                    }
-                                  ></textarea>
-                                )}
-
-                                {item.input_type === "dropdown" && (
-                                  <select
-                                    className="w-full border rounded p-2.5 text-gray-700 focus:outline-none"
-                                    value={answers[item.id] || ""}
-                                    onChange={(e) =>
-                                      handleChange(item.id, e.target.value)
-                                    }
+                                {/* Yes/No Options */}
+                                <div className="flex space-x-4 text-base text-gray-600">
+                                  {/* Yes Option */}
+                                  <div
+                                    className={`flex items-center justify-center space-x-2 cursor-pointer border pr-2 font-normal rounded-[4px] py-1 text-[13px] ${
+                                      answers[item.id]?.is_correct === 1 ? "text-green-600 border-green-600" : "text-gray-500"
+                                    }`}
+                                    onClick={() => handleChange(item.id, 1, "")}
                                   >
-                                    <option value="" disabled>
-                                      Select an option...
-                                    </option>
-                                    {item.options.map((option, index) => (
-                                      <option key={index} value={option}>
-                                        {option}
-                                      </option>
-                                    ))}
-                                  </select>
+                                    <input
+                                      type="radio"
+                                      name={item.id}
+                                      value="yes"
+                                      checked={answers[item.id]?.is_correct === 1}
+                                      onChange={() => handleChange(item.id, 1, "")}
+                                      className="hidden"
+                                    />
+                                    <FaRegCircleCheck size={18} />
+                                    <span>Yes</span>
+                                  </div>
+
+                                  {/* No Option */}
+                                  <div
+                                    className={`flex items-center justify-center space-x-2 cursor-pointer border font-normal rounded-[4px] pr-2 py-1 text-[13px] ${
+                                      answers[item.id]?.is_correct === 0 ? "text-red-600 border-red-600" : "text-gray-500"
+                                    }`}
+                                    onClick={() => handleChange(item.id, 0, answers[item.id]?.comment || "")}
+                                  >
+                                    <input
+                                      type="radio"
+                                      name={item.id}
+                                      value="no"
+                                      checked={answers[item.id]?.is_correct === 0}
+                                      onChange={() => handleChange(item.id, 0, answers[item.id]?.comment || "")}
+                                      className="hidden"
+                                    />
+                                    <GiCancel size={18} />
+                                    <span>No</span>
+                                  </div>
+                                </div>
+
+                                {/* Show dropdown and textarea when "No" is selected */}
+                                {answers[item.id]?.is_correct === 0 && (
+                                  <>
+                                    <select
+                                      className="w-full border rounded p-2 text-gray-700 focus:outline-none font-normal"
+                                      value={answers[item.id]?.comment || ""}
+                                      onChange={(e) => handleReasonChange(item.id, e.target.value)}
+                                    >
+                                      <option value="" disabled>Select a reason...</option>
+                                      {possibleReasons.map((reason, index) => (
+                                        <option key={index} value={reason}>
+                                          {reason}
+                                        </option>
+                                      ))}
+                                    </select>
+
+                                    {/* Show textarea if "Other" is selected */}
+                                    {showCustomReason[item.id] && (
+                                      <textarea
+                                        className="w-full border rounded p-2 text-gray-700 focus:outline-none font-normal mt-2"
+                                        rows="3"
+                                        placeholder="Enter your custom reason..."
+                                        value={answers[item.id]?.comment || ""}
+                                        onChange={(e) => handleChange(item.id, 0, e.target.value)}
+                                      ></textarea>
+                                    )}
+
+                                    <p className="text-right text-[10px] font-medium text-bChkRed">
+                                      Note: <span className="text-black">It is required to provide a reason</span>
+                                    </p>
+                                  </>
                                 )}
                               </div>
-                            ))}
+                            );
+                          })}
+
                           </div>
                         </div>
+
                       ))
                     ) : (
                       <div className="md:!h-[65vh] h-[60vh] flex flex-col gap-8 items-center justify-center">
@@ -930,20 +950,28 @@ export default function IncomingRequests() {
                 Close
               </Button>
 
-              {(data?.status == "received" || data?.status == "submitted") && (
-                <Button
-                  radius="none"
-                  size="md"
-                  className="w-1/2 bg-gray-300 text-gray-800 font-medium !rounded-md"
-                  onClick={() => declineDisclosure.onOpen()}
+              {data?.status == "processing" && (
+                <PermissionWrapper
+                  permission={["e-check.cancel"]}
                 >
-                  Decline Request
-                </Button>
+                  <Button
+                    radius="none"
+                    size="md"
+                    className="w-1/2 bg-gray-300 text-gray-800 font-medium !rounded-md"
+                    onClick={() => declineDisclosure.onOpen()}
+                  >
+                    Decline Request
+                  </Button>
+                </PermissionWrapper>
               )}
 
               {data?.status !== "created" &&
                 data?.status !== "completed" &&
+                data?.status !== "rejected" &&
                 data?.status !== "processing" && (
+                <PermissionWrapper
+                  permission={["e-check.process"]}
+                >
                   <Button
                     radius="none"
                     className="bg-bChkRed text-white font-medium w-1/2 !rounded-md"
@@ -953,26 +981,27 @@ export default function IncomingRequests() {
                     {data?.status === "submitted"
                       ? "Acknowledge Request"
                       : data?.status === "received"
-                      ? "Process Request"
-                      : data?.status === "rejected" || "cancelled"
-                      ? "Revert Rejection"
+                      ? "Verify Document"
                       : "Acknowledge Request"}
                   </Button>
+                </PermissionWrapper>
+                  
                 )}
               {data?.status === "processing" && (
-                <Button
-                  isLoading={isSaving}
-                  radius="none"
-                  className="bg-bChkRed text-white font-medium w-1/2 !rounded-md"
-                  size="md"
-                  onClick={handleSubmitVerificationAnswers}
-                  disabled={
-                    !checkListSections.sections ||
-                    checkListSections.sections.length === 0
-                  } // Disable if no sections
+                <PermissionWrapper
+                  permission={["e-check.process"]}
                 >
-                  Submit Verifications
-                </Button>
+                  <Button
+                    isLoading={isSaving}
+                    radius="none"
+                    className="bg-bChkRed text-white font-medium w-1/2 !rounded-md"
+                    size="md"
+                    onClick={handleSubmitVerification}
+                    disabled={Object.keys(answers).length === 0}
+                  >
+                    Submit Verifications
+                  </Button>
+                </PermissionWrapper>
               )}
             </div>
           </div>
@@ -982,7 +1011,12 @@ export default function IncomingRequests() {
           processing={processing}
           disclosure={changeStatusDisclosure}
           title="Change Request Status"
+          size="xl"
           onButtonClick={async () => {
+            if (data?.status === "received" && !isChecked) {
+              return toast.error("Please confirm that you have reviewed the documents.");
+            }
+
             setProcessing(true);
             await axios
               .post(
@@ -997,29 +1031,27 @@ export default function IncomingRequests() {
                       ? "received"
                       : data?.status == "received"
                       ? "processing"
-                      : data?.status == "rejected" || "cancelled"
+                      : data?.status == "rejected" || data?.status == "cancelled"
                       ? "received"
                       : "completed",
                 }
               )
-              .then((res) => {
-                if (data?.status == "processing") {
-                  fetchVerificationChecklist();
+              .then(async (res) => {
+                if (res?.data?.status === "processing") {
+                  await fetchVerificationChecklist(data?.id);
                 }
 
                 setData(res?.data);
                 setProcessing(false);
                 toast.success("Request status updated successfully");
                 institutionVerificationRequests();
-                //mutate("/institution/requests/verification-requests");
                 changeStatusDisclosure.onClose();
               })
               .catch((err) => {
                 console.log(err);
-                toast.error(err.response.data.message);
+                toast.error(err.response?.data?.message || "An error occurred");
                 setProcessing(false);
                 changeStatusDisclosure.onClose();
-                return;
               });
           }}
         >
@@ -1029,12 +1061,40 @@ export default function IncomingRequests() {
               {data?.status == "submitted"
                 ? "Received"
                 : data?.status == "received"
-                ? "Processing"
-                : data?.status == "rejected" || "cancelled"
+                ? "Process Request"
+                : data?.status == "rejected" || data?.status == "cancelled"
                 ? "Received"
                 : "Complete Request"}
             </span>
           </p>
+
+          {data?.status == "received" && (
+            <div className="border-l-2 border-bChkRed bg-red-50 shadow-md p-4">
+              <div className="flex flex-col space-y-2">
+                <div className="flex space-x-2 font-semibold text-black">
+                  <BsFillInfoCircleFill size={20} />
+                  <p>Notice</p>
+                </div>
+                <p>
+                  Please review all attached documents before processing this request, ensuring all necessary consent and compliance documents are in order.
+                </p>
+
+                {/* ✅ Checkbox */}
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    id="reviewCheckbox"
+                    checked={isChecked}
+                    onChange={(e) => setIsChecked(e.target.checked)}
+                    className="w-4 h-5 cursor-pointer accent-bChkRed"
+                  />
+                  <label htmlFor="reviewCheckbox" className="text-sm font-semibold">
+                    I have reviewed the documents
+                  </label>
+                </div>
+              </div>
+            </div>
+          )}
         </ConfirmModal>
 
         <DeleteModal
@@ -1080,6 +1140,7 @@ export default function IncomingRequests() {
           <Textarea
             name="rejection_reason"
             label="Reason"
+            radius="none"
             onChange={(e) =>
               setData((prev) => ({ ...prev, rejection_reason: e.target.value }))
             }

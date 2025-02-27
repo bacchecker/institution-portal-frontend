@@ -6,7 +6,7 @@ import DashboardValidationRequestReports from "./DashboardValidationRequestRepor
 
 function DashboardReports({ clickedDefaultItems, dashboardScreens }) {
     const [currentScreen1, setCurrentScreen1] = useState(1);
-    const lineRef1 = useRef(null);
+    const lineRef12 = useRef(null);
     const [lineStyle, setLineStyle] = useState({ width: 0, left: 0 });
 
     const user = JSON.parse(secureLocalStorage.getItem("user"));
@@ -19,7 +19,7 @@ function DashboardReports({ clickedDefaultItems, dashboardScreens }) {
         });
     };
     useEffect(() => {
-        const activeButton = document.querySelector(".active-button");
+        const activeButton = document.querySelector(".active-button2");
         if (activeButton) {
             setLineStyle({
                 width: activeButton.offsetWidth,
@@ -51,7 +51,7 @@ function DashboardReports({ clickedDefaultItems, dashboardScreens }) {
                     {((clickedDefaultItems.includes("reports_validation_requests") || dashboardScreens.includes("reports_validation_requests")) && (clickedDefaultItems.includes("reports_document_requests") || dashboardScreens.includes("reports_document_requests"))) && (
                         <div className="w-full border-b border-[#d5d6d6] flex md:gap-[2vw] gap-[6vw] relative ">
                             <button
-                                className={`md:text-[1vw] text-[3.5vw] tab_button py-[0.3vw] ${currentScreen1 === 1 && "active-button"
+                                className={`md:text-[1vw] text-[3.5vw] tab_button py-[0.3vw] ${currentScreen1 === 1 && "active-button2"
                                     }`}
                                 onClick={(e) => {
                                     handleTabClick(e);
@@ -61,7 +61,7 @@ function DashboardReports({ clickedDefaultItems, dashboardScreens }) {
                                 Document Requests Report
                             </button>
                             <button
-                                className={`md:text-[1vw] text-[3.5vw] tab_button py-[0.3vw] ${currentScreen1 === 2 && "active-button"
+                                className={`md:text-[1vw] text-[3.5vw] tab_button py-[0.3vw] ${currentScreen1 === 2 && "active-button2"
                                     }`}
                                 onClick={(e) => {
                                     handleTabClick(e);
@@ -82,7 +82,7 @@ function DashboardReports({ clickedDefaultItems, dashboardScreens }) {
                         </button> */}
                             <div
                                 className="line"
-                                ref={lineRef1}
+                                ref={lineRef12}
                                 style={{
                                     width: `${lineStyle.width}px`,
                                     left: `${lineStyle.left}px`,

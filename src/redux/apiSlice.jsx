@@ -1,6 +1,7 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { useNavigate } from "react-router-dom";
 import secureLocalStorage from "react-secure-storage";
+import { setUser } from "./authSlice";
 
 export const baccheckerApi = createApi({
   reducerPath: "baccheckerApi",
@@ -8,8 +9,8 @@ export const baccheckerApi = createApi({
     const token = JSON?.parse(secureLocalStorage?.getItem("userToken"))?.token;
 
     const result = await fetchBaseQuery({
-      baseUrl: "https://admin-dev.baccheck.online/api",
-      // baseUrl: "http://aw8kkg8ck48040oc4cgo44so.67.205.158.15.sslip.io/api",
+      baseUrl:
+        import.meta.env.VITE_BACCHECKER_API_URL || "http://127.0.0.1:8000/api",
 
       prepareHeaders: (headers) => {
         if (token) {
@@ -49,6 +50,7 @@ export const baccheckerApi = createApi({
     "Payment",
     "Validation",
     "Affiliation",
+    "Notification",
   ],
   endpoints: (builder) => ({
     loginUser: builder.mutation({
@@ -59,28 +61,42 @@ export const baccheckerApi = createApi({
       }),
       invalidatesTags: ["Log"],
     }),
+    getNotifications: builder.query({
+      query: () => "/institution/notifications",
+      refetchOnFocus: true,
+      providesTags: ["Notification"],
+    }),
     getInstitutionDetails: builder.query({
       query: () => "/institution/institution-data",
       providesTags: ["Institution"],
-      transformResponse: (response) => {
-        if (response?.institutionData) {
-          const user = JSON.parse(secureLocalStorage.getItem("user"));
-          if (user) {
-            secureLocalStorage.setItem(
-              "user",
-              JSON.stringify({
+      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          if (data?.institutionData) {
+            const user = JSON.parse(secureLocalStorage.getItem("user"));
+            if (user) {
+              const updatedUser = {
                 ...user,
-                institution: response.institutionData.institution,
-                user: response.institutionData.user,
-              })
-            );
+                institution: data.institutionData.institution,
+                user: data.institutionData.user,
+              };
+              // Update local storage
+              secureLocalStorage.setItem("user", JSON.stringify(updatedUser));
+              // Update Redux store
+              dispatch(setUser(updatedUser));
+            }
           }
+        } catch (err) {
+          console.error("Failed to update user data:", err);
         }
-        return response;
       },
     }),
     getInstitutionRevenueGraph: builder.query({
       query: () => "/institution/revenue",
+      providesTags: ["DocumentRequest"],
+    }),
+    getInstitutionVerificationData: builder.query({
+      query: () => "/institution/verification/dashboard-data",
       providesTags: ["DocumentRequest"],
     }),
     getAllPermissions: builder.query({
@@ -115,7 +131,82 @@ export const baccheckerApi = createApi({
       },
       providesTags: ["Department"],
     }),
+    getInstitutionVericationRequestsReceived: builder.query({
+      query: ({
+        page,
+        searchValue,
+        selectedFrom,
+        selectedTo,
+        selectedDocumentType,
+        sortBy,
+        sortOrder,
+        selectedStatus,
+      }) => {
+        let queryString = `/institution/requests/verification-in-requests?page=${page}`;
+        if (searchValue) {
+          queryString += `&search_query=${searchValue}`;
+        }
+        if (selectedFrom) {
+          queryString += `&start_date=${selectedFrom}`;
+        }
+        if (selectedTo) {
+          queryString += `&end_date=${selectedTo}`;
+        }
+        if (selectedDocumentType) {
+          queryString += `&document_type=${selectedDocumentType}`;
+        }
+        if (sortBy) {
+          queryString += `&sort_by=${sortBy}`;
+        }
+        if (sortOrder) {
+          queryString += `&sort_order=${sortOrder}`;
+        }
+        if (selectedStatus) {
+          queryString += `&status=${selectedStatus}`;
+        }
 
+        return queryString;
+      },
+      // providesTags: ["DocumentRequest"],
+    }),
+    getInstitutionVericationRequestsSent: builder.query({
+      query: ({
+        page,
+        searchValue,
+        selectedFrom,
+        selectedTo,
+        selectedDocumentType,
+        sortBy,
+        sortOrder,
+        selectedStatus,
+      }) => {
+        let queryString = `/institution/requests/verification-out-requests?page=${page}`;
+        if (searchValue) {
+          queryString += `&search_query=${searchValue}`;
+        }
+        if (selectedFrom) {
+          queryString += `&start_date=${selectedFrom}`;
+        }
+        if (selectedTo) {
+          queryString += `&end_date=${selectedTo}`;
+        }
+        if (selectedDocumentType) {
+          queryString += `&document_type=${selectedDocumentType}`;
+        }
+        if (sortBy) {
+          queryString += `&sort_by=${sortBy}`;
+        }
+        if (sortOrder) {
+          queryString += `&sort_order=${sortOrder}`;
+        }
+        if (selectedStatus) {
+          queryString += `&status=${selectedStatus}`;
+        }
+
+        return queryString;
+      },
+      // providesTags: ["DocumentRequest"],
+    }),
     getInstitutionDocumentRequests: builder.query({
       query: ({
         page,
@@ -419,6 +510,13 @@ export const baccheckerApi = createApi({
       }),
       invalidatesTags: ["Log"],
     }),
+    updateNotification: builder.mutation({
+      query: ({ id }) => ({
+        url: `/institution/notifications/${id}`,
+        method: "POST",
+      }),
+      invalidatesTags: ["Notification"],
+    }),
     changePassword: builder.mutation({
       query: (body) => ({
         url: "/auth/change-password",
@@ -601,11 +699,40 @@ export const baccheckerApi = createApi({
     }),
     validateDocument: builder.mutation({
       query: (body) => ({
-        url: "/verifications",
+        url: "/institution/requests/verifications",
         method: "POST",
         body,
       }),
       invalidatesTags: ["Log"],
+    }),
+    completeAccountSetup: builder.mutation({
+      query: () => ({
+        url: "/institution/complete-setup",
+        method: "POST",
+      }),
+      invalidatesTags: ["Institution"],
+      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+        try {
+          await queryFulfilled;
+          const user = JSON.parse(secureLocalStorage.getItem("user"));
+          if (user) {
+            const updatedUser = {
+              ...user,
+              institution: {
+                ...user.institution,
+                setup_done: true,
+                current_step: "5",
+              },
+            };
+            // Update local storage
+            secureLocalStorage.setItem("user", JSON.stringify(updatedUser));
+            // Update Redux store
+            dispatch(setUser(updatedUser));
+          }
+        } catch (err) {
+          console.error("Failed to complete account setup:", err);
+        }
+      },
     }),
   }),
 });
@@ -657,4 +784,10 @@ export const {
   useValidateDocumentMutation,
   useCustomizeDashboardMutation,
   useGetInstitutionValidationRequestsQuery,
+  useGetNotificationsQuery,
+  useUpdateNotificationMutation,
+  useGetInstitutionVerificationDataQuery,
+  useGetInstitutionVericationRequestsSentQuery,
+  useGetInstitutionVericationRequestsReceivedQuery,
+  useCompleteAccountSetupMutation,
 } = baccheckerApi;
