@@ -757,7 +757,7 @@ export default function OutgoingRequests() {
                         )}
 
                         {/* No Reports Found Message */}
-                        {!authLetter && !requestLetter && !verificationReport && (
+                        {!verificationReport && (
                           <div className="col-span-2 text-center text-gray-500 text-sm py-4">
                             No reports found.
                           </div>

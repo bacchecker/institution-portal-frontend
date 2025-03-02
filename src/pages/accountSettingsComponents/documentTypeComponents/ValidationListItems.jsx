@@ -3,6 +3,8 @@ import axios from "@/utils/axiosConfig";
 import { Button, Select, SelectItem, Input } from "@nextui-org/react";
 import { toast } from "sonner";
 import { v4 as uuidv4 } from "uuid";
+import { IoMdClose } from "react-icons/io";
+import { IoTrashOutline } from "react-icons/io5";
 
 const inputTypes = [
   { label: "Text Input", value: "text" },
@@ -24,14 +26,7 @@ export default function ChecklistManager({ selectedDocumentType }) {
     });
 
 
-  // Store newly requested questions separately
   const [requestedQuestions, setRequestedQuestions] = useState({});
-
-  /* useEffect(() => {
-    if (selectedDocumentType?.checklist_sections) {
-      setSections(selectedDocumentType.checklist_sections);
-    }
-  }, [selectedDocumentType]); */
 
   // Fetch sections and pending updates
     const fetchSections = async () => {
@@ -74,7 +69,7 @@ export default function ChecklistManager({ selectedDocumentType }) {
         description: newSection.description,
         checklist_items: [],
     };
-
+    toast.success('Section added successfully')
     setSections([...sections, newSectionData]);
     setNewSection({ name: "", description: "" });
 
@@ -90,7 +85,7 @@ export default function ChecklistManager({ selectedDocumentType }) {
             id: uuidv4(),
             question_text: newQuestion.question_text,
             input_type: newQuestion.input_type,
-            is_mandatory: Boolean(newQuestion.is_mandatory), // ✅ Ensure is_mandatory is stored
+            is_mandatory: Boolean(newQuestion.is_mandatory),
             options: newQuestion.input_type === "dropdown" ? newQuestion.options.split(",").map(opt => opt.trim()) : null,
         };
 
@@ -102,19 +97,37 @@ export default function ChecklistManager({ selectedDocumentType }) {
         setNewQuestion({ question_text: "", input_type: "text", options: "", is_mandatory: true });
     };
 
-
+    const handleRemoveSection = (sectionId) => {
+      setSections((prevSections) => prevSections.filter((section) => section.id !== sectionId));
+      setRequestedQuestions((prev) => {
+        const updatedQuestions = { ...prev };
+        delete updatedQuestions[sectionId];
+        return updatedQuestions;
+      });
+      toast.success("Section removed successfully.");
+    };
+  
+    const handleRemoveQuestion = (sectionId, questionId) => {
+      setRequestedQuestions((prev) => ({
+        ...prev,
+        [sectionId]: prev[sectionId]?.filter((question) => question.id !== questionId),
+      }));
+      toast.success("Question removed successfully.");
+    };
+    
     const handleSubmit = async () => {
         const formattedSections = sections
             .filter(section => requestedQuestions[section.id] && requestedQuestions[section.id].length > 0)
             .map((section, sectionIndex) => ({
                 id: section.id && typeof section.id === "string" ? section.id : uuidv4(),
                 name: section.name,
+                description: section.description,
                 order: sectionIndex + 1,
                 items: requestedQuestions[section.id].map((item, itemIndex) => ({
                     id: item.id,
                     question_text: item.question_text,
                     input_type: item.input_type,
-                    is_mandatory: item.is_mandatory ? 1 : 0, // ✅ Ensure it's always true/false
+                    is_mandatory: item.is_mandatory ? 1 : 0,
                     order: section.checklist_items.length + itemIndex + 1,
                     options: item.input_type === "dropdown" ? item.options : null,
                 })),
@@ -150,149 +163,52 @@ export default function ChecklistManager({ selectedDocumentType }) {
       <div className="w-full">
         {sections?.length > 0 && (
           <div className="mb-4">
-            <h3 className="text-md font-semibold mb-2">Checklist Sections:</h3>
-            {sections?.map((section) => (
-              <div key={section.id} className="mb-3 p-3 border rounded">
-                <h4 className="font-semibold text-black">{section?.name}</h4>
-                <p className="text-xs text-gray-600 mb-2">{section?.description}</p>
-                
-                {/* Existing Questions */}
-                <div className="mt-2 ml-2">
-                  {section.checklist_items.map((item) => (
-                    <div key={item.id} className="mb-3">
-                        <div className="flex space-x-2 items-center mb-1">
-                            <p className="font-medium">{item.question_text}</p>
-                            <label className="flex items-center space-x-1 accent-bChkRed">
-                                <input 
-                                    type="checkbox" 
-                                    checked={item.is_mandatory} 
-                                    className="cursor-pointer"
-                                />
-                                <span className="text-xs">Required</span>
-                            </label>
-                        </div>
-                      
-                      {item.input_type === "dropdown" && item.options ? (
-                        <div className="flex flex-wrap gap-2">
-                          {item.options.map((option, index) => (
-                            <span key={index} className="px-2 py-1 text-xs bg-gray-100 rounded-md">
-                              {option}
-                            </span>
-                          ))}
-                        </div>
-                      ) : (
-                        <div className="px-2 py-1 bg-gray-100 rounded-md inline-block text-xs">
-                          {inputTypes.find((type) => type.value === item.input_type)?.label}
-                        </div>
-                      )}
+            {sections
+              .filter(
+                (section) =>
+                  requestedQuestions[section.id]?.length > 0
+              )
+              .map((section) => (
+                <div key={section.id} className="mb-3 p-3 border rounded">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <h4 className="font-semibold text-black">{section?.name}</h4>
+                      <p className="text-xs text-gray-600 mb-2">{section?.description}</p>
                     </div>
-                  ))}
-                </div>
-                {/* Pending Updates for This Section */}
-                {pendingUpdates.find(update => update.id === section.id)?.items?.length > 0 && (
-                    <div className="mt-4 border-t pt-2">
-                        <div className="">
-                            <p className="text-sm font-medium text-orange-500">Pending Updates:</p>
-                                {pendingUpdates
-                                .find(update => update.id === section.id)
-                                ?.items.map((item) => (
-                                    <div key={item.id} className="mb-2">
-                                        <p className="font-medium">{item.question_text}</p>
-                                        {item.input_type === "dropdown" && item.options ? (
-                                            <div className="flex flex-wrap gap-2">
-                                            {item.options.map((option, index) => (
-                                                <span key={index} className="px-2 py-1 text-xs bg-yellow-100 rounded-md">
-                                                {option}
-                                                </span>
-                                            ))}
-                                            </div>
-                                        ) : (
-                                            <div className="px-2 py-1 bg-yellow-100 rounded-md inline-block text-xs">
-                                            {inputTypes.find((type) => type.value === item.input_type)?.label}
-                                            </div>
-                                        )}
-                                        {/* <div className="px-2 py-1 bg-yellow-100 rounded-md inline-block text-xs">
-                                            {inputTypes.find((type) => type.value === item.input_type)?.label}
-                                        </div> */}
-                                    </div>
-                                ))}
-                        </div>
-                        
-                    </div>
-                )}
-
-                {/* Display New Sections That Exist Only in Pending Updates */}
-                {pendingUpdates
-                    .filter(update => !sections.some(section => section.id === update.id))
-                    .map((newSection) => (
-                        <div key={newSection.id} className="my-3 p-3 border border-orange-500 rounded bg-orange-50">
-                            <h4 className="font-semibold text-orange-600">{newSection?.name} (New Section)</h4>
-                            <p className="text-xs text-gray-600 mb-2">{newSection?.description}</p>
-
-                            {/* Pending Items */}
-                            {newSection.items.map((item) => (
-                                <div key={item.id} className="mb-2">
-                                    <p className="font-medium">{item.question_text}</p>
-                                    {item.input_type === "dropdown" && item.options ? (
-                                        <div className="flex flex-wrap gap-2">
-                                        {item.options.map((option, index) => (
-                                            <span key={index} className="px-2 py-1 text-xs bg-yellow-100 rounded-md">
-                                            {option}
-                                            </span>
-                                        ))}
-                                        </div>
-                                    ) : (
-                                        <div className="px-2 py-1 bg-yellow-100 rounded-md inline-block text-xs">
-                                        {inputTypes.find((type) => type.value === item.input_type)?.label}
-                                        </div>
-                                    )}
-                                </div>
-                            ))}
-                        </div>
-                ))}
-
-                {/* Requested Questions (Pending Submission) */}
-                {requestedQuestions[section.id]?.length > 0 && (
-                  <div className="mt-4 border-t pt-2">
-                    <p className="text-sm font-medium text-blue-500 mb-2">
-                      New Questions (Pending Submission):
-                    </p>
-                    {requestedQuestions[section.id].map((item) => (
-                      <div key={item.id} className="mb-2">
-                        <div className="flex space-x-2 items-center mb-1">
-                            <p className="font-medium">{item.question_text}</p>
-                            <label className="flex items-center space-x-1 accent-bChkRed">
-                                <input 
-                                    type="checkbox" 
-                                    checked={item.is_mandatory} 
-                                    className="cursor-pointer"
-                                />
-                                <span className="text-xs">Required</span>
-                            </label>
-                        </div>
-                        
-                        {item.input_type === "dropdown" && item.options ? (
-                          <div className="flex flex-wrap gap-2">
-                            {item.options.map((option, index) => (
-                              <span key={index} className="px-2 py-1 text-xs bg-gray-200 rounded-md">
-                                {option}
-                              </span>
-                            ))}
-                          </div>
-                        ) : (
-                          <div className="px-2 py-1 bg-gray-200 rounded-md inline-block text-xs">
-                            {inputTypes.find((type) => type.value === item.input_type)?.label}
-                          </div>
-                        )}
-                      </div>
-                    ))}
+                    <Button 
+                      size="sm"
+                      className="bg-transparent text-bChkRed"
+                      onClick={() => handleRemoveSection(section.id)}
+                    >
+                      <IoTrashOutline size={22}/>
+                    </Button>
                   </div>
-                )}
-              </div>
-            ))}
+
+                  {requestedQuestions[section.id]?.length > 0 && (
+                    <div className="mt-4 border-t pt-2">
+                      <p className="text-sm font-medium text-blue-500 mb-2">
+                        New Questions (Pending Submission):
+                      </p>
+                      {requestedQuestions[section.id].map((item) => (
+                        <div key={item.id} className="mb-2 flex justify-between items-center">
+                          <p className="font-medium">{item.question_text}</p>
+                          <Button 
+                            size="sm"
+                            className="bg-transparent text-bChkRed"
+                            onClick={() => handleRemoveQuestion(section.id, item.id)}
+                          >
+                            <IoMdClose size={22}/>
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
           </div>
         )}
       </div>
+
 
       {/* Add New Section */}
       <div className="border p-2 rounded-md mb-4">

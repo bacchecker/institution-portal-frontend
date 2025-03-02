@@ -140,7 +140,7 @@ export default function IncomingRequests() {
     setAnswers((prev) => ({
       ...prev,
       [itemId]: { 
-        is_correct: isCorrect ? 1 : 0, // Convert true → 1, false → 0
+        is_correct: isCorrect ? 1 : 0,
         comment: comment 
       },
     }));

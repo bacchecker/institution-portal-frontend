@@ -3,6 +3,8 @@ import axios from "@/utils/axiosConfig";
 import { Button, Select, SelectItem, Input } from "@nextui-org/react";
 import { toast } from "sonner";
 import { v4 as uuidv4 } from "uuid";
+import { IoTrashOutline } from "react-icons/io5";
+import { IoMdClose } from "react-icons/io";
 
 export default function VerificationChecklistManager({ selectedDocumentType }) {
   // State for existing verification sections (from document type)
@@ -66,6 +68,7 @@ export default function VerificationChecklistManager({ selectedDocumentType }) {
       items: [],
     };
 
+    toast.success('Section added successfully')
     setVerificationSections([...verificationSections, newSectionData]);
     setNewVerificationSection({ name: "", description: "", weight: "" });
     // Auto-select the new section for adding a question
@@ -97,8 +100,26 @@ export default function VerificationChecklistManager({ selectedDocumentType }) {
     setNewVerificationQuestion({ question_text: "", is_mandatory: true });
   };
 
-  // Submit the verification update request.
-  // Note: We set checklist_sections to null.
+  // Remove a section before submission
+  const handleRemoveSection = (sectionId) => {
+    setVerificationSections(prevSections => prevSections.filter(section => section.id !== sectionId));
+    setRequestedVerificationQuestions(prev => {
+      const updatedQuestions = { ...prev };
+      delete updatedQuestions[sectionId];
+      return updatedQuestions;
+    });
+    toast.success("Section removed successfully.");
+  };
+
+  // Remove a question from pending submission
+  const handleRemoveQuestion = (sectionId, questionId) => {
+    setRequestedVerificationQuestions(prev => ({
+      ...prev,
+      [sectionId]: prev[sectionId]?.filter(question => question.id !== questionId),
+    }));
+    toast.success("Question removed successfully.");
+  };
+
   const handleSubmit = async () => {
     const formattedVerificationSections = verificationSections
       .filter(section => requestedVerificationQuestions[section.id] && requestedVerificationQuestions[section.id].length > 0)
@@ -144,106 +165,101 @@ export default function VerificationChecklistManager({ selectedDocumentType }) {
       <div className="w-full">
         {verificationSections?.length > 0 && (
           <div className="mb-4">
-            <h3 className="text-md font-semibold mb-2">Verification Checklist Sections:</h3>
-            {verificationSections.map((section) => (
-              <div key={section.id} className="mb-3 p-3 border rounded">
-                <h4 className="font-semibold text-black">{section.name}</h4>
-                <p className="text-xs text-gray-600 mb-2">{section.description}</p>
-                <p className="text-xs text-gray-600 mb-2">Weight: {section.weight}</p>
-
-                {/* Existing Items */}
-                <div className="mt-2 ml-2">
-                  {section.items?.map((item) => (
-                    <div key={item.id} className="mb-3">
-                      <p className="font-medium">{item.question_text}</p>
-                      <label className="flex items-center space-x-1 accent-bChkRed">
-                        <input
-                          type="checkbox"
-                          checked={item.is_mandatory}
-                          readOnly
-                          className="cursor-pointer"
-                        />
-                        <span className="text-xs">Required</span>
-                      </label>
+            {verificationSections
+              .filter(
+                (section) =>
+                  requestedVerificationQuestions[section.id]?.length > 0 || // Show section if it has new questions
+                  pendingVerificationUpdates.find((update) => update.id === section.id)?.items?.length > 0 // Show section if it has pending updates
+              )
+              .map((section) => (
+                <div key={section.id} className="mb-3 p-3 border rounded">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <h4 className="font-semibold text-black">{section?.name}</h4>
+                      <p className="text-xs text-gray-600 mb-2">{section?.description}</p>
+                      <p className="text-xs text-bChkRed mb-2">Weight: {section?.weight}%</p>
                     </div>
-                  ))}
-                </div>
+                    
+                    {/* Remove Section Button */}
+                    <Button 
+                      size="sm"
+                      className="bg-transparent text-bChkRed"
+                      onClick={() => handleRemoveSection(section.id)}
+                    >
+                      <IoTrashOutline size={22}/>
+                    </Button>
+                  </div>
 
-                {/* Pending Updates for This Section */}
-                {pendingVerificationUpdates.find(update => update.id === section.id)?.items?.length > 0 && (
-                  <div className="mt-4 border-t pt-2">
-                    <p className="text-sm font-medium text-orange-500">Pending Updates:</p>
-                    {pendingVerificationUpdates
-                      .find(update => update.id === section.id)
-                      ?.items.map((item) => (
-                        <div key={item.id} className="mb-2">
-                          <p className="font-medium">{item.question_text}</p>
-                          <label className="flex items-center space-x-1 accent-bChkRed">
-                            <input
-                              type="checkbox"
-                              checked={item.is_mandatory}
-                              readOnly
-                              className="cursor-pointer"
-                            />
-                            <span className="text-xs">Required</span>
-                          </label>
+                  {/* Show New Questions (Pending Submission) */}
+                  {requestedVerificationQuestions[section.id]?.length > 0 && (
+                    <div className="mt-4 border-t pt-2">
+                      <p className="text-sm font-medium text-blue-500 mb-2">
+                        New Questions (Pending Submission):
+                      </p>
+                      {requestedVerificationQuestions[section.id].map((item) => (
+                        <div key={item.id} className="mb-2 flex justify-between items-center">
+                          <div>
+                            <p className="font-medium">{item.question_text}</p>
+                            <label className="flex items-center space-x-1">
+                              <input
+                                type="checkbox"
+                                checked={item.is_mandatory}
+                                readOnly
+                                className="cursor-pointer accent-bChkRed"
+                              />
+                              <span className="text-xs">Required</span>
+                            </label>
+                          </div>
+                          
+                          {/* Remove Question Button */}
+                          <Button 
+                            size="sm"
+                            className="bg-transparent text-bChkRed"
+                            onClick={() => handleRemoveQuestion(section.id, item.id)}
+                          >
+                            <IoMdClose size={22}/>
+                          </Button>
                         </div>
                       ))}
-                  </div>
-                )}
-
-                {/* New Requested Verification Items (Pending Submission) */}
-                {requestedVerificationQuestions[section.id]?.length > 0 && (
-                  <div className="mt-4 border-t pt-2">
-                    <p className="text-sm font-medium text-blue-500 mb-2">
-                      New Questions (Pending Submission):
-                    </p>
-                    {requestedVerificationQuestions[section.id].map((item) => (
-                      <div key={item.id} className="mb-2">
-                        <p className="font-medium">{item.question_text}</p>
-                        <label className="flex items-center space-x-1 accent-bChkRed">
-                          <input
-                            type="checkbox"
-                            checked={item.is_mandatory}
-                            readOnly
-                            className="cursor-pointer"
-                          />
-                          <span className="text-xs">Required</span>
-                        </label>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
-
-            {/* Display New Sections That Exist Only in Pending Updates */}
-            {pendingVerificationUpdates
-              .filter(update => !verificationSections.some(section => section.id === update.id))
-              .map((newSec) => (
-                <div key={newSec.id} className="mb-3 p-3 border border-orange-500 rounded bg-orange-50">
-                  <h4 className="font-semibold text-orange-600">{newSec.name} (New Section)</h4>
-                  <p className="text-xs text-gray-600 mb-2">{newSec.description}</p>
-                  <p className="text-xs text-gray-600 mb-2">Weight: {newSec.weight}</p>
-                  {newSec.items.map((item) => (
-                    <div key={item.id} className="mb-2">
-                      <p className="font-medium">{item.question_text}</p>
-                      <label className="flex items-center space-x-1">
-                        <input
-                          type="checkbox"
-                          checked={item.is_mandatory}
-                          readOnly
-                          className="cursor-pointer"
-                        />
-                        <span className="text-xs">Required</span>
-                      </label>
                     </div>
-                  ))}
+                  )}
                 </div>
               ))}
           </div>
         )}
+
+        {/* Pending Updates (Separate from Existing Sections) */}
+        {pendingVerificationUpdates.length > 0 && (
+          <div className="mt-6 p-3 border border-orange-600 rounded bg-orange-50">
+            <h3 className="text-md font-semibold text-orange-600 mb-2">Pending Updates</h3>
+            {pendingVerificationUpdates.map((update) => (
+              <div key={update.id} className="mb-4 p-3 border border-orange-400 rounded">
+                <h4 className="font-semibold text-orange-600">{update.name} {verificationSections.some(section => section.id === update.id) ? "(Update)" : "(New Section)"}</h4>
+                <p className="text-xs text-gray-600 mb-2">{update?.description}</p>
+                <p className="text-xs text-gray-600 mb-2">Weight: {update?.weight}</p>
+
+                {/* Pending Questions */}
+                {update.items.map((item) => (
+                  <div key={item.id} className="mb-2 pl-2 border-l-4 border-orange-300">
+                    <p className="font-medium">{item.question_text}</p>
+                    <label className="flex items-center space-x-1">
+                      <input
+                        type="checkbox"
+                        checked={item.is_mandatory}
+                        readOnly
+                        className="cursor-pointer accent-bChkRed"
+                      />
+                      <span className="text-xs">Required</span>
+                    </label>
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
+
+
 
       {/* Add New Verification Section */}
       <div className="border p-2 rounded-md mb-4">
@@ -298,7 +314,7 @@ export default function VerificationChecklistManager({ selectedDocumentType }) {
             type="checkbox"
             checked={newVerificationQuestion.is_mandatory}
             onChange={(e) => setNewVerificationQuestion({ ...newVerificationQuestion, is_mandatory: e.target.checked })}
-            className="cursor-pointer"
+            className="cursor-pointer accent-bChkRed"
           />
           <span>Is Required</span>
         </label>

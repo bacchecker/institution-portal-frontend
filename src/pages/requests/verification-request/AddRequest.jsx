@@ -28,6 +28,7 @@ function NewApplicationForm({
     otherInstitutionEmail: "",
     otherInstitutionPostalAddress: "",
     reason: "",
+    purpose: "",
     doc_owner_full_name: "",
     doc_owner_email: "",
     doc_owner_phone: "",
@@ -68,10 +69,6 @@ function NewApplicationForm({
     { title: "Non-Academic Credentials", value: "non-academic" },
   ];
 
-  const purposeTypes = [
-    { title: "Educational", value: "Educational" },
-    { title: "Employment", value: "Employment" },
-  ];
   const academicLevels = [
     { title: "tertiary" },
     { title: "secondary" },
@@ -86,6 +83,15 @@ function NewApplicationForm({
     { title: "BacChecker Business", value: "bacchecker-business" },
     { title: "BacChecker Government", value: "bacchecker-government" },
   ];
+
+  const handleSelectChange = (e) => {
+    const selectedValue = e.target.value;
+    setUserInput((prev) => ({
+      ...prev,
+      purpose: selectedValue,
+      reason: selectedValue !== "Others" ? selectedValue : "",
+    }));
+  };
 
   useEffect(() => {
     if (!openModal) {
@@ -1106,16 +1112,33 @@ function NewApplicationForm({
               Purpose
               <span className="text-[#f1416c]">*</span>
             </h4>
-            <div className="relative w-full md:h-[7vw] h-[30vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
-              <textarea
-                placeholder="Enter your reason for the document verification"
-                value={userInput?.reason}
-                name="reason"
-                required
-                onChange={handleUserInput}
-                className="w-full h-full md:p-[0.8vw] p-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0"
-              ></textarea>
-            </div>
+            
+            {/* Select Input */}
+            <select
+              name="purpose"
+              value={userInput.purpose}
+              onChange={handleSelectChange}
+              className="w-full md:p-[0.8vw] p-[2vw] md:text-[1vw] text-[3.5vw] border-[1.5px] border-[#E5E5E5] bg-[#f7f7f7] focus:outline-none"
+            >
+              <option value="">Select Purpose</option>
+              <option value="Educational">Educational</option>
+              <option value="Employment">Employment</option>
+              <option value="Others">Others</option>
+            </select>
+
+            {/* Conditionally render textarea */}
+            {userInput.purpose === "Others" && (
+              <div className="relative w-full md:h-[7vw] h-[30vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5] mt-2">
+                <textarea
+                  placeholder="Enter your reason for the document verification"
+                  value={userInput.reason}
+                  name="reason"
+                  required
+                  onChange={handleUserInput}
+                  className="w-full h-full md:p-[0.8vw] p-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0"
+                ></textarea>
+              </div>
+            )}
           </div>
 
           <button
