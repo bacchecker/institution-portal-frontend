@@ -22,6 +22,7 @@ export default function VerificationChecklistManager({ selectedDocumentType }) {
   });
   // Store newly requested verification questions separately (per section)
   const [requestedVerificationQuestions, setRequestedVerificationQuestions] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Fetch existing verification sections and pending updates
   const fetchVerificationSections = async () => {
@@ -121,6 +122,7 @@ export default function VerificationChecklistManager({ selectedDocumentType }) {
   };
 
   const handleSubmit = async () => {
+    setIsSubmitting(true)
     const formattedVerificationSections = verificationSections
       .filter(section => requestedVerificationQuestions[section.id] && requestedVerificationQuestions[section.id].length > 0)
       .map((section, sectionIndex) => ({
@@ -150,10 +152,11 @@ export default function VerificationChecklistManager({ selectedDocumentType }) {
         payload
       );
       toast.success("Verification update request sent successfully.");
-      // Clear the newly requested questions and refresh pending updates
+      setIsSubmitting(false)
       setRequestedVerificationQuestions({});
       fetchVerificationSections();
     } catch (error) {
+      setIsSubmitting(false)
       console.error("Error submitting verification update:", error.response?.data.message || error);
       toast.error(error?.response?.data?.message);
     }
@@ -324,7 +327,7 @@ export default function VerificationChecklistManager({ selectedDocumentType }) {
       </div>
 
       {/* Submit Button */}
-      <Button onClick={handleSubmit} className="mt-4 bg-black text-white">
+      <Button isLoading={isSubmitting} onClick={handleSubmit} className="mt-4 bg-black text-white">
         Submit Verification Update Request
       </Button>
     </div>

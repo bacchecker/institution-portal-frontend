@@ -18,6 +18,7 @@ export default function ChecklistManager({ selectedDocumentType }) {
     const [pendingUpdates, setPendingUpdates] = useState([]);
     const [newSection, setNewSection] = useState({ name: "", description: "" });
     const [selectedSectionId, setSelectedSectionId] = useState("");
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [newQuestion, setNewQuestion] = useState({ 
         question_text: "", 
         input_type: "text", 
@@ -116,6 +117,7 @@ export default function ChecklistManager({ selectedDocumentType }) {
     };
     
     const handleSubmit = async () => {
+      setIsSubmitting(true)
         const formattedSections = sections
             .filter(section => requestedQuestions[section.id] && requestedQuestions[section.id].length > 0)
             .map((section, sectionIndex) => ({
@@ -146,9 +148,11 @@ export default function ChecklistManager({ selectedDocumentType }) {
                 payload
             );
             toast.success("Checklist update request sent successfully.");
+            setIsSubmitting(false);
             setRequestedQuestions({});
             fetchSections();
         } catch (error) {
+          setIsSubmitting(false)
             console.error("Error submitting request:", error.response?.data.message || error);
             toast.error(error?.response?.data?.message);
         }
@@ -289,7 +293,7 @@ export default function ChecklistManager({ selectedDocumentType }) {
       </div>
 
       {/* Submit Button */}
-      <Button onClick={handleSubmit} className="mt-4 bg-black text-white">
+      <Button isLoading={isSubmitting} onClick={handleSubmit} className="mt-4 bg-black text-white">
         Submit Update Request
       </Button>
     </div>
