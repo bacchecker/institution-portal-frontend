@@ -271,19 +271,22 @@ function InstitutionDataSetup({ setActiveStep }) {
             </div>
             <div className="w-full h-[0.1vw] bg-[#E2E2E2] mt-[2vw]"></div>
             <div className="flex flex-wrap w-full mt-[1vw] justify-between gap-y-[1.5vw]">
-              <div className="w-[49%]">
-                <h4 className="md:text-[1vw] text-[4vw] mb-1">
-                  Academic Level
-                </h4>
-                <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
-                  <input
-                    type="text"
-                    value={userInput?.academic_level}
-                    readOnly
-                    className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0 capitalize read-only:bg-[#d8d8d8]"
-                  />
-                </div>
-              </div>
+              {userInput?.type === "bacchecker-academic"
+                && (
+                  <div className="w-[49%]">
+                    <h4 className="md:text-[1vw] text-[4vw] mb-1">
+                      Academic Level
+                    </h4>
+                    <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
+                      <input
+                        type="text"
+                        value={userInput?.academic_level}
+                        readOnly
+                        className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0 capitalize read-only:bg-[#d8d8d8]"
+                      />
+                    </div>
+                  </div>
+                )}
               <div className="w-[49%]">
                 <h4 className="md:text-[1vw] text-[4vw] mb-1">Region</h4>
                 <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
