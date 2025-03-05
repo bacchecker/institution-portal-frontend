@@ -5,7 +5,7 @@ import {
   useGetAllExistingDocumentTypesQuery,
   useGetInstitutionDocumentTypesQuery,
 } from "../../redux/apiSlice";
-import formatText from "@/components/FormatText";
+import axios from "@/utils/axiosConfig";
 import LoadItems from "@/components/LoadItems";
 import AddNewDocumentType from "./institutionDocumentTypesComponents/AddNewDocumentType";
 import secureLocalStorage from "react-secure-storage";
@@ -22,6 +22,8 @@ function InstitutionDocumentTypes({ setActiveStep }) {
   const [openModal, setOpenModal] = useState(false);
   const [openEditModal, setOpenEditModal] = useState(false);
   const [selectedDocumentType, setSelectedDocumentType] = useState({});
+  const [existingDocumentTypes, setExistingDocumentTypes] = useState([]);
+    const [isExistingDocTypesLoading, setIsExistingDocTypesLoading] = useState(false);
 
   const user = JSON.parse(secureLocalStorage.getItem("user"));
 
@@ -31,18 +33,23 @@ function InstitutionDocumentTypes({ setActiveStep }) {
     isFetching,
   } = useGetInstitutionDocumentTypesQuery({ page: pageNumber });
 
-  const {
-    data: existingDocumentTypes,
-    isLoading: isExistingDocTypesLoading,
-    isFetching: isExistingDocTypesFetching,
-  } = useGetAllExistingDocumentTypesQuery({
-    ...(user?.institution?.type === "bacchecker-academic" && {
-      selectedAcademicLevel: user?.institution?.academic_level,
-    }),
-    ...(user?.institution?.type !== "bacchecker-academic" && {
-      institution_type: "non-academic",
-    }),
-  });
+  useEffect(() => {
+    const fetchAvailableDocs = async () => {
+      setIsExistingDocTypesLoading(true);
+      try {
+          const response = await axios.get('/institution/document-types/available');
+
+          setExistingDocumentTypes(response.data.available_types);
+          setIsExistingDocTypesLoading(false);
+      } catch (error) {
+          console.error('Error fetching tickets:', error);
+          setIsExistingDocTypesLoading(false);
+      }
+    };
+    fetchAvailableDocs()
+  }, []);
+
+
 
   const handleDocumentType = (documentType) => {
     setOpenEditModal(true);
@@ -476,7 +483,6 @@ function InstitutionDocumentTypes({ setActiveStep }) {
             setOpenModal={setOpenModal}
             openModal={openModal}
             existingDocumentTypes={existingDocumentTypes}
-            isExistingDocTypesFetching={isExistingDocTypesFetching}
             isExistingDocTypesLoading={isExistingDocTypesLoading}
           />
           <EditDocumentType

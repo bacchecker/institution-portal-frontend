@@ -103,24 +103,24 @@ export default function InstitutionDocTypes() {
         setSelectedUser(document);        
     };
 
-    const handleClickDelete = async (user, i) => {
+    const handleClickDelete = async (document, i) => {
         try {
         // Display confirmation dialog
         const result = await Swal.fire({
-            title: "Are you sure you want to delete this user?",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#febf4c",
-            cancelButtonColor: "#d33",
-            confirmButtonText: "Yes, I'm sure",
-            cancelButtonText: "No, cancel",
+          title: "Are you sure you want to delete this document type?",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#febf4c",
+          cancelButtonColor: "#d33",
+          confirmButtonText: "Yes, I'm sure",
+          cancelButtonText: "No, cancel",
         });
 
         if (result.isConfirmed) {
-            const response = await axios.delete(`/institution/users/${user?.id}`);
+          const response = await axios.delete(`/institution/document-types/${document?.id}`);
 
-            toast.success(response.data.message);
-            fetchDocumentType();
+          toast.success(response.data.message);
+          fetchDocumentType();
         }
         } catch (error) {
         // Error feedback

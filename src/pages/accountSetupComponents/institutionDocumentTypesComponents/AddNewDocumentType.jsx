@@ -10,8 +10,7 @@ function AddNewDocumentType({
   setOpenModal,
   openModal,
   existingDocumentTypes,
-  isExistingDocTypesFetching,
-  isExistingDocTypesLoading,
+  isExistingDocTypesLoading
 }) {
   const [items, setItems] = useState([
     {
@@ -23,7 +22,7 @@ function AddNewDocumentType({
       hard_copy: false,
     },
   ]);
-
+  
   const handleDocumentTypeOption = (item, index) => {
     const updatedItems = [...items];
 
@@ -63,7 +62,7 @@ function AddNewDocumentType({
   };
 
   const getDocumentName = (value) => {
-    const type = existingDocumentTypes?.data?.types?.find(
+    const type = existingDocumentTypes.find(
       (type) => type?.id === value
     );
     return type?.name;
@@ -217,12 +216,12 @@ function AddNewDocumentType({
                     </h4>
                     <SelectInput
                       placeholder={"Select option"}
-                      data={existingDocumentTypes?.data?.types}
+                      data={existingDocumentTypes}
                       inputValue={getDocumentName(item?.document_type_id)}
                       onItemSelect={(selectedItem) =>
                         handleDocumentTypeOption(selectedItem, i)
                       }
-                      isLoading={isExistingDocTypesFetching}
+                      isLoading={isExistingDocTypesLoading}
                       className="custom-dropdown-class display-md-none"
                     />
                   </div>

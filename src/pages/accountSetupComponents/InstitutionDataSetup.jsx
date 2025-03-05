@@ -17,6 +17,7 @@ function InstitutionDataSetup({ setActiveStep }) {
   const [userInput, setUserInput] = useState([]);
   const [selectedImage, setSelectedImage] = useState(null);
   const [selectedCert, setSelectedCert] = useState(null);
+  const [selectedBusinessCert, setSelectedBusinessCert] = useState(null);
   const {
     data: institutionDetails,
     isLoading: isInstitutionDetailsLoading,
@@ -28,6 +29,9 @@ function InstitutionDataSetup({ setActiveStep }) {
       setUserInput(institutionDetails?.institutionData?.institution);
     }
   }, [institutionDetails]);
+
+  console.log("useInp", userInput);
+
 
   const handleUserInput = (e) => {
     setUserInput((userInput) => ({
@@ -57,12 +61,23 @@ function InstitutionDataSetup({ setActiveStep }) {
       mailing_address,
       operation_certificate,
       alternate_contacts,
+      accreditation_number,
+      business_registration_document
     } = userInput;
     const validationError = validateEmail(institution_email);
-    if (!operation_certificate && !selectedCert) {
+    if ((userInput?.type === "bacchecker-academic"
+      && !operation_certificate) && !selectedCert) {
       Swal.fire({
         title: "Error",
         text: "Operation Certificate is required",
+        icon: "error",
+        button: "OK",
+      });
+    } else if ((userInput?.type !== "bacchecker-academic"
+      && !business_registration_document) && !selectedBusinessCert) {
+      Swal.fire({
+        title: "Error",
+        text: "Business Registration Document is required",
         icon: "error",
         button: "OK",
       });
@@ -86,9 +101,11 @@ function InstitutionDataSetup({ setActiveStep }) {
       formData.append("prefix", prefix);
       formData.append("digital_address", digital_address);
       formData.append("mailing_address", mailing_address);
+      formData.append("accreditation_number", accreditation_number);
       formData.append("alternate_contacts", alternate_contacts);
       selectedImage && formData.append("logo", selectedImage);
       selectedCert && formData.append("operation_certificate", selectedCert);
+      selectedBusinessCert && formData.append("business_registration_document", selectedBusinessCert);
       try {
         await createInstitutionSetup(formData);
       } catch (error) {
@@ -254,19 +271,22 @@ function InstitutionDataSetup({ setActiveStep }) {
             </div>
             <div className="w-full h-[0.1vw] bg-[#E2E2E2] mt-[2vw]"></div>
             <div className="flex flex-wrap w-full mt-[1vw] justify-between gap-y-[1.5vw]">
-              <div className="w-[49%]">
-                <h4 className="md:text-[1vw] text-[4vw] mb-1">
-                  Academic Level
-                </h4>
-                <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
-                  <input
-                    type="text"
-                    value={userInput?.academic_level}
-                    readOnly
-                    className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0 capitalize read-only:bg-[#d8d8d8]"
-                  />
-                </div>
-              </div>
+              {userInput?.type === "bacchecker-academic"
+                && (
+                  <div className="w-[49%]">
+                    <h4 className="md:text-[1vw] text-[4vw] mb-1">
+                      Academic Level
+                    </h4>
+                    <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
+                      <input
+                        type="text"
+                        value={userInput?.academic_level}
+                        readOnly
+                        className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0 capitalize read-only:bg-[#d8d8d8]"
+                      />
+                    </div>
+                  </div>
+                )}
               <div className="w-[49%]">
                 <h4 className="md:text-[1vw] text-[4vw] mb-1">Region</h4>
                 <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
@@ -384,8 +404,8 @@ function InstitutionDataSetup({ setActiveStep }) {
                     {userInput?.logo
                       ? userInput?.logo
                       : selectedImage
-                      ? selectedImage?.name
-                      : "Browse to upload image"}{" "}
+                        ? selectedImage?.name
+                        : "Browse to upload image"}{" "}
                   </h4>
                 </div>
                 <h4 className="text-[0.7rem] text-right">
@@ -395,7 +415,9 @@ function InstitutionDataSetup({ setActiveStep }) {
               </div>
               <div className="w-[49%]">
                 <h4 className="md:text-[1vw] text-[4vw] mb-1">
-                  Operation Certificate<span className="text-[#f1416c]">*</span>
+                  Operation Certificate
+                  {userInput?.type === "bacchecker-academic"
+                    && <span className="text-[#f1416c]">*</span>}
                 </h4>
                 <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] flex items-center rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
                   <input
@@ -419,8 +441,8 @@ function InstitutionDataSetup({ setActiveStep }) {
                     {userInput?.operation_certificate
                       ? userInput?.operation_certificate
                       : selectedCert
-                      ? selectedCert?.name
-                      : "Browse to upload file"}{" "}
+                        ? selectedCert?.name
+                        : "Browse to upload file"}{" "}
                   </h4>
                 </div>
                 <h4 className="text-[0.7rem] text-right">
@@ -428,6 +450,61 @@ function InstitutionDataSetup({ setActiveStep }) {
                   docx, pdf
                 </h4>
               </div>
+              <div className="w-[49%]">
+                <h4 className="md:text-[1vw] text-[4vw] mb-1">
+                  Accreditation Number
+                  {/* <span className="text-[#f1416c]">*</span> */}
+                </h4>
+                <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
+                  <input
+                    type="text"
+                    name="accreditation_number"
+                    // required
+                    value={userInput?.accreditation_number}
+                    onChange={handleUserInput}
+                    className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0"
+                  />
+                </div>
+              </div>
+              {userInput?.type !== "bacchecker-academic"
+                && (
+                  <div className="w-[49%]">
+                    <h4 className="md:text-[1vw] text-[4vw] mb-1">
+                      Business Registration Document<span className="text-[#f1416c]">*</span>
+                    </h4>
+                    <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] flex items-center rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
+                      <input
+                        type="file"
+                        id="certBusinessFile"
+                        accept=".pdf, .doc, .docx"
+                        // required
+                        onChange={(e) => setSelectedBusinessCert(e.target.files[0])}
+                        className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0 hidden"
+                      />
+                      <label
+                        htmlFor="certBusinessFile"
+                        className="absolute right-[1vw] absolute-pos-items-center cursor-pointer"
+                      >
+                        <img
+                          src="/assets/img/uplo.svg"
+                          alt=""
+                          className="w-[1.5vw]"
+                        />
+                      </label>
+                      <h4 className="pl-[1vw] text-[1vw] max-w-[29vw] text-nowrap overflow-hidden text-ellipsis">
+                        {userInput?.business_registration_document
+                          ? userInput?.business_registration_document
+                          : selectedBusinessCert
+                            ? selectedBusinessCert?.name
+                            : "Browse to upload file"}{" "}
+                      </h4>
+                    </div>
+                    <h4 className="text-[0.7rem] text-right">
+                      <span className="text-[#ff0404]">Accepted Formats</span> doc,
+                      docx, pdf
+                    </h4>
+                  </div>
+                )}
             </div>
             <div className="w-full flex justify-end mt-[2vw]">
               <button

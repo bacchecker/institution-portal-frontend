@@ -29,7 +29,7 @@ function ChecklistItems({ setOpenModal, openModal, selectedDocumentType, fetchDo
         isOpen={openModal}
         setIsOpen={setOpenModal}
         title={"Document Type Checklist Items"}
-        classNames="w-[55%]"
+        classNames="w-full md:w-[70%] lg:w-[55%] 2xl:w-[50%]"
     >
         <div className="-mt-4">
             <Tabs
