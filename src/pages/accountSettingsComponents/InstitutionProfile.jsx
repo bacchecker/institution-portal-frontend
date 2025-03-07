@@ -24,6 +24,7 @@ export default function InstitutionProfile() {
     const [isLoading, setIsLoading] = useState(false);
     const [sortBy, setSortBy] = useState(null);
     const [pdfPath, setPdfPath] = useState(null);
+    const [businessCertPath, setBusinessCertPath] = useState(null);
     const [sortOrder, setSortOrder] = useState("asc");
     const [departments, setDepartments] = useState([]);
     const [institutionPayments, setInstitutionPayments] = useState([]);
@@ -41,6 +42,7 @@ export default function InstitutionProfile() {
           setProfileData(response.data)
           setDepartments(response.data.departments)
           setPdfPath(response.data?.institution?.operation_certificate)
+          setBusinessCertPath(response.data?.institution?.business_registration_document)
           setIsLoading(false)
         } catch (error) {
             setIsLoading(false)
@@ -193,28 +195,53 @@ export default function InstitutionProfile() {
                     </div>
                 </div> 
             )}
-            
-            <div className="bg-white rounded-md p-4 border mb-4">
-                <p className="font-semibold mb-2">Operation Certificate</p>
-                <div className="w-full h-72 border rounded-lg overflow-hidden relative">
-                    <iframe
-                        src={`https://admin-dev.baccheck.online/storage/${pdfPath}#toolbar=0&navpanes=0&scrollbar=0`}
-                        className="w-full h-full"
-                    ></iframe>
+            {profileData?.institution?.type == "bacchecker-business" &&(
+                <div className="bg-white rounded-md p-4 border mb-4">
+                    <p className="font-semibold mb-2">Business Registration Document</p>
+                    <div className="w-full h-72 border rounded-lg overflow-hidden relative">
+                        <iframe
+                            src={`https://admin-dev.baccheck.online/storage/${businessCertPath}#toolbar=0&navpanes=0&scrollbar=0`}
+                            className="w-full h-full"
+                        ></iframe>
 
-                    {/* Download Button */}
-                    <div className="absolute top-2 right-2">
-                        <a
-                        href={`https://admin-dev.baccheck.online/storage/${pdfPath}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="p-3 bg-bChkRed text-white rounded-full shadow-md flex items-center justify-center"
-                        >
-                        <MdFileDownload size={28}/>
-                        </a>
+                        {/* Download Button */}
+                        <div className="absolute top-2 right-2">
+                            <a
+                            href={`https://admin-dev.baccheck.online/storage/${businessCertPath}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="p-3 bg-bChkRed text-white rounded-full shadow-md flex items-center justify-center"
+                            >
+                            <MdFileDownload size={28}/>
+                            </a>
+                        </div>
                     </div>
                 </div>
-            </div>
+            )}
+            {pdfPath != null && (
+                <div className="bg-white rounded-md p-4 border mb-4">
+                    <p className="font-semibold mb-2">Operation Certificate</p>
+                    <div className="w-full h-72 border rounded-lg overflow-hidden relative">
+                        <iframe
+                            src={`https://admin-dev.baccheck.online/storage/${pdfPath}#toolbar=0&navpanes=0&scrollbar=0`}
+                            className="w-full h-full"
+                        ></iframe>
+
+                        {/* Download Button */}
+                        <div className="absolute top-2 right-2">
+                            <a
+                            href={`https://admin-dev.baccheck.online/storage/${pdfPath}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="p-3 bg-bChkRed text-white rounded-full shadow-md flex items-center justify-center"
+                            >
+                            <MdFileDownload size={28}/>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            )}
+            
             <div className="bg-white rounded-md p-4 border mb-4">
                 <div className="flex justify-between mb-2">
                     <p className="font-semibold">Departments</p>
