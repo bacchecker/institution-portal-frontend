@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 import {Tabs, Tab, Chip} from "@nextui-org/react";
 import { IoDocuments, IoSettingsOutline } from "react-icons/io5";
 import Navbar from "@/components/Navbar";
@@ -12,12 +12,13 @@ import { BsBuildingsFill } from "react-icons/bs";
 import InstitutionDocTypes from "./InstitutionDocTypes";
 
 export default function AccountSettings() { 
-
+  const [activeTab, setActiveTab] = useState("profile");
   return (
     <div className="bg-white text-sm w-full">
       <Navbar />
       <div className="flex w-full flex-col">
         <Tabs
+          selectedKey={activeTab} onSelectionChange={setActiveTab}
           aria-label="Options"
           classNames={{
             tabList: "gap-6 w-full relative rounded-none p-0 border-b border-divider",
@@ -47,6 +48,7 @@ export default function AccountSettings() {
             JSON.parse(secureLocalStorage.getItem('userRole'))?.isAdmin) && (
             <Tab
               key="security"
+              id="security"
               title={
                 <div className="flex items-center space-x-2">
                   <IoSettingsOutline size={18} />
@@ -54,7 +56,7 @@ export default function AccountSettings() {
                 </div>
               }
             >
-              <SecuritySettings />
+              <SecuritySettings setActiveTab={setActiveTab}/>
             </Tab>
           )}
 
@@ -62,6 +64,7 @@ export default function AccountSettings() {
             JSON.parse(secureLocalStorage.getItem('userRole'))?.isAdmin) && (
             <Tab
               key="docTypes"
+              id="docTypes"
               title={
                 <div className="flex items-center space-x-2">
                   <IoDocuments size={18} />
@@ -77,6 +80,7 @@ export default function AccountSettings() {
             JSON.parse(secureLocalStorage.getItem('userRole'))?.isAdmin) && (
             <Tab
               key="departments"
+              id="departments"
               title={
                 <div className="flex items-center space-x-2">
                   <FaBuilding size={18} />
@@ -92,6 +96,7 @@ export default function AccountSettings() {
             JSON.parse(secureLocalStorage.getItem('userRole'))?.isAdmin) && (
               <Tab
                 key="users"
+                id="users"
                 title={
                   <div className="flex items-center space-x-2">
                     <FaUsers size={20} />

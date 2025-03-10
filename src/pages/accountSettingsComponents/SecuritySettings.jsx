@@ -13,12 +13,14 @@ import {UAParser} from "ua-parser-js";
 import moment from "moment";
 import secureLocalStorage from "react-secure-storage";
 import { toast } from "sonner";
+import { NavLink } from "react-router-dom";
 
 
-export default function SecuritySettings() {
+export default function SecuritySettings({ setActiveTab }) {
     const changeStatusDisclosure = useDisclosure();
     const [processing, setProcessing] = useState(false);
     const [percentage, setPercentage] = useState(0);
+    const [missingFields, setMissingFields] = useState({});
     const radius = 50; // Circle radius
     const strokeWidth = 10;
     const circumference = 2 * Math.PI * radius;
@@ -41,7 +43,8 @@ export default function SecuritySettings() {
     const fetchUserProfile = async (ip) => {
         try {
           const response = await axios.get(`institution/profile-complete`);
-          setPercentage(response.data.percentage)
+          setPercentage(response.data.completion_percentage)
+          setMissingFields(response.data.missing_fields || {})
           const twoFactor = JSON?.parse(
             secureLocalStorage?.getItem("user")
         )?.two_factor;
@@ -101,10 +104,37 @@ export default function SecuritySettings() {
             fetchUserProfile()
     }, [submittedFilters, currentPage, sortBy, sortOrder]);
    
+    const institutionFields = missingFields
+        ? Object.entries(missingFields)
+            .filter(([key, value]) => value === null) // Only include fields that are null
+            .map(([key]) => key)
+        : [];
+
+    const modelFields = missingFields
+        ? Object.entries(missingFields)
+            .filter(([key]) => ["departments", "users", "document_types"].includes(key))
+            .map(([key]) => key)
+        : [];
+
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
+    const handleAddDepartment = () => {
+        setActiveTab("departments"); // Switch to Departments Tab
+    };
+    
+    const handleAddUser = () => {
+        setActiveTab("users"); // Switch to Users Tab
+    };
+    
+    const handleAddDocumentType = () => {
+        setActiveTab("docTypes");
+    };
 
+    const handleCompleteProfile = () => {
+        console.log("Navigate to profile update page");
+        // Navigate user to profile completion form
+      };
     return (
         <div className="px-2">
             <div className="w-full rounded-lg bg-gray-200 p-4">
@@ -141,18 +171,72 @@ export default function SecuritySettings() {
                             />
                         </svg>
                         {/* Percentage Label */}
-                        <span className="absolute text-sm md:text-base lg:text-lg font-semibold text-bChkRed">
+                        <span className="absolute text-sm font-semibold text-bChkRed">
                             {percentage}%
                         </span>
                     </div>
                     <div className="">
-                        <p className="font-bold text-base">Your account profile is {percentage}%</p>
+                        <p className="font-bold text-base">Your institution account profile is {percentage}% complete</p>
                         <p>Please review your account profile settings regularly and update your password</p>
                     </div>
                 </div>
             </div>
             <div className="pb-5 border-b mt-3">
-                <p className="pl-4">Basic</p>
+                {Object.keys(missingFields || {}).length > 0 ? (
+                <>
+                    <h3 className="text-md font-semibold mt-3">Missing Information:</h3>
+                    <div className="w-full flex justify-between border rounded-md px-3 py-2">
+                        <ul className="list-disc ml-5 text-sm">
+                            {/* List all missing institution fields */}
+                            {institutionFields.map((field) => (
+                               <li key={field} className="text-red-500">
+                                    {field.replace(/_/g, " ").replace(/^\w/, (c) => c.toUpperCase())}
+                                </li>
+                           
+                            ))}
+                        </ul>
+
+                        {/* Single button for all institution fields */}
+                        {institutionFields.length > 0 && (
+                            <NavLink
+                                to={`/account-settings/update-request`}
+                                className="self-start bg-yellow-500 text-white text-xs px-4 py-2 mt-2 rounded"
+                                onClick={handleCompleteProfile}
+                            >
+                                Complete Profile
+                            </NavLink>
+                        )}
+                    </div>
+                    
+
+                    {/* Individual buttons for missing models */}
+                    {modelFields.map((key) => (
+                        <div key={key} className="flex justify-between items-center mt-2 ml-2">
+                            <span className="text-red-500">NO {key.replace(/_/g, " ").toUpperCase()}</span>
+                            <button
+                                className="bg-blue-500 text-white text-xs px-3 py-1.5 rounded"
+                                onClick={
+                                    key === "departments"
+                                        ? handleAddDepartment
+                                        : key === "users"
+                                        ? handleAddUser
+                                        : handleAddDocumentType
+                                }
+                            >
+                                {key === "departments"
+                                    ? "Add Department"
+                                    : key === "users"
+                                    ? "Add User"
+                                    : "Add Document Type"}
+                            </button>
+                        </div>
+                    ))}
+                </>
+            ) : (
+                <p className="text-green-500 font-semibold mt-3">
+                    Profile is fully completed! ✅
+                </p>
+            )}
             </div>
             <div className="flex justify-between items-center space-x-2 py-4 border-b pl-4">
                 <div className="">
