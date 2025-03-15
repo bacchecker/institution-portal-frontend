@@ -76,6 +76,7 @@ function TicketChat({ setOpenModal, openModal, selectedTicket }) {
 
   useEffect(() => {
     if (!selectedTicket) return;
+    console.log("selectedTicket", selectedTicket);
 
     // Setup Laravel Echo with Reverb
     window.Pusher = Pusher;
@@ -83,11 +84,13 @@ function TicketChat({ setOpenModal, openModal, selectedTicket }) {
       broadcaster: "reverb",
       key: import.meta.env.VITE_REVERB_APP_KEY,
       wsHost: import.meta.env.VITE_REVERB_HOST,
-      wsPort: import.meta.env.VITE_REVERB_PORT || 80,
-      wssPort: import.meta.env.VITE_REVERB_PORT || 443,
-      forceTLS: false,
-      encrypted: true,
-      disableStats: true,
+      forceTLS: true,
+      // encrypted: false,
+      auth: {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      },
       enabledTransports: ["ws", "wss"],
     });
 
