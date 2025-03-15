@@ -348,65 +348,65 @@ function TicketChat({ setOpenModal, openModal, selectedTicket }) {
                           : "bg-white"
                       } text-gray-800 px-3 pt-2 pb-0.5 rounded-md shadow min-w-[50%] max-w-[70%] relative`}
                     >
-                      <p className="text-sm">{message.message}</p>
+                      
 
-                      {/* Attachments */}
-                      {message.attachments &&
-                        message.attachments.length > 0 && (
-                          <div className="mt-2 flex flex-wrap gap-2">
-                            {message.attachments.map((attachment, index) => (
-                              <div
-                                key={index}
-                                className="flex flex-col items-start"
-                              >
-                                {attachment.mime_type.startsWith("image/") ? (
-                                  <img
-                                    src={`${
-                                      import.meta.env.VITE_BACCHECKER_URL
-                                    }/storage/${attachment.path}`}
-                                    alt={attachment.name}
-                                    className="max-w-full h-auto rounded-md shadow object-contain"
-                                    style={{
-                                      maxHeight: "200px",
-                                      width: "100%",
-                                    }}
-                                  />
-                                ) : (
-                                  <div className="flex items-center space-x-2 border p-2 rounded-md bg-gray-100">
-                                    <span
-                                      className="text-sm truncate max-w-[150px]"
-                                      title={attachment.name}
-                                    >
-                                      {attachment.name}
-                                    </span>
-                                    <button
-                                      onClick={() =>
-                                        handleDownloadAttachment(
-                                          message.ticket_id,
-                                          message.id,
-                                          attachment.name
-                                        )
-                                      }
-                                      className="text-blue-500 text-xs font-medium hover:underline"
-                                    >
-                                      {isDownloading ? (
-                                        <div className="flex items-center justify-center gap-2">
-                                          <LoadItems
-                                            color={"#ffffff"}
-                                            size={15}
-                                          />
-                                        </div>
-                                      ) : (
-                                        <MdOutlineFileDownload size={22} />
-                                      )}
-                                    </button>
-                                  </div>
-                                )}
-                              </div>
-                            ))}
-                          </div>
+                        {/* Attachments */}
+                        {message.attachments &&
+                            message.attachments.length > 0 && (
+                            <div className="mb-1 flex flex-wrap gap-2">
+                                {message.attachments.map((attachment, index) => (
+                                <div
+                                    key={index}
+                                    className="flex flex-col items-start"
+                                >
+                                    {attachment.mime_type.startsWith("image/") ? (
+                                    <img
+                                        src={`${
+                                        import.meta.env.VITE_BACCHECKER_URL
+                                        }/storage/${attachment.path}`}
+                                        alt={attachment.name}
+                                        className="max-w-full h-auto rounded-md shadow object-contain"
+                                        style={{
+                                        maxHeight: "200px",
+                                        width: "100%",
+                                        }}
+                                    />
+                                    ) : (
+                                    <div className="flex items-center space-x-2 border p-2 rounded-md bg-gray-100">
+                                        <span
+                                        className="text-sm truncate max-w-[150px]"
+                                        title={attachment.name}
+                                        >
+                                        {attachment.name}
+                                        </span>
+                                        <button
+                                        onClick={() =>
+                                            handleDownloadAttachment(
+                                            message.ticket_id,
+                                            message.id,
+                                            attachment.name
+                                            )
+                                        }
+                                        className="text-blue-500 text-xs font-medium hover:underline"
+                                        >
+                                        {isDownloading ? (
+                                            <div className="flex items-center justify-center gap-2">
+                                            <LoadItems
+                                                color={"#ffffff"}
+                                                size={15}
+                                            />
+                                            </div>
+                                        ) : (
+                                            <MdOutlineFileDownload size={22} />
+                                        )}
+                                        </button>
+                                    </div>
+                                    )}
+                                </div>
+                                ))}
+                            </div>
                         )}
-
+                        <p className="text-sm">{message.message}</p>
                       <div className="flex space-x-1 items-center justify-end mt-1">
                         <span className="text-[11px] text-gray-500 block text-right">
                           {new Date(message.created_at).toLocaleTimeString(
@@ -428,7 +428,7 @@ function TicketChat({ setOpenModal, openModal, selectedTicket }) {
         </div>
 
         {/* Sticky Message Input */}
-        <div className="sticky bottom-0 bg-white py-2 border-t flex flex-col items-start px-2">
+        <div className="sticky bottom-0 bg-white py-2 border-t flex flex-col items-start">
           {/* File Previews */}
           {selectedFiles.length > 0 && (
             <div className="w-full flex space-x-2 bg-gray-100 px-2 py-1 rounded-md mb-2">
@@ -487,7 +487,7 @@ function TicketChat({ setOpenModal, openModal, selectedTicket }) {
             >
                 {isSending ? (
                 <div className="flex items-center justify-center gap-2">
-                    <LoadItems color={"#ffffff"} size={26} />
+                    <LoadItems color={"#ffffff"} size={24} />
                 </div>
                 ) : (
                 <BiSend size={26} />
