@@ -452,42 +452,49 @@ function TicketChat({ setOpenModal, openModal, selectedTicket }) {
           )}
 
           {/* Input Field & Buttons */}
-          <div className="w-full flex items-center">
+          <form 
+            className="w-full flex items-center" 
+            onSubmit={(e) => {
+                e.preventDefault(); // Prevent page reload
+                handleSendMessage();
+            }}
+            >
             {/* File Attachment Button */}
             <label className="cursor-pointer bg-gray-200 text-gray-600 p-2 rounded-md hover:bg-gray-300 mr-2">
-              <MdAttachFile size={20} />
-              <input
+                <MdAttachFile size={24} />
+                <input
                 type="file"
                 className="hidden"
                 multiple
                 onChange={handleFileChange}
-              />
+                />
             </label>
 
             {/* Message Input */}
             <input
-              type="text"
-              placeholder="Type a message..."
-              className="flex-1 border border-gray-300 rounded-md px-3 py-2 focus:outline-none"
-              value={messageText}
-              onChange={(e) => setMessageText(e.target.value)}
+                type="text"
+                placeholder="Type a message..."
+                className="flex-1 border border-gray-300 rounded-md px-3 py-2 focus:outline-none"
+                value={messageText}
+                onChange={(e) => setMessageText(e.target.value)}
             />
 
             {/* Send Button */}
             <button
-              className="ml-2 px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-              onClick={handleSendMessage}
-              disabled={isSending}
+                type="submit"
+                className="ml-2 px-2 py-1.5 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                disabled={isSending}
             >
-              {isSending ? (
+                {isSending ? (
                 <div className="flex items-center justify-center gap-2">
-                  <LoadItems color={"#ffffff"} size={15} />
+                    <LoadItems color={"#ffffff"} size={26} />
                 </div>
-              ) : (
-                <BiSend size={22} />
-              )}
+                ) : (
+                <BiSend size={26} />
+                )}
             </button>
-          </div>
+            </form>
+
         </div>
       </div>
     </Drawer>

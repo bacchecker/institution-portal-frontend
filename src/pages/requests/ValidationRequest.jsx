@@ -115,18 +115,25 @@ export default function ValidationRequest() {
   };
 
   const fetchReports = async (requestId) => {
-    setIsFetching(true)
+    setIsFetching(true);
     try {
-      const response = axios.get(`/pdf/digital-validation-certificate/${requestId}`, { responseType: "blob" });
-      const validReport = response.data
+        const response = await axios.get(`/pdf/digital-validation-certificate/${requestId}`, { responseType: "blob" });
 
-      setValidationReport(validReport ? URL.createObjectURL(validReport.data) : null);
-      setIsFetching(false)
+        if (response && response.data) {
+            const blobUrl = URL.createObjectURL(response.data);
+            setValidationReport(blobUrl);
+            console.log("Validation Report URL:", blobUrl);
+        } else {
+            setValidationReport(null);
+            console.warn("No data received in response.");
+        }
     } catch (error) {
-      setIsFetching(false)
-      console.error("Error fetching reports:", error);
+        console.error("Error fetching reports:", error);
+    } finally {
+        setIsFetching(false);
     }
-  };
+};
+
 
   useEffect(() => {
     const fetchInstitutionDocs = async () => {
@@ -628,9 +635,9 @@ export default function ValidationRequest() {
                 </div>
 
                 <div className="-mt-4">
-                  <section className="mb-3 flex items-center justify-between">
+                  <section className="flex items-center justify-between">
                     <div className="w-full flex gap-2 items-center">
-                      <p className="font-semibold ">Attachments</p>
+                      <p className="uppercase font-semibold py-2 text-bChkRed">Attachments</p>
                     </div>
 
                     
@@ -657,12 +664,6 @@ export default function ValidationRequest() {
                                 "https://admin-dev.baccheck.online/api/download-pdf?path=" +
                                 encodeURIComponent(data?.file?.path);
                             }}
-                            /* onClick={() => {
-                              window.location.href =
-                                "https://admin-dev.baccheck.online/api/document/download" +
-                                "?path=" +
-                                encodeURIComponent(data?.file?.path);
-                            }} */
                           >
                             <FaDownload />
                             <p>Download</p>
