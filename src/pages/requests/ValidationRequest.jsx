@@ -20,25 +20,23 @@ import axios from "../../utils/axiosConfig";
 import StatusChip from "@/components/status-chip";
 import Drawer from "@/components/Drawer";
 import CustomUser from "@/components/custom-user";
-
 import { filesize } from "filesize";
 import ConfirmModal from "@/components/confirm-modal";
 import DeleteModal from "@/components/DeleteModal";
 import { toast } from "sonner";
 import {
-  FaChevronLeft,
-  FaChevronRight,
   FaDownload,
+  FaFilePdf,
   FaHeart,
   FaRegCircleCheck,
 } from "react-icons/fa6";
 import { IoCloseCircleOutline, IoDocuments } from "react-icons/io5";
 import { PiQueueFill } from "react-icons/pi";
 import { FcCancel } from "react-icons/fc";
-import { GiCancel } from "react-icons/gi";
 import { MdOutlineFilterAlt, MdOutlineFilterAltOff } from "react-icons/md";
 import secureLocalStorage from "react-secure-storage";
-import PermissionWrapper from "../../components/permissions/PermissionWrapper";
+import PermissionWrapper from "@/components/permissions/PermissionWrapper";
+import { IoIosOpen } from "react-icons/io";
 
 export default function ValidationRequest() {
   const changeStatusDisclosure = useDisclosure();
@@ -48,12 +46,13 @@ export default function ValidationRequest() {
   const [openDrawer, setOpenDrawer] = useState(false);
   const [processing, setProcessing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isFetching, setIsFetching] = useState(false);
   const [data, setData] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [lastPage, setLastPage] = useState(1);
   const [total, setTotal] = useState(0);
-  const [dateRange, setDateRange] = useState({});
   const [validationRequests, setValidationRequests] = useState([]);
+  const [validationReport, setValidationReport] = useState([]);
   const [sortBy, setSortBy] = useState(null);
   const [sortOrder, setSortOrder] = useState("asc");
   const user = JSON?.parse(secureLocalStorage?.getItem("user"))?.user;
@@ -112,6 +111,20 @@ export default function ValidationRequest() {
     } catch (error) {
       console.error("Error fetching institution documents:", error);
       throw error;
+    }
+  };
+
+  const fetchReports = async (requestId) => {
+    setIsFetching(true)
+    try {
+      const response = axios.get(`/pdf/digital-validation-certificate/${requestId}`, { responseType: "blob" });
+      const validReport = response.data
+
+      setValidationReport(validReport ? URL.createObjectURL(validReport.data) : null);
+      setIsFetching(false)
+    } catch (error) {
+      setIsFetching(false)
+      console.error("Error fetching reports:", error);
     }
   };
 
@@ -234,8 +247,8 @@ export default function ValidationRequest() {
     const payload = {
       validation_request_id: data?.id,
       checklist: allChecklistItems.map((item) => ({
-        id: item.id, // The checklist item's id
-        answer: answers[item.id], // Yes or No
+        id: item.id,
+        answer: answers[item.id],
       })),
     };
 
@@ -515,6 +528,10 @@ export default function ValidationRequest() {
                         await fetchRequestAnswers(item?.id);
                       }
 
+                      if (item?.status === "completed") {
+                        await fetchReports(item?.id);
+                      }
+
                       setOpenDrawer(true);
                       setData(item);
                     }}
@@ -597,8 +614,6 @@ export default function ValidationRequest() {
                     <div className="col-span-2">{data?.user?.email}</div>
                     <div className="text-gray-500">Phone Number</div>
                     <div className="col-span-2">{data?.user?.phone}</div>
-                    <div className="text-gray-500">Index Number</div>
-                    <div className="col-span-2">{data?.index_number}</div>
                     <div className="text-gray-500 mt-2">Applicant Picture</div>
                     <div className="col-span-2 w-10 h-10 rounded-full bg-gray-200 overflow-hidden">
                       {data?.user?.photo && (
@@ -618,23 +633,10 @@ export default function ValidationRequest() {
                       <p className="font-semibold ">Attachments</p>
                     </div>
 
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      color="primary"
-                      isLoading={bulkDownloadLoading}
-                      isDisabled={bulkDownloadLoading}
-                      onClick={() => {
-                        setBulkDownloadLoading(true);
-                        handleBulkDownload(data.files.map((f) => f.path));
-                      }}
-                    >
-                      <FaDownload className="text-red-600" />
-                      Download all
-                    </Button>
+                    
                   </section>
 
-                  <section className="grid grid-cols-1 lg:grid-cols-2 gap-2">
+                  <section className="grid grid-cols-1">
                     <div className="gap-3 p-2 rounded-lg border">
                       <div className="w-full flex flex-col gap-1">
                         <p className="font-semibold">
@@ -667,6 +669,51 @@ export default function ValidationRequest() {
                           </div>
                         </div>
                       </div>
+                    </div>
+                  </section>
+                  <section className="flex flex-col mt-2">
+                    <p className="uppercase font-semibold py-2 text-bChkRed">Validation Request Documents</p>
+                    <div className="flex flex-col space-y-2">
+                      {/* Show Loading Spinner */}
+                      {isFetching ? (
+                        <div className="flex justify-center items-center col-span-2">
+                          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-gray-900"></div>
+                        </div>
+                      ) : (
+                        <>
+                          {/* Display Reports if available */}
+                          {validationReport && (
+                            <div className="gap-3 p-2 rounded-md border">
+                              <div className="w-full flex justify-between">
+                                <div className="w-full flex space-x-2 items-center">
+                                  <FaFilePdf size={36} className="text-bChkRed" />
+                                  <div className="flex flex-col space-y-1">
+                                    <p>Validation Report</p>
+                                    <div className="text-xs font-semibold -mt-1">
+                                      <p>From: <span className="font-normal text-gray-500">{data?.institution?.name}</span></p>
+                                    </div>
+                                  </div>
+                                </div>
+                                
+                                <div
+                                  className="flex self-end space-x-1 items-center cursor-pointer py-1 px-2 rounded-sm bg-blue-600 text-white text-xs w-20"
+                                  onClick={() => window.open(validationReport, "_blank")}
+                                >
+                                  <IoIosOpen size={16} />
+                                  <p>Open</p>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+  
+                          {/* No Reports Found Message */}
+                          {!validationReport && (
+                            <div className="col-span-2 text-center text-gray-500 text-sm py-4">
+                              No reports found.
+                            </div>
+                          )}
+                        </>
+                      )}
                     </div>
                   </section>
                 </div>

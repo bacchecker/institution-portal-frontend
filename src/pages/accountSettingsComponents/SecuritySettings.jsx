@@ -196,7 +196,6 @@ export default function SecuritySettings({ setActiveTab }) {
                             ))}
                         </ul>
 
-                        {/* Single button for all institution fields */}
                         {institutionFields.length > 0 && (
                             <NavLink
                                 to={`/account-settings/update-request`}

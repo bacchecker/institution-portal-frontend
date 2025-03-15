@@ -17,6 +17,7 @@ import Navbar from "@/components/Navbar";
 import secureLocalStorage from "react-secure-storage";
 import { MdOutlineFilterAlt, MdOutlineFilterAltOff } from "react-icons/md";
 import PermissionWrapper from "@/components/permissions/PermissionWrapper";
+import TicketChat from "./TicketChat";
 
 export default function Tickets() {
 
@@ -27,6 +28,7 @@ export default function Tickets() {
     const [lastPage, setLastPage] = useState(1);
     const [openDrawer, setOpenDrawer] = useState(false);
     const [openEditDrawer, setOpenEditDrawer] = useState(false);
+    const [openChatDrawer, setOpenChatDrawer] = useState(false);
     const [isPopoverOpen, setPopoverOpen] = useState(false);
     const [selectedData, setSelectedData] = useState({});
     const [sortBy, setSortBy] = useState(null);
@@ -80,7 +82,7 @@ export default function Tickets() {
       setCurrentPage(1); // Reset to first page on filter submit
     };
   return (
-    <div title="Tickets" className="bg-white">
+    <div className="bg-white">
     <Navbar />
     <div className="p-2 lg:p-4">
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -120,13 +122,13 @@ export default function Tickets() {
             openModal={openEditDrawer}
             fetchTickets={fetchTickets}
           />
-          {/* <CreateTicket setOpenModal={setOpenDrawer} openModal={openDrawer} /> */}
-          {/* <EditTicket
+
+          <TicketChat
+            selectedTicket={selectedData}
+            setOpenModal={setOpenChatDrawer}
+            openModal={openChatDrawer}
             fetchTickets={fetchTickets}
-            setOpenEditDrawer={setOpenEditDrawer}
-            openEditDrawer={openEditDrawer}
-            selectedData={selectedData}
-          /> */}
+          />
       </div>
 
       <Card className="md:w-full w-full mx-auto shadow-none rounded-md">
@@ -204,31 +206,7 @@ export default function Tickets() {
             </form>
           </CardBody>
         </Card>
-      {/* <div className="bg-white px-4 py-3 mt-5 rounded-xl">
-        <div className="text-gray-700 flex items-center space-x-4">
-          <p className="text-lg font-semibold">Ticket History</p>
-          <div className="relative w-full lg:w-1/2">
-              <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-                  <svg className="w-4 h-4 text-gray-500 " aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-                      <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
-                  </svg>
-              </div>
-              <input type="search" onChange={(e) => setSearch(e.target.value)} value={search} id="default-search" className="block w-full focus:outline-0 px-4 py-2.5 ps-10 text-sm text-gray-900 border border-gray-300 rounded-2xl bg-gray-50 focus:ring-blue-500 focus:border-blue-500" placeholder="Search by ticket description, subject or status" required />
-          </div>
-          <Select
-            selectedKeys={status}
-            onSelectionChange={(selected) => setStatus(selected)}
-            label="Filter by Status"
-            size="xs"
-            className="max-w-[180px] min-w-[180px]"
-          >
-              <SelectItem key="">All Statuses</SelectItem>
-              <SelectItem key="open">Open</SelectItem>
-              <SelectItem key="closed">Closed</SelectItem>
-              
-          </Select>
-        </div>
-      </div> */}
+      
       <section className="md:w-full w-[98vw] min-h-[60vh] mx-auto mt-2">
        
             <CustomTable
@@ -286,12 +264,14 @@ export default function Tickets() {
                       <DropdownMenu aria-label="Static Actions">
                         <DropdownItem
                           key="view_response"
-                          
+                          onClick={() => {
+                            setPopoverOpen(false);
+                            setSelectedData(item);
+                            setOpenChatDrawer(true);
+                          }}
                         >
                           View Response
                         </DropdownItem>
-                        {(secureLocalStorage.getItem('userPermissions')?.includes('document-requests.view') || 
-                        JSON.parse(secureLocalStorage.getItem('userRole'))?.isAdmin) && (
                         <DropdownItem
                           key="edit"
                           onClick={() => {
@@ -301,7 +281,7 @@ export default function Tickets() {
                           }}
                         >
                           Edit Ticket
-                        </DropdownItem>)}
+                        </DropdownItem>
                       </DropdownMenu>
                     </Dropdown>
                     
@@ -314,7 +294,6 @@ export default function Tickets() {
       </section>
       
     </div>
-      
     </div>
   );
 }
