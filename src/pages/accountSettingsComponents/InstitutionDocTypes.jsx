@@ -22,7 +22,6 @@ export default function InstitutionDocTypes() {
     const [total, setTotal] = useState(0);
     const [isLoading, setIsLoading] = useState(false);
     const [documentType, setDocumentType] = useState([]);
-    const [institutionDepartments, setInstitutionDepartments] = useState([]);
     const [existingDocumentTypes, setExistingDocumentTypes] = useState([]);
     const [sortBy, setSortBy] = useState(null);
     const [sortOrder, setSortOrder] = useState("asc");
@@ -68,18 +67,18 @@ export default function InstitutionDocTypes() {
     };
 
     useEffect(() => {
-        const fetchAvailableDocuments = async () => {
-            setIsLoading(true)
-            try {
-            const response = await axios.get("/institution/document-types/available");
+      const fetchAvailableDocuments = async () => {
+        setIsLoading(true)
+        try {
+        const response = await axios.get("/institution/document-types/available");
 
-            setExistingDocumentTypes( response.data.available_types);
-            } catch (error) {
-            console.error("Error fetching documents:", error);
-            throw error;
-            }
-        }; 
-        fetchAvailableDocuments();
+        setExistingDocumentTypes( response.data.available_types);
+        } catch (error) {
+        console.error("Error fetching documents:", error);
+        throw error;
+        }
+      }; 
+      fetchAvailableDocuments();
     }, []);
 
     useEffect(() => {

@@ -184,30 +184,35 @@ function NewApplicationForm({
   useEffect(() => {
     if (userAffiliations && institutions) {
       let filteredInstitutions = institutions?.data?.institutions;
-
+    
+       // Debugging purpose
+    
       // Exclude the logged-in user's institution
       if (institutionName?.id) {
         filteredInstitutions = filteredInstitutions?.filter(
           (institution) => String(institution.id) !== String(institutionName.id)
         );
       }
-
+    
       if (userAffiliations?.affiliations?.length > 0) {
         const institutionIds = userAffiliations?.affiliations?.map(
           (item) => item?.institution_id
         );
-
+    
         const insAffiliations = filteredInstitutions
           ?.filter((item) => institutionIds.includes(item?.id))
           .map((institution) => ({
             ...institution,
           }));
-
+    
         setAllInstitutions(insAffiliations);
       } else {
+        console.log(filteredInstitutions);
+        
         setAllInstitutions(filteredInstitutions);
       }
     }
+    
   }, [institutions, userAffiliations, institutionName?.id]);
 
   useEffect(() => {
@@ -755,7 +760,7 @@ function NewApplicationForm({
                         </h4>
                         <SearchSelectInput
                           placeholder={"Select Option"}
-                          data={institutions?.data?.institutions}
+                          data={allInstitutions}
                           isLoading={
                             isInstitutionLoading || isInstitutionFetching
                           }

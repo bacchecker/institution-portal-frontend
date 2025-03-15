@@ -211,7 +211,7 @@ const UpdateRequest = () => {
           ) : (
             <div className="relative space-y-3 p-4">
               {Object.entries(updates).map(([key, value]) => {
-                if (key === "logo" || key === "operation_certificate") {
+                if (key === "logo" || key === "operation_certificate" || "business_registration_document") {
                   return (
                     <div key={key} className="w-full mt-4 flex space-x-2">
                       <div className="w-full">

@@ -423,7 +423,7 @@ function InstitutionDataSetup({ setActiveStep }) {
                   <input
                     type="file"
                     id="certFile"
-                    accept=".pdf, .doc, .docx"
+                    accept=".pdf"
                     onChange={(e) => setSelectedCert(e.target.files[0])}
                     className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0 hidden"
                   />
@@ -446,8 +446,7 @@ function InstitutionDataSetup({ setActiveStep }) {
                   </h4>
                 </div>
                 <h4 className="text-[0.7rem] text-right">
-                  <span className="text-[#ff0404]">Accepted Formats</span> doc,
-                  docx, pdf
+                  <span className="text-[#ff0404]">Accepted Format</span>pdf
                 </h4>
               </div>
               <div className="w-[49%]">
@@ -476,7 +475,7 @@ function InstitutionDataSetup({ setActiveStep }) {
                       <input
                         type="file"
                         id="certBusinessFile"
-                        accept=".pdf, .doc, .docx"
+                        accept=".pdf"
                         // required
                         onChange={(e) => setSelectedBusinessCert(e.target.files[0])}
                         className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0 hidden"
@@ -500,8 +499,7 @@ function InstitutionDataSetup({ setActiveStep }) {
                       </h4>
                     </div>
                     <h4 className="text-[0.7rem] text-right">
-                      <span className="text-[#ff0404]">Accepted Formats</span> doc,
-                      docx, pdf
+                      <span className="text-[#ff0404]">Accepted Format</span>pdf
                     </h4>
                   </div>
                 )}

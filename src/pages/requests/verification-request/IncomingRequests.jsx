@@ -36,7 +36,6 @@ import { MdOutlineFilterAlt, MdOutlineFilterAltOff } from "react-icons/md";
 import secureLocalStorage from "react-secure-storage";
 import { IoIosOpen } from "react-icons/io";
 import { BsFillInfoCircleFill } from "react-icons/bs";
-import PermissionProtectedRoute from "../../../components/permissions/PermissionProtectedRoute";
 import PermissionWrapper from "../../../components/permissions/PermissionWrapper";
 
 export default function IncomingRequests() {
@@ -81,7 +80,7 @@ export default function IncomingRequests() {
   
   const reasonMappings = {
     // Document Authenticity
-    "tampering": ["Signs of tampering (erasures, mismatched fonts, corrections)", "Ink inconsistencies", "Document appears altered"],
+    "tamper": ["Signs of tampering (erasures, mismatched fonts, corrections)", "Ink inconsistencies", "Document appears altered"],
     "format": ["Format does not match institution standards", "Unrecognized document template", "Incorrect document type"],
     "valid timeframe": ["Document is expired", "Issued date is missing", "Document issued before/after allowed timeframe"],
   
