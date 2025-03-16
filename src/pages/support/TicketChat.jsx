@@ -362,7 +362,7 @@ function TicketChat({ setOpenModal, openModal, selectedTicket }) {
                                     {attachment.mime_type.startsWith("image/") ? (
                                     <img
                                         src={`${
-                                        import.meta.env.VITE_REVERB_HOST
+                                        import.meta.env.VITE_BACCHECKER_URL
                                         }/storage/${attachment.path}`}
                                         alt={attachment.name}
                                         className="max-w-full h-auto rounded-md shadow object-contain"
