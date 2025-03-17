@@ -13,6 +13,7 @@ import {
 import { BiSend } from "react-icons/bi";
 import Echo from "laravel-echo";
 import Pusher from "pusher-js";
+import { toast } from "sonner";
 
 function TicketChat({ setOpenModal, openModal, selectedTicket }) {
   const [userInput, setUserInput] = useState([]);
@@ -36,7 +37,10 @@ function TicketChat({ setOpenModal, openModal, selectedTicket }) {
 
   // Handle sending message
   const handleSendMessage = async () => {
-    if (!messageText.trim() && selectedFiles.length === 0) return; // Prevent empty submission
+    if (!messageText.trim() && selectedFiles.length === 0){
+      toast.error('No message or file has been attached');
+      return;
+    }
 
     setIsSending(true);
     const formData = new FormData();
@@ -307,7 +311,7 @@ function TicketChat({ setOpenModal, openModal, selectedTicket }) {
           </div>
         </div>
         {/* Messages Section */}
-        <div ref={messageContainerRef} className="flex-1 overflow-y-auto p-3">
+        <div ref={messageContainerRef} className="flex-1 overflow-y-auto px-1 py-2">
           {isLoading ? (
             <div className="w-full flex items-center justify-center h-full">
               <div className="flex flex-col items-center">
@@ -344,20 +348,20 @@ function TicketChat({ setOpenModal, openModal, selectedTicket }) {
                     <div
                       className={`${
                         message.sender_type === "App\\Models\\User"
-                          ? "bg-green-200"
+                          ? "bg-gray-300"
                           : "bg-white"
-                      } text-gray-800 px-3 pt-2 pb-0.5 rounded-md shadow min-w-[50%] max-w-[70%] relative`}
+                      } text-gray-800 px-2 pt-2 pb-0.5 rounded-md shadow min-w-[50%] max-w-[70%] relative`}
                     >
                       
 
                         {/* Attachments */}
                         {message.attachments &&
                             message.attachments.length > 0 && (
-                            <div className="mb-1 flex flex-wrap gap-2">
+                            <div className="w-full mb-1 flex flex-wrap gap-2">
                                 {message.attachments.map((attachment, index) => (
                                 <div
                                     key={index}
-                                    className="flex flex-col items-start"
+                                    className="w-full flex flex-col"
                                 >
                                     {attachment.mime_type.startsWith("image/") ? (
                                     <img
@@ -365,14 +369,14 @@ function TicketChat({ setOpenModal, openModal, selectedTicket }) {
                                         import.meta.env.VITE_BACCHECKER_URL
                                         }/storage/${attachment.path}`}
                                         alt={attachment.name}
-                                        className="max-w-full h-auto rounded-md shadow object-contain"
+                                        className="w-full h-auto rounded-md object-contain"
                                         style={{
                                         maxHeight: "200px",
                                         width: "100%",
                                         }}
                                     />
                                     ) : (
-                                    <div className="flex items-center space-x-2 border p-2 rounded-md bg-gray-100">
+                                    <div className="w-full flex items-center justify-between border p-2 rounded-md bg-gray-100">
                                         <span
                                         className="text-sm truncate max-w-[150px]"
                                         title={attachment.name}
@@ -482,7 +486,7 @@ function TicketChat({ setOpenModal, openModal, selectedTicket }) {
             {/* Send Button */}
             <button
                 type="submit"
-                className="ml-2 px-2 py-1.5 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                className="ml-2 p-1.5 bg-bChkRed text-white rounded-md hover:bg-opacity-70"
                 disabled={isSending}
             >
                 {isSending ? (
