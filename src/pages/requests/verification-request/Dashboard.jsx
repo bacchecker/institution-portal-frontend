@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "@/utils/axiosConfig";
+import { Elements } from "@stripe/react-stripe-js";
+import { loadStripe } from "@stripe/stripe-js";
 import {
   FaCreditCard,
   FaCrown,
@@ -21,6 +23,7 @@ import {
 import Modal from "@/components/Modal";
 import SideModal from "@/components/SideModal";
 import { fetchSubscription } from "../../subscription/fetchSubscription";
+import StripeCheckoutForm from "../../subscription/StripeCheckoutForm";
 import { useStripe, useElements, PaymentElement } from "@stripe/react-stripe-js";
 import LoadItems from "@/components/LoadItems";
 import { toast } from "sonner";
@@ -43,9 +46,10 @@ export default function Dashboard() {
   const [openSubDrawer, setOpenSubDrawer] = useState(false);
   const [openTopUpDrawer, setOpenTopUpDrawer] = useState(false);
   const [openPaymentDrawer, setOpenPaymentDrawer] = useState(false);
-  const stripe = useStripe();
-  const elements = useElements();
 
+  const [clientSecret, setClientSecret] = useState(null); // Stripe client secret
+  const [showStripeForm, setShowStripeForm] = useState(false);
+  const stripePromise = loadStripe("pk_test_51R6UPMGfpcTSeSCYZFlk5zGIgl2l7xEV0IcNTEmi0XObDS3DfbRCQOKiBZjOdaSOGxDvpIykgAI1OKh3xn6Oq1ty00rF3VL1NJ");
   // Payment States
   const [selectedPayment, setSelectedPayment] = useState("card");
   const [paymentDetails, setPaymentDetails] = useState({
@@ -443,28 +447,10 @@ export default function Dashboard() {
       const response = await axios.post("/payments/initiate", payload);
       if (response.data.status === "success") {
         if (preferredPlatform === "paystack") {
-          // Redirect to Paystack
           window.location.href = response?.data?.authorization_url;
         } else if (preferredPlatform === "stripe") {
-          if (!stripe || !elements) {
-            toast.error("Stripe not ready");
-            setIsSaving(false);
-            return;
-          }
-        
-          const result = await stripe.confirmPayment({
-            elements,
-            confirmParams: {
-              return_url: "https://institution-dev.baccheck.online/payment-success", // optional
-            },
-            redirect: "if_required",
-          });
-        
-          if (result.error) {
-            toast.error(result.error.message);
-          } else if (result.paymentIntent?.status === "succeeded") {
-            toast.success("Stripe payment successful!");
-          }
+          setClientSecret(response.data.clientSecret);
+          setShowStripeForm(true);
         }
       }
       setIsSaving(false);
@@ -519,28 +505,10 @@ export default function Dashboard() {
       const response = await axios.post("/payments/initiate", payload);
       if (response.data.status === "success") {
         if (preferredPlatform === "paystack") {
-          // Redirect to Paystack
           window.location.href = response?.data?.authorization_url;
         } else if (preferredPlatform === "stripe") {
-          if (!stripe || !elements) {
-            toast.error("Stripe not ready");
-            setIsSaving(false);
-            return;
-          }
-        
-          const result = await stripe.confirmPayment({
-            elements,
-            confirmParams: {
-              return_url: "https://institution-dev.baccheck.online/payment-success", // optional
-            },
-            redirect: "if_required",
-          });
-        
-          if (result.error) {
-            toast.error(result.error.message);
-          } else if (result.paymentIntent?.status === "succeeded") {
-            toast.success("Stripe payment successful!");
-          }
+          setClientSecret(response.data.clientSecret);
+          setShowStripeForm(true);
         }
       }
       setIsSaving(false);
@@ -1237,10 +1205,13 @@ export default function Dashboard() {
                 </div>
               )}
 
-              {selectedPayment === "card" && preferredPlatform === "stripe" && (
-                <div className="my-4">
-                  <PaymentElement />
-                </div>
+              {showStripeForm && clientSecret && (
+                <Elements stripe={stripePromise} options={{ clientSecret }}>
+                  <StripeCheckoutForm onSuccess={() => {
+                    setShowStripeForm(false);
+                    setClientSecret(null);
+                  }} />
+                </Elements>
               )}
 
               {/* Additional Fields for Mobile Money */}

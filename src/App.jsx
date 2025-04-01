@@ -1,4 +1,3 @@
-import React, {useState, useEffect} from 'react';
 import {
   BrowserRouter as Router,
   Route,
@@ -8,15 +7,12 @@ import {
 } from "react-router-dom";
 import Login from "@/pages/Login";
 import { Toaster } from "sonner";
-import { Elements } from "@stripe/react-stripe-js";
-import { loadStripe } from "@stripe/stripe-js";
 import ResetPassword from "@/pages/ResetPassword";
 import NewPassword from "@/pages/NewPassword";
 import AuthenticationProtectedRoute from "@/components/AuthenticationProtectedRoute";
 import AuthenticatedSuccessProtectedRoute from "@/components/AuthenticatedSuccessProtectedRoute";
 import AuthenticationPage from "@/pages/AuthenticationPage";
 import PrivateRoute from "@/components/PrivateRoute";
-import StripeProvider from "@/components/StripeProvider";
 import RootLayout from "@/components/RootLayout";
 import AccountUnderReview from "@/pages/AccountUnderReview";
 import AccountSetup from "@/pages/AccountSetup";
@@ -38,25 +34,9 @@ import AccountSuspended from "@/pages/AccountSuspended";
 import AccountSuspendedProtection from "@/components/AccountSuspendedProtection";
 import AccountSettings from "./pages/accountSettingsComponents/AccountSettings";
 import MainRequests from "./pages/accountSettingsComponents/updateRequestComponents/MainRequests";
-import axios from "@/utils/axiosConfig";
 
 function App() {
-  const [clientSecret, setClientSecret] = useState(null);
-
-  useEffect(() => {
-    // Fetch from backend when needed
-    axios.post("/payments/initiate", {
-      amount: 5000, // example
-      platform: "stripe",
-      payment_type: "subscription"
-    }).then(res => {
-      if (res.data.clientSecret) {
-        setClientSecret(res.data.clientSecret);
-      }
-    });
-  }, []);
-
-  if (!clientSecret) return <p>Loading Stripe...</p>;
+  
   return (
     <>
       <Toaster richColors position="top-right" />
@@ -115,9 +95,7 @@ function App() {
                     element={
                       <AuthenticatedSuccessProtectedRoute>
                         <AccountSetupProtectedRoute>
-                          <StripeProvider clientSecret={clientSecret}>
-                            <Dashboard />
-                          </StripeProvider>
+                          <Dashboard />
                         </AccountSetupProtectedRoute>
                       </AuthenticatedSuccessProtectedRoute>
                     }
