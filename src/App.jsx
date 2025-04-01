@@ -15,6 +15,7 @@ import AuthenticationProtectedRoute from "@/components/AuthenticationProtectedRo
 import AuthenticatedSuccessProtectedRoute from "@/components/AuthenticatedSuccessProtectedRoute";
 import AuthenticationPage from "@/pages/AuthenticationPage";
 import PrivateRoute from "@/components/PrivateRoute";
+import StripeProvider from "@/components/StripeProvider";
 import RootLayout from "@/components/RootLayout";
 import AccountUnderReview from "@/pages/AccountUnderReview";
 import AccountSetup from "@/pages/AccountSetup";
@@ -39,6 +40,22 @@ import MainRequests from "./pages/accountSettingsComponents/updateRequestCompone
 
 function App() {
   const stripePromise = loadStripe("pk_test_51R6UPMGfpcTSeSCYZFlk5zGIgl2l7xEV0IcNTEmi0XObDS3DfbRCQOKiBZjOdaSOGxDvpIykgAI1OKh3xn6Oq1ty00rF3VL1NJ");
+  const [clientSecret, setClientSecret] = useState(null);
+
+  useEffect(() => {
+    // Fetch from backend when needed
+    axios.post("/payments/initiate", {
+      amount: 5000, // example
+      platform: "stripe",
+      payment_type: "subscription"
+    }).then(res => {
+      if (res.data.clientSecret) {
+        setClientSecret(res.data.clientSecret);
+      }
+    });
+  }, []);
+
+  if (!clientSecret) return <p>Loading Stripe...</p>;
   return (
     <>
       <Toaster richColors position="top-right" />
@@ -97,9 +114,9 @@ function App() {
                     element={
                       <AuthenticatedSuccessProtectedRoute>
                         <AccountSetupProtectedRoute>
-                          <Elements stripe={stripePromise}>
+                          <StripeProvider clientSecret={clientSecret}>
                             <Dashboard />
-                          </Elements>
+                          </StripeProvider>
                         </AccountSetupProtectedRoute>
                       </AuthenticatedSuccessProtectedRoute>
                     }
