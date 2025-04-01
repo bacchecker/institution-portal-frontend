@@ -465,39 +465,39 @@ function TicketChat({ setOpenModal, openModal, selectedTicket }) {
             >
             {/* File Attachment Button */}
             <label className="cursor-pointer bg-gray-200 text-gray-600 p-2 rounded-md hover:bg-gray-300 mr-2">
-                <MdAttachFile size={24} />
-                <input
+              <MdAttachFile size={24}/>
+              <input
                 type="file"
                 className="hidden"
                 multiple
                 onChange={handleFileChange}
-                />
+              />
             </label>
 
             {/* Message Input */}
             <input
-                type="text"
-                placeholder="Type a message..."
-                className="flex-1 border border-gray-300 rounded-md px-3 py-2 focus:outline-none"
-                value={messageText}
-                onChange={(e) => setMessageText(e.target.value)}
+              type="text"
+              placeholder="Type a message..."
+              className="flex-1 border border-gray-300 rounded-md px-3 py-2 focus:outline-none"
+              value={messageText}
+              onChange={(e) => setMessageText(e.target.value)}
             />
 
             {/* Send Button */}
             <button
-                type="submit"
-                className="ml-2 p-1.5 bg-bChkRed text-white rounded-md hover:bg-opacity-70"
-                disabled={isSending}
+              type="submit"
+              className="ml-2 p-1.5 bg-bChkRed text-white rounded-md hover:bg-opacity-70"
+              disabled={isSending}
             >
-                {isSending ? (
-                <div className="flex items-center justify-center gap-2">
-                    <LoadItems color={"#ffffff"} size={24} />
-                </div>
-                ) : (
-                <BiSend size={26} />
-                )}
+              {isSending ? (
+              <div className="flex items-center justify-center gap-2">
+                  <LoadItems color={"#ffffff"} size={24} />
+              </div>
+              ) : (
+              <BiSend size={26} />
+              )}
             </button>
-            </form>
+          </form>
 
         </div>
       </div>

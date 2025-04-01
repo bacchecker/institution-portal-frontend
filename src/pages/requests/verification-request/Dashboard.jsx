@@ -1,11 +1,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "@/utils/axiosConfig";
 import {
-  FaChevronLeft,
-  FaChevronRight,
   FaCreditCard,
   FaCrown,
-  FaRegCircleCheck,
 } from "react-icons/fa6";
 import { RiAddBoxFill, RiAlarmWarningFill } from "react-icons/ri";
 import { HiMiniUsers } from "react-icons/hi2";
@@ -24,6 +21,7 @@ import {
 import Modal from "@/components/Modal";
 import SideModal from "@/components/SideModal";
 import { fetchSubscription } from "../../subscription/fetchSubscription";
+import { useStripe, useElements, PaymentElement } from "@stripe/react-stripe-js";
 import LoadItems from "@/components/LoadItems";
 import { toast } from "sonner";
 import { GiUpgrade } from "react-icons/gi";
@@ -33,6 +31,7 @@ export default function Dashboard() {
   const [sentRequest, setSentRequest] = useState(0);
   const [subscription, setSubscription] = useState("");
   const [currentPackage, setCurrentPackage] = useState("");
+  const [preferredPlatform, setPreferredPlatform] = useState("stripe");
   const [creditValue, setCreditValue] = useState(0);
   const [tab, setTab] = useState("day");
   const [plans, setPlans] = useState([]);
@@ -44,6 +43,9 @@ export default function Dashboard() {
   const [openSubDrawer, setOpenSubDrawer] = useState(false);
   const [openTopUpDrawer, setOpenTopUpDrawer] = useState(false);
   const [openPaymentDrawer, setOpenPaymentDrawer] = useState(false);
+  const stripe = useStripe();
+  const elements = useElements();
+
   // Payment States
   const [selectedPayment, setSelectedPayment] = useState("card");
   const [paymentDetails, setPaymentDetails] = useState({
@@ -51,7 +53,7 @@ export default function Dashboard() {
     firstName: "",
     lastName: "",
     expirationDate: "",
-    cvv: "",
+    cvcCode: "",
     mobileMoneyNumber: "",
     mobileNetwork: "",
     numberOfCredits: 0,
@@ -421,9 +423,15 @@ export default function Dashboard() {
       channel: selectedPayment,
       payment_type: "subscription",
       amount: paymentData?.amount,
+      platform: preferredPlatform,
       ...(selectedPayment === "card" && {
-        payment_method: 'VISA',
-        payment_detail: paymentDetails.cardNumber,
+        payment_method: 'card',
+        payment_detail: {
+          number: paymentDetails.cardNumber,
+          exp_month: paymentDetails.expiryMonth,
+          exp_year: paymentDetails.expiryYear,
+          cvc: paymentDetails.cvcCode,
+        },
       }),
       ...(selectedPayment === "mobile_money" && {
         payment_method: paymentDetails.mobileNetwork,
@@ -433,8 +441,31 @@ export default function Dashboard() {
 
     try {
       const response = await axios.post("/payments/initiate", payload);
-      if (response.data.status == "success") {
-        window.location.href = response?.data?.authorization_url;
+      if (response.data.status === "success") {
+        if (preferredPlatform === "paystack") {
+          // Redirect to Paystack
+          window.location.href = response?.data?.authorization_url;
+        } else if (preferredPlatform === "stripe") {
+          if (!stripe || !elements) {
+            toast.error("Stripe not ready");
+            setIsSaving(false);
+            return;
+          }
+        
+          const result = await stripe.confirmPayment({
+            elements,
+            confirmParams: {
+              return_url: "https://institution-dev.baccheck.online/payment-success", // optional
+            },
+            redirect: "if_required",
+          });
+        
+          if (result.error) {
+            toast.error(result.error.message);
+          } else if (result.paymentIntent?.status === "succeeded") {
+            toast.success("Stripe payment successful!");
+          }
+        }
       }
       setIsSaving(false);
     } catch (error) {
@@ -468,9 +499,15 @@ export default function Dashboard() {
       amount: paymentDetails?.amount,
       bonus_amount: paymentDetails?.bonus_amount,
       credit_amount: paymentDetails?.numberOfCredits,
+      platform: preferredPlatform,
       ...(selectedPayment === "card" && {
-        payment_method: 'VISA',
-        payment_detail: paymentDetails.cardNumber,
+        payment_method: 'card',
+        payment_detail: {
+          number: paymentDetails.cardNumber,
+          exp_month: paymentDetails.expiryMonth,
+          exp_year: paymentDetails.expiryYear,
+          cvc: paymentDetails.cvcCode,
+        },
       }),
       ...(selectedPayment === "mobile_money" && {
         payment_method: paymentDetails.mobileNetwork,
@@ -480,8 +517,31 @@ export default function Dashboard() {
 
     try {
       const response = await axios.post("/payments/initiate", payload);
-      if (response.data.status == "success") {
-        window.location.href = response?.data?.authorization_url;
+      if (response.data.status === "success") {
+        if (preferredPlatform === "paystack") {
+          // Redirect to Paystack
+          window.location.href = response?.data?.authorization_url;
+        } else if (preferredPlatform === "stripe") {
+          if (!stripe || !elements) {
+            toast.error("Stripe not ready");
+            setIsSaving(false);
+            return;
+          }
+        
+          const result = await stripe.confirmPayment({
+            elements,
+            confirmParams: {
+              return_url: "https://institution-dev.baccheck.online/payment-success", // optional
+            },
+            redirect: "if_required",
+          });
+        
+          if (result.error) {
+            toast.error(result.error.message);
+          } else if (result.paymentIntent?.status === "succeeded") {
+            toast.success("Stripe payment successful!");
+          }
+        }
       }
       setIsSaving(false);
     } catch (error) {
@@ -1103,7 +1163,7 @@ export default function Dashboard() {
               </div>
 
               {/* Additional Fields for Card Payment */}
-              {selectedPayment === "card" && (
+              {selectedPayment === "card" && preferredPlatform === "paystack" && (
                 <div className="">
                   <div className="mb-4">
                     <h4 className="md:text-[1vw] text-[4vw] mb-1">
@@ -1120,61 +1180,66 @@ export default function Dashboard() {
                     </div>
                   </div>
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                    {/* <div className="">
-                      <h4 className="md:text-[1vw] text-[4vw] mb-1">
-                        First Name
-                      </h4>
-                      <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
-                        <input
-                          type="text"
-                          name="firstName"
-                          value={paymentDetails.firstName}
-                          onChange={handleInputChange}
-                          className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-white absolute left-0 right-0 bottom-0 top-0"
-                        />
+                    <div className="">
+                      <h4 className="md:text-[1vw] text-[4vw] mb-1">Expiration Date</h4>
+                      <div className="flex gap-2">
+                        {/* Expiry Month */}
+                        <div className="relative w-1/2 md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
+                          <input
+                            type="number"
+                            name="expiryMonth"
+                            placeholder="MM"
+                            value={paymentDetails.expiryMonth}
+                            onChange={(e) => {
+                              let value = e.target.value;
+                              if (value.length <= 2) {
+                                if (value > 12) value = "12"; // Restrict to 12 max
+                                if (value < 1 && value !== "") value = "01"; // Restrict to 01 min
+                                handleInputChange({ target: { name: "expiryMonth", value } });
+                              }
+                            }}
+                            className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-white absolute left-0 right-0 bottom-0 top-0 text-center"
+                          />
+                        </div>
+
+                        {/* Expiry Year */}
+                        <div className="relative w-1/2 md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
+                          <input
+                            type="number"
+                            name="expiryYear"
+                            placeholder="YYYY"
+                            value={paymentDetails.expiryYear}
+                            onChange={(e) => {
+                              let value = e.target.value;
+                              if (value.length <= 4) {
+                                handleInputChange({ target: { name: "expiryYear", value } });
+                              }
+                            }}
+                            className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-white absolute left-0 right-0 bottom-0 top-0 text-center"
+                          />
+                        </div>
                       </div>
                     </div>
+
                     <div className="">
-                      <h4 className="md:text-[1vw] text-[4vw] mb-1">
-                        Last Name
-                      </h4>
+                      <h4 className="md:text-[1vw] text-[4vw] mb-1">CVC</h4>
                       <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
                         <input
                           type="text"
-                          name="lastName"
-                          value={paymentDetails.lastName}
-                          onChange={handleInputChange}
-                          className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-white absolute left-0 right-0 bottom-0 top-0"
-                        />
-                      </div>
-                    </div> */}
-                    <div className="">
-                      <h4 className="md:text-[1vw] text-[4vw] mb-1">
-                        Expiration Date
-                      </h4>
-                      <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
-                        <input
-                          type="text"
-                          name="expirationDate"
-                          value={paymentDetails.expirationDate}
-                          onChange={handleInputChange}
-                          className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-white absolute left-0 right-0 bottom-0 top-0"
-                        />
-                      </div>
-                    </div>
-                    <div className="">
-                      <h4 className="md:text-[1vw] text-[4vw] mb-1">CVV</h4>
-                      <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
-                        <input
-                          type="text"
-                          name="cvv"
-                          value={paymentDetails.cvv}
+                          name="cvcCode"
+                          value={paymentDetails.cvcCode}
                           onChange={handleInputChange}
                           className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-white absolute left-0 right-0 bottom-0 top-0"
                         />
                       </div>
                     </div>
                   </div>
+                </div>
+              )}
+
+              {selectedPayment === "card" && preferredPlatform === "stripe" && (
+                <div className="my-4">
+                  <PaymentElement />
                 </div>
               )}
 
@@ -1296,7 +1361,7 @@ export default function Dashboard() {
               </div>
 
               {/* Additional Fields for Card Payment */}
-              {selectedPayment === "card" && (
+              {selectedPayment === "card" && preferredPlatform === "paystack" && (
                 <div className="">
                   <div className="mb-5">
                     <h4 className="md:text-[1vw] text-[4vw] mb-1">
@@ -1356,18 +1421,24 @@ export default function Dashboard() {
                       </div>
                     </div>
                     <div className="">
-                      <h4 className="md:text-[1vw] text-[4vw] mb-1">CVV</h4>
+                      <h4 className="md:text-[1vw] text-[4vw] mb-1">CVC</h4>
                       <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
                         <input
                           type="text"
-                          name="cvv"
-                          value={paymentDetails.cvv}
+                          name="cvcCode"
+                          value={paymentDetails.cvcCode}
                           onChange={handleInputChange}
                           className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-white absolute left-0 right-0 bottom-0 top-0"
                         />
                       </div>
                     </div>
                   </div>
+                </div>
+              )}
+
+              {selectedPayment === "card" && preferredPlatform === "stripe" && (
+                <div className="my-4">
+                  <PaymentElement />
                 </div>
               )}
 

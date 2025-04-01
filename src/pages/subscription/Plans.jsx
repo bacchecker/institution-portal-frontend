@@ -15,6 +15,7 @@ export default function Plans() {
     const [isSaving, setIsSaving] = useState(false);
     const [openDrawer, setOpenDrawer] = useState(false);
     const [data, setData] = useState(null);
+    const [preferredPlatform, setPreferredPlatform] = useState(null);
     // Payment States
     const [selectedPayment, setSelectedPayment] = useState(""); // Track selected payment method
     const [mobileNetwork, setMobileNetwork] = useState("");
@@ -62,27 +63,43 @@ export default function Plans() {
   
     const handleFormSubmit = async (e) => {
       e.preventDefault();
-      setIsSaving(true)
+      setIsSaving(true);
+      setPreferredPlatform('stripe')
       const payload = {
         subscription_plan_id: data?.id,
         channel: selectedPayment,
         payment_type: 'subscription',
         amount: data?.amount,
+        platform: 'stripe', // Add this to specify "paystack" or "stripe"
         ...(selectedPayment === "card" && { payment_method: cardType, payment_detail: cardNumber }),
         ...(selectedPayment === "mobile_money" && { payment_method: mobileNetwork, payment_detail: mobileNumber }),
       };
     
       try {
         const response = await axios.post("/payments/initiate", payload);
-        if (response.data.status == "success") {
-          window.location.href = response?.data?.authorization_url;
+    
+        if (response.data.status === "success") {
+          if (preferredPlatform === "paystack") {
+            // Redirect to Paystack
+            window.location.href = response?.data?.authorization_url;
+          } else if (preferredPlatform === "stripe") {
+            // Handle Stripe Payment
+            console.log("Stripe payment successful:", response.data.transaction_id);
+    
+            if (result.error) {
+              console.error("Payment failed:", result.error.message);
+            } else {
+              console.log("Payment successful!");
+            }
+          }
         }
-        setIsSaving(false)
+        setIsSaving(false);
       } catch (error) {
         console.error("Error:", error.response?.data || error.message);
-        setIsSaving(false)
+        setIsSaving(false);
       }
-    }
+    };
+    
 
   return (
     <div title="Subscription Plan" className="bg-white">

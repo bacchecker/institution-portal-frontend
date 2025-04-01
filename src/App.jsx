@@ -7,6 +7,8 @@ import {
 } from "react-router-dom";
 import Login from "@/pages/Login";
 import { Toaster } from "sonner";
+import { Elements } from "@stripe/react-stripe-js";
+import { loadStripe } from "@stripe/stripe-js";
 import ResetPassword from "@/pages/ResetPassword";
 import NewPassword from "@/pages/NewPassword";
 import AuthenticationProtectedRoute from "@/components/AuthenticationProtectedRoute";
@@ -36,6 +38,7 @@ import AccountSettings from "./pages/accountSettingsComponents/AccountSettings";
 import MainRequests from "./pages/accountSettingsComponents/updateRequestComponents/MainRequests";
 
 function App() {
+  const stripePromise = loadStripe("pk_test_51R6UPMGfpcTSeSCYZFlk5zGIgl2l7xEV0IcNTEmi0XObDS3DfbRCQOKiBZjOdaSOGxDvpIykgAI1OKh3xn6Oq1ty00rF3VL1NJ");
   return (
     <>
       <Toaster richColors position="top-right" />
@@ -88,12 +91,15 @@ function App() {
                       </AuthenticatedSuccessProtectedRoute>
                     }
                   />
+                  
                   <Route
                     path="/dashboard"
                     element={
                       <AuthenticatedSuccessProtectedRoute>
                         <AccountSetupProtectedRoute>
-                          <Dashboard />
+                          <Elements stripe={stripePromise}>
+                            <Dashboard />
+                          </Elements>
                         </AccountSetupProtectedRoute>
                       </AuthenticatedSuccessProtectedRoute>
                     }
