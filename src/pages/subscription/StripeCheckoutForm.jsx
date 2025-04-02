@@ -9,17 +9,28 @@ export default function StripeCheckoutForm({ onSuccess }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (!stripe || !elements) return;
 
     setIsProcessing(true);
-    const result = await stripe.confirmPayment({ elements, redirect: "if_required" });
 
-    if (result.error) {
-      toast.error(result.error.message);
-    } else if (result.paymentIntent?.status === "succeeded") {
+    const { error, paymentIntent } = await stripe.confirmPayment({
+      elements,
+      confirmParams: {
+        return_url: window.location.href, // Optional: for redirect flows
+      },
+      redirect: "if_required",
+    });
+
+    if (error) {
+      toast.error(error.message || "Payment failed");
+    } else if (paymentIntent?.status === "succeeded") {
       toast.success("Payment successful!");
-      if (onSuccess) onSuccess();
+      onSuccess?.(); // Run success callback
+    } else {
+      toast.info("Payment is processing...");
     }
+
     setIsProcessing(false);
   };
 
