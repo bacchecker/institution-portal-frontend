@@ -34,7 +34,7 @@ export default function Dashboard() {
   const [sentRequest, setSentRequest] = useState(0);
   const [subscription, setSubscription] = useState("");
   const [currentPackage, setCurrentPackage] = useState("");
-  const [preferredPlatform, setPreferredPlatform] = useState("stripe");
+  const [preferredPlatform, setPreferredPlatform] = useState("paystack");
   const [creditValue, setCreditValue] = useState(0);
   const [tab, setTab] = useState("day");
   const [plans, setPlans] = useState([]);
@@ -47,7 +47,7 @@ export default function Dashboard() {
   const [openTopUpDrawer, setOpenTopUpDrawer] = useState(false);
   const [openPaymentDrawer, setOpenPaymentDrawer] = useState(false);
 
-  const [clientSecret, setClientSecret] = useState(null); // Stripe client secret
+  const [clientSecret, setClientSecret] = useState(null);
   const [showStripeForm, setShowStripeForm] = useState(false);
   const stripePromise = loadStripe("pk_test_51R6UPMGfpcTSeSCYZFlk5zGIgl2l7xEV0IcNTEmi0XObDS3DfbRCQOKiBZjOdaSOGxDvpIykgAI1OKh3xn6Oq1ty00rF3VL1NJ");
   // Payment States
@@ -1205,14 +1205,23 @@ export default function Dashboard() {
                 </div>
               )}
 
-              {showStripeForm && clientSecret && (
+              {clientSecret && preferredPlatform === "stripe" && (
                 <Elements stripe={stripePromise} options={{ clientSecret }}>
-                  <StripeCheckoutForm onSuccess={() => {
-                    setShowStripeForm(false);
-                    setClientSecret(null);
-                  }} />
+                  <Modal
+                    isOpen={showStripeForm}
+                    setIsOpen={setShowStripeForm}
+                    classNames="w-[100vw] md:w-[80vw] lg:w-[60vw] z-50 rounded-md"
+                  >
+                    <div className="p-4">
+                      <StripeCheckoutForm onSuccess={() => {
+                        setShowStripeForm(false);
+                        setClientSecret(null);
+                      }} />
+                    </div>
+                  </Modal>
                 </Elements>
               )}
+
 
               {/* Additional Fields for Mobile Money */}
               {selectedPayment === "mobile_money" && (
