@@ -16,14 +16,16 @@ export default function StripeCheckoutForm({ onSuccess }) {
 
     const { error, paymentIntent } = await stripe.confirmPayment({
       elements,
-      confirmParams: {
+      /* confirmParams: {
         return_url: window.location.href, // Optional: for redirect flows
-      },
+      }, */
       redirect: "if_required",
     });
 
     if (error) {
-      toast.error(error.message || "Payment failed");
+        console.error("Stripe error:", error);
+        toast.error(error.message || "Payment failed");
+      
     } else if (paymentIntent?.status == "succeeded") {
       toast.success("Payment successful!");
       onSuccess?.(); // Run success callback

@@ -1104,7 +1104,7 @@ export default function Dashboard() {
                       className="w-5 h-5 bg-gray-100 border-gray-300"
                     />
                     <label
-                      for="card-option"
+                      htmlFor="card-option"
                       className="ms-2 text-base font-medium text-gray-900 dark:text-gray-300"
                     >
                       Debit Card
@@ -1122,7 +1122,7 @@ export default function Dashboard() {
                       className="w-5 h-5 bg-gray-100 border-gray-300"
                     />
                     <label
-                      for="mobile-money-option"
+                      htmlFor="mobile-money-option"
                       className="ms-2 text-base font-medium text-gray-900 dark:text-gray-300"
                     >
                       Mobile Wallet
@@ -1314,7 +1314,7 @@ export default function Dashboard() {
                       className="w-5 h-5 bg-gray-100 border-gray-300 accent-bChkRed"
                     />
                     <label
-                      for="card-option"
+                      htmlFor="card-option"
                       className="ms-2 text-base font-medium text-gray-900 dark:text-gray-300"
                     >
                       Debit Card
@@ -1332,7 +1332,7 @@ export default function Dashboard() {
                       className="w-5 h-5 bg-gray-100 border-gray-300 accent-bChkRed"
                     />
                     <label
-                      for="mobile-money-option"
+                      htmlFor="mobile-money-option"
                       className="ms-2 text-base font-medium text-gray-900 dark:text-gray-300"
                     >
                       Mobile Wallet
