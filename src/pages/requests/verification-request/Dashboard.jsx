@@ -511,6 +511,7 @@ export default function Dashboard() {
           setShowStripeForm(true);
         }
       }
+      //toast.success("Payment successful!");
       setIsSaving(false);
     } catch (error) {
       console.error("Error:", error.response?.data || error.message);
@@ -1210,7 +1211,7 @@ export default function Dashboard() {
                   <Modal
                     isOpen={showStripeForm}
                     setIsOpen={setShowStripeForm}
-                    classNames="w-[100vw] md:w-[80vw] lg:w-[60vw] z-50 rounded-md"
+                    classNames="w-[100vw] bg-red-600 md:w-[80vw] lg:w-[60vw] z-50 rounded-sm"
                   >
                     <div className="p-4">
                       <StripeCheckoutForm onSuccess={() => {

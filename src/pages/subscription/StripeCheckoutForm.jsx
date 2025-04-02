@@ -24,7 +24,7 @@ export default function StripeCheckoutForm({ onSuccess }) {
 
     if (error) {
       toast.error(error.message || "Payment failed");
-    } else if (paymentIntent?.status === "succeeded") {
+    } else if (paymentIntent?.status == "succeeded") {
       toast.success("Payment successful!");
       onSuccess?.(); // Run success callback
     } else {
