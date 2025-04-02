@@ -73,12 +73,18 @@ export default function Dashboard() {
 
   const getUserCountry = async () => {
     try {
-      const response = await axiosDef.get('https://ipapi.co/json/');
-      const country = response.data.country_name;
-      console.log('Country:', country);
-      return country;
+      const response = await fetch('https://ipwho.is/');
+      const data = await response.json();
+  
+      if (data.success) {
+        console.log('User Country:', data.country); // e.g., "NG"
+        return data.country;
+      } else {
+        console.error('Failed to fetch country', data.message);
+        return null;
+      }
     } catch (error) {
-      console.error('Failed to get location', error);
+      console.error('IP lookup error:', error);
       return null;
     }
   };
