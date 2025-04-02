@@ -7,8 +7,6 @@ import axios from "@/utils/axiosConfig";
 import { FaCircleArrowDown, FaCreditCard } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
 import { MdDashboard } from "react-icons/md";
-import { HiMiniUsers } from "react-icons/hi2";
-import { IoMdTrendingUp } from "react-icons/io";
 import Dashboard from "./verification-request/Dashboard";
 import { useDispatch, useSelector } from "react-redux";
 import { setSelectedTab } from "../../redux/baccheckerSlice";
@@ -22,7 +20,6 @@ export default function VerificationRequest() {
   const navigate = useNavigate();
 
   let selectedTab = useSelector((state) => state.bacchecker.selectedTab);
-
 
   useEffect(() => {
     if (selectedTab) {

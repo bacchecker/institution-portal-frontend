@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "@/utils/axiosConfig";
+import axiosDef from 'axios';
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 import {
@@ -24,7 +25,6 @@ import Modal from "@/components/Modal";
 import SideModal from "@/components/SideModal";
 import { fetchSubscription } from "../../subscription/fetchSubscription";
 import StripeCheckoutForm from "../../subscription/StripeCheckoutForm";
-import { useStripe, useElements, PaymentElement } from "@stripe/react-stripe-js";
 import LoadItems from "@/components/LoadItems";
 import { toast } from "sonner";
 import { GiUpgrade } from "react-icons/gi";
@@ -70,6 +70,27 @@ export default function Dashboard() {
   useEffect(() => {
     setPaymentData(paymentData);
   }, [paymentData]);
+
+  const getUserCountry = async () => {
+    try {
+      const response = await axiosDef.get('https://ipapi.co/json/');
+      const country = response.data.country_name;
+      console.log('Country:', country);
+      return country;
+    } catch (error) {
+      console.error('Failed to get location', error);
+      return null;
+    }
+  };
+  useEffect(() => {
+    getUserCountry().then((country) => {
+      if(country == "Ghana"){
+        setPreferredPlatform('paystack')
+      }else{
+        setPreferredPlatform('stripe')
+      }
+    });
+  }, []);
 
   const pages = [
     <div className="w-full flex flex-col justify-center h-full">

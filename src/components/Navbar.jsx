@@ -167,7 +167,7 @@ const Navbar = () => {
               buttonContent={
                 <>
                   <div className='w-fit h-fit relative pt-[1vw]'>
-                    <i class='bx bx-bell text-[2vw]'></i>
+                    <i className='bx bx-bell text-[2vw]'></i>
                     <div className='rounded-[50%] w-[1.8vw] h-[1.8vw] bg-[#ff0404] flex justify-center items-center absolute top-[0.2vw] right-[-0.8vw]'>
                       <h4 className='text-[0.9vw] text-white font-[600]'>{notifications?.data?.notifications?.length || 0}</h4>
                     </div>

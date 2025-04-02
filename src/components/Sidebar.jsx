@@ -149,7 +149,7 @@ function Sidebar() {
                     className={`flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[15vw] md:rounded-[0.3vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] ${pathname === "/dashboard" && "active"
                       }`}
                   >
-                    <i class="bx bxs-dashboard md:text-[1.3vw] text-[5vw] menu-icon"></i>
+                    <i className="bx bxs-dashboard md:text-[1.3vw] text-[5vw] menu-icon"></i>
                     <span className="md:text-[1.1vw] text-[4vw] link">
                       Dashboard
                     </span>
@@ -167,30 +167,13 @@ function Sidebar() {
                         pathname.startsWith("/manage-document") && "active"
                       }`}
                     >
-                      <i class="bx bxs-file md:text-[1.3vw] text-[5vw] menu-icon"></i>
+                      <i className="bx bxs-file md:text-[1.3vw] text-[5vw] menu-icon"></i>
                       <span className="md:text-[1.1vw] text-[4vw] link">
                         Manage Document
                       </span>
                     </Link>
                   </li>
                 )}
-                {/* <PermissionWrapper permission={['e-check.view']}>
-                  <li>
-                    <Link
-                      onClick={() => {
-                        handleMenuClick(); // Call the first function
-                        handleDropdownToggle("close"); // Call the second function
-                      }}
-                      className={`flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[10vw] md:rounded-[0.3vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] ${pathname.includes("e-check") || pathname.includes("subscription-plans") ? "active" : ""
-                        }`}
-                    >
-                      <i class="bx bxs-check-shield md:text-[1.3vw] text-[5vw] menu-icon"></i>
-                      <span className="md:text-[1.1vw] text-[4vw] link">
-                        E-Check
-                      </span>
-                    </Link>
-                  </li>
-                </PermissionWrapper> */}
                 {((permissions?.includes("e-check.view") ||
                   permissions.includes("e-check.create") || permissions.includes("e-check.process") || permissions.includes("e-check.cancel")) || isAdmin) && (
                     <li>
@@ -232,7 +215,7 @@ function Sidebar() {
                         className={`flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[15vw] md:rounded-[0.3vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] ${pathname.includes("user-support") && "active"
                           }`}
                       >
-                        <i class="bx bx-support md:text-[1.3vw] text-[5vw] menu-icon"></i>
+                        <i className="bx bx-support md:text-[1.3vw] text-[5vw] menu-icon"></i>
                         <span className="md:text-[1.1vw] text-[4vw] link">
                           Support
                         </span>
@@ -251,7 +234,7 @@ function Sidebar() {
                         className={`flex items-center md:gap-[0.7vw] gap-[2vw] w-full md:h-[3vw] h-[15vw] md:rounded-[0.3vw] rounded-[2vw] md:pl-[0.7vw] pl-[4vw] ${pathname.includes("reports") && "active"
                           }`}
                       >
-                        <i class="bx bxs-pie-chart-alt-2 md:text-[1.3vw] text-[5vw] menu-icon"></i>
+                        <i className="bx bxs-pie-chart-alt-2 md:text-[1.3vw] text-[5vw] menu-icon"></i>
                         <span className="md:text-[1.1vw] text-[4vw] link">
                           Reports
                         </span>
