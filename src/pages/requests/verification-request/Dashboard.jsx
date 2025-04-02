@@ -34,7 +34,7 @@ export default function Dashboard() {
   const [sentRequest, setSentRequest] = useState(0);
   const [subscription, setSubscription] = useState("");
   const [currentPackage, setCurrentPackage] = useState("");
-  const [preferredPlatform, setPreferredPlatform] = useState("paystack");
+  const [preferredPlatform, setPreferredPlatform] = useState("stripe");
   const [creditValue, setCreditValue] = useState(0);
   const [tab, setTab] = useState("day");
   const [plans, setPlans] = useState([]);
@@ -407,7 +407,7 @@ export default function Dashboard() {
   const handleFormSubmit = async (e) => {
     e.preventDefault();
     setIsSaving(true);
-    if (selectedPayment === "card") {
+    if (selectedPayment === "card" && preferredPlatform == 'paystack') {
       if (!paymentDetails.cardNumber) {
         toast.error("Card details are required.");
         setIsSaving(false);
@@ -463,7 +463,7 @@ export default function Dashboard() {
   const handleTopupSubmit = async (e) => {
     e.preventDefault();
     setIsSaving(true);
-    if (selectedPayment === "card") {
+    if (selectedPayment === "card" && preferredPlatform == 'paystack') {
       if (!paymentDetails.cardNumber) {
         toast.error("Card details are required.");
         setIsSaving(false);
@@ -486,7 +486,7 @@ export default function Dashboard() {
       bonus_amount: paymentDetails?.bonus_amount,
       credit_amount: paymentDetails?.numberOfCredits,
       platform: preferredPlatform,
-      ...(selectedPayment === "card" && {
+      ...(selectedPayment === "card" && preferredPlatform == 'paystack' &&  {
         payment_method: 'card',
         payment_detail: {
           number: paymentDetails.cardNumber,
@@ -1416,10 +1416,21 @@ export default function Dashboard() {
                 </div>
               )}
 
-              {selectedPayment === "card" && preferredPlatform === "stripe" && (
-                <div className="my-4">
-                  <PaymentElement />
-                </div>
+              {clientSecret && preferredPlatform === "stripe" && (
+                <Elements stripe={stripePromise} options={{ clientSecret }}>
+                  <Modal
+                    isOpen={showStripeForm}
+                    setIsOpen={setShowStripeForm}
+                    classNames="w-[100vw] md:w-[80vw] lg:w-[60vw] z-50 rounded-md"
+                  >
+                    <div className="p-4">
+                      <StripeCheckoutForm onSuccess={() => {
+                        setShowStripeForm(false);
+                        setClientSecret(null);
+                      }} />
+                    </div>
+                  </Modal>
+                </Elements>
               )}
 
               {/* Additional Fields for Mobile Money */}
