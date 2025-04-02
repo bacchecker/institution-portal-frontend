@@ -1128,33 +1128,35 @@ export default function Dashboard() {
                       value="card"
                       checked={selectedPayment === "card"}
                       onChange={() => setSelectedPayment("card")}
-                      className="w-5 h-5 bg-gray-100 border-gray-300"
+                      className="w-5 h-5 bg-gray-100 border-gray-300 accent-bChkRed"
                     />
                     <label
                       htmlFor="card-option"
-                      className="ms-2 text-base font-medium text-gray-900 dark:text-gray-300"
+                      className="ms-2 md:text-[1vw] text-[4vw] font-medium text-gray-900 dark:text-gray-300"
                     >
                       Debit Card
                     </label>
                   </div>
-
-                  <div className="flex items-center">
-                    <input
-                      id="mobile-money-option"
-                      type="radio"
-                      name="payment"
-                      value="mobile_money"
-                      checked={selectedPayment === "mobile_money"}
-                      onChange={() => setSelectedPayment("mobile_money")}
-                      className="w-5 h-5 bg-gray-100 border-gray-300"
-                    />
-                    <label
-                      htmlFor="mobile-money-option"
-                      className="ms-2 text-base font-medium text-gray-900 dark:text-gray-300"
-                    >
-                      Mobile Wallet
-                    </label>
-                  </div>
+                  {preferredPlatform == "paystack" && (
+                    <div className="flex items-center">
+                      <input
+                        id="mobile-money-option"
+                        type="radio"
+                        name="payment"
+                        value="mobile_money"
+                        checked={selectedPayment === "mobile_money"}
+                        onChange={() => setSelectedPayment("mobile_money")}
+                        className="w-5 h-5 bg-gray-100 border-gray-300 accent-bChkRed"
+                      />
+                      <label
+                        htmlFor="mobile-money-option"
+                        className="ms-2 md:text-[1vw] text-[4vw] font-medium text-gray-900 dark:text-gray-300"
+                      >
+                        Mobile Wallet
+                      </label>
+                    </div>
+                  )}
+                  
                 </div>
               </div>
 
@@ -1342,29 +1344,31 @@ export default function Dashboard() {
                     />
                     <label
                       htmlFor="card-option"
-                      className="ms-2 text-base font-medium text-gray-900 dark:text-gray-300"
+                      className="ms-2 md:text-[1vw] text-[4vw] font-medium text-gray-900 dark:text-gray-300"
                     >
                       Debit Card
                     </label>
                   </div>
-
-                  <div className="flex items-center">
-                    <input
-                      id="mobile-money-option"
-                      type="radio"
-                      name="payment"
-                      value="mobile_money"
-                      checked={selectedPayment === "mobile_money"}
-                      onChange={() => setSelectedPayment("mobile_money")}
-                      className="w-5 h-5 bg-gray-100 border-gray-300 accent-bChkRed"
-                    />
-                    <label
-                      htmlFor="mobile-money-option"
-                      className="ms-2 text-base font-medium text-gray-900 dark:text-gray-300"
-                    >
-                      Mobile Wallet
-                    </label>
-                  </div>
+                  {preferredPlatform == "paystack" && (
+                    <div className="flex items-center">
+                      <input
+                        id="mobile-money-option"
+                        type="radio"
+                        name="payment"
+                        value="mobile_money"
+                        checked={selectedPayment === "mobile_money"}
+                        onChange={() => setSelectedPayment("mobile_money")}
+                        className="w-5 h-5 bg-gray-100 border-gray-300 accent-bChkRed"
+                      />
+                      <label
+                        htmlFor="mobile-money-option"
+                        className="ms-2 md:text-[1vw] text-[4vw] font-medium text-gray-900 dark:text-gray-300"
+                      >
+                        Mobile Wallet
+                      </label>
+                    </div>
+                  )}
+                  
                 </div>
               </div>
 
