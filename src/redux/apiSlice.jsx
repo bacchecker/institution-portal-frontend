@@ -80,6 +80,7 @@ export const baccheckerApi = createApi({
                 institution: data.institutionData.institution,
                 user: data.institutionData.user,
               };
+              
               // Update local storage
               secureLocalStorage.setItem("user", JSON.stringify(updatedUser));
               // Update Redux store

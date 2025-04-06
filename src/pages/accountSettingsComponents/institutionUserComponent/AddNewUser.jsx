@@ -250,16 +250,16 @@ function AddNewUser({
             <div className="relative w-full md:h-[2.7vw] h-[12vw] flex items-center border-[1.5px] border-[#E5E5E5] overflow-hidden bg-[#f7f7f7]">
               {/* Country Code Selector */}
               <select
-              className="px-1 md:h-[2.7vw] h-[12vw] w-2/5 md:text-[1vw] text-[3.5vw] bg-white border-r border-gray-300 focus:outline-none"
-              value={selectedCode}
-              onChange={(e) => setSelectedCode(e.target.value)}
-            >
-              {countryCodes.map((country) => (
-                <option key={country.cca2} value={country.code}>
-                  {country.name} ({country.code})
-                </option>
-              ))}
-            </select>
+                className="px-1 md:h-[2.7vw] h-[12vw] w-2/5 md:text-[1vw] text-[3.5vw] bg-white border-r border-gray-300 focus:outline-none"
+                value={selectedCode}
+                onChange={(e) => setSelectedCode(e.target.value)}
+              >
+                {countryCodes.map((country) => (
+                  <option key={country.cca2} value={country.code}>
+                    {country.name} ({country.code})
+                  </option>
+                ))}
+              </select>
 
 
               {/* Phone Number Input */}

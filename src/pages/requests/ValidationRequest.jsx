@@ -29,6 +29,7 @@ import {
   FaFilePdf,
   FaHeart,
   FaRegCircleCheck,
+  FaRegFileImage,
 } from "react-icons/fa6";
 import { IoCloseCircleOutline, IoDocuments } from "react-icons/io5";
 import { PiQueueFill } from "react-icons/pi";
@@ -115,18 +116,25 @@ export default function ValidationRequest() {
   };
 
   const fetchReports = async (requestId) => {
-    setIsFetching(true)
+    setIsFetching(true);
     try {
-      const response = axios.get(`/pdf/digital-validation-certificate/${requestId}`, { responseType: "blob" });
-      const validReport = response.data
+        const response = await axios.get(`/pdf/digital-validation-certificate/${requestId}`, { responseType: "blob" });
 
-      setValidationReport(validReport ? URL.createObjectURL(validReport.data) : null);
-      setIsFetching(false)
+        if (response && response.data) {
+            const blobUrl = URL.createObjectURL(response.data);
+            setValidationReport(blobUrl);
+            console.log("Validation Report URL:", blobUrl);
+        } else {
+            setValidationReport(null);
+            console.warn("No data received in response.");
+        }
     } catch (error) {
-      setIsFetching(false)
-      console.error("Error fetching reports:", error);
+        console.error("Error fetching reports:", error);
+    } finally {
+        setIsFetching(false);
     }
-  };
+};
+
 
   useEffect(() => {
     const fetchInstitutionDocs = async () => {
@@ -628,51 +636,61 @@ export default function ValidationRequest() {
                 </div>
 
                 <div className="-mt-4">
-                  <section className="mb-3 flex items-center justify-between">
+                  <section className="flex items-center justify-between">
                     <div className="w-full flex gap-2 items-center">
-                      <p className="font-semibold ">Attachments</p>
+                      <p className="uppercase font-semibold py-2 text-bChkRed">Attachments</p>
                     </div>
 
                     
                   </section>
 
                   <section className="grid grid-cols-1">
-                    <div className="gap-3 p-2 rounded-lg border">
-                      <div className="w-full flex flex-col gap-1">
-                        <p className="font-semibold">
-                          {data?.document_type?.name}
-                        </p>
-                        <p>GH¢ {data?.total_amount}</p>
+                    <div className="gap-3 p-2 rounded-md border">
+                      <div className="w-full flex justify-between">
+                        {/* Left: Document Info */}
+                        <div className="w-full flex space-x-2 items-center">
+                        {["png", "jpg", "jpeg"].includes(data?.file?.extension?.toLowerCase()) ? (
+                          <FaRegFileImage size={36} className="text-bChkRed" />
+                        ) : (
+                          <FaFilePdf size={36} className="text-bChkRed" />
+                        )}
+ 
+                          <div className="flex flex-col space-y-1">
+                            <p className="font-semibold">
+                              {data?.institution_document_type?.document_type?.name}
+                            </p>
+                            {/* <div className="flex gap-2 items-center text-xs font-semibold text-gray-500 -mt-1">
+                              <Chip size="sm">{data?.file?.extension}</Chip>
+                              <p>{filesize(data?.file?.size ?? 1000)}</p>
+                            </div> */}
+                            <div className="text-xs font-semibold -mt-1">
+                              <p>
+                                From:{" "}
+                                <span className="font-normal text-gray-500">
+                                  {data?.user?.first_name} {data?.user?.last_name}
+                                </span>
+                              </p>
+                            </div>
+                          </div>
+                        </div>
 
-                        <div className="flex justify-between">
-                          <div className="flex gap-2 items-center">
-                            <Chip size="sm">{data?.file?.extension}</Chip>
-                            <p>{filesize(data?.file?.size ?? 1000)}</p>
-                          </div>
-                          <div
-                            className="flex space-x-1 cursor-pointer py-1 px-2 rounded-md bg-primary text-white text-xs"
-                            // onClick={() => downloadFile(data?.file?.name)}
-                            onClick={() => {
-                              window.location.href =
-                                "https://admin-dev.baccheck.online/api/download-pdf?path=" +
-                                encodeURIComponent(data?.file?.path);
-                            }}
-                            /* onClick={() => {
-                              window.location.href =
-                                "https://admin-dev.baccheck.online/api/document/download" +
-                                "?path=" +
-                                encodeURIComponent(data?.file?.path);
-                            }} */
-                          >
-                            <FaDownload />
-                            <p>Download</p>
-                          </div>
+                        {/* Right: Download Button */}
+                        <div
+                          className="flex self-end space-x-1 items-center cursor-pointer py-1 px-2 rounded-sm bg-blue-600 text-white text-xs w-24 justify-center"
+                          onClick={() => {
+                            window.location.href =
+                              "https://admin-dev.baccheck.online/api/download-pdf?path=" +
+                              encodeURIComponent(data?.file?.path);
+                          }}
+                        >
+                          <FaDownload />
+                          <p>Download</p>
                         </div>
                       </div>
                     </div>
                   </section>
                   <section className="flex flex-col mt-2">
-                    <p className="uppercase font-semibold py-2 text-bChkRed">Validation Request Documents</p>
+                    <p className="uppercase font-semibold py-2 text-bChkRed">Validation Report</p>
                     <div className="flex flex-col space-y-2">
                       {/* Show Loading Spinner */}
                       {isFetching ? (
@@ -682,7 +700,7 @@ export default function ValidationRequest() {
                       ) : (
                         <>
                           {/* Display Reports if available */}
-                          {validationReport && (
+                          {validationReport && data?.status === "completed" ? (
                             <div className="gap-3 p-2 rounded-md border">
                               <div className="w-full flex justify-between">
                                 <div className="w-full flex space-x-2 items-center">
@@ -690,11 +708,16 @@ export default function ValidationRequest() {
                                   <div className="flex flex-col space-y-1">
                                     <p>Validation Report</p>
                                     <div className="text-xs font-semibold -mt-1">
-                                      <p>From: <span className="font-normal text-gray-500">{data?.institution?.name}</span></p>
+                                      <p>
+                                        From:{" "}
+                                        <span className="font-normal text-gray-500">
+                                          {data?.institution?.name}
+                                        </span>
+                                      </p>
                                     </div>
                                   </div>
                                 </div>
-                                
+
                                 <div
                                   className="flex self-end space-x-1 items-center cursor-pointer py-1 px-2 rounded-sm bg-blue-600 text-white text-xs w-20"
                                   onClick={() => window.open(validationReport, "_blank")}
@@ -704,10 +727,7 @@ export default function ValidationRequest() {
                                 </div>
                               </div>
                             </div>
-                          )}
-  
-                          {/* No Reports Found Message */}
-                          {!validationReport && (
+                          ) : (
                             <div className="col-span-2 text-center text-gray-500 text-sm py-4">
                               No reports found.
                             </div>
@@ -768,7 +788,7 @@ export default function ValidationRequest() {
                           className="space-y-4 pb-4 border-b"
                         >
                           {/* Section Header */}
-                          <h2 className="text-base">
+                          <h2 className="text-base text-black">
                             {
                               section.checklist_items[0]
                                 ?.institutionDocumentTypeChecklistItem?.section
@@ -782,7 +802,7 @@ export default function ValidationRequest() {
                           )}
 
                           {/* Render Items */}
-                          <div className="grid grid-cols-2 gap-4">
+                          <div className="grid grid-cols-1 gap-4">
                             {section.checklist_items.map((item) => (
                               <div key={item.id} className="space-y-2">
                                 {/* Question Text */}

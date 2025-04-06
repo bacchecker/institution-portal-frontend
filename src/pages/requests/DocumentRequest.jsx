@@ -33,7 +33,7 @@ import ExcelIcon from "../../assets/icons/excel";
 import Elipsis from "../../assets/icons/elipsis";
 import ConfirmModal from "@/components/confirm-modal";
 import { toast } from "sonner";
-import { FaChevronLeft, FaChevronRight, FaHeart } from "react-icons/fa6";
+import { FaChevronLeft, FaChevronRight, FaDownload, FaFilePdf, FaHeart, FaRegFileImage } from "react-icons/fa6";
 import { IoDocuments } from "react-icons/io5";
 import { PiQueueFill } from "react-icons/pi";
 import { FcCancel } from "react-icons/fc";
@@ -610,7 +610,7 @@ export default function DocumentRequest() {
                     <p className="font-semibold text-base">Attachments</p>
                   </div>
 
-                  {data?.files.length >= 1 && (
+                  {data?.files.length > 1 && (
                     <Button
                       variant="ghost"
                       size="sm"
@@ -628,39 +628,42 @@ export default function DocumentRequest() {
                   )}
                 </section>
 
-                <section className="w-full grid grid-cols-2 gap-3">
+                <section className="w-full grid grid-cols-1 gap-3">
                   {data?.files.length >= 1
                     ? data?.files?.map((item) => (
-                        <div
-                          key={item?.id}
-                          className="flex items-center gap-3 p-2 rounded-lg border"
-                        >
-                          {item?.extension === "pdf" ? (
-                            <PdfIcon className="size-11" color="red" />
-                          ) : (
-                            <WordIcon className="size-11" color="blue" />
-                          )}
-                          <div className="w-full flex flex-col h-full">
-                            <p className="font-semibold line-clamp-2">
-                              {item?.name}
-                            </p>
-
-                            <div className="flex justify-between items-center mt-auto">
-                              <p>{filesize(item.size)}</p>
-                              <p
-                                className="cursor-pointer px-2 py-1 rounded-md bg-primary text-white text-xs"
-                                onClick={() => {
-                                  window.location.href =
-                                    "https://backend.baccheck.online/api/document/download" +
-                                    "?path=" +
-                                    encodeURIComponent(item.path);
-                                }}
-                              >
-                                <MdOutlineFileDownload size={20} />
-                              </p>
+                      <div key={item?.id} className="gap-3 px-2 py-2.5 rounded-md border">
+                        <div className="w-full flex justify-between">
+                          {/* File Type Icon + Info */}
+                          <div className="w-full flex space-x-2 items-center">
+                            {["png", "jpg", "jpeg"].includes(item?.extension?.toLowerCase()) ? (
+                              <FaRegFileImage size={36} className="text-bChkRed" />
+                            ) : (
+                              <FaFilePdf size={36} className="text-bChkRed" />
+                            )}
+                            <div className="flex flex-col space-y-1">
+                              <p className="font-semibold line-clamp-2">{item?.name}</p>
+                              <div className="text-xs font-semibold text-gray-500 -mt-1">
+                                <p>{filesize(item?.size ?? 1000)}</p>
+                              </div>
                             </div>
                           </div>
+                      
+                          {/* Download Button */}
+                          <div
+                            className="flex self-end space-x-1 items-center cursor-pointer py-1 px-2 rounded-sm bg-blue-600 text-white text-xs w-24 justify-center"
+                            onClick={() => {
+                              window.location.href =
+                                "https://admin-dev.baccheck.online/api/document/download" +
+                                "?path=" +
+                                encodeURIComponent(item.path);
+                            }}
+                          >
+                            <FaDownload />
+                            <p>Download</p>
+                          </div>
                         </div>
+                      </div>
+                    
                       ))
                     : data?.status != "rejected" && (
                         <p className="border rounded-md py-1.5 pl-4">
@@ -722,7 +725,7 @@ export default function DocumentRequest() {
             )}
           </div>
 
-          <div className="w-full flex items-center space-x-2 justify-center border-t pt-2">
+          <div className="w-full flex items-center space-x-2 justify-end border-t pt-2">
             <Button
               radius="none"
               size="md"

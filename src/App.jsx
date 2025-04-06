@@ -36,6 +36,7 @@ import AccountSettings from "./pages/accountSettingsComponents/AccountSettings";
 import MainRequests from "./pages/accountSettingsComponents/updateRequestComponents/MainRequests";
 
 function App() {
+  
   return (
     <>
       <Toaster richColors position="top-right" />
@@ -88,6 +89,7 @@ function App() {
                       </AuthenticatedSuccessProtectedRoute>
                     }
                   />
+                  
                   <Route
                     path="/dashboard"
                     element={

@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import axios from "@/utils/axiosConfig";
+import axiosDef from 'axios';
+import { Elements } from "@stripe/react-stripe-js";
+import { loadStripe } from "@stripe/stripe-js";
 import {
-  FaChevronLeft,
-  FaChevronRight,
   FaCreditCard,
   FaCrown,
-  FaRegCircleCheck,
 } from "react-icons/fa6";
 import { RiAddBoxFill, RiAlarmWarningFill } from "react-icons/ri";
 import { HiMiniUsers } from "react-icons/hi2";
@@ -24,15 +24,18 @@ import {
 import Modal from "@/components/Modal";
 import SideModal from "@/components/SideModal";
 import { fetchSubscription } from "../../subscription/fetchSubscription";
+import StripeCheckoutForm from "../../subscription/StripeCheckoutForm";
 import LoadItems from "@/components/LoadItems";
 import { toast } from "sonner";
 import { GiUpgrade } from "react-icons/gi";
+import secureLocalStorage from "react-secure-storage";
 
 export default function Dashboard() {
   const [receivedRequest, setReceivedRequest] = useState(0);
   const [sentRequest, setSentRequest] = useState(0);
   const [subscription, setSubscription] = useState("");
   const [currentPackage, setCurrentPackage] = useState("");
+  const [preferredPlatform, setPreferredPlatform] = useState("stripe");
   const [creditValue, setCreditValue] = useState(0);
   const [tab, setTab] = useState("day");
   const [plans, setPlans] = useState([]);
@@ -44,6 +47,14 @@ export default function Dashboard() {
   const [openSubDrawer, setOpenSubDrawer] = useState(false);
   const [openTopUpDrawer, setOpenTopUpDrawer] = useState(false);
   const [openPaymentDrawer, setOpenPaymentDrawer] = useState(false);
+  const [countryNames, setCountryNames] = useState([]);
+  const userInstData = JSON.parse(secureLocalStorage.getItem("user") || "{}");
+  const [instBill, setInstBill] = useState(userInstData?.institution?.billing_address || "");
+
+
+  const [clientSecret, setClientSecret] = useState(null);
+  const [showStripeForm, setShowStripeForm] = useState(false);
+  const stripePromise = loadStripe("pk_test_51R6UPMGfpcTSeSCYZFlk5zGIgl2l7xEV0IcNTEmi0XObDS3DfbRCQOKiBZjOdaSOGxDvpIykgAI1OKh3xn6Oq1ty00rF3VL1NJ");
   // Payment States
   const [selectedPayment, setSelectedPayment] = useState("card");
   const [paymentDetails, setPaymentDetails] = useState({
@@ -51,7 +62,7 @@ export default function Dashboard() {
     firstName: "",
     lastName: "",
     expirationDate: "",
-    cvv: "",
+    cvcCode: "",
     mobileMoneyNumber: "",
     mobileNetwork: "",
     numberOfCredits: 0,
@@ -61,9 +72,38 @@ export default function Dashboard() {
   const [currentPage, setCurrentPage] = useState(1);
   const [lastPage, setLastPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
+  
   useEffect(() => {
     setPaymentData(paymentData);
   }, [paymentData]);
+
+  useEffect(() => {
+    if (instBill === "Ghana") {
+      setPreferredPlatform("paystack");
+    } else {
+      setPreferredPlatform("stripe");
+    }
+  }, [instBill]);
+
+  useEffect(() => {
+    if (preferredPlatform === "stripe") {
+      setSelectedPayment("card");
+    }
+  }, [preferredPlatform]);
+
+   useEffect(() => {
+    axiosDef
+      .get("https://restcountries.com/v3.1/all?fields=cca2,idd,name")
+      .then((res) => {
+        const names = res.data
+          .map((country) => ({
+            name: country.name.common,
+          }))
+          .sort((a, b) => a.name.localeCompare(b.name));
+        setCountryNames(names);        
+      })
+      .catch((err) => console.error("Error fetching countries:", err));
+    }, []);
 
   const pages = [
     <div className="w-full flex flex-col justify-center h-full">
@@ -401,7 +441,7 @@ export default function Dashboard() {
   const handleFormSubmit = async (e) => {
     e.preventDefault();
     setIsSaving(true);
-    if (selectedPayment === "card") {
+    if (selectedPayment === "card" && preferredPlatform == 'paystack') {
       if (!paymentDetails.cardNumber) {
         toast.error("Card details are required.");
         setIsSaving(false);
@@ -421,9 +461,15 @@ export default function Dashboard() {
       channel: selectedPayment,
       payment_type: "subscription",
       amount: paymentData?.amount,
+      platform: preferredPlatform,
       ...(selectedPayment === "card" && {
-        payment_method: 'VISA',
-        payment_detail: paymentDetails.cardNumber,
+        payment_method: 'card',
+        payment_detail: {
+          number: paymentDetails.cardNumber,
+          exp_month: paymentDetails.expiryMonth,
+          exp_year: paymentDetails.expiryYear,
+          cvc: paymentDetails.cvcCode,
+        },
       }),
       ...(selectedPayment === "mobile_money" && {
         payment_method: paymentDetails.mobileNetwork,
@@ -433,8 +479,13 @@ export default function Dashboard() {
 
     try {
       const response = await axios.post("/payments/initiate", payload);
-      if (response.data.status == "success") {
-        window.location.href = response?.data?.authorization_url;
+      if (response.data.status === "success") {
+        if (preferredPlatform === "paystack") {
+          window.location.href = response?.data?.authorization_url;
+        } else if (preferredPlatform === "stripe") {
+          setClientSecret(response.data.clientSecret);
+          setShowStripeForm(true);
+        }
       }
       setIsSaving(false);
     } catch (error) {
@@ -446,7 +497,7 @@ export default function Dashboard() {
   const handleTopupSubmit = async (e) => {
     e.preventDefault();
     setIsSaving(true);
-    if (selectedPayment === "card") {
+    if (selectedPayment === "card" && preferredPlatform == 'paystack') {
       if (!paymentDetails.cardNumber) {
         toast.error("Card details are required.");
         setIsSaving(false);
@@ -468,9 +519,15 @@ export default function Dashboard() {
       amount: paymentDetails?.amount,
       bonus_amount: paymentDetails?.bonus_amount,
       credit_amount: paymentDetails?.numberOfCredits,
-      ...(selectedPayment === "card" && {
-        payment_method: 'VISA',
-        payment_detail: paymentDetails.cardNumber,
+      platform: preferredPlatform,
+      ...(selectedPayment === "card" && preferredPlatform == 'paystack' &&  {
+        payment_method: 'card',
+        payment_detail: {
+          number: paymentDetails.cardNumber,
+          exp_month: paymentDetails.expiryMonth,
+          exp_year: paymentDetails.expiryYear,
+          cvc: paymentDetails.cvcCode,
+        },
       }),
       ...(selectedPayment === "mobile_money" && {
         payment_method: paymentDetails.mobileNetwork,
@@ -480,9 +537,15 @@ export default function Dashboard() {
 
     try {
       const response = await axios.post("/payments/initiate", payload);
-      if (response.data.status == "success") {
-        window.location.href = response?.data?.authorization_url;
+      if (response.data.status === "success") {
+        if (preferredPlatform === "paystack") {
+          window.location.href = response?.data?.authorization_url;
+        } else if (preferredPlatform === "stripe") {
+          setClientSecret(response.data.clientSecret);
+          setShowStripeForm(true);
+        }
       }
+      //toast.success("Payment successful!");
       setIsSaving(false);
     } catch (error) {
       console.error("Error:", error.response?.data || error.message);
@@ -1049,7 +1112,7 @@ export default function Dashboard() {
                     />
                   </div>
                 </div>
-                <div className=" mt-4">
+                <div className="mt-4">
                   <h4 className="md:text-[1vw] text-[4vw]">
                     Amount to be Paid
                   </h4>
@@ -1062,48 +1125,94 @@ export default function Dashboard() {
                     />
                   </div>
                 </div>
-
-                <div className="flex flex-row space-x-4 mt-4">
-                  <div className="flex items-center">
-                    <input
-                      id="card-option"
-                      type="radio"
-                      name="payment"
-                      value="card"
-                      checked={selectedPayment === "card"}
-                      onChange={() => setSelectedPayment("card")}
-                      className="w-5 h-5 bg-gray-100 border-gray-300"
-                    />
-                    <label
-                      for="card-option"
-                      className="ms-2 text-base font-medium text-gray-900 dark:text-gray-300"
-                    >
-                      Debit Card
-                    </label>
-                  </div>
-
-                  <div className="flex items-center">
-                    <input
-                      id="mobile-money-option"
-                      type="radio"
-                      name="payment"
-                      value="mobile_money"
-                      checked={selectedPayment === "mobile_money"}
-                      onChange={() => setSelectedPayment("mobile_money")}
-                      className="w-5 h-5 bg-gray-100 border-gray-300"
-                    />
-                    <label
-                      for="mobile-money-option"
-                      className="ms-2 text-base font-medium text-gray-900 dark:text-gray-300"
-                    >
-                      Mobile Wallet
-                    </label>
+                <div className="w-full mt-4">
+                  <h4 className="md:text-[1vw] text-[4vw] mb-1">
+                    Billing Address
+                  </h4>
+                  <div className="relative w-full md:h-[2.7vw] h-[12vw] flex items-center border overflow-hidden bg-white rounded-md">
+                  <select
+                    className="w-full px-1 md:h-[2.7vw] h-[12vw] md:text-[1vw] text-[3.5vw] bg-white border-r border-gray-300 focus:outline-none rounded-md"
+                    value={instBill || ""}
+                    onChange={(e) => setInstBill(e.target.value)}
+                  >
+                    {countryNames.map((country) => (
+                      <option key={country.name} value={country.name}>
+                        {country.name}
+                      </option>
+                    ))}
+                  </select>
                   </div>
                 </div>
+                {preferredPlatform == "paystack" && (
+                  <div className="flex flex-row space-x-4 mt-4">
+                    <div className="flex items-center">
+                      <input
+                        id="card-option"
+                        type="radio"
+                        name="payment"
+                        value="card"
+                        checked={selectedPayment === "card"}
+                        onChange={() => setSelectedPayment("card")}
+                        className="w-5 h-5 bg-gray-100 border-gray-300 accent-bChkRed"
+                      />
+                      <label
+                        htmlFor="card-option"
+                        className="ms-2 md:text-[1vw] text-[4vw] font-medium text-gray-900 dark:text-gray-300"
+                      >
+                        Debit Card
+                      </label>
+                    </div>
+                    
+                      
+                      <div className="flex items-center">
+                        <input
+                          id="mobile-money-option"
+                          type="radio"
+                          name="payment"
+                          value="mobile_money"
+                          checked={selectedPayment === "mobile_money"}
+                          onChange={() => setSelectedPayment("mobile_money")}
+                          className="w-5 h-5 bg-gray-100 border-gray-300 accent-bChkRed"
+                        />
+                        <label
+                          htmlFor="mobile-money-option"
+                          className="ms-2 md:text-[1vw] text-[4vw] font-medium text-gray-900 dark:text-gray-300"
+                        >
+                          Mobile Wallet
+                        </label>
+                      </div>
+                    
+                  </div>
+                )}
+                {preferredPlatform === "stripe" && (
+                  <div className="p-[2px] rounded-xl bg-gradient-to-r from-bChkRed to-black mt-4">
+                    <div
+                      className={`relative p-4 w-full bg-white cursor-pointer rounded-lg ${
+                        selectedPayment === "card" ? "border-gradient-to-r from-bChkRed to-black" : "border-gray-300"
+                      }`}
+                      onClick={() => setSelectedPayment("card")}
+                    >
+                      <input
+                        type="radio"
+                        id="stripe-card"
+                        name="payment"
+                        value="card"
+                        checked={selectedPayment === "card"}
+                        onChange={() => setSelectedPayment("card")}
+                        className="absolute top-2 left-2 w-5 h-5 accent-bChkRed"
+                      />
+                      <label htmlFor="stripe-card" className="block h-full w-full pl-8">
+                        <div className="font-bold text-[1.2vw]">Debit Card</div>
+                        <div className="text-gray-500 text-[0.9vw] mt-1">Pay with Visa / MasterCard</div>
+                      </label>
+                    </div>
+                  </div>
+                )}
+
               </div>
 
               {/* Additional Fields for Card Payment */}
-              {selectedPayment === "card" && (
+              {selectedPayment === "card" && preferredPlatform === "paystack" && (
                 <div className="">
                   <div className="mb-4">
                     <h4 className="md:text-[1vw] text-[4vw] mb-1">
@@ -1120,55 +1229,54 @@ export default function Dashboard() {
                     </div>
                   </div>
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                    {/* <div className="">
-                      <h4 className="md:text-[1vw] text-[4vw] mb-1">
-                        First Name
-                      </h4>
-                      <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
-                        <input
-                          type="text"
-                          name="firstName"
-                          value={paymentDetails.firstName}
-                          onChange={handleInputChange}
-                          className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-white absolute left-0 right-0 bottom-0 top-0"
-                        />
+                    <div className="">
+                      <h4 className="md:text-[1vw] text-[4vw] mb-1">Expiration Date</h4>
+                      <div className="flex gap-2">
+                        {/* Expiry Month */}
+                        <div className="relative w-1/2 md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
+                          <input
+                            type="number"
+                            name="expiryMonth"
+                            placeholder="MM"
+                            value={paymentDetails.expiryMonth}
+                            onChange={(e) => {
+                              let value = e.target.value;
+                              if (value.length <= 2) {
+                                if (value > 12) value = "12"; // Restrict to 12 max
+                                if (value < 1 && value !== "") value = "01"; // Restrict to 01 min
+                                handleInputChange({ target: { name: "expiryMonth", value } });
+                              }
+                            }}
+                            className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-white absolute left-0 right-0 bottom-0 top-0 text-center"
+                          />
+                        </div>
+
+                        {/* Expiry Year */}
+                        <div className="relative w-1/2 md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
+                          <input
+                            type="number"
+                            name="expiryYear"
+                            placeholder="YYYY"
+                            value={paymentDetails.expiryYear}
+                            onChange={(e) => {
+                              let value = e.target.value;
+                              if (value.length <= 4) {
+                                handleInputChange({ target: { name: "expiryYear", value } });
+                              }
+                            }}
+                            className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-white absolute left-0 right-0 bottom-0 top-0 text-center"
+                          />
+                        </div>
                       </div>
                     </div>
+
                     <div className="">
-                      <h4 className="md:text-[1vw] text-[4vw] mb-1">
-                        Last Name
-                      </h4>
+                      <h4 className="md:text-[1vw] text-[4vw] mb-1">CVC</h4>
                       <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
                         <input
                           type="text"
-                          name="lastName"
-                          value={paymentDetails.lastName}
-                          onChange={handleInputChange}
-                          className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-white absolute left-0 right-0 bottom-0 top-0"
-                        />
-                      </div>
-                    </div> */}
-                    <div className="">
-                      <h4 className="md:text-[1vw] text-[4vw] mb-1">
-                        Expiration Date
-                      </h4>
-                      <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
-                        <input
-                          type="text"
-                          name="expirationDate"
-                          value={paymentDetails.expirationDate}
-                          onChange={handleInputChange}
-                          className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-white absolute left-0 right-0 bottom-0 top-0"
-                        />
-                      </div>
-                    </div>
-                    <div className="">
-                      <h4 className="md:text-[1vw] text-[4vw] mb-1">CVV</h4>
-                      <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
-                        <input
-                          type="text"
-                          name="cvv"
-                          value={paymentDetails.cvv}
+                          name="cvcCode"
+                          value={paymentDetails.cvcCode}
                           onChange={handleInputChange}
                           className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-white absolute left-0 right-0 bottom-0 top-0"
                         />
@@ -1177,6 +1285,24 @@ export default function Dashboard() {
                   </div>
                 </div>
               )}
+
+              {clientSecret && preferredPlatform === "stripe" && (
+                <Elements stripe={stripePromise} options={{ clientSecret }}>
+                  <Modal
+                    isOpen={showStripeForm}
+                    setIsOpen={setShowStripeForm}
+                    classNames="w-[100vw] bg-red-600 md:w-[80vw] lg:w-[60vw] z-50 rounded-sm"
+                  >
+                    <div className="p-4">
+                      <StripeCheckoutForm onSuccess={() => {
+                        setShowStripeForm(false);
+                        setClientSecret(null);
+                      }} />
+                    </div>
+                  </Modal>
+                </Elements>
+              )}
+
 
               {/* Additional Fields for Mobile Money */}
               {selectedPayment === "mobile_money" && (
@@ -1223,10 +1349,10 @@ export default function Dashboard() {
                   {isSaving ? (
                     <div className="flex items-center justify-center gap-2">
                       <LoadItems color={"#ffffff"} size={15} />
-                      <h4 className=" text-[#ffffff]">Completing...</h4>
+                      <h4 className=" text-[#ffffff]">Processing...</h4>
                     </div>
                   ) : (
-                    <h4 className=" text-[#ffffff]">Complete Top-up</h4>
+                    <h4 className=" text-[#ffffff]">{preferredPlatform == "paystack" ? 'Complete Top-up': 'Proceed to Payment'}</h4>
                   )}
                 </button>
               </div>
@@ -1255,8 +1381,26 @@ export default function Dashboard() {
                     verifying instantly
                   </p>
                 </div>
-
-                <div className="flex flex-row space-x-4 mt-12">
+                <div className="w-full mt-2">
+                  <h4 className="md:text-[1vw] text-[4vw] mb-1">
+                    Billing Address
+                  </h4>
+                  <div className="relative w-full md:h-[2.7vw] h-[12vw] flex items-center border overflow-hidden bg-white rounded-sm">
+                  <select
+                    className="w-full px-1 md:h-[2.7vw] h-[12vw] md:text-[1vw] text-[3.5vw] bg-white border-r border-gray-300 focus:outline-none rounded-sm"
+                    value={instBill || ""}
+                    onChange={(e) => setInstBill(e.target.value)}
+                  >
+                    {countryNames.map((country) => (
+                      <option key={country.name} value={country.name}>
+                        {country.name}
+                      </option>
+                    ))}
+                  </select>
+                  </div>
+                </div>
+                {preferredPlatform == "paystack" && (
+                <div className="flex flex-row space-x-4 mt-6">
                   <div className="flex items-center">
                     <input
                       id="card-option"
@@ -1268,36 +1412,60 @@ export default function Dashboard() {
                       className="w-5 h-5 bg-gray-100 border-gray-300 accent-bChkRed"
                     />
                     <label
-                      for="card-option"
-                      className="ms-2 text-base font-medium text-gray-900 dark:text-gray-300"
+                      htmlFor="card-option"
+                      className="ms-2 md:text-[1vw] text-[4vw] font-medium text-gray-900 dark:text-gray-300"
                     >
                       Debit Card
                     </label>
                   </div>
-
-                  <div className="flex items-center">
-                    <input
-                      id="mobile-money-option"
-                      type="radio"
-                      name="payment"
-                      value="mobile_money"
-                      checked={selectedPayment === "mobile_money"}
-                      onChange={() => setSelectedPayment("mobile_money")}
-                      className="w-5 h-5 bg-gray-100 border-gray-300 accent-bChkRed"
-                    />
-                    <label
-                      for="mobile-money-option"
-                      className="ms-2 text-base font-medium text-gray-900 dark:text-gray-300"
+                  
+                    <div className="flex items-center">
+                      <input
+                        id="mobile-money-option"
+                        type="radio"
+                        name="payment"
+                        value="mobile_money"
+                        checked={selectedPayment === "mobile_money"}
+                        onChange={() => setSelectedPayment("mobile_money")}
+                        className="w-5 h-5 bg-gray-100 border-gray-300 accent-bChkRed"
+                      />
+                      <label
+                        htmlFor="mobile-money-option"
+                        className="ms-2 md:text-[1vw] text-[4vw] font-medium text-gray-900 dark:text-gray-300"
+                      >
+                        Mobile Wallet
+                      </label>
+                    </div>
+                </div>)}
+                {preferredPlatform === "stripe" && (
+                  <div className="p-[2px] rounded-xl bg-gradient-to-r from-bChkRed to-black mt-4">
+                    <div
+                      className={`relative p-4 w-full bg-white cursor-pointer rounded-lg ${
+                        selectedPayment === "card" ? "border-gradient-to-r from-bChkRed to-black" : "border-gray-300"
+                      }`}
+                      onClick={() => setSelectedPayment("card")}
                     >
-                      Mobile Wallet
-                    </label>
+                      <input
+                        type="radio"
+                        id="stripe-card"
+                        name="payment"
+                        value="card"
+                        checked={selectedPayment === "card"}
+                        onChange={() => setSelectedPayment("card")}
+                        className="absolute top-2 left-2 w-5 h-5 accent-bChkRed"
+                      />
+                      <label htmlFor="stripe-card" className="block h-full w-full pl-8">
+                        <div className="font-bold text-[1.2vw]">Debit Card</div>
+                        <div className="text-gray-500 text-[0.9vw] mt-1">Pay with Visa / MasterCard</div>
+                      </label>
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
 
               {/* Additional Fields for Card Payment */}
-              {selectedPayment === "card" && (
-                <div className="">
+              {selectedPayment === "card" && preferredPlatform === "paystack" && (
+                <div className="-mt-3">
                   <div className="mb-5">
                     <h4 className="md:text-[1vw] text-[4vw] mb-1">
                       Card Number
@@ -1356,12 +1524,12 @@ export default function Dashboard() {
                       </div>
                     </div>
                     <div className="">
-                      <h4 className="md:text-[1vw] text-[4vw] mb-1">CVV</h4>
+                      <h4 className="md:text-[1vw] text-[4vw] mb-1">CVC</h4>
                       <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
                         <input
                           type="text"
-                          name="cvv"
-                          value={paymentDetails.cvv}
+                          name="cvcCode"
+                          value={paymentDetails.cvcCode}
                           onChange={handleInputChange}
                           className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-white absolute left-0 right-0 bottom-0 top-0"
                         />
@@ -1369,6 +1537,23 @@ export default function Dashboard() {
                     </div>
                   </div>
                 </div>
+              )}
+
+              {clientSecret && preferredPlatform === "stripe" && (
+                <Elements stripe={stripePromise} options={{ clientSecret }}>
+                  <Modal
+                    isOpen={showStripeForm}
+                    setIsOpen={setShowStripeForm}
+                    classNames="w-[100vw] md:w-[80vw] lg:w-[60vw] z-50 rounded-md"
+                  >
+                    <div className="p-4">
+                      <StripeCheckoutForm onSuccess={() => {
+                        setShowStripeForm(false);
+                        setClientSecret(null);
+                      }} />
+                    </div>
+                  </Modal>
+                </Elements>
               )}
 
               {/* Additional Fields for Mobile Money */}
@@ -1427,10 +1612,10 @@ export default function Dashboard() {
                   {isSaving ? (
                     <div className="flex items-center justify-center gap-2">
                       <LoadItems color={"#ffffff"} size={15} />
-                      <h4 className=" text-[#ffffff]">Completing...</h4>
+                      <h4 className=" text-[#ffffff]">Processing...</h4>
                     </div>
                   ) : (
-                    <h4 className=" text-[#ffffff]">Complete Subscription</h4>
+                    <h4 className=" text-[#ffffff]">{preferredPlatform == "paystack" ? 'Complete Subscription' : 'Proceed to Payment'}</h4>
                   )}
                 </button>
               </div>
