@@ -6,6 +6,7 @@ import secureLocalStorage from "react-secure-storage";
 import { BsBuildingsFill } from "react-icons/bs";
 import UpdateRequest from "./UpdateRequest";
 import UpdateHistory from "./UpdateHistory";
+import { MdNewLabel, MdOutlineHistory } from "react-icons/md";
 
 export default function AccountSettings() { 
 
@@ -30,7 +31,7 @@ export default function AccountSettings() {
               key="request"
               title={
                 <div className="flex items-center space-x-2">
-                  <BsBuildingsFill size={18} />
+                  <MdNewLabel size={22} />
                   <span>Update Request</span>
                 </div>
               }
@@ -45,7 +46,7 @@ export default function AccountSettings() {
               key="history"
               title={
                 <div className="flex items-center space-x-2">
-                  <IoSettingsOutline size={18} />
+                  <MdOutlineHistory size={22} />
                   <span>Request History</span>
                 </div>
               }

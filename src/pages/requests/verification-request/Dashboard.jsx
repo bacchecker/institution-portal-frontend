@@ -28,6 +28,7 @@ import StripeCheckoutForm from "../../subscription/StripeCheckoutForm";
 import LoadItems from "@/components/LoadItems";
 import { toast } from "sonner";
 import { GiUpgrade } from "react-icons/gi";
+import secureLocalStorage from "react-secure-storage";
 
 export default function Dashboard() {
   const [receivedRequest, setReceivedRequest] = useState(0);
@@ -46,6 +47,10 @@ export default function Dashboard() {
   const [openSubDrawer, setOpenSubDrawer] = useState(false);
   const [openTopUpDrawer, setOpenTopUpDrawer] = useState(false);
   const [openPaymentDrawer, setOpenPaymentDrawer] = useState(false);
+  const [countryNames, setCountryNames] = useState([]);
+  const userInstData = JSON.parse(secureLocalStorage.getItem("user") || "{}");
+  const [instBill, setInstBill] = useState(userInstData?.institution?.billing_address || "");
+
 
   const [clientSecret, setClientSecret] = useState(null);
   const [showStripeForm, setShowStripeForm] = useState(false);
@@ -67,36 +72,38 @@ export default function Dashboard() {
   const [currentPage, setCurrentPage] = useState(1);
   const [lastPage, setLastPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
+  
   useEffect(() => {
     setPaymentData(paymentData);
   }, [paymentData]);
 
-  const getUserCountry = async () => {
-    try {
-      const response = await fetch('https://ipwho.is/');
-      const data = await response.json();
-  
-      if (data.success) {
-        console.log('User Country:', data.country); // e.g., "NG"
-        return data.country;
-      } else {
-        console.error('Failed to fetch country', data.message);
-        return null;
-      }
-    } catch (error) {
-      console.error('IP lookup error:', error);
-      return null;
-    }
-  };
   useEffect(() => {
-    getUserCountry().then((country) => {
-      if(country == "Ghana"){
-        setPreferredPlatform('paystack')
-      }else{
-        setPreferredPlatform('stripe')
-      }
-    });
-  }, []);
+    if (instBill === "Ghana") {
+      setPreferredPlatform("paystack");
+    } else {
+      setPreferredPlatform("stripe");
+    }
+  }, [instBill]);
+
+  useEffect(() => {
+    if (preferredPlatform === "stripe") {
+      setSelectedPayment("card");
+    }
+  }, [preferredPlatform]);
+
+   useEffect(() => {
+    axiosDef
+      .get("https://restcountries.com/v3.1/all?fields=cca2,idd,name")
+      .then((res) => {
+        const names = res.data
+          .map((country) => ({
+            name: country.name.common,
+          }))
+          .sort((a, b) => a.name.localeCompare(b.name));
+        setCountryNames(names);        
+      })
+      .catch((err) => console.error("Error fetching countries:", err));
+    }, []);
 
   const pages = [
     <div className="w-full flex flex-col justify-center h-full">
@@ -1105,7 +1112,7 @@ export default function Dashboard() {
                     />
                   </div>
                 </div>
-                <div className=" mt-4">
+                <div className="mt-4">
                   <h4 className="md:text-[1vw] text-[4vw]">
                     Amount to be Paid
                   </h4>
@@ -1118,46 +1125,90 @@ export default function Dashboard() {
                     />
                   </div>
                 </div>
-
-                <div className="flex flex-row space-x-4 mt-4">
-                  <div className="flex items-center">
-                    <input
-                      id="card-option"
-                      type="radio"
-                      name="payment"
-                      value="card"
-                      checked={selectedPayment === "card"}
-                      onChange={() => setSelectedPayment("card")}
-                      className="w-5 h-5 bg-gray-100 border-gray-300 accent-bChkRed"
-                    />
-                    <label
-                      htmlFor="card-option"
-                      className="ms-2 md:text-[1vw] text-[4vw] font-medium text-gray-900 dark:text-gray-300"
-                    >
-                      Debit Card
-                    </label>
+                <div className="w-full mt-4">
+                  <h4 className="md:text-[1vw] text-[4vw] mb-1">
+                    Billing Address
+                  </h4>
+                  <div className="relative w-full md:h-[2.7vw] h-[12vw] flex items-center border overflow-hidden bg-white rounded-md">
+                  <select
+                    className="w-full px-1 md:h-[2.7vw] h-[12vw] md:text-[1vw] text-[3.5vw] bg-white border-r border-gray-300 focus:outline-none rounded-md"
+                    value={instBill || ""}
+                    onChange={(e) => setInstBill(e.target.value)}
+                  >
+                    {countryNames.map((country) => (
+                      <option key={country.name} value={country.name}>
+                        {country.name}
+                      </option>
+                    ))}
+                  </select>
                   </div>
-                  {preferredPlatform == "paystack" && (
+                </div>
+                {preferredPlatform == "paystack" && (
+                  <div className="flex flex-row space-x-4 mt-4">
                     <div className="flex items-center">
                       <input
-                        id="mobile-money-option"
+                        id="card-option"
                         type="radio"
                         name="payment"
-                        value="mobile_money"
-                        checked={selectedPayment === "mobile_money"}
-                        onChange={() => setSelectedPayment("mobile_money")}
+                        value="card"
+                        checked={selectedPayment === "card"}
+                        onChange={() => setSelectedPayment("card")}
                         className="w-5 h-5 bg-gray-100 border-gray-300 accent-bChkRed"
                       />
                       <label
-                        htmlFor="mobile-money-option"
+                        htmlFor="card-option"
                         className="ms-2 md:text-[1vw] text-[4vw] font-medium text-gray-900 dark:text-gray-300"
                       >
-                        Mobile Wallet
+                        Debit Card
                       </label>
                     </div>
-                  )}
-                  
-                </div>
+                    
+                      
+                      <div className="flex items-center">
+                        <input
+                          id="mobile-money-option"
+                          type="radio"
+                          name="payment"
+                          value="mobile_money"
+                          checked={selectedPayment === "mobile_money"}
+                          onChange={() => setSelectedPayment("mobile_money")}
+                          className="w-5 h-5 bg-gray-100 border-gray-300 accent-bChkRed"
+                        />
+                        <label
+                          htmlFor="mobile-money-option"
+                          className="ms-2 md:text-[1vw] text-[4vw] font-medium text-gray-900 dark:text-gray-300"
+                        >
+                          Mobile Wallet
+                        </label>
+                      </div>
+                    
+                  </div>
+                )}
+                {preferredPlatform === "stripe" && (
+                  <div className="p-[2px] rounded-xl bg-gradient-to-r from-bChkRed to-black mt-4">
+                    <div
+                      className={`relative p-4 w-full bg-white cursor-pointer rounded-lg ${
+                        selectedPayment === "card" ? "border-gradient-to-r from-bChkRed to-black" : "border-gray-300"
+                      }`}
+                      onClick={() => setSelectedPayment("card")}
+                    >
+                      <input
+                        type="radio"
+                        id="stripe-card"
+                        name="payment"
+                        value="card"
+                        checked={selectedPayment === "card"}
+                        onChange={() => setSelectedPayment("card")}
+                        className="absolute top-2 left-2 w-5 h-5 accent-bChkRed"
+                      />
+                      <label htmlFor="stripe-card" className="block h-full w-full pl-8">
+                        <div className="font-bold text-[1.2vw]">Debit Card</div>
+                        <div className="text-gray-500 text-[0.9vw] mt-1">Pay with Visa / MasterCard</div>
+                      </label>
+                    </div>
+                  </div>
+                )}
+
               </div>
 
               {/* Additional Fields for Card Payment */}
@@ -1298,10 +1349,10 @@ export default function Dashboard() {
                   {isSaving ? (
                     <div className="flex items-center justify-center gap-2">
                       <LoadItems color={"#ffffff"} size={15} />
-                      <h4 className=" text-[#ffffff]">Completing...</h4>
+                      <h4 className=" text-[#ffffff]">Processing...</h4>
                     </div>
                   ) : (
-                    <h4 className=" text-[#ffffff]">Complete Top-up</h4>
+                    <h4 className=" text-[#ffffff]">{preferredPlatform == "paystack" ? 'Complete Top-up': 'Proceed to Payment'}</h4>
                   )}
                 </button>
               </div>
@@ -1330,8 +1381,26 @@ export default function Dashboard() {
                     verifying instantly
                   </p>
                 </div>
-
-                <div className="flex flex-row space-x-4 mt-12">
+                <div className="w-full mt-2">
+                  <h4 className="md:text-[1vw] text-[4vw] mb-1">
+                    Billing Address
+                  </h4>
+                  <div className="relative w-full md:h-[2.7vw] h-[12vw] flex items-center border overflow-hidden bg-white rounded-sm">
+                  <select
+                    className="w-full px-1 md:h-[2.7vw] h-[12vw] md:text-[1vw] text-[3.5vw] bg-white border-r border-gray-300 focus:outline-none rounded-sm"
+                    value={instBill || ""}
+                    onChange={(e) => setInstBill(e.target.value)}
+                  >
+                    {countryNames.map((country) => (
+                      <option key={country.name} value={country.name}>
+                        {country.name}
+                      </option>
+                    ))}
+                  </select>
+                  </div>
+                </div>
+                {preferredPlatform == "paystack" && (
+                <div className="flex flex-row space-x-4 mt-6">
                   <div className="flex items-center">
                     <input
                       id="card-option"
@@ -1349,7 +1418,7 @@ export default function Dashboard() {
                       Debit Card
                     </label>
                   </div>
-                  {preferredPlatform == "paystack" && (
+                  
                     <div className="flex items-center">
                       <input
                         id="mobile-money-option"
@@ -1367,14 +1436,36 @@ export default function Dashboard() {
                         Mobile Wallet
                       </label>
                     </div>
-                  )}
-                  
-                </div>
+                </div>)}
+                {preferredPlatform === "stripe" && (
+                  <div className="p-[2px] rounded-xl bg-gradient-to-r from-bChkRed to-black mt-4">
+                    <div
+                      className={`relative p-4 w-full bg-white cursor-pointer rounded-lg ${
+                        selectedPayment === "card" ? "border-gradient-to-r from-bChkRed to-black" : "border-gray-300"
+                      }`}
+                      onClick={() => setSelectedPayment("card")}
+                    >
+                      <input
+                        type="radio"
+                        id="stripe-card"
+                        name="payment"
+                        value="card"
+                        checked={selectedPayment === "card"}
+                        onChange={() => setSelectedPayment("card")}
+                        className="absolute top-2 left-2 w-5 h-5 accent-bChkRed"
+                      />
+                      <label htmlFor="stripe-card" className="block h-full w-full pl-8">
+                        <div className="font-bold text-[1.2vw]">Debit Card</div>
+                        <div className="text-gray-500 text-[0.9vw] mt-1">Pay with Visa / MasterCard</div>
+                      </label>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Additional Fields for Card Payment */}
               {selectedPayment === "card" && preferredPlatform === "paystack" && (
-                <div className="">
+                <div className="-mt-3">
                   <div className="mb-5">
                     <h4 className="md:text-[1vw] text-[4vw] mb-1">
                       Card Number
@@ -1521,10 +1612,10 @@ export default function Dashboard() {
                   {isSaving ? (
                     <div className="flex items-center justify-center gap-2">
                       <LoadItems color={"#ffffff"} size={15} />
-                      <h4 className=" text-[#ffffff]">Completing...</h4>
+                      <h4 className=" text-[#ffffff]">Processing...</h4>
                     </div>
                   ) : (
-                    <h4 className=" text-[#ffffff]">Complete Subscription</h4>
+                    <h4 className=" text-[#ffffff]">{preferredPlatform == "paystack" ? 'Complete Subscription' : 'Proceed to Payment'}</h4>
                   )}
                 </button>
               </div>

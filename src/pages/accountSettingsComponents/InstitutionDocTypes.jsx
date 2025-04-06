@@ -8,7 +8,7 @@ import {
 import CustomTable from "@/components/CustomTable";
 import axios from "@/utils/axiosConfig";
 import {FaPlus } from "react-icons/fa";
-import { MdChecklist, MdEdit, MdMoreVert, MdOutlineFilterAlt } from "react-icons/md";
+import { MdChecklist, MdEdit, MdMoreVert, MdOutlineFilterAlt, MdOutlineFilterAltOff } from "react-icons/md";
 import AddNewDocumentType from "../accountSettingsComponents/documentTypeComponents/AddNewDocumentType";
 import EditDocumentType from "../accountSettingsComponents/documentTypeComponents/EditDocumentType";
 import Swal from "sweetalert2";
@@ -140,7 +140,7 @@ export default function InstitutionDocTypes() {
                         type="text"
                         className={`bg-white text-gray-900 text-[13px] rounded-[4px] font-[400] focus:outline-none block w-[360px] p-2 placeholder:text-gray-500`}
                         name="search"
-                        placeholder="Search by user name or description"
+                        placeholder="Search by document name"
                         value={filters.search}
                         onChange={(e) =>
                           setFilters({ ...filters, search: e.target.value })
@@ -156,6 +156,30 @@ export default function InstitutionDocTypes() {
                           className="rounded-[4px] bg-bChkRed text-white"
                         >
                           Filter
+                        </Button>
+                        <Button
+                          startContent={<MdOutlineFilterAltOff size={17} />}
+                          radius="none"
+                          size="sm"
+                          type="button"
+                          className="rounded-[4px] bg-black text-white"
+                          onClick={() => {
+                            setFilters({
+                              search: "",
+                              document_type: null,
+                              start_date: null,
+                              end_date: null,
+                            });
+        
+                            setSubmittedFilters({
+                              search_query: "",
+                              document_type: null,
+                              start_date: null,
+                              end_date: null,
+                            });
+                          }}
+                        >
+                          Clear
                         </Button>
                       </div>
                     </form>

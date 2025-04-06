@@ -10,7 +10,7 @@ import axios from "@/utils/axiosConfig";
 import { FaChevronLeft, FaChevronRight, FaPlus } from "react-icons/fa";
 import { FaRegCircleUser } from "react-icons/fa6";
 import { BsTrash3 } from "react-icons/bs";
-import { MdDelete, MdEdit, MdMailLock, MdMoreVert, MdOutlineFilterAlt } from "react-icons/md";
+import { MdDelete, MdEdit, MdMailLock, MdMoreVert, MdOutlineFilterAlt, MdOutlineFilterAltOff } from "react-icons/md";
 import AddNewDepartment from "../accountSettingsComponents/departmentComponents/AddNewDepartment";
 import EditDepartment from "../accountSettingsComponents/departmentComponents/EditDepartment";
 import Swal from "sweetalert2";
@@ -172,7 +172,7 @@ export default function InstitutionDepartments() {
                         >
                           Filter
                         </Button>
-                        {/* <Button
+                        <Button
                           startContent={<MdOutlineFilterAltOff size={17} />}
                           radius="none"
                           size="sm"
@@ -195,7 +195,7 @@ export default function InstitutionDepartments() {
                           }}
                         >
                           Clear
-                        </Button> */}
+                        </Button>
                       </div>
                     </form>
                     {canAddDepartment ? (

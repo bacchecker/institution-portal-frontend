@@ -10,11 +10,13 @@ import validateEmail from "@/components/EmailValidator";
 import { toast } from "sonner";
 import { setUser, setUserToken } from "../../redux/authSlice";
 import { useDispatch } from "react-redux";
+import axios from "axios";
 
 function InstitutionDataSetup({ setActiveStep }) {
   const user = JSON?.parse(secureLocalStorage?.getItem("user"));
   const dispatch = useDispatch();
   const [userInput, setUserInput] = useState([]);
+  const [countryNames, setCountryNames] = useState([]);
   const [selectedImage, setSelectedImage] = useState(null);
   const [selectedCert, setSelectedCert] = useState(null);
   const [selectedBusinessCert, setSelectedBusinessCert] = useState(null);
@@ -29,9 +31,6 @@ function InstitutionDataSetup({ setActiveStep }) {
       setUserInput(institutionDetails?.institutionData?.institution);
     }
   }, [institutionDetails]);
-
-  console.log("useInp", userInput);
-
 
   const handleUserInput = (e) => {
     setUserInput((userInput) => ({
@@ -58,6 +57,7 @@ function InstitutionDataSetup({ setActiveStep }) {
       helpline_contact,
       prefix,
       digital_address,
+      billing_address,
       mailing_address,
       operation_certificate,
       alternate_contacts,
@@ -100,6 +100,7 @@ function InstitutionDataSetup({ setActiveStep }) {
       formData.append("helpline_contact", helpline_contact);
       formData.append("prefix", prefix);
       formData.append("digital_address", digital_address);
+      formData.append("billing_address", billing_address);
       formData.append("mailing_address", mailing_address);
       formData.append("accreditation_number", accreditation_number);
       formData.append("alternate_contacts", alternate_contacts);
@@ -154,6 +155,22 @@ function InstitutionDataSetup({ setActiveStep }) {
       });
     }
   }, [isSuccess, data]);
+
+  useEffect(() => {
+    axios
+      .get("https://restcountries.com/v3.1/all?fields=cca2,idd,name")
+      .then((res) => {
+        const names = res.data
+          .map((country) => ({
+            name: country.name.common,
+          }))
+          .sort((a, b) => a.name.localeCompare(b.name)); // Sort alphabetically
+        setCountryNames(names);
+        console.log(names);
+        
+      })
+      .catch((err) => console.error("Error fetching countries:", err));
+  }, []);
 
   useEffect(() => {
     if (isError) {
@@ -322,6 +339,7 @@ function InstitutionDataSetup({ setActiveStep }) {
                   />
                 </div>
               </div>
+              
               <div className="w-[49%]">
                 <h4 className="md:text-[1vw] text-[4vw] mb-1">
                   Institution Website URL
@@ -354,11 +372,36 @@ function InstitutionDataSetup({ setActiveStep }) {
                   />
                 </div>
               </div>
-              <div className="w-[65%]">
+              <div className="w-[49%]">
+                <h4 className="md:text-[1vw] text-[4vw] mb-1">
+                  Billing Address
+                </h4>
+                <div className="relative w-full md:h-[2.7vw] h-[12vw] flex items-center border overflow-hidden bg-[#f7f7f7] rounded-md">
+                  <select
+                    className="w-full px-1 md:h-[2.7vw] h-[12vw] md:text-[1vw] text-[3.5vw] bg-[#f7f7f7] border-r border-gray-300 focus:outline-none rounded-md"
+                    value={userInput?.billing_address || ""}
+                    onChange={(e) =>
+                      setUserInput({
+                        ...userInput,
+                        billing_address: e.target.value,
+                      })
+                    }
+                  >
+                    {countryNames.map((country) => (
+                      <option key={country.name} value={country.name}>
+                        {country.name}
+                      </option>
+                    ))}
+                  </select>
+
+
+                </div>
+              </div>
+              <div className="w-[49%]">
                 <h4 className="md:text-[1vw] text-[4vw] mb-1">
                   Other Contacts
                 </h4>
-                <div className="flex items-center">
+                <div className="flex flex-col items-center">
                   <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
                     <input
                       type="text"
@@ -368,11 +411,12 @@ function InstitutionDataSetup({ setActiveStep }) {
                       className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0"
                     />
                   </div>
-                  <div className="w-[30%] ml-[1vw]">
+                  <p className="w-full text-right text-[0.7rem] font-medium"><span className="text-bChkRed">Note: </span>Seperate contacts with a comma</p>
+                  {/* <div className="w-[30%] ml-[1vw]">
                     <h4 className="text-[1vw] text-[#ff0404] underline">
                       Add Contact
                     </h4>
-                  </div>
+                  </div> */}
                 </div>
               </div>
             </div>
