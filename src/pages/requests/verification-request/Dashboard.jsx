@@ -35,7 +35,7 @@ export default function Dashboard() {
   const [sentRequest, setSentRequest] = useState(0);
   const [subscription, setSubscription] = useState("");
   const [currentPackage, setCurrentPackage] = useState("");
-  const [preferredPlatform, setPreferredPlatform] = useState("stripe");
+  const [preferredPlatform, setPreferredPlatform] = useState("paystack");
   const [creditValue, setCreditValue] = useState(0);
   const [tab, setTab] = useState("day");
   const [plans, setPlans] = useState([]);
@@ -54,7 +54,8 @@ export default function Dashboard() {
 
   const [clientSecret, setClientSecret] = useState(null);
   const [showStripeForm, setShowStripeForm] = useState(false);
-  const stripePromise = loadStripe("pk_test_51R6UPMGfpcTSeSCYZFlk5zGIgl2l7xEV0IcNTEmi0XObDS3DfbRCQOKiBZjOdaSOGxDvpIykgAI1OKh3xn6Oq1ty00rF3VL1NJ");
+  //const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
+  const stripePromise = loadStripe("pk_live_51QwBccH83VZsct6SY7BdgTysPuzkiTVDK3sRFZ02Yv4WgldRfNxUMvOJZ8wcs3mZXiH4BRfr0fyycxLXdlCfipGg00rll5Bnxz");
   // Payment States
   const [selectedPayment, setSelectedPayment] = useState("card");
   const [paymentDetails, setPaymentDetails] = useState({
@@ -91,7 +92,7 @@ export default function Dashboard() {
     }
   }, [preferredPlatform]);
 
-   useEffect(() => {
+  useEffect(() => {
     axiosDef
       .get("https://restcountries.com/v3.1/all?fields=cca2,idd,name")
       .then((res) => {
@@ -103,7 +104,7 @@ export default function Dashboard() {
         setCountryNames(names);        
       })
       .catch((err) => console.error("Error fetching countries:", err));
-    }, []);
+  }, []);
 
   const pages = [
     <div className="w-full flex flex-col justify-center h-full">
