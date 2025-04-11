@@ -51,11 +51,10 @@ export default function Dashboard() {
   const userInstData = JSON.parse(secureLocalStorage.getItem("user") || "{}");
   const [instBill, setInstBill] = useState(userInstData?.institution?.billing_address || "");
 
-
   const [clientSecret, setClientSecret] = useState(null);
   const [showStripeForm, setShowStripeForm] = useState(false);
   //const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
-  const stripePromise = loadStripe("pk_live_51QwBccH83VZsct6SY7BdgTysPuzkiTVDK3sRFZ02Yv4WgldRfNxUMvOJZ8wcs3mZXiH4BRfr0fyycxLXdlCfipGg00rll5Bnxz");
+  const stripePromise = loadStripe("pk_test_51QwBccH83VZsct6SO27tERuGE1I5mPFIB6BUoZNrdcr1VPPhCf5aTZtzMMXR5ORBjFrejCcTexxJaCyKUGAtQmJq00uoUnSctK");
   // Payment States
   const [selectedPayment, setSelectedPayment] = useState("card");
   const [paymentDetails, setPaymentDetails] = useState({
