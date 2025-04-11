@@ -462,7 +462,7 @@ export default function Dashboard() {
       payment_type: "subscription",
       amount: paymentData?.amount,
       platform: preferredPlatform,
-      ...(selectedPayment === "card" && {
+      ...(selectedPayment === "card" && preferredPlatform === "paystack" && {
         payment_method: 'card',
         payment_detail: {
           number: paymentDetails.cardNumber,

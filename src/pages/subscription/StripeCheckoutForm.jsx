@@ -23,10 +23,15 @@ export default function StripeCheckoutForm({ onSuccess }) {
     });
 
     if (error) {
-        console.error("Stripe error:", error);
-        toast.error(error.message || "Payment failed");
-      
-    } else if (paymentIntent?.status == "succeeded") {
+      console.error("Stripe error:", error);
+      toast.error(error.message || "Payment failed");
+    
+      // Optional: show full error object in dev
+      if (process.env.NODE_ENV === "development") {
+        console.error("Full Stripe error object:", error);
+      }
+    }
+     else if (paymentIntent?.status == "succeeded") {
       toast.success("Payment successful!");
       onSuccess?.(); // Run success callback
     } else {
