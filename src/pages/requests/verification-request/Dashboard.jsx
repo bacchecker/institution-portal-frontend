@@ -540,8 +540,7 @@ export default function Dashboard() {
         if (preferredPlatform === "paystack") {
           window.location.href = response?.data?.authorization_url;
         } else if (preferredPlatform === "stripe") {
-          setClientSecret(response.data.clientSecret);
-          setShowStripeForm(true);
+          window.location.href = response?.data?.url;
         }
       }
       //toast.success("Payment successful!");
