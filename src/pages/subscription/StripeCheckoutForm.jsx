@@ -24,7 +24,6 @@ export default function StripeCheckoutForm({ onSuccess }) {
 
     console.log("PaymentMethod:", paymentMethod);
 
-
     if (error) {
       console.error("Stripe error:", error);
       toast.error(error.message || "Payment failed");
