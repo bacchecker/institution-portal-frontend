@@ -7,6 +7,9 @@ import {
   Spinner,
   Divider,
   Chip,
+  Select,
+  SelectItem,
+  Tooltip,
 } from "@nextui-org/react";
 import { toast } from "sonner";
 import PropTypes from "prop-types";
@@ -25,6 +28,29 @@ const stripePromise = loadStripe(
   import.meta.env.VITE_STRIPE_PUBLIC_KEY || "pk_test_placeholder"
 );
 
+// ISO country names for display
+const countryNames = {
+  US: "United States",
+  GB: "United Kingdom",
+  GH: "Ghana",
+  NG: "Nigeria",
+  KE: "Kenya",
+  ZA: "South Africa",
+  IN: "India",
+  CA: "Canada",
+  DE: "Germany",
+  // Add more as needed
+};
+
+// Country flag emoji function
+const getFlagEmoji = (countryCode) => {
+  const codePoints = countryCode
+    .toUpperCase()
+    .split("")
+    .map((char) => 127397 + char.charCodeAt());
+  return String.fromCodePoint(...codePoints);
+};
+
 export default function SubscriptionManagement() {
   const [activeSubscription, setActiveSubscription] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -33,12 +59,22 @@ export default function SubscriptionManagement() {
   const [setupIntentSecret, setSetupIntentSecret] = useState(null);
   const [paymentMethodsLoading, setPaymentMethodsLoading] = useState(false);
   const [paymentMethods, setPaymentMethods] = useState([]);
+  const [userLocation, setUserLocation] = useState(null);
+  const [selectedLocation, setSelectedLocation] = useState(null);
+  const [locationLoading, setLocationLoading] = useState(false);
 
   useEffect(() => {
     fetchSubscriptionData();
     fetchAvailablePlans();
     fetchPaymentMethods();
   }, []);
+
+  useEffect(() => {
+    // Refetch plans when location changes
+    if (selectedLocation) {
+      fetchAvailablePlans(selectedLocation);
+    }
+  }, [selectedLocation]);
 
   const fetchSubscriptionData = async () => {
     setLoading(true);
@@ -57,17 +93,32 @@ export default function SubscriptionManagement() {
     }
   };
 
-  const fetchAvailablePlans = async () => {
+  const fetchAvailablePlans = async (countryCode = null) => {
+    setLocationLoading(true);
     try {
-      const response = await axios.get("/institution/subscriptions/plans");
+      // Include country parameter if specified
+      const params = countryCode ? { country: countryCode } : {};
+      const response = await axios.get("/institution/subscriptions/plans", {
+        params,
+      });
       console.log("Plans:", response.data);
 
       if (response.data.success) {
         setAvailablePlans(response.data.data.plans);
+
+        // Set user location from API response if not already set
+        if (!userLocation && response.data.user_location) {
+          setUserLocation(response.data.user_location);
+          if (!selectedLocation) {
+            setSelectedLocation(response.data.user_location);
+          }
+        }
       }
     } catch (error) {
       console.error("Error fetching plans:", error);
       toast.error("Failed to load subscription plans");
+    } finally {
+      setLocationLoading(false);
     }
   };
 
@@ -133,9 +184,25 @@ export default function SubscriptionManagement() {
       }
     } catch (error) {
       console.error("Error subscribing to plan:", error);
-      toast.error(
-        error.response?.data?.message || "Failed to subscribe to plan"
-      );
+      // Handle specific error about undefined status property
+      if (
+        error.message &&
+        error.message.includes(
+          "Undefined property: App\\Models\\Subscription::$status"
+        )
+      ) {
+        toast.error(
+          "There was an issue with your subscription status. Please contact support."
+        );
+        // Refresh available plans to ensure we have the latest data
+        fetchAvailablePlans();
+        // Refresh subscription data to check if a subscription was actually created
+        fetchSubscriptionData();
+      } else {
+        toast.error(
+          error.response?.data?.message || "Failed to subscribe to plan"
+        );
+      }
     }
   };
 
@@ -184,6 +251,10 @@ export default function SubscriptionManagement() {
     setSelectedPlanId(null);
   };
 
+  const handleLocationChange = (e) => {
+    setSelectedLocation(e.target.value);
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -217,6 +288,20 @@ export default function SubscriptionManagement() {
       </Elements>
     );
   }
+
+  // List of common countries for the selector
+  const commonCountries = [
+    { code: "US", name: "United States" },
+    { code: "GB", name: "United Kingdom" },
+    { code: "GH", name: "Ghana" },
+    { code: "NG", name: "Nigeria" },
+    { code: "KE", name: "Kenya" },
+    { code: "ZA", name: "South Africa" },
+    { code: "IN", name: "India" },
+    { code: "CA", name: "Canada" },
+    { code: "DE", name: "Germany" },
+    // Add more as needed
+  ];
 
   return (
     <div className="space-y-6 p-6">
@@ -306,47 +391,120 @@ export default function SubscriptionManagement() {
         </Card>
       )}
 
-      <h3 className="text-xl font-bold mt-8">Available Plans</h3>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {availablePlans.map((plan) => (
-          <Card key={plan.id} className="w-full">
-            <CardHeader className="flex flex-col items-start">
-              <h3 className="text-lg font-semibold">{plan.name}</h3>
-              <p className="text-xl font-bold">
-                ${plan.amount}{" "}
+      <div className="flex flex-col mt-8">
+        <h3 className="text-xl font-bold">Available Plans</h3>
+
+        <div className="flex gap-2">
+          {userLocation && (
+            <div className="mr-2 flex items-center">
+              <Tooltip content="Your detected location">
                 <span className="text-sm text-gray-500">
-                  / monthly
-                  {/* / {plan.billing_period} */}
+                  {getFlagEmoji(userLocation)}{" "}
+                  {countryNames[userLocation] || userLocation}
                 </span>
-              </p>
-            </CardHeader>
-            <Divider />
-            <CardBody>
-              <ul className="space-y-2">
-                <li>• {plan.total_credit} total credits</li>
-                <li>• {plan.number_of_users} users</li>
-                <li>• {plan.number_of_departments} departments</li>
-                {plan.features?.map((feature, index) => (
-                  <li key={index}>• {feature}</li>
-                ))}
-              </ul>
-              <Button
-                color="danger"
-                className="w-full mt-4"
-                onPress={() => subscribeToNewPlan(plan.id)}
-                disabled={
-                  activeSubscription?.plan.id === plan.id &&
-                  !activeSubscription.is_canceled
-                }
+              </Tooltip>
+            </div>
+          )}
+
+          <Select
+            size="sm"
+            label="View pricing for"
+            className="max-w-xs"
+            selectedKeys={selectedLocation ? [selectedLocation] : []}
+            onChange={handleLocationChange}
+            isLoading={locationLoading}
+          >
+            {commonCountries.map((country) => (
+              <SelectItem
+                key={country.code}
+                value={country.code}
+                textValue={country.name}
               >
-                {activeSubscription?.plan.id === plan.id &&
-                !activeSubscription.is_canceled
-                  ? "Current Plan"
-                  : "Subscribe"}
-              </Button>
-            </CardBody>
-          </Card>
-        ))}
+                <div className="flex items-center gap-2">
+                  <span>{getFlagEmoji(country.code)}</span>
+                  <span>{country.name}</span>
+                </div>
+              </SelectItem>
+            ))}
+          </Select>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {availablePlans.map((plan) => {
+          const hasLocationPricing =
+            plan.has_location_pricing && plan.original_amount;
+          const discount = hasLocationPricing
+            ? Math.round(
+                ((plan.original_amount - plan.amount) / plan.original_amount) *
+                  100
+              )
+            : 0;
+
+          return (
+            <Card key={plan.id} className="w-full">
+              <CardHeader className="flex flex-col items-start">
+                <div className="flex justify-between items-center w-full">
+                  <h3 className="text-lg font-semibold">{plan.name}</h3>
+                  {hasLocationPricing && discount > 0 && (
+                    <Chip color="success" size="sm">
+                      {discount}% off
+                    </Chip>
+                  )}
+                </div>
+                <div className="flex items-baseline gap-2">
+                  <p className="text-xl font-bold">${plan.amount}</p>
+                  {hasLocationPricing && plan.original_amount > plan.amount && (
+                    <p className="text-sm text-gray-500 line-through">
+                      ${plan.original_amount}
+                    </p>
+                  )}
+                  <span className="text-sm text-gray-500">
+                    / monthly
+                    {/* / {plan.billing_period} */}
+                  </span>
+                </div>
+                {plan.applied_country && (
+                  <div className="mt-1 text-sm">
+                    <span className="text-success font-medium flex items-center gap-1">
+                      {getFlagEmoji(plan.applied_country)}
+                      <span>
+                        Price for{" "}
+                        {countryNames[plan.applied_country] ||
+                          plan.applied_country}
+                      </span>
+                    </span>
+                  </div>
+                )}
+              </CardHeader>
+              <Divider />
+              <CardBody>
+                <ul className="space-y-2">
+                  <li>• {plan.total_credit} total credits</li>
+                  <li>• {plan.number_of_users} users</li>
+                  <li>• {plan.number_of_departments} departments</li>
+                  {plan.features?.map((feature, index) => (
+                    <li key={index}>• {feature}</li>
+                  ))}
+                </ul>
+                <Button
+                  color="danger"
+                  className="w-full mt-4"
+                  onPress={() => subscribeToNewPlan(plan.id)}
+                  disabled={
+                    activeSubscription?.plan.id === plan.id &&
+                    !activeSubscription.is_canceled
+                  }
+                >
+                  {activeSubscription?.plan.id === plan.id &&
+                  !activeSubscription.is_canceled
+                    ? "Current Plan"
+                    : "Subscribe"}
+                </Button>
+              </CardBody>
+            </Card>
+          );
+        })}
       </div>
 
       <h3 className="text-xl font-bold mt-8">Payment Methods</h3>
