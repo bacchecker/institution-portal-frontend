@@ -80,9 +80,9 @@ export default function SubscriptionManagement() {
     setLoading(true);
     try {
       const response = await axios.get("/institution/subscriptions/active");
-      console.log("Subscription Data:", response.data);
 
       if (response.data.success) {
+        console.log("Active Subscription:", response.data.data);
         setActiveSubscription(response.data.data);
       }
     } catch (error) {
@@ -107,10 +107,10 @@ export default function SubscriptionManagement() {
         setAvailablePlans(response.data.data.plans);
 
         // Set user location from API response if not already set
-        if (!userLocation && response.data.user_location) {
-          setUserLocation(response.data.user_location);
+        if (!userLocation && response.data.data.user_location) {
+          setUserLocation(response.data.data.user_location);
           if (!selectedLocation) {
-            setSelectedLocation(response.data.user_location);
+            setSelectedLocation(response.data.data.user_location);
           }
         }
       }
@@ -155,6 +155,8 @@ export default function SubscriptionManagement() {
 
   const subscribeToNewPlan = async (planId) => {
     try {
+      console.log(`Subscribing to plan ID: ${planId}`);
+
       // Check if we have payment methods first
       if (paymentMethods.length === 0) {
         // Create a setup intent for adding payment method first
@@ -163,11 +165,13 @@ export default function SubscriptionManagement() {
         return;
       }
 
+      // Pass the country code in the request to ensure correct pricing
       const response = await axios.post(
         "/institution/subscriptions/subscribe",
         {
           plan_id: planId,
           payment_method_id: paymentMethods[0]?.id, // Use the first payment method
+          country: selectedLocation, // Include the selected location/country
         }
       );
 
@@ -284,6 +288,7 @@ export default function SubscriptionManagement() {
           onCancel={clearSetupIntent}
           setSetupIntentSecret={setSetupIntentSecret}
           setSelectedPlanId={setSelectedPlanId}
+          selectedLocation={selectedLocation}
         />
       </Elements>
     );
@@ -334,8 +339,8 @@ export default function SubscriptionManagement() {
                 <div>
                   <p className="text-sm text-gray-500">Price</p>
                   <p className="font-semibold">
-                    ${activeSubscription.plan.price} /{" "}
-                    {activeSubscription.plan.billing_period}
+                    ${activeSubscription.subscription.price} /{" "}
+                    {activeSubscription.plan.billing_period || "monthly"}
                   </p>
                 </div>
                 <div>
@@ -572,6 +577,7 @@ function PaymentSetupForm({
   onCancel,
   setSetupIntentSecret,
   setSelectedPlanId,
+  selectedLocation,
 }) {
   const stripe = useStripe();
   const elements = useElements();
@@ -626,6 +632,7 @@ function PaymentSetupForm({
             plan_id: planId,
             payment_method_id: result.setupIntent.payment_method,
             setup_intent_id: result.setupIntent.id,
+            country: selectedLocation, // Include the selected country
           }
         );
 
@@ -709,4 +716,5 @@ PaymentSetupForm.propTypes = {
   onCancel: PropTypes.func.isRequired,
   setSetupIntentSecret: PropTypes.func.isRequired,
   setSelectedPlanId: PropTypes.func.isRequired,
+  selectedLocation: PropTypes.string,
 };
