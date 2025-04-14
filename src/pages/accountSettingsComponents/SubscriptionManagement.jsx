@@ -271,8 +271,8 @@ export default function SubscriptionManagement() {
               <div className="mt-6">
                 {activeSubscription.is_canceled ? (
                   <Button
-                    color="primary"
-                    onClick={resumeSubscription}
+                    color="danger"
+                    onPress={resumeSubscription}
                     className="w-full md:w-auto"
                   >
                     Resume Subscription
@@ -281,7 +281,7 @@ export default function SubscriptionManagement() {
                   <Button
                     color="danger"
                     variant="flat"
-                    onClick={cancelSubscription}
+                    onPress={cancelSubscription}
                     className="w-full md:w-auto"
                   >
                     Cancel Subscription
@@ -331,9 +331,9 @@ export default function SubscriptionManagement() {
                 ))}
               </ul>
               <Button
-                color="primary"
+                color="danger"
                 className="w-full mt-4"
-                onClick={() => subscribeToNewPlan(plan.id)}
+                onPress={() => subscribeToNewPlan(plan.id)}
                 disabled={
                   activeSubscription?.plan.id === plan.id &&
                   !activeSubscription.is_canceled
@@ -532,7 +532,7 @@ function PaymentSetupForm({
           >
             Cancel
           </Button>
-          <Button color="primary" type="submit" disabled={!stripe || loading}>
+          <Button color="danger" type="submit" disabled={!stripe || loading}>
             {loading ? (
               <Spinner size="sm" color="white" />
             ) : (
