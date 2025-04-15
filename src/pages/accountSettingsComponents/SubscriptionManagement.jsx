@@ -339,7 +339,7 @@ export default function SubscriptionManagement() {
                 <div>
                   <p className="text-sm text-gray-500">Price</p>
                   <p className="font-semibold">
-                    ${activeSubscription.subscription.price} /{" "}
+                    ${activeSubscription.subscription.amount} /{" "}
                     {activeSubscription.plan.billing_period || "monthly"}
                   </p>
                 </div>

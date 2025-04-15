@@ -131,12 +131,12 @@ function NewApplicationForm({
     {
       ...(selectedAcademicLevel !== undefined &&
         selectedAcademicLevel !== "" && {
-        academicLevel: selectedAcademicLevel,
-      }),
+          academicLevel: selectedAcademicLevel,
+        }),
       ...(selectedInstitutionType?.value !== undefined &&
         selectedInstitutionType?.value !== "" && {
-        institutionType: selectedInstitutionType?.value,
-      }),
+          institutionType: selectedInstitutionType?.value,
+        }),
     },
     {
       skip:
@@ -170,8 +170,8 @@ function NewApplicationForm({
         selectedAcademicLevel !== "" && { selectedAcademicLevel }),
       ...(selectedInstitutionType?.value !== undefined &&
         selectedInstitutionType?.value !== "" && {
-        selectedInstitutionType: selectedInstitutionType?.value,
-      }),
+          selectedInstitutionType: selectedInstitutionType?.value,
+        }),
     },
     {
       skip:
@@ -184,35 +184,34 @@ function NewApplicationForm({
   useEffect(() => {
     if (userAffiliations && institutions) {
       let filteredInstitutions = institutions?.data?.institutions;
-    
-       // Debugging purpose
-    
+
+      // Debugging purpose
+
       // Exclude the logged-in user's institution
       if (institutionName?.id) {
         filteredInstitutions = filteredInstitutions?.filter(
           (institution) => String(institution.id) !== String(institutionName.id)
         );
       }
-    
+
       if (userAffiliations?.affiliations?.length > 0) {
         const institutionIds = userAffiliations?.affiliations?.map(
           (item) => item?.institution_id
         );
-    
+
         const insAffiliations = filteredInstitutions
           ?.filter((item) => institutionIds.includes(item?.id))
           .map((institution) => ({
             ...institution,
           }));
-    
+
         setAllInstitutions(insAffiliations);
       } else {
         console.log(filteredInstitutions);
-        
+
         setAllInstitutions(filteredInstitutions);
       }
     }
-    
   }, [institutions, userAffiliations, institutionName?.id]);
 
   useEffect(() => {
@@ -476,7 +475,10 @@ function NewApplicationForm({
     });
 
     try {
-      const response = await axios.post("/institution/requests/verifications", formData);
+      const response = await axios.post(
+        "/institution/requests/verifications",
+        formData
+      );
 
       toast.success(response.data.message, {
         position: "top-right",
@@ -549,7 +551,7 @@ function NewApplicationForm({
               <input
                 type="text"
                 readOnly
-                value={`${subscription?.balance || 0}`}
+                value={`${subscription?.credit_balance || 0}`}
                 className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0 read-only:bg-[#d8d8d8]"
               />
             </div>
@@ -566,7 +568,7 @@ function NewApplicationForm({
               className="custom-dropdown-class display-md-none"
             />
           </div>
-          
+
           {selectedCredentialType?.value === "non-academic" && (
             <div className="md:mt-[2vw] mt-[8vw]">
               <h4 className="md:text-[1vw] text-[4vw] mb-1">
@@ -600,7 +602,7 @@ function NewApplicationForm({
                   {!isChecked && (
                     <>
                       {userAffiliations?.affiliations &&
-                        userAffiliations?.affiliations?.length === 1 ? (
+                      userAffiliations?.affiliations?.length === 1 ? (
                         <div className="md:mt-[1vw] mt-[5vw]">
                           <h4 className="md:text-[1vw] text-[4vw] mb-1">
                             Institution
@@ -737,7 +739,7 @@ function NewApplicationForm({
               {!isChecked && (
                 <>
                   {userAffiliations?.affiliations &&
-                    userAffiliations?.affiliations?.length === 1 ? (
+                  userAffiliations?.affiliations?.length === 1 ? (
                     <div className="md:mt-[1vw] mt-[5vw]">
                       <h4 className="md:text-[1vw] text-[4vw] mb-1">
                         Institution
@@ -1117,7 +1119,7 @@ function NewApplicationForm({
               Purpose
               <span className="text-[#f1416c]">*</span>
             </h4>
-            
+
             {/* Select Input */}
             <select
               name="purpose"
@@ -1185,4 +1187,3 @@ function NewApplicationForm({
 }
 
 export default NewApplicationForm;
-
