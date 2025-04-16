@@ -62,6 +62,9 @@ export default function SubscriptionManagement() {
   const [userLocation, setUserLocation] = useState(null);
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [locationLoading, setLocationLoading] = useState(false);
+  const [cancelLoading, setCancelLoading] = useState(false);
+  const [resumeLoading, setResumeLoading] = useState(false);
+  const [subscribeLoading, setSubscribeLoading] = useState(null);
 
   useEffect(() => {
     fetchSubscriptionData();
@@ -156,6 +159,7 @@ export default function SubscriptionManagement() {
   const subscribeToNewPlan = async (planId) => {
     try {
       console.log(`Subscribing to plan ID: ${planId}`);
+      setSubscribeLoading(planId);
 
       // Check if we have payment methods first
       if (paymentMethods.length === 0) {
@@ -188,25 +192,11 @@ export default function SubscriptionManagement() {
       }
     } catch (error) {
       console.error("Error subscribing to plan:", error);
-      // Handle specific error about undefined status property
-      if (
-        error.message &&
-        error.message.includes(
-          "Undefined property: App\\Models\\Subscription::$status"
-        )
-      ) {
-        toast.error(
-          "There was an issue with your subscription status. Please contact support."
-        );
-        // Refresh available plans to ensure we have the latest data
-        fetchAvailablePlans();
-        // Refresh subscription data to check if a subscription was actually created
-        fetchSubscriptionData();
-      } else {
-        toast.error(
-          error.response?.data?.message || "Failed to subscribe to plan"
-        );
-      }
+      toast.error(
+        error.response?.data?.message || "Failed to subscribe to plan"
+      );
+    } finally {
+      setSubscribeLoading(null);
     }
   };
 
@@ -217,6 +207,7 @@ export default function SubscriptionManagement() {
       return;
     }
 
+    setCancelLoading(true);
     try {
       const response = await axios.post("/institution/subscriptions/cancel", {
         subscription_id: activeSubscription.subscription.id,
@@ -229,12 +220,15 @@ export default function SubscriptionManagement() {
     } catch (error) {
       console.error("Error cancelling subscription:", error);
       toast.error("Failed to cancel subscription");
+    } finally {
+      setCancelLoading(false);
     }
   };
 
   const resumeSubscription = async () => {
     if (!activeSubscription) return;
 
+    setResumeLoading(true);
     try {
       const response = await axios.post("/institution/subscriptions/resume", {
         subscription_id: activeSubscription.subscription.id,
@@ -247,6 +241,8 @@ export default function SubscriptionManagement() {
     } catch (error) {
       console.error("Error resuming subscription:", error);
       toast.error("Failed to resume subscription");
+    } finally {
+      setResumeLoading(false);
     }
   };
 
@@ -364,8 +360,10 @@ export default function SubscriptionManagement() {
                     color="danger"
                     onPress={resumeSubscription}
                     className="w-full md:w-auto"
+                    isLoading={resumeLoading}
+                    disabled={resumeLoading}
                   >
-                    Resume Subscription
+                    {resumeLoading ? "Resuming..." : "Resume Subscription"}
                   </Button>
                 ) : (
                   <Button
@@ -373,8 +371,10 @@ export default function SubscriptionManagement() {
                     variant="flat"
                     onPress={cancelSubscription}
                     className="w-full md:w-auto"
+                    isLoading={cancelLoading}
+                    disabled={cancelLoading}
                   >
-                    Cancel Subscription
+                    {cancelLoading ? "Cancelling..." : "Cancel Subscription"}
                   </Button>
                 )}
               </div>
@@ -435,7 +435,7 @@ export default function SubscriptionManagement() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {availablePlans.map((plan) => {
           const hasLocationPricing =
             plan.has_location_pricing && plan.original_amount;
@@ -497,13 +497,17 @@ export default function SubscriptionManagement() {
                   className="w-full mt-4"
                   onPress={() => subscribeToNewPlan(plan.id)}
                   disabled={
-                    activeSubscription?.plan.id === plan.id &&
-                    !activeSubscription.is_canceled
+                    (activeSubscription?.plan.id === plan.id &&
+                      !activeSubscription.is_canceled) ||
+                    subscribeLoading === plan.id
                   }
+                  isLoading={subscribeLoading === plan.id}
                 >
                   {activeSubscription?.plan.id === plan.id &&
                   !activeSubscription.is_canceled
                     ? "Current Plan"
+                    : subscribeLoading === plan.id
+                    ? "Subscribing..."
                     : "Subscribe"}
                 </Button>
               </CardBody>
