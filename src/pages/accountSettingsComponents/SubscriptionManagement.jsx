@@ -65,6 +65,7 @@ export default function SubscriptionManagement() {
   const [cancelLoading, setCancelLoading] = useState(false);
   const [resumeLoading, setResumeLoading] = useState(false);
   const [subscribeLoading, setSubscribeLoading] = useState(null);
+  const [addPaymentMethodLoading, setAddPaymentMethodLoading] = useState(false);
 
   useEffect(() => {
     fetchSubscriptionData();
@@ -144,6 +145,7 @@ export default function SubscriptionManagement() {
 
   const createSetupIntent = async () => {
     try {
+      setAddPaymentMethodLoading(true);
       const response = await axios.post(
         "/institution/subscriptions/setup-intent"
       );
@@ -153,7 +155,14 @@ export default function SubscriptionManagement() {
     } catch (error) {
       console.error("Error creating setup intent:", error);
       toast.error("Failed to initialize payment setup");
+    } finally {
+      setAddPaymentMethodLoading(false);
     }
+  };
+
+  const handlePaymentSuccess = async () => {
+    await fetchPaymentMethods(); // Refresh payment methods list
+    await fetchSubscriptionData(); // Refresh subscription data if needed
   };
 
   const subscribeToNewPlan = async (planId) => {
@@ -280,7 +289,7 @@ export default function SubscriptionManagement() {
       >
         <PaymentSetupForm
           planId={selectedPlanId}
-          onSuccess={fetchSubscriptionData}
+          onSuccess={handlePaymentSuccess}
           onCancel={clearSetupIntent}
           setSetupIntentSecret={setSetupIntentSecret}
           setSelectedPlanId={setSelectedPlanId}
@@ -361,7 +370,6 @@ export default function SubscriptionManagement() {
                     onPress={resumeSubscription}
                     className="w-full md:w-auto"
                     isLoading={resumeLoading}
-                    disabled={resumeLoading}
                   >
                     {resumeLoading ? "Resuming..." : "Resume Subscription"}
                   </Button>
@@ -372,9 +380,8 @@ export default function SubscriptionManagement() {
                     onPress={cancelSubscription}
                     className="w-full md:w-auto"
                     isLoading={cancelLoading}
-                    disabled={cancelLoading}
                   >
-                    {cancelLoading ? "Cancelling..." : "Cancel Subscription"}
+                    Cancel Subscription
                   </Button>
                 )}
               </div>
@@ -557,6 +564,7 @@ export default function SubscriptionManagement() {
                 variant="flat"
                 className="mt-2"
                 onPress={createSetupIntent}
+                isLoading={addPaymentMethodLoading}
               >
                 Add Payment Method
               </Button>
@@ -564,7 +572,11 @@ export default function SubscriptionManagement() {
           ) : (
             <div className="text-center p-4">
               <p className="mb-4">No payment methods available</p>
-              <Button color="danger" onPress={createSetupIntent}>
+              <Button
+                color="danger"
+                onPress={createSetupIntent}
+                isLoading={addPaymentMethodLoading}
+              >
                 Add Payment Method
               </Button>
             </div>
@@ -648,7 +660,7 @@ function PaymentSetupForm({
           setSetupIntentSecret(null);
           setSelectedPlanId(null);
           // Then call onSuccess to refresh data
-          onSuccess();
+          await onSuccess();
         } else {
           throw new Error(
             response.data.message || "Failed to complete subscription"
@@ -661,7 +673,7 @@ function PaymentSetupForm({
         // Clear the setup intent first
         setSetupIntentSecret(null);
         // Then call onSuccess to refresh data
-        onSuccess();
+        await onSuccess();
       }
     } catch (error) {
       console.error("Payment error details:", error);
