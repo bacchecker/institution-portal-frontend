@@ -56,6 +56,7 @@ export default function Dashboard() {
 
   const [clientSecret, setClientSecret] = useState(null);
   const [showStripeForm, setShowStripeForm] = useState(false);
+  const [checked, setChecked] = useState(false);
   //const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
   const stripePromise = loadStripe(
     "pk_test_51QwBccH83VZsct6SO27tERuGE1I5mPFIB6BUoZNrdcr1VPPhCf5aTZtzMMXR5ORBjFrejCcTexxJaCyKUGAtQmJq00uoUnSctK"
@@ -77,6 +78,23 @@ export default function Dashboard() {
   const [currentPage, setCurrentPage] = useState(1);
   const [lastPage, setLastPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
+  
+  const handleEcheckChange = async (e) => {
+    const isChecked = e.target.checked;
+    setChecked(isChecked);
+
+    if (isChecked) {
+      setLoading(true);
+      try {
+        const response = await axios.post("/institution/dont-show-echeck-modal");
+        toast.success(response.data.message);
+      } catch (error) {
+        toast.error("Failed to update eCheck modal setting:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
 
   useEffect(() => {
     setPaymentData(paymentData);
@@ -113,15 +131,30 @@ export default function Dashboard() {
   const pages = [
     <div className="w-full flex flex-col justify-center h-full">
       <div className="w-full bg-black rounded-md h-48"></div>
-      <button
-        type="button"
-        onClick={() => {
-          setOpenDrawer(false);
-        }}
-        className="w-full flex justify-end mt-1 font-normal underline"
-      >
-        Skip
-      </button>
+      <div className="w-full flex justify-between">
+        {checked == 0 && (
+          <label className="w-full flex items-center space-x-2 cursor-pointer mt-1">
+            <input
+              type="checkbox"
+              checked={checked}
+              onChange={handleEcheckChange}
+              className="form-checkbox accent-bChkRed"
+            />
+            <span className=" text-bChkRed">Don't show this again</span>
+          </label>
+        )}
+        
+        <button
+          type="button"
+          onClick={() => {
+            setOpenDrawer(false);
+          }}
+          className="w-full flex justify-end mt-1 font-normal underline"
+        >
+          Skip
+        </button>
+      </div>
+      
       <div className="font-normal">
         <p className="font-semibold text-black my-3 text-lg">
           Welcome to E-Check
@@ -403,11 +436,16 @@ export default function Dashboard() {
 
       const totalCredit = subscription?.subscription?.total_credit || 0;
       const inRequest = subscription?.received_requests || 0;
+      const dontShow = subscription?.institution?.echeck_modal || 0;
 
-      if (totalCredit < 1 && inRequest < 1) {
+      if (totalCredit < 1 && inRequest < 1 && dontShow == 1) {
         setOpenDrawer(true);
       } else {
         setOpenDrawer(false);
+      }
+
+      if(dontShow == 0) {
+        setChecked(true);
       }
     };
     handleECheckModal();

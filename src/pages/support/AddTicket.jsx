@@ -33,7 +33,6 @@ function AddTicket({ setOpenModal, openModal, fetchTickets }) {
         { id: "complaint", name: "Complaint" },
         { id: "inquiry", name: "Inquiry" },
         { id: "request", name: "Request" },
-        { id: "suggestion", name: "Inquiry" },
         { id: "other", name: "Other" },
     ];
 

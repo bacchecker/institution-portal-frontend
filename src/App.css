@@ -33,6 +33,13 @@
   }
 }
 
+@layer utilities {
+  .animate-bounce-gradient {
+    animation: bounceSmooth 2s cubic-bezier(0.65, 0, 0.35, 1) infinite,
+               gradientSwipe 4s ease infinite;
+  }
+}
+
 .card {
   padding: 2em;
 }
