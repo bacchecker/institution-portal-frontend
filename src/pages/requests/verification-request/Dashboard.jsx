@@ -621,12 +621,12 @@ export default function Dashboard() {
             onClick={() => {
               setOpenDrawer(true);
             }}
-            className="border border-gray-400 flex space-x-1 items-center rounded-full px-3 py-1 uppercase text-sm text-gray-600"
+            className="bg-black flex space-x-1 items-center rounded-md px-3 py-1 uppercase text-sm text-white"
           >
             <p>Learn More</p>
             <IoIosArrowDroprightCircle size={20} />
           </button>
-          <div className=" flex justify-end pr-2 space-x-2">
+          {/* <div className=" flex justify-end pr-2 space-x-2">
             <button
               type="button"
               onClick={() => {
@@ -653,7 +653,7 @@ export default function Dashboard() {
                 <p>Top Up Credits</p>
               </button>
             )}
-          </div>
+          </div> */}
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 text-black gap-2 lg:gap-4 p-2">
           <div className="flex flex-col justify-center bg-yellow-100 rounded-md p-8">
