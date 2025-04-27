@@ -235,29 +235,56 @@ export default function InstitutionDocTypes() {
                             </TableCell>
                             <TableCell>
                                 {document?.soft_copy &&
-                                    document?.hard_copy ? (
-                                        <>
-                                        <span className="text-[#FFA52D]">
-                                            soft copy
-                                        </span>
-                                        <span className="text-[#000000]">
-                                            , hard copy
-                                        </span>
-                                        </>
-                                    ) : document?.soft_copy ? (
-                                        <span className="text-[#FFA52D]">
-                                        soft copy
-                                        </span>
-                                    ) : document?.hard_copy ? (
-                                        <span className="text-[#000000]">
-                                        hard copy
-                                        </span>
-                                    ) : null
+                                  document?.hard_copy ? (
+                                    <div className="text-left">
+                                      <p className="text-[#FFA52D]">
+                                          Soft copy
+                                      </p>
+                                      <p className="text-[#000000]">
+                                          Hard copy
+                                      </p>
+                                    </div>
+                                  ) : document?.soft_copy ? (
+                                      <p className="text-[#FFA52D]">
+                                      Soft copy
+                                      </p>
+                                  ) : document?.hard_copy ? (
+                                      <p className="text-[#000000]">
+                                      Hard copy
+                                      </p>
+                                  ) : null
                                 }
                             </TableCell>
-                            <TableCell className="text-center">{document?.base_fee}</TableCell>
-                            <TableCell className="text-center">{document?.validation_fee}</TableCell>
-                            <TableCell className="text-center">{document?.printing_fee}</TableCell>
+                            <TableCell className="text-center">
+                              <div className="text-right pr-10">
+                                <p className="text-[#FFA52D]">
+                                GH₵ {document?.base_fee}
+                                </p>
+                                <p className="text-[#000000]">
+                                  $ {document?.foreign_base_fee}
+                                </p>
+                              </div>
+                            </TableCell>
+                            <TableCell className="text-center">
+                              <div className="text-right pr-10">
+                                <p className="text-[#FFA52D]">
+                                GH₵ {document?.validation_fee}
+                                </p>
+                                <p className="text-[#000000]">
+                                  $ {document?.foreign_validation_fee}
+                                </p>
+                              </div>
+                            </TableCell>
+                            <TableCell className="text-center">
+                              <div className="text-right pr-10">
+                                <p className="text-[#FFA52D]">
+                                GH₵ {document?.printing_fee}
+                                </p>
+                                <p className="text-[#000000]">
+                                  $ {document?.foreign_printing_fee}
+                                </p>
+                              </div>
+                            </TableCell>
                             <TableCell className="text-center">
                               <div className="relative inline-block">
                                 <Popover
