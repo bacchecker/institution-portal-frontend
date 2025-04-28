@@ -368,7 +368,7 @@ export default function SubscriptionManagement() {
                   <Button
                     // color="danger"
                     onPress={resumeSubscription}
-                    className="w-full md:w-auto bg-red-700"
+                    className="w-full md:w-auto bg-red-500 text-white"
                     isLoading={resumeLoading}
                   >
                     {resumeLoading ? "Resuming..." : "Resume Subscription"}
@@ -378,7 +378,7 @@ export default function SubscriptionManagement() {
                     // color="danger"
                     variant="flat"
                     onPress={cancelSubscription}
-                    className="w-full md:w-auto bg-red-700"
+                    className="w-full md:w-auto bg-red-500 text-white"
                     isLoading={cancelLoading}
                   >
                     Cancel Subscription
@@ -501,7 +501,7 @@ export default function SubscriptionManagement() {
                 </ul>
                 <Button
                   // color="danger"
-                  className="w-full mt-4 bg-red-700"
+                  className="w-full mt-4 bg-red-500 text-white"
                   onPress={() => subscribeToNewPlan(plan.id)}
                   disabled={
                     (activeSubscription?.plan.id === plan.id &&
@@ -562,7 +562,7 @@ export default function SubscriptionManagement() {
               <Button
                 // color="danger"
                 variant="flat"
-                className="mt-2 bg-red-700"
+                className="mt-2 bg-red-500 text-white"
                 onPress={createSetupIntent}
                 isLoading={addPaymentMethodLoading}
               >
@@ -575,7 +575,7 @@ export default function SubscriptionManagement() {
               <Button
                 // color="danger"
                 // variant="flat"
-                className="mt-2 bg-red-700"
+                className="mt-2 bg-red-500 text-white"
                 onPress={createSetupIntent}
                 isLoading={addPaymentMethodLoading}
               >
@@ -709,7 +709,7 @@ function PaymentSetupForm({
         <div className="flex gap-3 justify-end">
           <Button
             // color="danger"
-            className="bg-red-700"
+            className="bg-red-500 text-white"
             variant="flat"
             onPress={onCancel}
             disabled={loading}
@@ -718,7 +718,7 @@ function PaymentSetupForm({
           </Button>
           <Button
             // color="danger"
-            className="bg-red-700"
+            className="bg-red-500 text-white"
             type="submit"
             disabled={!stripe || loading}
           >
