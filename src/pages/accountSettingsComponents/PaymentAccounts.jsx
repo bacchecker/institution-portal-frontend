@@ -170,7 +170,8 @@ export default function PaymentAccounts() {
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-semibold">Payment Accounts</h2>
         <Button
-          color="primary"
+          // color="primary"
+          className="bg-bChkRed text-white"
           startContent={<FaPlus />}
           onClick={() => handleOpenModal()}
         >
@@ -339,7 +340,8 @@ export default function PaymentAccounts() {
                   Cancel
                 </Button>
                 <Button
-                  color="primary"
+                  // color="primary"
+                  className="bg-bChkRed text-white"
                   onPress={handleSubmit}
                   isLoading={submitting}
                 >
@@ -368,7 +370,8 @@ export default function PaymentAccounts() {
                   Cancel
                 </Button>
                 <Button
-                  color="danger"
+                  // color="danger"
+                  className="bg-bChkRed text-white"
                   onPress={handleDelete}
                   isLoading={submitting}
                 >
