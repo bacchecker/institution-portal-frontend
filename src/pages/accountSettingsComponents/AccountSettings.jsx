@@ -5,12 +5,13 @@ import Navbar from "@/components/Navbar";
 import secureLocalStorage from "react-secure-storage";
 import InstitutionDepartments from "./InstitutionDepartments";
 import InstitutionUsers from "./InstitutionUsers";
-import { FaBuilding, FaUsers } from "react-icons/fa";
+import { FaBuilding, FaUsers, FaCreditCard } from "react-icons/fa";
 import SecuritySettings from "./SecuritySettings";
 import InstitutionProfile from "./InstitutionProfile";
 import { BsBuildingsFill } from "react-icons/bs";
 import InstitutionDocTypes from "./InstitutionDocTypes";
 import SubscriptionManagement from "./SubscriptionManagement";
+import PaymentAccounts from "./PaymentAccounts";
 import { RiVipCrownFill } from "react-icons/ri";
 
 export default function AccountSettings() {
@@ -137,6 +138,24 @@ export default function AccountSettings() {
               }
             >
               <InstitutionUsers />
+            </Tab>
+          )}
+
+          {(secureLocalStorage
+            .getItem("userPermissions")
+            ?.includes("institution.settings.view") ||
+            JSON.parse(secureLocalStorage.getItem("userRole"))?.isAdmin) && (
+            <Tab
+              key="paymentAccounts"
+              id="paymentAccounts"
+              title={
+                <div className="flex items-center space-x-2">
+                  <FaCreditCard size={18} />
+                  <span>Payment Accounts</span>
+                </div>
+              }
+            >
+              <PaymentAccounts />
             </Tab>
           )}
         </Tabs>
