@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
+import { debounce } from "lodash";
 import {
   Table,
   TableHeader,
@@ -18,9 +19,9 @@ import {
   SelectItem,
   Spinner,
   Pagination,
-  Chip
+  Chip,
 } from "@nextui-org/react";
-import { FaPlus, FaEdit, FaTrash } from "react-icons/fa";
+import { FaPlus, FaEdit, FaTrash, FaCheck } from "react-icons/fa";
 import axios from "@/utils/axiosConfig";
 import { toast } from "sonner";
 
@@ -29,22 +30,27 @@ export default function PaymentAccounts() {
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [perPage, setPerPage] = useState(10);
+  const [perPage] = useState(10);
   const [formData, setFormData] = useState({
     account_name: "",
     account_number: "",
     bank_name: "",
     bank_branch: "",
     account_type: "savings",
-    currency: "USD",
-    swift_code: ""
+    currency: "NGN",
+    swift_code: "",
+    bank_code: "",
   });
+  const [banks, setBanks] = useState([]);
+  const [loadingBanks, setLoadingBanks] = useState(false);
+  const [verifying, setVerifying] = useState(false);
+  const [verified, setVerified] = useState(false);
   const [editId, setEditId] = useState(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const {
     isOpen: isDeleteOpen,
     onOpen: onDeleteOpen,
-    onClose: onDeleteClose
+    onClose: onDeleteClose,
   } = useDisclosure();
   const [deleteId, setDeleteId] = useState(null);
   const [submitting, setSubmitting] = useState(false);
@@ -52,22 +58,28 @@ export default function PaymentAccounts() {
   const accountTypes = [
     { value: "savings", label: "Savings Account" },
     { value: "current", label: "Current Account" },
-    { value: "domiciliary", label: "Domiciliary Account" }
+    { value: "domiciliary", label: "Domiciliary Account" },
   ];
 
   const currencies = [
+    { value: "NGN", label: "Nigerian Naira (NGN)" },
     { value: "USD", label: "US Dollar (USD)" },
     { value: "EUR", label: "Euro (EUR)" },
     { value: "GBP", label: "British Pound (GBP)" },
-    { value: "NGN", label: "Nigerian Naira (NGN)" },
     { value: "GHS", label: "Ghanaian Cedi (GHS)" },
     { value: "KES", label: "Kenyan Shilling (KES)" },
-    { value: "ZAR", label: "South African Rand (ZAR)" }
+    { value: "ZAR", label: "South African Rand (ZAR)" },
   ];
 
   useEffect(() => {
     fetchAccounts();
   }, [currentPage, perPage]);
+
+  useEffect(() => {
+    if (isOpen) {
+      fetchBanks();
+    }
+  }, [isOpen]);
 
   const fetchAccounts = async () => {
     setLoading(true);
@@ -85,16 +97,87 @@ export default function PaymentAccounts() {
     }
   };
 
+  const fetchBanks = async () => {
+    setLoadingBanks(true);
+    try {
+      const response = await axios.get("/institution/payment-accounts/banks", {
+        params: {
+          country: "nigeria",
+          currency: formData.currency === "NGN" ? "NGN" : undefined,
+        },
+      });
+
+      if (response.data.status === "success") {
+        // Sort banks alphabetically for better user experience
+        const sortedBanks = (response.data.data || []).sort((a, b) =>
+          a.name.localeCompare(b.name)
+        );
+        setBanks(sortedBanks);
+      } else {
+        toast.error("Failed to load bank list");
+      }
+    } catch (error) {
+      console.error("Error fetching banks:", error);
+      toast.error(error.response?.data?.message || "Failed to load bank list");
+    } finally {
+      setLoadingBanks(false);
+    }
+  };
+
+  // Debounce verification to prevent too many API calls
+  const debouncedVerify = useCallback(
+    debounce(async (accountNumber, bankCode) => {
+      if (!accountNumber || !bankCode) return;
+
+      setVerifying(true);
+      setVerified(false);
+      try {
+        const response = await axios.post(
+          "/institution/payment-accounts/verify-account",
+          {
+            account_number: accountNumber,
+            bank_code: bankCode,
+          }
+        );
+
+        if (response.data.status === "success") {
+          toast.success("Account verified successfully");
+          setVerified(true);
+          setFormData(prev => ({
+            ...prev,
+            account_name: response.data.data.account_name
+          }));
+        } else {
+          toast.error(response.data.message || "Failed to verify account");
+          setVerified(false);
+        }
+      } catch (error) {
+        console.error("Error verifying account:", error);
+        const errorMessage =
+          error.response?.data?.message ||
+          error.response?.data?.error?.message ||
+          "Failed to verify account. Please check the details and try again.";
+        toast.error(errorMessage);
+        setVerified(false);
+      } finally {
+        setVerifying(false);
+      }
+    }, 500), // 500ms debounce delay
+    [] // Empty dependency array since we don't need any dependencies
+  );
+
   const handleOpenModal = (account = null) => {
+    setVerified(false);
     if (account) {
       setFormData({
         account_name: account.account_name,
         account_number: account.account_number,
         bank_name: account.bank_name,
-        bank_branch: account.bank_branch,
+        bank_branch: account.bank_branch || "",
         account_type: account.account_type,
-        currency: account.currency || "USD",
-        swift_code: account.swift_code || ""
+        currency: account.currency || "NGN",
+        swift_code: account.swift_code || "",
+        bank_code: account.bank_code || "",
       });
       setEditId(account.id);
     } else {
@@ -104,8 +187,9 @@ export default function PaymentAccounts() {
         bank_name: "",
         bank_branch: "",
         account_type: "savings",
-        currency: "USD",
-        swift_code: ""
+        currency: "NGN",
+        swift_code: "",
+        bank_code: "",
       });
       setEditId(null);
     }
@@ -113,22 +197,62 @@ export default function PaymentAccounts() {
   };
 
   const handleInputChange = (key, value) => {
+    setFormData((prev) => {
+      const newData = {
+        ...prev,
+        [key]: value,
+      };
+
+      // Reset verification if account number or bank code changes
+      if (key === "account_number" || key === "bank_code") {
+        setVerified(false);
+        
+        // Automatically trigger verification if both fields are filled
+        if (newData.account_number && newData.bank_code) {
+          debouncedVerify(newData.account_number, newData.bank_code);
+        }
+      }
+
+      return newData;
+    });
+
+    // If currency changes, reload the bank list
+    if (key === "currency") {
+      setBanks([]);
+      fetchBanks();
+    }
+  };
+
+  const handleBankSelect = (bankCode) => {
+    const selectedBank = banks.find((bank) => bank.code === bankCode);
     setFormData({
       ...formData,
-      [key]: value
+      bank_code: bankCode,
+      bank_name: selectedBank ? selectedBank.name : "",
     });
+    setVerified(false);
   };
 
   const handleSubmit = async () => {
+    // For Nigerian banks, require verification first
+    if (formData.currency === "NGN" && !verified && !editId) {
+      toast.error("Please verify the account details first");
+      return;
+    }
+
     setSubmitting(true);
     try {
+      const payload = {
+        ...formData,
+      };
+
       if (editId) {
         // Update existing account
-        await axios.post(`/institution/payment-accounts/${editId}`, formData);
+        await axios.put(`/institution/payment-accounts/${editId}`, payload);
         toast.success("Payment account updated successfully");
       } else {
         // Create new account
-        await axios.post("/institution/payment-accounts", formData);
+        await axios.post("/institution/payment-accounts", payload);
         toast.success("Payment account created successfully");
       }
       onClose();
@@ -170,7 +294,6 @@ export default function PaymentAccounts() {
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-semibold">Payment Accounts</h2>
         <Button
-          // color="primary"
           className="bg-bChkRed text-white"
           startContent={<FaPlus />}
           onClick={() => handleOpenModal()}
@@ -184,7 +307,7 @@ export default function PaymentAccounts() {
           <Spinner size="lg" />
         </div>
       ) : (
-        <>
+        <div>
           <Table aria-label="Payment Accounts">
             <TableHeader>
               <TableColumn>ACCOUNT NAME</TableColumn>
@@ -192,6 +315,7 @@ export default function PaymentAccounts() {
               <TableColumn>ACCOUNT NUMBER</TableColumn>
               <TableColumn>ACCOUNT TYPE</TableColumn>
               <TableColumn>CURRENCY</TableColumn>
+              <TableColumn>STATUS</TableColumn>
               <TableColumn>ACTIONS</TableColumn>
             </TableHeader>
             <TableBody emptyContent="No payment accounts found">
@@ -207,10 +331,22 @@ export default function PaymentAccounts() {
                   <TableCell>{account.account_number}</TableCell>
                   <TableCell>
                     <Chip size="sm" variant="flat" color="primary">
-                      {account.account_type.charAt(0).toUpperCase() + account.account_type.slice(1)}
+                      {account.account_type.charAt(0).toUpperCase() +
+                        account.account_type.slice(1)}
                     </Chip>
                   </TableCell>
-                  <TableCell>{account.currency || "USD"}</TableCell>
+                  <TableCell>{account.currency || "NGN"}</TableCell>
+                  <TableCell>
+                    {account.recipient_code ? (
+                      <Chip size="sm" variant="flat" color="success">
+                        Verified
+                      </Chip>
+                    ) : (
+                      <Chip size="sm" variant="flat" color="warning">
+                        Unverified
+                      </Chip>
+                    )}
+                  </TableCell>
                   <TableCell>
                     <div className="flex gap-2">
                       <Button
@@ -245,7 +381,7 @@ export default function PaymentAccounts() {
               />
             </div>
           )}
-        </>
+        </div>
       )}
 
       {/* Add/Edit Modal */}
@@ -258,15 +394,54 @@ export default function PaymentAccounts() {
               </ModalHeader>
               <ModalBody>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <Input
-                    label="Account Name"
-                    placeholder="Enter account name"
-                    value={formData.account_name}
+                  <Select
+                    label="Currency"
+                    placeholder="Select currency"
+                    value={formData.currency}
                     onChange={(e) =>
-                      handleInputChange("account_name", e.target.value)
+                      handleInputChange("currency", e.target.value)
                     }
                     isRequired
-                  />
+                    className="col-span-2 md:col-span-1"
+                  >
+                    {currencies.map((currency) => (
+                      <SelectItem key={currency.value} value={currency.value}>
+                        {currency.label}
+                      </SelectItem>
+                    ))}
+                  </Select>
+
+                  {formData.currency === "NGN" ? (
+                    <Select
+                      label="Bank"
+                      placeholder="Select bank"
+                      value={formData.bank_code}
+                      onChange={(e) => handleBankSelect(e.target.value)}
+                      isRequired
+                      isLoading={loadingBanks}
+                      isDisabled={verifying || loadingBanks}
+                      color={verified ? "success" : undefined}
+                      className="col-span-2 md:col-span-1"
+                    >
+                      {banks.map((bank) => (
+                        <SelectItem key={bank.code} value={bank.code}>
+                          {bank.name}
+                        </SelectItem>
+                      ))}
+                    </Select>
+                  ) : (
+                    <Input
+                      label="Bank Name"
+                      placeholder="Enter bank name"
+                      value={formData.bank_name}
+                      onChange={(e) =>
+                        handleInputChange("bank_name", e.target.value)
+                      }
+                      isRequired
+                      className="col-span-2 md:col-span-1"
+                    />
+                  )}
+
                   <Input
                     label="Account Number"
                     placeholder="Enter account number"
@@ -275,16 +450,24 @@ export default function PaymentAccounts() {
                       handleInputChange("account_number", e.target.value)
                     }
                     isRequired
+                    isDisabled={verifying}
+                    description={verifying ? "Verifying account..." : ""}
+                    color={verified ? "success" : undefined}
+                    className="col-span-2 md:col-span-1"
                   />
+
                   <Input
-                    label="Bank Name"
-                    placeholder="Enter bank name"
-                    value={formData.bank_name}
+                    label="Account Name"
+                    placeholder="Enter account name"
+                    value={formData.account_name}
                     onChange={(e) =>
-                      handleInputChange("bank_name", e.target.value)
+                      handleInputChange("account_name", e.target.value)
                     }
                     isRequired
+                    isReadOnly={formData.currency === "NGN" && verified}
+                    className="col-span-2 md:col-span-1"
                   />
+
                   <Input
                     label="Bank Branch"
                     placeholder="Enter bank branch"
@@ -293,15 +476,18 @@ export default function PaymentAccounts() {
                       handleInputChange("bank_branch", e.target.value)
                     }
                     isRequired
+                    className="col-span-2 md:col-span-1"
                   />
+
                   <Select
                     label="Account Type"
                     placeholder="Select account type"
-                    selectedKeys={[formData.account_type]}
+                    value={formData.account_type}
                     onChange={(e) =>
                       handleInputChange("account_type", e.target.value)
                     }
                     isRequired
+                    className="col-span-2 md:col-span-1"
                   >
                     {accountTypes.map((type) => (
                       <SelectItem key={type.value} value={type.value}>
@@ -309,21 +495,7 @@ export default function PaymentAccounts() {
                       </SelectItem>
                     ))}
                   </Select>
-                  <Select
-                    label="Currency"
-                    placeholder="Select currency"
-                    selectedKeys={[formData.currency]}
-                    onChange={(e) =>
-                      handleInputChange("currency", e.target.value)
-                    }
-                    isRequired
-                  >
-                    {currencies.map((currency) => (
-                      <SelectItem key={currency.value} value={currency.value}>
-                        {currency.label}
-                      </SelectItem>
-                    ))}
-                  </Select>
+
                   <Input
                     label="SWIFT Code (Optional)"
                     placeholder="Enter SWIFT code for international transfers"
@@ -331,19 +503,32 @@ export default function PaymentAccounts() {
                     onChange={(e) =>
                       handleInputChange("swift_code", e.target.value)
                     }
-                    className="md:col-span-2"
+                    className="col-span-2"
                   />
                 </div>
+
+                {formData.currency === "NGN" && !editId && (
+                  <div className="mt-2 text-sm text-gray-500">
+                    <p className="font-semibold">Note:</p>
+                    <p>
+                      Nigerian bank accounts must be verified before saving.
+                      This helps ensure your payouts will be processed
+                      correctly.
+                    </p>
+                  </div>
+                )}
               </ModalBody>
               <ModalFooter>
                 <Button variant="flat" onPress={onClose}>
                   Cancel
                 </Button>
                 <Button
-                  // color="primary"
                   className="bg-bChkRed text-white"
                   onPress={handleSubmit}
                   isLoading={submitting}
+                  isDisabled={
+                    formData.currency === "NGN" && !verified && !editId
+                  }
                 >
                   {editId ? "Update" : "Save"}
                 </Button>
@@ -362,7 +547,8 @@ export default function PaymentAccounts() {
               <ModalBody>
                 <p>Are you sure you want to delete this payment account?</p>
                 <p className="text-sm text-gray-500 mt-2">
-                  This action cannot be undone.
+                  This action cannot be undone. This will also remove the
+                  account from Paystack.
                 </p>
               </ModalBody>
               <ModalFooter>
@@ -370,7 +556,6 @@ export default function PaymentAccounts() {
                   Cancel
                 </Button>
                 <Button
-                  // color="danger"
                   className="bg-bChkRed text-white"
                   onPress={handleDelete}
                   isLoading={submitting}
