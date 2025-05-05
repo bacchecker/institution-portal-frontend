@@ -61,14 +61,21 @@ export default function PaymentAccounts() {
     { value: "domiciliary", label: "Domiciliary Account" },
   ];
 
+  const countries = [
+    { value: "nigeria", label: "Nigeria", currency: "NGN" },
+    { value: "ghana", label: "Ghana", currency: "GHS" },
+    { value: "kenya", label: "Kenya", currency: "KES" },
+    { value: "south africa", label: "South Africa", currency: "ZAR" },
+  ];
+
   const currencies = [
     { value: "NGN", label: "Nigerian Naira (NGN)" },
-    { value: "USD", label: "US Dollar (USD)" },
-    { value: "EUR", label: "Euro (EUR)" },
-    { value: "GBP", label: "British Pound (GBP)" },
     { value: "GHS", label: "Ghanaian Cedi (GHS)" },
     { value: "KES", label: "Kenyan Shilling (KES)" },
     { value: "ZAR", label: "South African Rand (ZAR)" },
+    { value: "USD", label: "US Dollar (USD)" },
+    { value: "EUR", label: "Euro (EUR)" },
+    { value: "GBP", label: "British Pound (GBP)" },
   ];
 
   useEffect(() => {
@@ -97,13 +104,21 @@ export default function PaymentAccounts() {
     }
   };
 
-  const fetchBanks = async () => {
+  const [selectedCountry, setSelectedCountry] = useState("nigeria");
+
+  const fetchBanks = useCallback(async (country = null, currency = null) => {
     setLoadingBanks(true);
     try {
+      // Use provided country/currency or fall back to state values
+      const countryToUse = country || selectedCountry;
+      const currencyToUse = currency || formData.currency;
+      
+      console.log('Fetching banks for:', { country: countryToUse, currency: currencyToUse });
+      
       const response = await axios.get("/institution/payment-accounts/banks", {
         params: {
-          country: "nigeria",
-          currency: formData.currency === "NGN" ? "NGN" : undefined,
+          country: countryToUse,
+          currency: currencyToUse,
         },
       });
 
@@ -122,12 +137,12 @@ export default function PaymentAccounts() {
     } finally {
       setLoadingBanks(false);
     }
-  };
+  }, [selectedCountry, formData.currency]);
 
   // Debounce verification to prevent too many API calls
   const debouncedVerify = useCallback(
     debounce(async (accountNumber, bankCode) => {
-      if (!accountNumber || !bankCode) return;
+      if (!accountNumber || !bankCode || !selectedCountry) return;
 
       setVerifying(true);
       setVerified(false);
@@ -137,50 +152,100 @@ export default function PaymentAccounts() {
           {
             account_number: accountNumber,
             bank_code: bankCode,
+            country: selectedCountry,
           }
         );
 
         if (response.data.status === "success") {
-          toast.success("Account verified successfully");
           setVerified(true);
-          setFormData(prev => ({
+          setFormData((prev) => ({
             ...prev,
-            account_name: response.data.data.account_name
+            account_name: response.data.data.account_name,
           }));
+          toast.success("Account verified successfully");
         } else {
           toast.error(response.data.message || "Failed to verify account");
-          setVerified(false);
         }
       } catch (error) {
         console.error("Error verifying account:", error);
-        const errorMessage =
-          error.response?.data?.message ||
-          error.response?.data?.error?.message ||
-          "Failed to verify account. Please check the details and try again.";
-        toast.error(errorMessage);
-        setVerified(false);
+        toast.error(
+          error.response?.data?.message || "Failed to verify account"
+        );
       } finally {
         setVerifying(false);
       }
-    }, 500), // 500ms debounce delay
-    [] // Empty dependency array since we don't need any dependencies
+    }, 500),
+    [selectedCountry]
+  );
+
+  const handleInputChange = useCallback((key, value) => {
+    setFormData((prev) => {
+      const newData = {
+        ...prev,
+        [key]: value,
+      };
+
+      // If account number or bank code changes, trigger verification
+      if (
+        (key === "account_number" || key === "bank_code") &&
+        newData.bank_code &&
+        newData.account_number
+      ) {
+        debouncedVerify(newData.account_number, newData.bank_code);
+      }
+
+      // If currency changes, reload the bank list
+      if (key === "currency") {
+        setBanks([]);
+        fetchBanks();
+      }
+
+      return newData;
+    });
+  }, [debouncedVerify, fetchBanks]);
+
+  const handleCountryChange = useCallback(
+    (country) => {
+      const selectedCountryData = countries.find((c) => c.value === country);
+      if (selectedCountryData) {
+        // Clear banks and reset verification first
+        setBanks([]);
+        setVerified(false);
+        
+        // Get the currency for this country
+        const newCurrency = selectedCountryData.currency;
+        
+        // Update state
+        setSelectedCountry(country);
+        setFormData((prev) => ({
+          ...prev,
+          currency: newCurrency,
+        }));
+        
+        // Fetch banks with the new country and currency directly
+        // This ensures we use the new values immediately
+        fetchBanks(country, newCurrency);
+      }
+    },
+    [countries, fetchBanks]
   );
 
   const handleOpenModal = (account = null) => {
-    setVerified(false);
     if (account) {
+      setEditId(account.id);
       setFormData({
         account_name: account.account_name,
         account_number: account.account_number,
         bank_name: account.bank_name,
-        bank_branch: account.bank_branch || "",
+        bank_branch: account.bank_branch,
         account_type: account.account_type,
-        currency: account.currency || "NGN",
+        currency: account.currency,
         swift_code: account.swift_code || "",
-        bank_code: account.bank_code || "",
+        bank_code: account.bank_code,
       });
-      setEditId(account.id);
+      setVerified(true); // Account is already verified if it exists
     } else {
+      setEditId(null);
       setFormData({
         account_name: "",
         account_number: "",
@@ -191,36 +256,9 @@ export default function PaymentAccounts() {
         swift_code: "",
         bank_code: "",
       });
-      setEditId(null);
+      setVerified(false);
     }
     onOpen();
-  };
-
-  const handleInputChange = (key, value) => {
-    setFormData((prev) => {
-      const newData = {
-        ...prev,
-        [key]: value,
-      };
-
-      // Reset verification if account number or bank code changes
-      if (key === "account_number" || key === "bank_code") {
-        setVerified(false);
-        
-        // Automatically trigger verification if both fields are filled
-        if (newData.account_number && newData.bank_code) {
-          debouncedVerify(newData.account_number, newData.bank_code);
-        }
-      }
-
-      return newData;
-    });
-
-    // If currency changes, reload the bank list
-    if (key === "currency") {
-      setBanks([]);
-      fetchBanks();
-    }
   };
 
   const handleBankSelect = (bankCode) => {
@@ -395,6 +433,21 @@ export default function PaymentAccounts() {
               <ModalBody>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <Select
+                    label="Country"
+                    placeholder="Select country"
+                    value={selectedCountry}
+                    onChange={(e) => handleCountryChange(e.target.value)}
+                    isRequired
+                    className="col-span-2"
+                  >
+                    {countries.map((country) => (
+                      <SelectItem key={country.value} value={country.value}>
+                        {country.label}
+                      </SelectItem>
+                    ))}
+                  </Select>
+
+                  <Select
                     label="Currency"
                     placeholder="Select currency"
                     value={formData.currency}
@@ -402,7 +455,8 @@ export default function PaymentAccounts() {
                       handleInputChange("currency", e.target.value)
                     }
                     isRequired
-                    className="col-span-2 md:col-span-1"
+                    isDisabled={!selectedCountry}
+                    className="col-span-2"
                   >
                     {currencies.map((currency) => (
                       <SelectItem key={currency.value} value={currency.value}>
@@ -411,7 +465,7 @@ export default function PaymentAccounts() {
                     ))}
                   </Select>
 
-                  {formData.currency === "NGN" ? (
+                  {selectedCountry ? (
                     <Select
                       label="Bank"
                       placeholder="Select bank"
@@ -507,11 +561,11 @@ export default function PaymentAccounts() {
                   />
                 </div>
 
-                {formData.currency === "NGN" && !editId && (
+                {selectedCountry && !editId && (
                   <div className="mt-2 text-sm text-gray-500">
                     <p className="font-semibold">Note:</p>
                     <p>
-                      Nigerian bank accounts must be verified before saving.
+                      Bank accounts must be verified before saving.
                       This helps ensure your payouts will be processed
                       correctly.
                     </p>
@@ -527,7 +581,7 @@ export default function PaymentAccounts() {
                   onPress={handleSubmit}
                   isLoading={submitting}
                   isDisabled={
-                    formData.currency === "NGN" && !verified && !editId
+                    selectedCountry && !verified && !editId
                   }
                 >
                   {editId ? "Update" : "Save"}
