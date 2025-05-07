@@ -299,7 +299,7 @@ function Login() {
           <h4 className="md:text-[1vw] text-[3.5vw] md:my-[1vw!important] my-[3vw!important]">
             Don’t have an account?
             <Link
-              to="https://client-dev.baccheck.online/sign-up"
+              to={import.meta.env.VITE_CLIENT_URL + "/sign-up"}
               className="text-[#ff0404] ml-[0.2rem]"
             >
               <span className="text-[#ff0000] ml-[0.5vw]">Sign Up</span>

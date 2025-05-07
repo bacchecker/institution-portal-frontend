@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from "react";
 import axios from "@/utils/axiosConfig";
-import axiosDef from 'axios';
+import axiosDef from "axios";
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
-import {
-  FaCreditCard,
-  FaCrown,
-} from "react-icons/fa6";
+import { FaCreditCard, FaCrown } from "react-icons/fa6";
 import { RiAddBoxFill, RiAlarmWarningFill } from "react-icons/ri";
 import { HiMiniUsers } from "react-icons/hi2";
-import { IoIosArrowDroprightCircle, IoIosStar, IoMdTrendingUp } from "react-icons/io";
+import {
+  IoIosArrowDroprightCircle,
+  IoIosStar,
+  IoMdTrendingUp,
+} from "react-icons/io";
 import moment from "moment";
 import {
   LineChart,
@@ -35,7 +36,7 @@ export default function Dashboard() {
   const [sentRequest, setSentRequest] = useState(0);
   const [subscription, setSubscription] = useState("");
   const [currentPackage, setCurrentPackage] = useState("");
-  const [preferredPlatform, setPreferredPlatform] = useState("stripe");
+  const [preferredPlatform, setPreferredPlatform] = useState("paystack");
   const [creditValue, setCreditValue] = useState(0);
   const [tab, setTab] = useState("day");
   const [plans, setPlans] = useState([]);
@@ -49,12 +50,17 @@ export default function Dashboard() {
   const [openPaymentDrawer, setOpenPaymentDrawer] = useState(false);
   const [countryNames, setCountryNames] = useState([]);
   const userInstData = JSON.parse(secureLocalStorage.getItem("user") || "{}");
-  const [instBill, setInstBill] = useState(userInstData?.institution?.billing_address || "");
-
+  const [instBill, setInstBill] = useState(
+    userInstData?.institution?.billing_address || ""
+  );
 
   const [clientSecret, setClientSecret] = useState(null);
   const [showStripeForm, setShowStripeForm] = useState(false);
-  const stripePromise = loadStripe("pk_test_51R6UPMGfpcTSeSCYZFlk5zGIgl2l7xEV0IcNTEmi0XObDS3DfbRCQOKiBZjOdaSOGxDvpIykgAI1OKh3xn6Oq1ty00rF3VL1NJ");
+  const [checked, setChecked] = useState(false);
+  //const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
+  const stripePromise = loadStripe(
+    "pk_test_51QwBccH83VZsct6SO27tERuGE1I5mPFIB6BUoZNrdcr1VPPhCf5aTZtzMMXR5ORBjFrejCcTexxJaCyKUGAtQmJq00uoUnSctK"
+  );
   // Payment States
   const [selectedPayment, setSelectedPayment] = useState("card");
   const [paymentDetails, setPaymentDetails] = useState({
@@ -73,6 +79,23 @@ export default function Dashboard() {
   const [lastPage, setLastPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
   
+  const handleEcheckChange = async (e) => {
+    const isChecked = e.target.checked;
+    setChecked(isChecked);
+
+    if (isChecked) {
+      setLoading(true);
+      try {
+        const response = await axios.post("/institution/dont-show-echeck-modal");
+        toast.success(response.data.message);
+      } catch (error) {
+        toast.error("Failed to update eCheck modal setting:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
   useEffect(() => {
     setPaymentData(paymentData);
   }, [paymentData]);
@@ -91,7 +114,7 @@ export default function Dashboard() {
     }
   }, [preferredPlatform]);
 
-   useEffect(() => {
+  useEffect(() => {
     axiosDef
       .get("https://restcountries.com/v3.1/all?fields=cca2,idd,name")
       .then((res) => {
@@ -100,23 +123,38 @@ export default function Dashboard() {
             name: country.name.common,
           }))
           .sort((a, b) => a.name.localeCompare(b.name));
-        setCountryNames(names);        
+        setCountryNames(names);
       })
       .catch((err) => console.error("Error fetching countries:", err));
-    }, []);
+  }, []);
 
   const pages = [
     <div className="w-full flex flex-col justify-center h-full">
       <div className="w-full bg-black rounded-md h-48"></div>
-      <button
-        type="button"
-        onClick={() => {
-          setOpenDrawer(false);
-        }}
-        className="w-full flex justify-end mt-1 font-normal underline"
-      >
-        Skip
-      </button>
+      <div className="w-full flex justify-between">
+        {checked == 0 && (
+          <label className="w-full flex items-center space-x-2 cursor-pointer mt-1">
+            <input
+              type="checkbox"
+              checked={checked}
+              onChange={handleEcheckChange}
+              className="form-checkbox accent-bChkRed"
+            />
+            <span className=" text-bChkRed">Don't show this again</span>
+          </label>
+        )}
+        
+        <button
+          type="button"
+          onClick={() => {
+            setOpenDrawer(false);
+          }}
+          className="w-full flex justify-end mt-1 font-normal underline"
+        >
+          Skip
+        </button>
+      </div>
+      
       <div className="font-normal">
         <p className="font-semibold text-black my-3 text-lg">
           Welcome to E-Check
@@ -258,7 +296,9 @@ export default function Dashboard() {
                 <p className="font-semibold text-base text-center">
                   GH₵ {plan?.amount}
                 </p>
-                <p className="font-light text-center -mt-1">{plan?.expires_in} Days</p>
+                <p className="font-light text-center -mt-1">
+                  {plan?.expires_in} Days
+                </p>
               </div>
               <div className="my-2">
                 <p className="font-semibold text-xs">Description</p>
@@ -270,11 +310,14 @@ export default function Dashboard() {
                 <p className="font-semibold">Package Benefits</p>
                 <div className="flex space-x-1.5 text-xs">
                   <IoIosStar className="text-yellow-500" />
-                  <p>{plan?.number_of_departments} Departments {plan?.number_of_users} Users</p>
+                  <p>
+                    {plan?.number_of_departments} Departments{" "}
+                    {plan?.number_of_users} Users
+                  </p>
                 </div>
                 <div className="flex space-x-1.5 text-xs">
-                    <IoIosStar className="text-yellow-500" />
-                    <p>{plan?.credit} Credits</p>
+                  <IoIosStar className="text-yellow-500" />
+                  <p>{plan?.credit} Credits</p>
                 </div>
                 <div className="flex space-x-1.5 text-xs">
                   <IoIosStar className="text-yellow-500" />
@@ -291,9 +334,10 @@ export default function Dashboard() {
                     <RiAlarmWarningFill />
                     Note
                   </div>
-                  You are subscribed to this package, you cannot choose the same plan
+                  You are subscribed to this package, you cannot choose the same
+                  plan
                 </div>
-              ):(
+              ) : (
                 <button
                   type="button"
                   onClick={() => {
@@ -307,7 +351,6 @@ export default function Dashboard() {
                   Choose Plan
                 </button>
               )}
-              
             </div>
           ))}
         </div>
@@ -339,13 +382,16 @@ export default function Dashboard() {
             },
           }
         );
+        console.log(response.data);
+
         setRecentVerifications(response.data.recent_verifications);
         setSentRequest(response.data.sent_requests);
         setReceivedRequest(response.data.received_requests);
         setSubscription(response.data.subscription);
-        const currentPackage = typeof response.data.current_package === 'string'
-          ? response.data.current_package
-          : response.data.current_package?.name;
+        const currentPackage =
+          typeof response.data.current_package === "string"
+            ? response.data.current_package
+            : response.data.current_package?.name;
 
         setCurrentPackage(currentPackage);
         setCreditValue(response.data.current_package?.topup_credit_value);
@@ -390,11 +436,16 @@ export default function Dashboard() {
 
       const totalCredit = subscription?.subscription?.total_credit || 0;
       const inRequest = subscription?.received_requests || 0;
-      
-      if (totalCredit < 1 && inRequest < 1) {
+      const dontShow = subscription?.institution?.echeck_modal || 0;
+
+      if (totalCredit < 1 && inRequest < 1 && dontShow == 1) {
         setOpenDrawer(true);
       } else {
         setOpenDrawer(false);
+      }
+
+      if(dontShow == 0) {
+        setChecked(true);
       }
     };
     handleECheckModal();
@@ -423,16 +474,16 @@ export default function Dashboard() {
 
   const handleCreditChange = (e) => {
     const { name, value } = e.target;
-    
+
     // Ensure that only numbers are entered for credits
-    if (name === 'numberOfCredits' && !/^\d*$/.test(value)) {
+    if (name === "numberOfCredits" && !/^\d*$/.test(value)) {
       return; // Prevent non-numeric input
     }
-  
+
     setPaymentDetails((prevDetails) => ({
       ...prevDetails,
       [name]: value,
-      ...(name === 'numberOfCredits' && {
+      ...(name === "numberOfCredits" && {
         amount: value ? value * creditValue : 0, // Multiply credits by creditValue
       }),
     }));
@@ -441,7 +492,7 @@ export default function Dashboard() {
   const handleFormSubmit = async (e) => {
     e.preventDefault();
     setIsSaving(true);
-    if (selectedPayment === "card" && preferredPlatform == 'paystack') {
+    if (selectedPayment === "card" && preferredPlatform == "paystack") {
       if (!paymentDetails.cardNumber) {
         toast.error("Card details are required.");
         setIsSaving(false);
@@ -462,15 +513,16 @@ export default function Dashboard() {
       payment_type: "subscription",
       amount: paymentData?.amount,
       platform: preferredPlatform,
-      ...(selectedPayment === "card" && {
-        payment_method: 'card',
-        payment_detail: {
-          number: paymentDetails.cardNumber,
-          exp_month: paymentDetails.expiryMonth,
-          exp_year: paymentDetails.expiryYear,
-          cvc: paymentDetails.cvcCode,
-        },
-      }),
+      ...(selectedPayment === "card" &&
+        preferredPlatform === "paystack" && {
+          payment_method: "card",
+          payment_detail: {
+            number: paymentDetails.cardNumber,
+            exp_month: paymentDetails.expiryMonth,
+            exp_year: paymentDetails.expiryYear,
+            cvc: paymentDetails.cvcCode,
+          },
+        }),
       ...(selectedPayment === "mobile_money" && {
         payment_method: paymentDetails.mobileNetwork,
         payment_detail: paymentDetails.mobileNumber,
@@ -483,8 +535,7 @@ export default function Dashboard() {
         if (preferredPlatform === "paystack") {
           window.location.href = response?.data?.authorization_url;
         } else if (preferredPlatform === "stripe") {
-          setClientSecret(response.data.clientSecret);
-          setShowStripeForm(true);
+          window.location.href = response?.data?.url;
         }
       }
       setIsSaving(false);
@@ -497,7 +548,7 @@ export default function Dashboard() {
   const handleTopupSubmit = async (e) => {
     e.preventDefault();
     setIsSaving(true);
-    if (selectedPayment === "card" && preferredPlatform == 'paystack') {
+    if (selectedPayment === "card" && preferredPlatform == "paystack") {
       if (!paymentDetails.cardNumber) {
         toast.error("Card details are required.");
         setIsSaving(false);
@@ -520,15 +571,16 @@ export default function Dashboard() {
       bonus_amount: paymentDetails?.bonus_amount,
       credit_amount: paymentDetails?.numberOfCredits,
       platform: preferredPlatform,
-      ...(selectedPayment === "card" && preferredPlatform == 'paystack' &&  {
-        payment_method: 'card',
-        payment_detail: {
-          number: paymentDetails.cardNumber,
-          exp_month: paymentDetails.expiryMonth,
-          exp_year: paymentDetails.expiryYear,
-          cvc: paymentDetails.cvcCode,
-        },
-      }),
+      ...(selectedPayment === "card" &&
+        preferredPlatform == "paystack" && {
+          payment_method: "card",
+          payment_detail: {
+            number: paymentDetails.cardNumber,
+            exp_month: paymentDetails.expiryMonth,
+            exp_year: paymentDetails.expiryYear,
+            cvc: paymentDetails.cvcCode,
+          },
+        }),
       ...(selectedPayment === "mobile_money" && {
         payment_method: paymentDetails.mobileNetwork,
         payment_detail: paymentDetails.mobileNumber,
@@ -541,8 +593,7 @@ export default function Dashboard() {
         if (preferredPlatform === "paystack") {
           window.location.href = response?.data?.authorization_url;
         } else if (preferredPlatform === "stripe") {
-          setClientSecret(response.data.clientSecret);
-          setShowStripeForm(true);
+          window.location.href = response?.data?.url;
         }
       }
       //toast.success("Payment successful!");
@@ -564,22 +615,18 @@ export default function Dashboard() {
   return (
     <>
       <div className="bg-white text-sm w-full">
-        
         <div className="w-full flex justify-between pl-2">
           <button
             type="button"
             onClick={() => {
               setOpenDrawer(true);
             }}
-            className="border border-gray-400 flex space-x-1 items-center rounded-full px-3 py-1 uppercase text-sm text-gray-600"
+            className="bg-black flex space-x-1 items-center rounded-md px-3 py-1 uppercase text-sm text-white"
           >
-            
-            <p>
-              Learn More
-            </p>
-            <IoIosArrowDroprightCircle size={20}/>
+            <p>Learn More</p>
+            <IoIosArrowDroprightCircle size={20} />
           </button>
-          <div className=" flex justify-end pr-2 space-x-2">
+          {/* <div className=" flex justify-end pr-2 space-x-2">
             <button
               type="button"
               onClick={() => {
@@ -587,13 +634,14 @@ export default function Dashboard() {
               }}
               className="bg-black flex space-x-1 items-center rounded-md px-3 py-1 uppercase text-sm text-white"
             >
-              <GiUpgrade size={16}/>
+              <GiUpgrade size={16} />
               <p>
-                {currentPackage == "No Package" ? "Subscribe to a Package" : "Upgrade Package"}
+                {currentPackage == "No Package"
+                  ? "Subscribe to a Package"
+                  : "Upgrade Package"}
               </p>
-
             </button>
-            {currentPackage != "No Package" &&(
+            {currentPackage != "No Package" && (
               <button
                 type="button"
                 onClick={() => {
@@ -601,13 +649,11 @@ export default function Dashboard() {
                 }}
                 className="bg-bChkRed flex space-x-1 items-center rounded-md px-3 py-1 uppercase text-sm text-white"
               >
-                <RiAddBoxFill size={21}/>
+                <RiAddBoxFill size={21} />
                 <p>Top Up Credits</p>
               </button>
             )}
-          </div>
-          
-          
+          </div> */}
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 text-black gap-2 lg:gap-4 p-2">
           <div className="flex flex-col justify-center bg-yellow-100 rounded-md p-8">
@@ -651,32 +697,30 @@ export default function Dashboard() {
           <div className="flex flex-col justify-center bg-purple-200 rounded-md px-8 py-6">
             <div className="w-full flex justify-end mb-2">
               <div className="flex items-center space-x-2 text-green-600 bg-green-100 border border-green-600 rounded-full px-4 py-1">
-              <p>
-                {typeof currentPackage === 'string' && currentPackage !== 'No Package'
-                  ? currentPackage.split(' ').pop() === 'Package'
-                    ? currentPackage
-                    : `${currentPackage} Package`
-                  : 'No Package'}
-              </p>
+                <p>
+                  {typeof currentPackage === "string" &&
+                  currentPackage !== "No Package"
+                    ? currentPackage.split(" ").pop() === "Package"
+                      ? currentPackage
+                      : `${currentPackage} Package`
+                    : "No Package"}
+                </p>
 
-                <FaCrown size={20} className="text-yellow-400"/>
+                <FaCrown size={20} className="text-yellow-400" />
               </div>
             </div>
-              
+
             <div className="flex space-x-4">
               <div className="bg-purple-300 text-purple-500 h-10 w-12 rounded-full flex items-center justify-center">
                 <FaCreditCard size={16} />
               </div>
               <div className="flex flex-col space-y-1">
-                <p className="font-medium">
-                  E-check subscription balance
-                </p>
+                <p className="font-medium">E-check subscription balance</p>
                 <div className="w-full flex items-center justify-between">
                   <p className="text-black text-xl font-semibold">
-                    {subscription?.balance || 0} Credits
+                    {subscription?.credit_balance || 0} Credits
                   </p>
                 </div>
-                
               </div>
             </div>
           </div>
@@ -826,8 +870,10 @@ export default function Dashboard() {
             onClick={() => setOpenDrawer(false)} // Close modal when clicking outside
           >
             {/* Prevent click inside modal from closing it */}
-            <div className="h-[90vh] flex flex-col relative bg-white rounded-lg w-[98vw] md:w-[80vw] xl:w-[70vw] p-4" onClick={(e) => e.stopPropagation()}>
-              
+            <div
+              className="h-[90vh] flex flex-col relative bg-white rounded-lg w-[98vw] md:w-[80vw] xl:w-[70vw] p-4"
+              onClick={(e) => e.stopPropagation()}
+            >
               {/* Modal Content */}
               <div className="w-full mx-auto p-2 rounded-md flex-1 overflow-y-auto">
                 <div className="w-full rounded-lg overflow-hidden flex justify-center items-center">
@@ -858,7 +904,9 @@ export default function Dashboard() {
                       <div
                         key={index}
                         className={`w-8 h-1 transition-all rounded-xl ${
-                          currentPage - 1 === index ? "bg-bChkRed" : "bg-gray-200"
+                          currentPage - 1 === index
+                            ? "bg-bChkRed"
+                            : "bg-gray-200"
                         }`}
                       ></div>
                     ))}
@@ -972,7 +1020,9 @@ export default function Dashboard() {
                       <p className="font-semibold text-base text-center">
                         GH₵ {plan?.amount}
                       </p>
-                      <p className="font-light text-center -mt-1">{plan?.expires_in} Days</p>
+                      <p className="font-light text-center -mt-1">
+                        {plan?.expires_in} Days
+                      </p>
                     </div>
                     <div className="my-2">
                       <p className="font-semibold text-xs">Description</p>
@@ -984,11 +1034,14 @@ export default function Dashboard() {
                       <p className="font-semibold">Package Benefits</p>
                       <div className="flex space-x-1.5 text-xs">
                         <IoIosStar className="text-yellow-500" />
-                        <p>{plan?.number_of_departments} Departments {plan?.number_of_users} Users</p>
+                        <p>
+                          {plan?.number_of_departments} Departments{" "}
+                          {plan?.number_of_users} Users
+                        </p>
                       </div>
                       <div className="flex space-x-1.5 text-xs">
-                          <IoIosStar className="text-yellow-500" />
-                          <p>{plan?.credit} Credits</p>
+                        <IoIosStar className="text-yellow-500" />
+                        <p>{plan?.credit} Credits</p>
                       </div>
                       <div className="flex space-x-1.5 text-xs">
                         <IoIosStar className="text-yellow-500" />
@@ -1002,27 +1055,25 @@ export default function Dashboard() {
                     {currentPackage == plan?.name ? (
                       <div className="border border-bChkRed rounded-md text-xs p-2 text-gray-700 font-medium">
                         <div className="flex space-x-1 text-sm text-bChkRed font-semibold">
-                          <RiAlarmWarningFill size={16}/>
+                          <RiAlarmWarningFill size={16} />
                           <p className="self">Notice</p>
                         </div>
-                        You are subscribed to this package, you cannot choose the same plan
+                        You are subscribed to this package, you cannot choose
+                        the same plan
                       </div>
-                    ):(
+                    ) : (
                       <button
-                      type="button"
-                      onClick={() => {
-                        setPaymentData(plan);
-                        setOpenPaymentDrawer(true);
-                        setOpenSubDrawer(false);
-                      }}
-                      className="w-full hover:text-white text-gray-500 hover:bg-gray-500 bg-gray-300 rounded-md mt-6 py-2 text-xs"
-                    >
-                      Choose Plan
-                    </button>
-                    )
-
-                    }
-                    
+                        type="button"
+                        onClick={() => {
+                          setPaymentData(plan);
+                          setOpenPaymentDrawer(true);
+                          setOpenSubDrawer(false);
+                        }}
+                        className="w-full hover:text-white text-gray-500 hover:bg-gray-500 bg-gray-300 rounded-md mt-6 py-2 text-xs"
+                      >
+                        Choose Plan
+                      </button>
+                    )}
                   </div>
                 ))}
               </div>
@@ -1079,7 +1130,6 @@ export default function Dashboard() {
           classNames="w-[98vw] md:w-[80vw] xl:w-[60vw] z-10 rounded-md"
         >
           <div className="h-full flex flex-col relative p-4 text-black">
-            
             <form
               onSubmit={handleTopupSubmit}
               className="relative space-y-4 h-[85dvh] text-sm"
@@ -1100,9 +1150,7 @@ export default function Dashboard() {
                   </div>
                 </div>
                 <div className=" mt-4">
-                  <h4 className="md:text-[1vw] text-[4vw]">
-                    Bonus Credits
-                  </h4>
+                  <h4 className="md:text-[1vw] text-[4vw]">Bonus Credits</h4>
                   <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
                     <input
                       type="text"
@@ -1130,17 +1178,17 @@ export default function Dashboard() {
                     Billing Address
                   </h4>
                   <div className="relative w-full md:h-[2.7vw] h-[12vw] flex items-center border overflow-hidden bg-white rounded-md">
-                  <select
-                    className="w-full px-1 md:h-[2.7vw] h-[12vw] md:text-[1vw] text-[3.5vw] bg-white border-r border-gray-300 focus:outline-none rounded-md"
-                    value={instBill || ""}
-                    onChange={(e) => setInstBill(e.target.value)}
-                  >
-                    {countryNames.map((country) => (
-                      <option key={country.name} value={country.name}>
-                        {country.name}
-                      </option>
-                    ))}
-                  </select>
+                    <select
+                      className="w-full px-1 md:h-[2.7vw] h-[12vw] md:text-[1vw] text-[3.5vw] bg-white border-r border-gray-300 focus:outline-none rounded-md"
+                      value={instBill || ""}
+                      onChange={(e) => setInstBill(e.target.value)}
+                    >
+                      {countryNames.map((country) => (
+                        <option key={country.name} value={country.name}>
+                          {country.name}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                 </div>
                 {preferredPlatform == "paystack" && (
@@ -1162,33 +1210,33 @@ export default function Dashboard() {
                         Debit Card
                       </label>
                     </div>
-                    
-                      
-                      <div className="flex items-center">
-                        <input
-                          id="mobile-money-option"
-                          type="radio"
-                          name="payment"
-                          value="mobile_money"
-                          checked={selectedPayment === "mobile_money"}
-                          onChange={() => setSelectedPayment("mobile_money")}
-                          className="w-5 h-5 bg-gray-100 border-gray-300 accent-bChkRed"
-                        />
-                        <label
-                          htmlFor="mobile-money-option"
-                          className="ms-2 md:text-[1vw] text-[4vw] font-medium text-gray-900 dark:text-gray-300"
-                        >
-                          Mobile Wallet
-                        </label>
-                      </div>
-                    
+
+                    <div className="flex items-center">
+                      <input
+                        id="mobile-money-option"
+                        type="radio"
+                        name="payment"
+                        value="mobile_money"
+                        checked={selectedPayment === "mobile_money"}
+                        onChange={() => setSelectedPayment("mobile_money")}
+                        className="w-5 h-5 bg-gray-100 border-gray-300 accent-bChkRed"
+                      />
+                      <label
+                        htmlFor="mobile-money-option"
+                        className="ms-2 md:text-[1vw] text-[4vw] font-medium text-gray-900 dark:text-gray-300"
+                      >
+                        Mobile Wallet
+                      </label>
+                    </div>
                   </div>
                 )}
                 {preferredPlatform === "stripe" && (
                   <div className="p-[2px] rounded-xl bg-gradient-to-r from-bChkRed to-black mt-4">
                     <div
                       className={`relative p-4 w-full bg-white cursor-pointer rounded-lg ${
-                        selectedPayment === "card" ? "border-gradient-to-r from-bChkRed to-black" : "border-gray-300"
+                        selectedPayment === "card"
+                          ? "border-gradient-to-r from-bChkRed to-black"
+                          : "border-gray-300"
                       }`}
                       onClick={() => setSelectedPayment("card")}
                     >
@@ -1201,90 +1249,101 @@ export default function Dashboard() {
                         onChange={() => setSelectedPayment("card")}
                         className="absolute top-2 left-2 w-5 h-5 accent-bChkRed"
                       />
-                      <label htmlFor="stripe-card" className="block h-full w-full pl-8">
+                      <label
+                        htmlFor="stripe-card"
+                        className="block h-full w-full pl-8"
+                      >
                         <div className="font-bold text-[1.2vw]">Debit Card</div>
-                        <div className="text-gray-500 text-[0.9vw] mt-1">Pay with Visa / MasterCard</div>
+                        <div className="text-gray-500 text-[0.9vw] mt-1">
+                          Pay with Visa / MasterCard
+                        </div>
                       </label>
                     </div>
                   </div>
                 )}
-
               </div>
 
               {/* Additional Fields for Card Payment */}
-              {selectedPayment === "card" && preferredPlatform === "paystack" && (
-                <div className="">
-                  <div className="mb-4">
-                    <h4 className="md:text-[1vw] text-[4vw] mb-1">
-                      Card Number
-                    </h4>
-                    <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
-                      <input
-                        type="text"
-                        name="cardNumber"
-                        value={paymentDetails.cardNumber}
-                        onChange={handleInputChange}
-                        className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-white absolute left-0 right-0 bottom-0 top-0"
-                      />
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                    <div className="">
-                      <h4 className="md:text-[1vw] text-[4vw] mb-1">Expiration Date</h4>
-                      <div className="flex gap-2">
-                        {/* Expiry Month */}
-                        <div className="relative w-1/2 md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
-                          <input
-                            type="number"
-                            name="expiryMonth"
-                            placeholder="MM"
-                            value={paymentDetails.expiryMonth}
-                            onChange={(e) => {
-                              let value = e.target.value;
-                              if (value.length <= 2) {
-                                if (value > 12) value = "12"; // Restrict to 12 max
-                                if (value < 1 && value !== "") value = "01"; // Restrict to 01 min
-                                handleInputChange({ target: { name: "expiryMonth", value } });
-                              }
-                            }}
-                            className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-white absolute left-0 right-0 bottom-0 top-0 text-center"
-                          />
-                        </div>
-
-                        {/* Expiry Year */}
-                        <div className="relative w-1/2 md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
-                          <input
-                            type="number"
-                            name="expiryYear"
-                            placeholder="YYYY"
-                            value={paymentDetails.expiryYear}
-                            onChange={(e) => {
-                              let value = e.target.value;
-                              if (value.length <= 4) {
-                                handleInputChange({ target: { name: "expiryYear", value } });
-                              }
-                            }}
-                            className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-white absolute left-0 right-0 bottom-0 top-0 text-center"
-                          />
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="">
-                      <h4 className="md:text-[1vw] text-[4vw] mb-1">CVC</h4>
+              {selectedPayment === "card" &&
+                preferredPlatform === "paystack" && (
+                  <div className="">
+                    <div className="mb-4">
+                      <h4 className="md:text-[1vw] text-[4vw] mb-1">
+                        Card Number
+                      </h4>
                       <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
                         <input
                           type="text"
-                          name="cvcCode"
-                          value={paymentDetails.cvcCode}
+                          name="cardNumber"
+                          value={paymentDetails.cardNumber}
                           onChange={handleInputChange}
                           className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-white absolute left-0 right-0 bottom-0 top-0"
                         />
                       </div>
                     </div>
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                      <div className="">
+                        <h4 className="md:text-[1vw] text-[4vw] mb-1">
+                          Expiration Date
+                        </h4>
+                        <div className="flex gap-2">
+                          {/* Expiry Month */}
+                          <div className="relative w-1/2 md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
+                            <input
+                              type="number"
+                              name="expiryMonth"
+                              placeholder="MM"
+                              value={paymentDetails.expiryMonth}
+                              onChange={(e) => {
+                                let value = e.target.value;
+                                if (value.length <= 2) {
+                                  if (value > 12) value = "12"; // Restrict to 12 max
+                                  if (value < 1 && value !== "") value = "01"; // Restrict to 01 min
+                                  handleInputChange({
+                                    target: { name: "expiryMonth", value },
+                                  });
+                                }
+                              }}
+                              className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-white absolute left-0 right-0 bottom-0 top-0 text-center"
+                            />
+                          </div>
+
+                          {/* Expiry Year */}
+                          <div className="relative w-1/2 md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
+                            <input
+                              type="number"
+                              name="expiryYear"
+                              placeholder="YYYY"
+                              value={paymentDetails.expiryYear}
+                              onChange={(e) => {
+                                let value = e.target.value;
+                                if (value.length <= 4) {
+                                  handleInputChange({
+                                    target: { name: "expiryYear", value },
+                                  });
+                                }
+                              }}
+                              className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-white absolute left-0 right-0 bottom-0 top-0 text-center"
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="">
+                        <h4 className="md:text-[1vw] text-[4vw] mb-1">CVC</h4>
+                        <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
+                          <input
+                            type="text"
+                            name="cvcCode"
+                            value={paymentDetails.cvcCode}
+                            onChange={handleInputChange}
+                            className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-white absolute left-0 right-0 bottom-0 top-0"
+                          />
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
 
               {clientSecret && preferredPlatform === "stripe" && (
                 <Elements stripe={stripePromise} options={{ clientSecret }}>
@@ -1294,15 +1353,16 @@ export default function Dashboard() {
                     classNames="w-[100vw] bg-red-600 md:w-[80vw] lg:w-[60vw] z-50 rounded-sm"
                   >
                     <div className="p-4">
-                      <StripeCheckoutForm onSuccess={() => {
-                        setShowStripeForm(false);
-                        setClientSecret(null);
-                      }} />
+                      <StripeCheckoutForm
+                        onSuccess={() => {
+                          setShowStripeForm(false);
+                          setClientSecret(null);
+                        }}
+                      />
                     </div>
                   </Modal>
                 </Elements>
               )}
-
 
               {/* Additional Fields for Mobile Money */}
               {selectedPayment === "mobile_money" && (
@@ -1341,7 +1401,6 @@ export default function Dashboard() {
               )}
 
               <div className="w-full absolute flex items-center space-x-2 justify-between pt-2 text-sm bottom-0">
-               
                 <button
                   type="submit"
                   className="w-full bg-bChkRed text-white py-2 rounded-md hover:bg-red-700"
@@ -1352,7 +1411,11 @@ export default function Dashboard() {
                       <h4 className=" text-[#ffffff]">Processing...</h4>
                     </div>
                   ) : (
-                    <h4 className=" text-[#ffffff]">{preferredPlatform == "paystack" ? 'Complete Top-up': 'Proceed to Payment'}</h4>
+                    <h4 className=" text-[#ffffff]">
+                      {preferredPlatform == "paystack"
+                        ? "Complete Top-up"
+                        : "Proceed to Payment"}
+                    </h4>
                   )}
                 </button>
               </div>
@@ -1386,39 +1449,39 @@ export default function Dashboard() {
                     Billing Address
                   </h4>
                   <div className="relative w-full md:h-[2.7vw] h-[12vw] flex items-center border overflow-hidden bg-white rounded-sm">
-                  <select
-                    className="w-full px-1 md:h-[2.7vw] h-[12vw] md:text-[1vw] text-[3.5vw] bg-white border-r border-gray-300 focus:outline-none rounded-sm"
-                    value={instBill || ""}
-                    onChange={(e) => setInstBill(e.target.value)}
-                  >
-                    {countryNames.map((country) => (
-                      <option key={country.name} value={country.name}>
-                        {country.name}
-                      </option>
-                    ))}
-                  </select>
+                    <select
+                      className="w-full px-1 md:h-[2.7vw] h-[12vw] md:text-[1vw] text-[3.5vw] bg-white border-r border-gray-300 focus:outline-none rounded-sm"
+                      value={instBill || ""}
+                      onChange={(e) => setInstBill(e.target.value)}
+                    >
+                      {countryNames.map((country) => (
+                        <option key={country.name} value={country.name}>
+                          {country.name}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                 </div>
                 {preferredPlatform == "paystack" && (
-                <div className="flex flex-row space-x-4 mt-6">
-                  <div className="flex items-center">
-                    <input
-                      id="card-option"
-                      type="radio"
-                      name="payment"
-                      value="card"
-                      checked={selectedPayment === "card"}
-                      onChange={() => setSelectedPayment("card")}
-                      className="w-5 h-5 bg-gray-100 border-gray-300 accent-bChkRed"
-                    />
-                    <label
-                      htmlFor="card-option"
-                      className="ms-2 md:text-[1vw] text-[4vw] font-medium text-gray-900 dark:text-gray-300"
-                    >
-                      Debit Card
-                    </label>
-                  </div>
-                  
+                  <div className="flex flex-row space-x-4 mt-6">
+                    <div className="flex items-center">
+                      <input
+                        id="card-option"
+                        type="radio"
+                        name="payment"
+                        value="card"
+                        checked={selectedPayment === "card"}
+                        onChange={() => setSelectedPayment("card")}
+                        className="w-5 h-5 bg-gray-100 border-gray-300 accent-bChkRed"
+                      />
+                      <label
+                        htmlFor="card-option"
+                        className="ms-2 md:text-[1vw] text-[4vw] font-medium text-gray-900 dark:text-gray-300"
+                      >
+                        Debit Card
+                      </label>
+                    </div>
+
                     <div className="flex items-center">
                       <input
                         id="mobile-money-option"
@@ -1436,12 +1499,15 @@ export default function Dashboard() {
                         Mobile Wallet
                       </label>
                     </div>
-                </div>)}
+                  </div>
+                )}
                 {preferredPlatform === "stripe" && (
                   <div className="p-[2px] rounded-xl bg-gradient-to-r from-bChkRed to-black mt-4">
                     <div
                       className={`relative p-4 w-full bg-white cursor-pointer rounded-lg ${
-                        selectedPayment === "card" ? "border-gradient-to-r from-bChkRed to-black" : "border-gray-300"
+                        selectedPayment === "card"
+                          ? "border-gradient-to-r from-bChkRed to-black"
+                          : "border-gray-300"
                       }`}
                       onClick={() => setSelectedPayment("card")}
                     >
@@ -1454,9 +1520,14 @@ export default function Dashboard() {
                         onChange={() => setSelectedPayment("card")}
                         className="absolute top-2 left-2 w-5 h-5 accent-bChkRed"
                       />
-                      <label htmlFor="stripe-card" className="block h-full w-full pl-8">
+                      <label
+                        htmlFor="stripe-card"
+                        className="block h-full w-full pl-8"
+                      >
                         <div className="font-bold text-[1.2vw]">Debit Card</div>
-                        <div className="text-gray-500 text-[0.9vw] mt-1">Pay with Visa / MasterCard</div>
+                        <div className="text-gray-500 text-[0.9vw] mt-1">
+                          Pay with Visa / MasterCard
+                        </div>
                       </label>
                     </div>
                   </div>
@@ -1464,80 +1535,81 @@ export default function Dashboard() {
               </div>
 
               {/* Additional Fields for Card Payment */}
-              {selectedPayment === "card" && preferredPlatform === "paystack" && (
-                <div className="-mt-3">
-                  <div className="mb-5">
-                    <h4 className="md:text-[1vw] text-[4vw] mb-1">
-                      Card Number
-                    </h4>
-                    <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
-                      <input
-                        type="text"
-                        name="cardNumber"
-                        value={paymentDetails.cardNumber}
-                        onChange={handleInputChange}
-                        className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-white absolute left-0 right-0 bottom-0 top-0"
-                      />
+              {selectedPayment === "card" &&
+                preferredPlatform === "paystack" && (
+                  <div className="-mt-3">
+                    <div className="mb-5">
+                      <h4 className="md:text-[1vw] text-[4vw] mb-1">
+                        Card Number
+                      </h4>
+                      <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
+                        <input
+                          type="text"
+                          name="cardNumber"
+                          value={paymentDetails.cardNumber}
+                          onChange={handleInputChange}
+                          className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-white absolute left-0 right-0 bottom-0 top-0"
+                        />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                      <div className="">
+                        <h4 className="md:text-[1vw] text-[4vw] mb-1">
+                          First Name
+                        </h4>
+                        <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
+                          <input
+                            type="text"
+                            name="firstName"
+                            value={paymentDetails.firstName}
+                            onChange={handleInputChange}
+                            className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-white absolute left-0 right-0 bottom-0 top-0"
+                          />
+                        </div>
+                      </div>
+                      <div className="">
+                        <h4 className="md:text-[1vw] text-[4vw] mb-1">
+                          Last Name
+                        </h4>
+                        <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
+                          <input
+                            type="text"
+                            name="lastName"
+                            value={paymentDetails.lastName}
+                            onChange={handleInputChange}
+                            className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-white absolute left-0 right-0 bottom-0 top-0"
+                          />
+                        </div>
+                      </div>
+                      <div className="">
+                        <h4 className="md:text-[1vw] text-[4vw] mb-1">
+                          Expiration Date
+                        </h4>
+                        <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
+                          <input
+                            type="text"
+                            name="expirationDate"
+                            value={paymentDetails.expirationDate}
+                            onChange={handleInputChange}
+                            className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-white absolute left-0 right-0 bottom-0 top-0"
+                          />
+                        </div>
+                      </div>
+                      <div className="">
+                        <h4 className="md:text-[1vw] text-[4vw] mb-1">CVC</h4>
+                        <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
+                          <input
+                            type="text"
+                            name="cvcCode"
+                            value={paymentDetails.cvcCode}
+                            onChange={handleInputChange}
+                            className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-white absolute left-0 right-0 bottom-0 top-0"
+                          />
+                        </div>
+                      </div>
                     </div>
                   </div>
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                    <div className="">
-                      <h4 className="md:text-[1vw] text-[4vw] mb-1">
-                        First Name
-                      </h4>
-                      <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
-                        <input
-                          type="text"
-                          name="firstName"
-                          value={paymentDetails.firstName}
-                          onChange={handleInputChange}
-                          className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-white absolute left-0 right-0 bottom-0 top-0"
-                        />
-                      </div>
-                    </div>
-                    <div className="">
-                      <h4 className="md:text-[1vw] text-[4vw] mb-1">
-                        Last Name
-                      </h4>
-                      <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
-                        <input
-                          type="text"
-                          name="lastName"
-                          value={paymentDetails.lastName}
-                          onChange={handleInputChange}
-                          className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-white absolute left-0 right-0 bottom-0 top-0"
-                        />
-                      </div>
-                    </div>
-                    <div className="">
-                      <h4 className="md:text-[1vw] text-[4vw] mb-1">
-                        Expiration Date
-                      </h4>
-                      <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
-                        <input
-                          type="text"
-                          name="expirationDate"
-                          value={paymentDetails.expirationDate}
-                          onChange={handleInputChange}
-                          className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-white absolute left-0 right-0 bottom-0 top-0"
-                        />
-                      </div>
-                    </div>
-                    <div className="">
-                      <h4 className="md:text-[1vw] text-[4vw] mb-1">CVC</h4>
-                      <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
-                        <input
-                          type="text"
-                          name="cvcCode"
-                          value={paymentDetails.cvcCode}
-                          onChange={handleInputChange}
-                          className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-white absolute left-0 right-0 bottom-0 top-0"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
+                )}
 
               {clientSecret && preferredPlatform === "stripe" && (
                 <Elements stripe={stripePromise} options={{ clientSecret }}>
@@ -1547,10 +1619,12 @@ export default function Dashboard() {
                     classNames="w-[100vw] md:w-[80vw] lg:w-[60vw] z-50 rounded-md"
                   >
                     <div className="p-4">
-                      <StripeCheckoutForm onSuccess={() => {
-                        setShowStripeForm(false);
-                        setClientSecret(null);
-                      }} />
+                      <StripeCheckoutForm
+                        onSuccess={() => {
+                          setShowStripeForm(false);
+                          setClientSecret(null);
+                        }}
+                      />
                     </div>
                   </Modal>
                 </Elements>
@@ -1615,7 +1689,11 @@ export default function Dashboard() {
                       <h4 className=" text-[#ffffff]">Processing...</h4>
                     </div>
                   ) : (
-                    <h4 className=" text-[#ffffff]">{preferredPlatform == "paystack" ? 'Complete Subscription' : 'Proceed to Payment'}</h4>
+                    <h4 className=" text-[#ffffff]">
+                      {preferredPlatform == "paystack"
+                        ? "Complete Subscription"
+                        : "Proceed to Payment"}
+                    </h4>
                   )}
                 </button>
               </div>

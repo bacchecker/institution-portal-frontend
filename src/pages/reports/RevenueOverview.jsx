@@ -4,6 +4,7 @@ import Navbar from "@/components/Navbar";
 import { useGetInstitutionRevenueQuery } from "../../redux/apiSlice";
 import secureLocalStorage from "react-secure-storage";
 import ValidationRequestReport from "./ValidationRequestReport";
+import VerificationRequestReport from "./VerificationRequestReport";
 
 function RevenueOverview() {
   const [currentScreen, setCurrentScreen] = useState(1);
@@ -119,7 +120,10 @@ function RevenueOverview() {
                   <i class="bx bx-money-withdraw text-white text-[1.4vw]"></i>
                 </div>
                 <div className="flex flex-col">
-                  <h4 className="text-[1.5vw] font-[600]">GH¢ 0</h4>
+                  <h4 className="text-[1.5vw] font-[600]">GH¢{" "}
+                    {parseInt(
+                      institutionRevenue?.verification_request_revenue ?? 0
+                    ).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</h4>
                 </div>
               </div>
               <h4 className="text-[0.9vw] mt-[0.5vw] mb-[0.3vw]">
@@ -247,6 +251,7 @@ function RevenueOverview() {
             )}
           {currentScreen === 1 && <DocumentRequestReport />}
           {currentScreen === 2 && <ValidationRequestReport />}
+          {currentScreen === 3 && <VerificationRequestReport />}
         </div>
       </div>
     </>

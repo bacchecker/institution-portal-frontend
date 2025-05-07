@@ -519,24 +519,28 @@ export default function OutgoingRequests() {
               <button
                 type="button"
                 onClick={() => {
-                    setOpenAddDrawer(true);
-                }} 
-                className="fixed flex items-center space-x-2 bottom-4 right-4 bg-black text-white px-4 py-2 rounded-full shadow-lg hover:bg-gray-800 focus:outline-none "
+                  setOpenAddDrawer(true);
+                }}
+                className="fixed flex items-center space-x-2 bottom-4 right-4 
+                          bg-black text-white px-4 py-2 rounded-md shadow-lg 
+                          hover:bg-gray-800 focus:outline-none 
+                          animate-bounceSubtle ripple-button"
               >
-                <FaPlus />
+                <FaPlus className="animate-iconPop" />
                 <p>New Request</p>
               </button>
             </PermissionWrapper>
+
             
         </section>
         <AddRequest setOpenModal={setOpenAddDrawer} openModal={openAddDrawer} fetchVerificationRequests={institutionVerificationRequests}/>
         <Drawer
-        title={
+          title={
             "Request Details"
-        }
-        isOpen={openDrawer}
-        setIsOpen={setOpenDrawer}
-        classNames="w-[100vw] md:w-[45vw] xl:w-[35vw] z-10"
+          }
+          isOpen={openDrawer}
+          setIsOpen={setOpenDrawer}
+          classNames="w-[100vw] md:w-[45vw] xl:w-[35vw] z-10"
         >
         <div className="h-full flex flex-col -mt-2 xl:pl-2 font-semibold justify-between">
             <div className="flex flex-col gap-2 mb-6">
