@@ -331,34 +331,56 @@ function InstitutionDocumentTypes({ setActiveStep }) {
                                   </td>
                                   <td className="py-[1vw] px-[2.5vw] border-b max-w-[13%]">
                                     {documentType?.soft_copy &&
-                                    documentType?.hard_copy ? (
-                                      <>
-                                        <span className="text-[#FFA52D]">
-                                          soft copy
-                                        </span>
-                                        <span className="text-[#000000]">
-                                          , hard copy
-                                        </span>
-                                      </>
-                                    ) : documentType?.soft_copy ? (
-                                      <span className="text-[#FFA52D]">
-                                        soft copy
-                                      </span>
-                                    ) : documentType?.hard_copy ? (
-                                      <span className="text-[#000000]">
-                                        hard copy
-                                      </span>
-                                    ) : null}
+                                      documentType?.hard_copy ? (
+                                        <div className="text-left">
+                                          <p className="text-[#FFA52D]">
+                                              Soft copy
+                                          </p>
+                                          <p className="text-[#000000]">
+                                              Hard copy
+                                          </p>
+                                        </div>
+                                      ) : documentType?.soft_copy ? (
+                                          <p className="text-[#FFA52D]">
+                                          Soft copy
+                                          </p>
+                                      ) : documentType?.hard_copy ? (
+                                          <p className="text-[#000000]">
+                                          Hard copy
+                                          </p>
+                                      ) : null
+                                    }
                                   </td>
 
                                   <td className="py-[1vw] px-[1vw] border-b max-w-[15%]">
-                                    GH¢ {documentType?.base_fee}
+                                    <div className="text-right pr-4">
+                                      <p className="text-[#FFA52D]">
+                                      GH₵ {documentType?.base_fee}
+                                      </p>
+                                      <p className="text-[#000000]">
+                                        $ {documentType?.foreign_base_fee}
+                                      </p>
+                                    </div>
                                   </td>
                                   <td className="py-[1vw] px-[1vw] border-b max-w-[15%]">
-                                    GH¢ {documentType?.printing_fee}
+                                    <div className="text-right pr-4">
+                                      <p className="text-[#FFA52D]">
+                                      GH₵ {documentType?.printing_fee}
+                                      </p>
+                                      <p className="text-[#000000]">
+                                        $ {documentType?.foreign_printing_fee}
+                                      </p>
+                                    </div>
                                   </td>
                                   <td className="py-[1vw] px-[1vw] border-b max-w-[15%]">
-                                    GH¢ {documentType?.validation_fee}
+                                    <div className="text-right pr-4">
+                                      <p className="text-[#FFA52D]">
+                                      GH₵ {documentType?.validation_fee}
+                                      </p>
+                                      <p className="text-[#000000]">
+                                        $ {documentType?.foreign_validation_fee}
+                                      </p>
+                                    </div>
                                   </td>
                                   <td className="text-end border-b">
                                     <Dropdown

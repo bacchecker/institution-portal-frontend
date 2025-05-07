@@ -15,6 +15,7 @@ import {
   useDisclosure,
 } from "@nextui-org/react";
 import CustomTable from "@/components/CustomTable";
+import SelectInput from "@/components/SelectInput";
 import moment from "moment";
 import axios from "../../utils/axiosConfig";
 import StatusChip from "@/components/status-chip";
@@ -28,7 +29,6 @@ import {
   FaDownload,
   FaFilePdf,
   FaHeart,
-  FaRegCircleCheck,
   FaRegFileImage,
 } from "react-icons/fa6";
 import { IoCloseCircleOutline, IoDocuments } from "react-icons/io5";
@@ -58,7 +58,7 @@ export default function ValidationRequest() {
   const [sortOrder, setSortOrder] = useState("asc");
   const user = JSON?.parse(secureLocalStorage?.getItem("user"))?.user;
   const [documentTypes, setDocumentTypes] = useState([]);
-  const [validationAnswers, setValidationAnswers] = useState([]);
+  const [checklistItems, setChecklistItems] = useState({ sections: [] });
   const [allRequests, setAllRequests] = useState(0);
   const [pending, setPending] = useState(0);
   const [rejected, setRejected] = useState(0);
@@ -75,13 +75,24 @@ export default function ValidationRequest() {
   const [answers, setAnswers] = useState({});
   const [isSaving, setIsSaving] = useState(false);
 
-  const handleChange = (itemId, value) => {
-    setAnswers((prev) => ({
-      ...prev,
-      [itemId]: value,
-    }));
+  const handleAnswerChange = (sectionIndex, questionIndex, newValue) => {
+    setChecklistItems((prev) => {
+      const newSections = [...prev.sections];
+      const updatedSection = { ...newSections[sectionIndex] };
+      const updatedItems = [...updatedSection.checklist_items];
+  
+      updatedItems[questionIndex] = {
+        ...updatedItems[questionIndex],
+        answer: newValue
+      };
+  
+      updatedSection.checklist_items = updatedItems;
+      newSections[sectionIndex] = updatedSection;
+  
+      return { ...prev, sections: newSections };
+    });
   };
-
+  
   const institutionValidationRequests = async () => {
     setIsLoading(true);
     try {
@@ -114,6 +125,11 @@ export default function ValidationRequest() {
       throw error;
     }
   };
+
+  const boolData = [
+    { title: "Yes", value: "yes" },
+    { title: "No", value: "no" },
+  ];
 
   const fetchReports = async (requestId) => {
     setIsFetching(true);
@@ -233,41 +249,48 @@ export default function ValidationRequest() {
     setFilters({ ...filters, document_type: event.target.value });
   };
 
-  const handleSubmitValidationAnswers = async (event) => {
+  const handleSubmitchecklistItems = async (event) => {
     event.preventDefault();
-
-    const allChecklistItems = validationAnswers.sections.flatMap((section) =>
+  
+    // Flatten the checklist items and attach their answers
+    const allChecklistItems = checklistItems.sections.flatMap((section) =>
       section.checklist_items.map((item) => ({
         id: item.id,
+        is_mandatory: item.is_mandatory,
+        answer: item.answer,
       }))
     );
-
-    // Check if every item has an answer
+    console.log(allChecklistItems);
+    
+    // Check for unanswered mandatory items
     const unansweredItems = allChecklistItems.filter(
-      (item) => !answers[item.id] || answers[item.id].trim() === ""
+      (item) =>
+        item.is_mandatory &&
+        (item.answer === undefined || item.answer === null || item.answer === "")
     );
-
+    
+  
     if (unansweredItems.length > 0) {
-      toast.error("Please provide answers to all questions before submitting.");
+      toast.error("Please provide answers to all mandatory questions before submitting.");
       return;
     }
-
+  
     const payload = {
       validation_request_id: data?.id,
-      checklist: allChecklistItems.map((item) => ({
-        id: item.id,
-        answer: answers[item.id],
+      checklist: allChecklistItems.map(({ id, answer }) => ({
+        id,
+        answer,
       })),
     };
-
+  
     try {
       setIsSaving(true);
-
+  
       const response = await axios.post(
         "/institution/requests/confirm-request-answers",
         payload
       );
-
+  
       toast.success(response.data.message);
       setAnswers({});
       setOpenDrawer(false);
@@ -281,13 +304,14 @@ export default function ValidationRequest() {
       setIsSaving(false);
     }
   };
+  
 
-  const fetchRequestAnswers = async (requestId) => {
+  const fetchChecklistItems = async (requestId) => {
     try {
-      const url = `/institution/requests/validation-requests/answers/${requestId}`;
+      const url = `/institution/requests/validation-requests/${requestId}/checklist-items/`;
       const response = await axios.get(url);
 
-      setValidationAnswers(response.data);
+      setChecklistItems(response.data);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -533,7 +557,7 @@ export default function ValidationRequest() {
                     className="rounded-[4px] text-white"
                     onClick={async () => {
                       if (item?.status === "processing") {
-                        await fetchRequestAnswers(item?.id);
+                        await fetchChecklistItems(item?.id);
                       }
 
                       if (item?.status === "completed") {
@@ -632,6 +656,24 @@ export default function ValidationRequest() {
                         />
                       )}
                     </div>
+                  </div>
+                </div>
+
+                <div className="pb-4">
+                  <p className="font-semibold mb-4 text-base">
+                    Academic Details
+                  </p>
+                  <div className="grid grid-cols-3 gap-y-4 border-b pb-4">
+                    <div className="text-gray-500">Student Number</div>
+                    <div className="col-span-2">
+                      {data?.index_number}
+                    </div>
+                    <div className="text-gray-500">Program of Study</div>
+                    <div className="col-span-2">{data?.program_of_study}</div>
+                    <div className="text-gray-500">Start Year</div>
+                    <div className="col-span-2">{data?.start_year}</div>
+                    <div className="text-gray-500">End Year</div>
+                    <div className="col-span-2">{data?.end_year}</div>
                   </div>
                 </div>
 
@@ -777,104 +819,89 @@ export default function ValidationRequest() {
                 </div>
               </div>
             ) : (
-              <div className="-mt-2">
+              <div className="-mt-12">
                 <div className="">
-                  <div className="space-y-2">
-                    {validationAnswers.sections &&
-                    validationAnswers.sections.length > 0 ? (
-                      validationAnswers.sections.map((section) => (
+                  <div className="space-y-4">
+                    {checklistItems.sections &&
+                    checklistItems.sections.length > 0 ? (
+                      checklistItems.sections.map((section, sectionIndex) => (
                         <div
-                          key={section.section_id}
-                          className="space-y-4 pb-4 border-b"
+                          className="md:mt-[3vw] border p-2.5 rounded-md"
+                          key={section.id}
                         >
-                          {/* Section Header */}
-                          <h2 className="text-base text-black">
-                            {
-                              section.checklist_items[0]
-                                ?.institutionDocumentTypeChecklistItem?.section
-                                ?.name
-                            }
-                          </h2>
-                          {section.description && (
-                            <p className="font-light text-gray-700 text-xs">
-                              {section.description}
-                            </p>
-                          )}
-
-                          {/* Render Items */}
-                          <div className="grid grid-cols-1 gap-4">
-                            {section.checklist_items.map((item) => (
-                              <div key={item.id} className="space-y-2">
-                                {/* Question Text */}
-                                <div>
-                                  <h4 className="text-sm font-medium">
-                                    {
-                                      item.institutionDocumentTypeChecklistItem
-                                        .question_text
-                                    }
-                                  </h4>
-                                </div>
-
-                                {/* Answer Display */}
-                                <div className="relative w-full">
-                                  {item.institutionDocumentTypeChecklistItem && (
-                                    <input
-                                      type="text"
-                                      value={item.answer || ""}
-                                      readOnly
-                                      className="w-full px-3 py-2 border border-gray-300 rounded-[3px] bg-white text-gray-400 font-normal"
-                                    />
+                          <h4 className="text-sm mb-1 font-bold">
+                            {section.name}
+                          </h4>
+                          <h4 className="text-xs mb-4 font-normal">
+                            {section.description}
+                          </h4>
+                          <div className="flex flex-col gap-4">
+                          {Array.isArray(section?.checklist_items) &&
+                            section.checklist_items.map((question, questionIndex) => (
+                              <div className="" key={question.id}>
+                                <h4 className="text-sm mb-1 font-normal">
+                                  {question.question_text}
+                                  {question.is_mandatory && (
+                                    <span className="text-[#f1416c]">
+                                      *
+                                    </span>
                                   )}
-                                </div>
-
-                                {/* Yes/No Buttons */}
-                                <div className="flex space-x-3 text-base text-gray-600">
-                                  <div
-                                    className={`flex items-center justify-center space-x-2 cursor-pointer pr-2 font-normal rounded-[4px] py-0.5 ${
-                                      answers[item.id] === "yes"
-                                        ? "text-green-600 border-green-600"
-                                        : "text-gray-600"
-                                    }`}
-                                    onClick={() => handleChange(item.id, "yes")}
-                                  >
+                                </h4>
+                                {(question.input_type === "yes_no" || question.input_type === "radio") && (
+                                  <SelectInput
+                                    placeholder={"Select Option"}
+                                    data={boolData}
+                                    inputValue={question.answer || ""}
+                                    onItemSelect={(selectedItem) =>
+                                      handleAnswerChange(sectionIndex, questionIndex, selectedItem.value)
+                                    }
+                                    className="custom-dropdown-class display-md-none"
+                                  />
+                                )}
+                                {(question.input_type === "text" || question.input_type === "date") && (
+                                  <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
                                     <input
-                                      type="radio"
-                                      name={item.id}
-                                      value="yes"
-                                      checked={answers[item.id] === "yes"}
-                                      onChange={() =>
-                                        handleChange(item.id, "yes")
+                                      type={question.input_type}
+                                      value={question.answer || ""}
+                                      required={question.is_mandatory}
+                                      onChange={(e) =>
+                                        handleAnswerChange(sectionIndex, questionIndex, e.target.value)
                                       }
-                                      className="hidden"
+                                      className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0 read-only:bg-[#d8d8d8]"
                                     />
-                                    <FaRegCircleCheck size={18} />
-                                    <span>Yes</span>
                                   </div>
-
-                                  <div
-                                    className={`flex items-center justify-center space-x-2 cursor-pointer font-normal rounded-[4px] pr-2 py-0.5 ${
-                                      answers[item.id] === "no"
-                                        ? "text-red-600 border-red-600"
-                                        : "text-gray-600"
-                                    }`}
-                                    onClick={() => handleChange(item.id, "no")}
-                                  >
-                                    <input
-                                      type="radio"
-                                      name={item.id}
-                                      value="no"
-                                      checked={answers[item.id] === "no"}
-                                      onChange={() =>
-                                        handleChange(item.id, "no")
+                                )}
+                                {question.input_type === "dropdown" && (
+                                  <SelectInput
+                                    placeholder={"Select Option"}
+                                    data={
+                                      JSON.parse(question.options || "[]").map((opt) => ({
+                                        title: opt,
+                                        value: opt
+                                      }))
+                                    }
+                                    inputValue={question.answer || ""}
+                                    onItemSelect={(selectedItem) =>
+                                      handleAnswerChange(sectionIndex, questionIndex, selectedItem.value)
+                                    }
+                                    className="custom-dropdown-class display-md-none"
+                                  />
+                                )}
+                                {question.input_type === "textarea" && (
+                                  <div className="relative w-full md:h-[7vw] h-[30vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
+                                    <textarea
+                                      value={question.answer || ""}
+                                      required={question.is_mandatory}
+                                      onChange={(e) =>
+                                        handleAnswerChange(sectionIndex, questionIndex, e.target.value)
                                       }
-                                      className="hidden"
-                                    />
-                                    <IoCloseCircleOutline size={22} />
-                                    <span>No</span>
+                                      className="w-full h-full md:p-[0.8vw] p-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0"
+                                    ></textarea>
                                   </div>
-                                </div>
+                                )}
                               </div>
                             ))}
+                            
                           </div>
                         </div>
                       ))
@@ -946,10 +973,10 @@ export default function ValidationRequest() {
                     radius="none"
                     className="bg-bChkRed text-white font-medium w-1/2 !rounded-md"
                     size="md"
-                    onClick={handleSubmitValidationAnswers}
+                    onClick={handleSubmitchecklistItems}
                     disabled={
-                      !validationAnswers?.sections ||
-                      validationAnswers?.sections.length === 0
+                      !checklistItems?.sections ||
+                      checklistItems?.sections.length === 0
                     } // Disable if no sections
                   >
                     Confirm Validations
@@ -987,7 +1014,7 @@ export default function ValidationRequest() {
               );
 
               if (res?.data?.status === "processing") {
-                await fetchRequestAnswers(data?.id);
+                await fetchChecklistItems(data?.id);
               }
 
               setData(res?.data);

@@ -59,6 +59,7 @@ function SystemLogs() {
   const handleClearFields = () => {
     setSelectedFrom(currentDate);
     setSelectedTo(currentDate);
+    setSearchValue("");
     setUserInput((userInput) => ({
       ...userInput,
       from: currentDate,
@@ -103,12 +104,12 @@ function SystemLogs() {
     <>
       <Navbar />
       <div className="bg-white md:p-[1vw] p-[5vw]">
-        <div className="flex justify-between mt-[2vw] flex-direct-sm">
+        <div className="flex justify-between mt-[2vw] flex-direct-sm bg-gray-100 rounded-md p-4">
           <div className="flex items-center gap-[2vw]">
             <h4 className="md:text-[1.2vw] text-[3.5vw] font-[600]">
               System Logs
             </h4>
-            <div className="relative md:w-[15vw] w-[66vw] md:h-[2.3vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1vw!important] overflow-hidden border-[1.5px] border-[#a9a9a9]">
+            <div className="relative md:w-[20vw] w-[66vw] md:h-[2.5vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1vw!important] overflow-hidden border-[1.5px] border-[#a9a9a9]">
               <i className="z-[1] bx bx-search absolute top-[50%] translate-y-[-50%] md:left-[0.5vw] left-[3vw] md:text-[1vw] text-[5vw]"></i>
               <input
                 type="text"
@@ -125,7 +126,7 @@ function SystemLogs() {
           >
             <div className="flex items-center md:gap-[0.5vw] gap-[2vw]">
               <h4 className="md:text-[1vw] text-[3.5vw]">From</h4>
-              <div className="relative md:w-[9vw] w-[80vw] md:h-[2.3vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1vw!important] overflow-hidden border-[1.5px] border-[#a9a9a9]">
+              <div className="relative md:w-[11vw] w-[80vw] md:h-[2.3vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1vw!important] overflow-hidden border-[1.5px] border-[#a9a9a9]">
                 <input
                   type="date"
                   id="from"
@@ -133,13 +134,13 @@ function SystemLogs() {
                   value={userInput.from}
                   onChange={(e) => handleUserInput(e)}
                   required={userInput.to != ""}
-                  className="w-full h-full md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0"
+                  className="w-full h-full md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0 px-2"
                 />
               </div>
             </div>
             <div className="flex items-center md:gap-[0.5vw] gap-[2vw]">
               <h4 className="md:text-[1vw] text-[3.5vw]">To</h4>
-              <div className="relative md:w-[9vw] w-[85vw] md:h-[2.3vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1vw!important] overflow-hidden border-[1.5px] border-[#a9a9a9]">
+              <div className="relative md:w-[11vw] w-[85vw] md:h-[2.3vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1vw!important] overflow-hidden border-[1.5px] border-[#a9a9a9]">
                 <input
                   type="date"
                   id="to"
@@ -147,7 +148,7 @@ function SystemLogs() {
                   value={userInput.to}
                   onChange={(e) => handleUserInput(e)}
                   min={userInput.from}
-                  className="w-full h-full md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0"
+                  className="w-full h-full md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0 px-2"
                 />
               </div>
             </div>
@@ -161,17 +162,15 @@ function SystemLogs() {
                 <LoadItems color={"#ffffff"} size={14} />
               ) : (
                 <h4 className="md:text-[1vw] text-[3.5vw] text-[#ffffff]">
-                  filter
+                  Filter
                 </h4>
               )}
             </button>
             <button
               type="button"
               onClick={handleClearFields}
-              disabled={
-                userInput?.to === currentDate && userInput?.from === currentDate
-              }
-              className="new-btn bg-[#000000] px-[1vw]  md:mt-0 mt-[3vw] flex justify-center items-center md:py-[0.7vw] py-[2vw] md:h-[2.3vw] h-[12vw] md:rounded-[0.3vw] rounded-[1vw] gap-[0.5vw] hover:bg-[#202020] transition-all duration-300 disabled:bg-[#414141] disabled:cursor-not-allowed"
+              
+              className="new-btn bg-black px-[1vw]  md:mt-0 mt-[3vw] flex justify-center items-center md:py-[0.7vw] py-[2vw] md:h-[2.3vw] h-[12vw] md:rounded-[0.3vw] rounded-[1vw] gap-[0.5vw] hover:bg-[#202020] transition-all duration-300 disabled:bg-[#414141] disabled:cursor-not-allowed"
             >
               <h4 className="md:text-[1vw] text-[3.5vw] text-[#ffffff]">
                 Clear

@@ -80,7 +80,7 @@ export const baccheckerApi = createApi({
                 institution: data.institutionData.institution,
                 user: data.institutionData.user,
               };
-              
+
               // Update local storage
               secureLocalStorage.setItem("user", JSON.stringify(updatedUser));
               // Update Redux store
@@ -378,6 +378,39 @@ export const baccheckerApi = createApi({
         return queryString;
       },
       providesTags: ["DocumentRequest"],
+    }),
+    getInstitutionVerificationReports: builder.query({
+      query: ({
+        page,
+        selectedStatus,
+        selectedDateRange,
+        sortBy,
+        sortOrder,
+        selectedFrom,
+        selectedTo,
+      }) => {
+        let queryString = `/institution/reports/institution-verifications?page=${page}`;
+        if (selectedStatus) {
+          queryString += `&status=${selectedStatus}`;
+        }
+        if (selectedDateRange) {
+          queryString += `&date_range=${selectedDateRange}`;
+        }
+        if (sortBy) {
+          queryString += `&sort_by=${sortBy}`;
+        }
+        if (sortOrder) {
+          queryString += `&sort_order=${sortOrder}`;
+        }
+        if (selectedFrom) {
+          queryString += `&start_date=${selectedFrom}`;
+        }
+        if (selectedTo) {
+          queryString += `&end_date=${selectedTo}`;
+        }
+        return queryString;
+      },
+      providesTags: ["VerificationRequest"],
     }),
 
     getDashboardAnalytics: builder.query({
@@ -774,6 +807,7 @@ export const {
   useGetInstitutionRevenueQuery,
   useGetInstitutionReportsQuery,
   useGetInstitutionValidationReportsQuery,
+  useGetInstitutionVerificationReportsQuery,
   useGetInstitutionRevenueGraphQuery,
   useGetUserSystemLogsQuery,
   useGetRevenuePercentageQuery,
