@@ -29,7 +29,7 @@ export default function ManageRequest() {
  
 
   return (
-    <div title="Manage Request" className="bg-white text-sm w-full">
+    <div className="bg-white text-sm w-full">
       <Navbar />
       <div className="flex w-full flex-col">
         <Tabs
