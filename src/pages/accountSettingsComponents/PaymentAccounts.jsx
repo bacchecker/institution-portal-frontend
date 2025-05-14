@@ -583,9 +583,9 @@ export default function PaymentAccounts() {
                       Bank accounts must be verified before saving. This helps
                       ensure your payouts will be processed correctly.
                     </p>
-                    <p className="text-red-700 italic">
+                    {/* <p className="text-red-700 italic">
                       Account Holder Names should be unique.
-                    </p>
+                    </p> */}
                   </div>
                 )}
               </ModalBody>
