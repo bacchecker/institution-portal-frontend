@@ -447,6 +447,7 @@ export default function PaymentAccounts() {
               <ModalBody>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <Select
+                    helpText="Only the listed countries are supported for payment accounts"
                     label="Country"
                     placeholder="Select country"
                     value={selectedCountry}
