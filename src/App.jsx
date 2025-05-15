@@ -115,6 +115,20 @@ function App() {
                     }
                   />
                   <Route
+                    path="/payment"
+                    element={
+                      <AuthenticatedSuccessProtectedRoute>
+                        <AccountSetupProtectedRoute>
+                          <PermissionProtectedRoute
+                            permission={["institution.payments.view"]}
+                          >
+                            <Payment />
+                          </PermissionProtectedRoute>
+                        </AccountSetupProtectedRoute>
+                      </AuthenticatedSuccessProtectedRoute>
+                    }
+                  />
+                  <Route
                     path="/e-check"
                     element={
                       <AuthenticatedSuccessProtectedRoute>
@@ -183,20 +197,7 @@ function App() {
                       </AuthenticatedSuccessProtectedRoute>
                     }
                   />
-                  <Route
-                    path="/payment"
-                    element={
-                      <AuthenticatedSuccessProtectedRoute>
-                        <AccountSetupProtectedRoute>
-                          <PermissionProtectedRoute
-                            permission={["institution.payments.view"]}
-                          >
-                            <Payment />
-                          </PermissionProtectedRoute>
-                        </AccountSetupProtectedRoute>
-                      </AuthenticatedSuccessProtectedRoute>
-                    }
-                  />
+                  
                   <Route
                     path="/account-settings"
                     element={
