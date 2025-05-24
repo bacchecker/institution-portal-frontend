@@ -139,7 +139,6 @@ export default function ValidationRequest() {
         if (response && response.data) {
             const blobUrl = URL.createObjectURL(response.data);
             setValidationReport(blobUrl);
-            console.log("Validation Report URL:", blobUrl);
         } else {
             setValidationReport(null);
             console.warn("No data received in response.");
