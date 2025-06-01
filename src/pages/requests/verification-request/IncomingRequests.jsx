@@ -37,6 +37,7 @@ import secureLocalStorage from "react-secure-storage";
 import { IoIosOpen } from "react-icons/io";
 import { BsFillInfoCircleFill } from "react-icons/bs";
 import PermissionWrapper from "../../../components/permissions/PermissionWrapper";
+import { Worker, Viewer } from '@react-pdf-viewer/core';
 
 export default function IncomingRequests() {
   const changeStatusDisclosure = useDisclosure();
@@ -520,490 +521,518 @@ export default function IncomingRequests() {
         </section>
 
         <Drawer
-          title={`Request Details`}
+          title={`Verification Request Details`}
           isOpen={openDrawer}
           setIsOpen={setOpenDrawer}
-          classNames="w-[100vw] md:w-[45vw] xl:w-[38vw] z-10"
+          classNames="w-[100vw] 2xl:w-[85vw] h-[100dvh] z-10"
         >
-          <div className="h-full flex flex-col -mt-2 xl:pl-2 font-semibold justify-between">
-            {data?.status != "processing" ? (
-              <div className="flex flex-col gap-2 mb-6">
-                <div className="grid grid-cols-3 gap-y-4 gap-x-2 border-b pb-4">
-                  <div className="text-gray-500">Request ID</div>
-                  <div className="col-span-2">#{data?.unique_code}</div>
-                  <div className="text-gray-500">Requested Date</div>
-                  <div className="col-span-2">
-                    {moment(data?.created_at).format("Do MMMM, YYYY")}
-                  </div>
-                  <div className="text-gray-500">Status</div>
-                  <div
-                    className={`col-span-2 flex items-center justify-center py-1 space-x-2 w-28 
-                      ${
-                        data?.status === "cancelled" ||
-                        data?.status === "rejected"
-                          ? "text-red-600 bg-red-200"
-                          : data?.status === "completed"
-                          ? "text-green-600 bg-green-200"
-                          : data?.status === "processing" ||
-                            data?.status === "received"
-                          ? "text-yellow-600 bg-yellow-200"
-                          : "text-gray-600 bg-gray-200"
-                      }`}
-                  >
-                    <div
-                      className={`h-2 w-2 rounded-full ${
-                        data?.status === "cancelled" ||
-                        data?.status === "rejected"
-                          ? "bg-red-600"
-                          : data?.status === "completed"
-                          ? "bg-green-600"
-                          : data?.status === "processing" ||
-                            data?.status === "received"
-                          ? "bg-yellow-600"
-                          : "bg-gray-600"
-                      }`}
-                    ></div>
-                    <p>
-                      {data?.status.charAt(0).toUpperCase() +
-                        data?.status.slice(1)}
-                    </p>
-                  </div>
-                  {/* <div className="text-gray-500">Document Fee</div>
-                  <div className="col-span-2">GH¢ {data?.total_amount}</div> */}
-                </div>
-                <div className="p">
-                  <p className="font-semibold mb-4 text-base">Document Owner</p>
-                  <div className="grid grid-cols-3 gap-y-3 border-b pb-4">
-                    <div className="text-gray-500">Full Name</div>
-                    <div className="col-span-2">
-                      {data?.doc_owner_full_name}
-                    </div>
-                    <div className="text-gray-500">Email Addres</div>
-                    <div className="col-span-2">{data?.doc_owner_email}</div>
-                    <div className="text-gray-500">Phone Number</div>
-                    <div className="col-span-2">{data?.doc_owner_phone}</div>
-                    <div className="text-gray-500">Date of Birth</div>
-                    <div className="col-span-2">{data?.doc_owner_dob}</div>
-                  </div>
-                </div>
-                <div className="py-4">
-                  <p className="font-semibold mb-4 text-base">
-                    Requesting Institution
-                  </p>
-                  <div className="grid grid-cols-3 gap-y-4 border-b pb-4">
-                    <div className="text-gray-500">Institution Name</div>
-                    <div className="col-span-2">
-                      {data?.sending_institution?.name}
-                    </div>
-                    <div className="text-gray-500">Institution Email</div>
-                    <div className="col-span-2">
-                      {data?.sending_institution?.institution_email}
-                    </div>
-                    <div className="text-gray-500">Phone Number</div>
-                    <div className="col-span-2">
-                      {data?.sending_institution?.helpline_contact}
-                    </div>
-                    <div className="text-gray-500 mt-2">Institution Logo</div>
-                    <div className="col-span-2 w-10 h-10 rounded-full bg-gray-200">
+          <div className="w-full flex space-x-4 h-[100dvh] overflow-hidden -mt-4">
+            {data?.file?.path && (
+              <div className='hidden md:block w-full h-full overflow-hidden'>
+                {["jpg", "jpeg", "png", "gif"].includes(
+                    data?.file?.extension
+                ) ? (
+                    <div className='flex-1 w-full h-[90dvh] overflow-auto border md:rounded-[0.3vw] rounded-[1vw] p-[1vw]'>
                       <img
-                        src={`https://admin-dev.baccheck.online/storage/${data?.sending_institution?.logo}`}
-                        alt=""
+                        src={`${import.meta.env.VITE_BACCHECKER_API_URL}view-decrypted-file?path=${data?.file?.path}`
+                        }
+                        alt="Document preview"
+                        className="w-full max-h-[calc(100vh-170px)] object-contain"
                       />
                     </div>
-                  </div>
-                </div>
-
-                <div className="-mt-4">
-                  <section className="mb-3 flex items-center justify-between">
-                    <div className="w-full flex gap-2 items-center">
-                      <p className="font-semibold uppercase text-bChkRed">Request Attachment</p>
-                    </div>
-
-                    {/* <Button
-                      variant="ghost"
-                      size="sm"
-                      color="primary"
-                      isLoading={bulkDownloadLoading}
-                      isDisabled={bulkDownloadLoading}
-                      onClick={() => {
-                        setBulkDownloadLoading(true);
-                        handleBulkDownload(data.files.map((f) => f.path));
-                      }}
-                    >
-                      <FaDownload className="text-red-600" />
-                      Download all
-                    </Button> */}
-                  </section>
-
-                  <section className="grid grid-cols-1 gap-2">
-                    <div className="gap-3 p-2 rounded-md border">
-                      <div className="w-full flex flex-col gap-1">
-                        <p className="font-semibold">
-                          {data?.document_type?.name}
-                        </p>
-                        {/* <p>GH¢ {data?.total_amount}</p> */}
-
-                        <div className="flex justify-between">
-                          <div className="flex gap-2 items-center">
-                            <Chip size="sm">{data?.file?.extension}</Chip>
-                            <p>{filesize(data?.file?.size ?? 1000)}</p>
-                          </div>
-                          <div
-                            className="flex space-x-1 cursor-pointer py-1 px-2 rounded-sm bg-primary text-white text-xs"
-                            // onClick={() => downloadFile(data?.file?.name)}
-                            onClick={() => {
-                              window.location.href =
-                                "https://admin-dev.baccheck.online/api/download-pdf?path=" +
-                                encodeURIComponent(data?.file?.path);
-                            }}
-                          >
-                            <FaDownload />
-                            <p>Download</p>
-                          </div>
+                ) : (
+                    <div className="flex-1">
+                      <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
+                        <div className="border md:rounded-[0.3vw] rounded-[1vw] h-[90dvh] overflow-auto">
+                          <Viewer
+                            fileUrl={`${import.meta.env.VITE_BACCHECKER_API_URL}view-decrypted-file?path=${data?.file?.path}`}
+                          />
                         </div>
-                      </div>
+                      </Worker>
                     </div>
-                    
-                  </section>
-                  <section className="flex flex-col mt-2">
-                    <p className="uppercase font-semibold py-2 text-bChkRed">Verification Request Documents</p>
-                    <div className="flex flex-col space-y-2">
-                      {/* Show Loading Spinner */}
-                      {isFetching ? (
-                        <div className="flex justify-center items-center col-span-2">
-                          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-gray-900"></div>
-                        </div>
-                      ) : (
-                        <>
-                          {/* Display Reports if available */}
-                          {requestLetter && (
-                            <div className="gap-3 p-2 rounded-md border">
-                              <div className="w-full flex justify-between">
-                                <div className="w-full flex space-x-2 items-center">
-                                  <FaFilePdf size={36} className="text-bChkRed" />
-                                  <div className="flex flex-col space-y-1">
-                                    <p>Request Letter</p>
-                                    <div className="text-xs font-semibold -mt-1">
-                                      <p>From: <span className="font-normal text-gray-500">{data?.sending_institution?.name}</span></p>
-                                    </div>
-                                  </div>
-                                </div>
-                                
-                                <div
-                                  className="flex self-end space-x-1 items-center cursor-pointer py-1 px-2 rounded-sm bg-blue-600 text-white text-xs w-20"
-                                  onClick={() => window.open(requestLetter, "_blank")}
-                                >
-                                  <IoIosOpen size={16} />
-                                  <p>Open</p>
-                                </div>
-                              </div>
-                            </div>
-                          )}
-                          {authLetter && (
-                            <div className="gap-3 p-2 rounded-md border">
-                              <div className="w-full flex justify-between">
-                                <div className="w-full flex space-x-2 items-center">
-                                  <FaFilePdf size={36} className="text-bChkRed" />
-                                  <div className="flex flex-col space-y-1">
-                                    <p>Authorisation Letter</p>
-                                    <div className="text-xs font-semibold -mt-1">
-                                      <p>From: <span className="font-normal text-gray-500">{data?.doc_owner_full_name}</span></p>
-                                    </div>
-                                  </div>
-                                </div>
-                                
-                                <div
-                                  className="flex self-end space-x-1 items-center cursor-pointer py-1 px-2 rounded-sm bg-blue-600 text-white text-xs w-20"
-                                  onClick={() => window.open(authLetter, "_blank")}
-                                >
-                                  <IoIosOpen size={16} />
-                                  <p>Open</p>
-                                </div>
-                              </div>
-                            </div>
-                          )}
-  
-                          {verificationReport && (
-                            <div className="gap-3 p-2 rounded-md border">
-                              <div className="w-full flex justify-between">
-                                <div className="w-full flex space-x-2 items-center">
-                                  <FaFilePdf size={36} className="text-bChkRed" />
-                                  <div className="flex flex-col space-y-1">
-                                    <p>Verification Report</p>
-                                    <div className="text-xs font-semibold">
-                                      <p>From: <span className="font-normal text-gray-500">Bacchecker</span></p>
-                                    </div>
-                                  </div>
-                                </div>
-                                
-                                <div
-                                  className="flex self-end space-x-1 items-center cursor-pointer py-1 px-2 rounded-sm bg-blue-600 text-white text-xs w-20"
-                                  onClick={() => window.open(verificationReport, "_blank")}
-                                >
-                                  <IoIosOpen size={16} />
-                                  <p>Open</p>
-                                </div>
-                              </div>
-                            </div>
-                          )}
-  
-                          {/* No Reports Found Message */}
-                          {!authLetter && !requestLetter && !verificationReport && (
-                            <div className="col-span-2 text-center text-gray-500 text-sm py-4">
-                              No reports found.
-                            </div>
-                          )}
-                        </>
-                      )}
-                    </div>
-                  </section>
-                </div>
-
-                <div>
-                  {data?.status == "rejected" && (
-                    <div className="mt-3 border rounded-md p-4">
-                      <div className="">
-                        <p className="font-semibold text-red-600">
-                          Rejection Reason
-                        </p>
-                        <p className="font-normal">{data?.rejection_reason}</p>
-                      </div>
-
-                      <div className="mt-3">
-                        <div className="flex flex-row">
-                          {data?.status == "cancelled" ? (
-                            <div className="flex-1">
-                              <p className="font-semibold text-red-600">
-                                Rejected By:
-                              </p>
-                              <p className="font-normal">
-                                {data?.doc_owner_full_name}
-                              </p>
-                              <p className="text-[11px] font-normal">
-                                {data?.doc_owner_email}
-                              </p>
-                            </div>
-                          ) : (
-                            <div className="flex-1">
-                              <p className="font-semibold text-red-600">
-                                Rejected By:
-                              </p>
-                              <p className="font-normal">
-                                {data?.rejected_by?.first_name}{" "}
-                                {data?.rejected_by?.last_name}
-                              </p>
-                              <p className="text-[11px] font-normal">
-                                {data?.rejected_by?.email}
-                              </p>
-                            </div>
-                          )}
-
-                          <div className="flex-1">
-                            <p className="font-semibold text-red-600">
-                              Rejection Date
-                            </p>
-                            <p className="font-normal">
-                              {moment(data?.updated_at).format("Do MMMM, YYYY")}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
+                )}
               </div>
-            ) : (
-              <div className="-mt-2">
-                <div className="">
-                  <div className="space-y-2">
-                    {checkListSections &&
-                    checkListSections.length > 0 ? (
-                      checkListSections.map((section) => (
-                        <div
-                          key={section.id}
-                          className="pb-4 border p-3 rounded-md"
-                        >
-                          {/* Section Header */}
-                          <div className="mb-4">
-                            <h2 className="text-base text-bChkRed">{section.name}</h2>
-                            <p className="font-light text-gray-700 text-xs">{section?.description}</p>
-                          </div>
+            )}
+            <div className="w-full lg:w-[50vw] xl:w-[45vw] h-full overflow-y-auto flex flex-col font-semibold justify-between">
+              {data?.status != "processing" ? (
+                <div className="flex flex-col gap-2 mb-6">
+                  <div className="grid grid-cols-3 gap-y-4 gap-x-2 border-b pb-4">
+                    <div className="text-gray-500">Request ID</div>
+                    <div className="col-span-2">#{data?.unique_code}</div>
+                    <div className="text-gray-500">Requested Date</div>
+                    <div className="col-span-2">
+                      {moment(data?.created_at).format("Do MMMM, YYYY")}
+                    </div>
+                    <div className="text-gray-500">Status</div>
+                    <div
+                      className={`col-span-2 flex items-center justify-center py-1 space-x-2 w-28 
+                        ${
+                          data?.status === "cancelled" ||
+                          data?.status === "rejected"
+                            ? "text-red-600 bg-red-200"
+                            : data?.status === "completed"
+                            ? "text-green-600 bg-green-200"
+                            : data?.status === "processing" ||
+                              data?.status === "received"
+                            ? "text-yellow-600 bg-yellow-200"
+                            : "text-gray-600 bg-gray-200"
+                        }`}
+                    >
+                      <div
+                        className={`h-2 w-2 rounded-full ${
+                          data?.status === "cancelled" ||
+                          data?.status === "rejected"
+                            ? "bg-red-600"
+                            : data?.status === "completed"
+                            ? "bg-green-600"
+                            : data?.status === "processing" ||
+                              data?.status === "received"
+                            ? "bg-yellow-600"
+                            : "bg-gray-600"
+                        }`}
+                      ></div>
+                      <p>
+                        {data?.status.charAt(0).toUpperCase() +
+                          data?.status.slice(1)}
+                      </p>
+                    </div>
+                    {/* <div className="text-gray-500">Document Fee</div>
+                    <div className="col-span-2">GH¢ {data?.total_amount}</div> */}
+                  </div>
+                  <div className="p">
+                    <p className="font-semibold mb-4 text-base">Document Owner</p>
+                    <div className="grid grid-cols-3 gap-y-3 border-b pb-4">
+                      <div className="text-gray-500">Full Name</div>
+                      <div className="col-span-2">
+                        {data?.doc_owner_full_name}
+                      </div>
+                      <div className="text-gray-500">Email Addres</div>
+                      <div className="col-span-2">{data?.doc_owner_email}</div>
+                      <div className="text-gray-500">Phone Number</div>
+                      <div className="col-span-2">{data?.doc_owner_phone}</div>
+                      <div className="text-gray-500">Date of Birth</div>
+                      <div className="col-span-2">{data?.doc_owner_dob}</div>
+                    </div>
+                  </div>
+                  <div className="py-4">
+                    <p className="font-semibold mb-4 text-base">
+                      Requesting Institution
+                    </p>
+                    <div className="grid grid-cols-3 gap-y-4 border-b pb-4">
+                      <div className="text-gray-500">Institution Name</div>
+                      <div className="col-span-2">
+                        {data?.sending_institution?.name}
+                      </div>
+                      <div className="text-gray-500">Institution Email</div>
+                      <div className="col-span-2">
+                        {data?.sending_institution?.institution_email}
+                      </div>
+                      <div className="text-gray-500">Phone Number</div>
+                      <div className="col-span-2">
+                        {data?.sending_institution?.helpline_contact}
+                      </div>
+                      <div className="text-gray-500 mt-2">Institution Logo</div>
+                      <div className="col-span-2 w-10 h-10 rounded-full bg-gray-200">
+                        <img
+                          src={`https://admin-dev.baccheck.online/storage/${data?.sending_institution?.logo}`}
+                          alt=""
+                        />
+                      </div>
+                    </div>
+                  </div>
 
-                          {/* Render Items */}
-                          <div className="space-y-4">
-                          {section.items.map((item) => {
-                            const possibleReasons = getPossibleReasons(item.question_text);
+                  <div className="-mt-4">
+                    <section className="mb-3 flex items-center justify-between">
+                      <div className="w-full flex gap-2 items-center">
+                        <p className="font-semibold uppercase text-bChkRed">Request Attachment</p>
+                      </div>
 
-                            return (
-                              <div key={item.id} className="space-y-1">
-                                <p className="text-sm font-normal">{item.question_text}</p>
+                      {/* <Button
+                        variant="ghost"
+                        size="sm"
+                        color="primary"
+                        isLoading={bulkDownloadLoading}
+                        isDisabled={bulkDownloadLoading}
+                        onClick={() => {
+                          setBulkDownloadLoading(true);
+                          handleBulkDownload(data.files.map((f) => f.path));
+                        }}
+                      >
+                        <FaDownload className="text-red-600" />
+                        Download all
+                      </Button> */}
+                    </section>
 
-                                {/* Yes/No Options */}
-                                <div className="flex space-x-4 text-base text-gray-600">
-                                  {/* Yes Option */}
-                                  <div
-                                    className={`flex items-center justify-center space-x-2 cursor-pointer border pr-2 font-normal rounded-[4px] py-1 text-[13px] ${
-                                      answers[item.id]?.is_correct === 1 ? "text-green-600 border-green-600" : "text-gray-500"
-                                    }`}
-                                    onClick={() => handleChange(item.id, 1, "")}
-                                  >
-                                    <input
-                                      type="radio"
-                                      name={item.id}
-                                      value="yes"
-                                      checked={answers[item.id]?.is_correct === 1}
-                                      onChange={() => handleChange(item.id, 1, "")}
-                                      className="hidden"
-                                    />
-                                    <FaRegCircleCheck size={18} />
-                                    <span>Yes</span>
-                                  </div>
+                    <section className="grid grid-cols-1 gap-2">
+                      <div className="gap-3 p-2 rounded-md border">
+                        <div className="w-full flex flex-col gap-1">
+                          <p className="font-semibold">
+                            {data?.document_type?.name}
+                          </p>
+                          {/* <p>GH¢ {data?.total_amount}</p> */}
 
-                                  {/* No Option */}
-                                  <div
-                                    className={`flex items-center justify-center space-x-2 cursor-pointer border font-normal rounded-[4px] pr-2 py-1 text-[13px] ${
-                                      answers[item.id]?.is_correct === 0 ? "text-red-600 border-red-600" : "text-gray-500"
-                                    }`}
-                                    onClick={() => handleChange(item.id, 0, answers[item.id]?.comment || "")}
-                                  >
-                                    <input
-                                      type="radio"
-                                      name={item.id}
-                                      value="no"
-                                      checked={answers[item.id]?.is_correct === 0}
-                                      onChange={() => handleChange(item.id, 0, answers[item.id]?.comment || "")}
-                                      className="hidden"
-                                    />
-                                    <GiCancel size={18} />
-                                    <span>No</span>
-                                  </div>
-                                </div>
-
-                                {/* Show dropdown and textarea when "No" is selected */}
-                                {answers[item.id]?.is_correct === 0 && (
-                                  <>
-                                    <select
-                                      className="w-full border rounded p-2 text-gray-700 focus:outline-none font-normal"
-                                      value={answers[item.id]?.comment || ""}
-                                      onChange={(e) => handleReasonChange(item.id, e.target.value)}
-                                    >
-                                      <option value="" disabled>Select a reason...</option>
-                                      {possibleReasons.map((reason, index) => (
-                                        <option key={index} value={reason}>
-                                          {reason}
-                                        </option>
-                                      ))}
-                                    </select>
-
-                                    {/* Show textarea if "Other" is selected */}
-                                    {showCustomReason[item.id] && (
-                                      <textarea
-                                        className="w-full border rounded p-2 text-gray-700 focus:outline-none font-normal mt-2"
-                                        rows="3"
-                                        placeholder="Enter your custom reason..."
-                                        value={answers[item.id]?.comment || ""}
-                                        onChange={(e) => handleChange(item.id, 0, e.target.value)}
-                                      ></textarea>
-                                    )}
-
-                                    <p className="text-right text-[10px] font-medium text-bChkRed">
-                                      Note: <span className="text-black">It is required to provide a reason</span>
-                                    </p>
-                                  </>
-                                )}
-                              </div>
-                            );
-                          })}
-
+                          <div className="flex justify-between">
+                            <div className="flex gap-2 items-center">
+                              <Chip size="sm">{data?.file?.extension}</Chip>
+                              <p>{filesize(data?.file?.size ?? 1000)}</p>
+                            </div>
+                            <div
+                              className="flex space-x-1 cursor-pointer py-1 px-2 rounded-sm bg-primary text-white text-xs"
+                              onClick={() => {
+                                window.location.href =
+                                  "https://admin-dev.baccheck.online/api/download-pdf?path=" +
+                                  encodeURIComponent(data?.file?.path);
+                              }}
+                            >
+                              <FaDownload />
+                              <p>Download</p>
+                            </div>
                           </div>
                         </div>
+                      </div>
+                      
+                    </section>
+                    <section className="flex flex-col mt-2">
+                      <p className="uppercase font-semibold py-2 text-bChkRed">Verification Request Documents</p>
+                      <div className="flex flex-col space-y-2">
+                        {/* Show Loading Spinner */}
+                        {isFetching ? (
+                          <div className="flex justify-center items-center col-span-2">
+                            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-gray-900"></div>
+                          </div>
+                        ) : (
+                          <>
+                            {/* Display Reports if available */}
+                            {requestLetter && (
+                              <div className="gap-3 p-2 rounded-md border">
+                                <div className="w-full flex justify-between">
+                                  <div className="w-full flex space-x-2 items-center">
+                                    <FaFilePdf size={36} className="text-bChkRed" />
+                                    <div className="flex flex-col space-y-1">
+                                      <p>Request Letter</p>
+                                      <div className="text-xs font-semibold -mt-1">
+                                        <p>From: <span className="font-normal text-gray-500">{data?.sending_institution?.name}</span></p>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  
+                                  <div
+                                    className="flex self-end space-x-1 items-center cursor-pointer py-1 px-2 rounded-sm bg-blue-600 text-white text-xs w-20"
+                                    onClick={() => window.open(requestLetter, "_blank")}
+                                  >
+                                    <IoIosOpen size={16} />
+                                    <p>Open</p>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+                            {authLetter && (
+                              <div className="gap-3 p-2 rounded-md border">
+                                <div className="w-full flex justify-between">
+                                  <div className="w-full flex space-x-2 items-center">
+                                    <FaFilePdf size={36} className="text-bChkRed" />
+                                    <div className="flex flex-col space-y-1">
+                                      <p>Authorisation Letter</p>
+                                      <div className="text-xs font-semibold -mt-1">
+                                        <p>From: <span className="font-normal text-gray-500">{data?.doc_owner_full_name}</span></p>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  
+                                  <div
+                                    className="flex self-end space-x-1 items-center cursor-pointer py-1 px-2 rounded-sm bg-blue-600 text-white text-xs w-20"
+                                    onClick={() => window.open(authLetter, "_blank")}
+                                  >
+                                    <IoIosOpen size={16} />
+                                    <p>Open</p>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+    
+                            {verificationReport && (
+                              <div className="gap-3 p-2 rounded-md border">
+                                <div className="w-full flex justify-between">
+                                  <div className="w-full flex space-x-2 items-center">
+                                    <FaFilePdf size={36} className="text-bChkRed" />
+                                    <div className="flex flex-col space-y-1">
+                                      <p>Verification Report</p>
+                                      <div className="text-xs font-semibold">
+                                        <p>From: <span className="font-normal text-gray-500">Bacchecker</span></p>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  
+                                  <div
+                                    className="flex self-end space-x-1 items-center cursor-pointer py-1 px-2 rounded-sm bg-blue-600 text-white text-xs w-20"
+                                    onClick={() => window.open(verificationReport, "_blank")}
+                                  >
+                                    <IoIosOpen size={16} />
+                                    <p>Open</p>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+    
+                            {/* No Reports Found Message */}
+                            {!authLetter && !requestLetter && !verificationReport && (
+                              <div className="col-span-2 text-center text-gray-500 text-sm py-4">
+                                No reports found.
+                              </div>
+                            )}
+                          </>
+                        )}
+                      </div>
+                    </section>
+                  </div>
 
-                      ))
-                    ) : (
-                      <div className="md:!h-[65vh] h-[60vh] flex flex-col gap-8 items-center justify-center">
-                        <img
-                          src="/assets/img/no-data.svg"
-                          alt="No data"
-                          className="w-1/4 h-auto"
-                        />
-                        <p className="text-center text-slate-500 font-montserrat font-medium text-base -mt-6">
-                          No questions available
-                        </p>
+                  <div>
+                    {data?.status == "rejected" && (
+                      <div className="mt-3 border rounded-md p-4">
+                        <div className="">
+                          <p className="font-semibold text-red-600">
+                            Rejection Reason
+                          </p>
+                          <p className="font-normal">{data?.rejection_reason}</p>
+                        </div>
+
+                        <div className="mt-3">
+                          <div className="flex flex-row">
+                            {data?.status == "cancelled" ? (
+                              <div className="flex-1">
+                                <p className="font-semibold text-red-600">
+                                  Rejected By:
+                                </p>
+                                <p className="font-normal">
+                                  {data?.doc_owner_full_name}
+                                </p>
+                                <p className="text-[11px] font-normal">
+                                  {data?.doc_owner_email}
+                                </p>
+                              </div>
+                            ) : (
+                              <div className="flex-1">
+                                <p className="font-semibold text-red-600">
+                                  Rejected By:
+                                </p>
+                                <p className="font-normal">
+                                  {data?.rejected_by?.first_name}{" "}
+                                  {data?.rejected_by?.last_name}
+                                </p>
+                                <p className="text-[11px] font-normal">
+                                  {data?.rejected_by?.email}
+                                </p>
+                              </div>
+                            )}
+
+                            <div className="flex-1">
+                              <p className="font-semibold text-red-600">
+                                Rejection Date
+                              </p>
+                              <p className="font-normal">
+                                {moment(data?.updated_at).format("Do MMMM, YYYY")}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     )}
                   </div>
                 </div>
-              </div>
-            )}
+              ) : (
+                <div className="-mt-2">
+                  <div className="">
+                    <div className="space-y-2">
+                      {checkListSections &&
+                      checkListSections.length > 0 ? (
+                        checkListSections.map((section) => (
+                          <div
+                            key={section.id}
+                            className="pb-4 border p-3 rounded-md"
+                          >
+                            {/* Section Header */}
+                            <div className="mb-4">
+                              <h2 className="text-base text-bChkRed">{section.name}</h2>
+                              <p className="font-light text-gray-700 text-xs">{section?.description}</p>
+                            </div>
 
-            <div className="flex items-center gap-3 justify-end mt-2">
-              <Button
-                radius="none"
-                size="md"
-                className="w-1/4 bg-black text-white font-medium !rounded-md"
-                onClick={() => {
-                  setOpenDrawer(false);
-                  setData(null);
-                }}
-              >
-                Close
-              </Button>
+                            {/* Render Items */}
+                            <div className="space-y-4">
+                            {section.items.map((item) => {
+                              const possibleReasons = getPossibleReasons(item.question_text);
 
-              {data?.status == "processing" && (
-                <PermissionWrapper
-                  permission={["e-check.cancel"]}
-                >
-                  <Button
-                    radius="none"
-                    size="md"
-                    className="w-1/2 bg-gray-300 text-gray-800 font-medium !rounded-md"
-                    onClick={() => declineDisclosure.onOpen()}
-                  >
-                    Decline Request
-                  </Button>
-                </PermissionWrapper>
+                              return (
+                                <div key={item.id} className="space-y-1">
+                                  <p className="text-sm font-normal">{item.question_text}</p>
+
+                                  {/* Yes/No Options */}
+                                  <div className="flex space-x-4 text-base text-gray-600">
+                                    {/* Yes Option */}
+                                    <div
+                                      className={`flex items-center justify-center space-x-2 cursor-pointer border pr-2 font-normal rounded-[4px] py-1 text-[13px] ${
+                                        answers[item.id]?.is_correct === 1 ? "text-green-600 border-green-600" : "text-gray-500"
+                                      }`}
+                                      onClick={() => handleChange(item.id, 1, "")}
+                                    >
+                                      <input
+                                        type="radio"
+                                        name={item.id}
+                                        value="yes"
+                                        checked={answers[item.id]?.is_correct === 1}
+                                        onChange={() => handleChange(item.id, 1, "")}
+                                        className="hidden"
+                                      />
+                                      <FaRegCircleCheck size={18} />
+                                      <span>Yes</span>
+                                    </div>
+
+                                    {/* No Option */}
+                                    <div
+                                      className={`flex items-center justify-center space-x-2 cursor-pointer border font-normal rounded-[4px] pr-2 py-1 text-[13px] ${
+                                        answers[item.id]?.is_correct === 0 ? "text-red-600 border-red-600" : "text-gray-500"
+                                      }`}
+                                      onClick={() => handleChange(item.id, 0, answers[item.id]?.comment || "")}
+                                    >
+                                      <input
+                                        type="radio"
+                                        name={item.id}
+                                        value="no"
+                                        checked={answers[item.id]?.is_correct === 0}
+                                        onChange={() => handleChange(item.id, 0, answers[item.id]?.comment || "")}
+                                        className="hidden"
+                                      />
+                                      <GiCancel size={18} />
+                                      <span>No</span>
+                                    </div>
+                                  </div>
+
+                                  {/* Show dropdown and textarea when "No" is selected */}
+                                  {answers[item.id]?.is_correct === 0 && (
+                                    <>
+                                      <select
+                                        className="w-full border rounded p-2 text-gray-700 focus:outline-none font-normal"
+                                        value={answers[item.id]?.comment || ""}
+                                        onChange={(e) => handleReasonChange(item.id, e.target.value)}
+                                      >
+                                        <option value="" disabled>Select a reason...</option>
+                                        {possibleReasons.map((reason, index) => (
+                                          <option key={index} value={reason}>
+                                            {reason}
+                                          </option>
+                                        ))}
+                                      </select>
+
+                                      {/* Show textarea if "Other" is selected */}
+                                      {showCustomReason[item.id] && (
+                                        <textarea
+                                          className="w-full border rounded p-2 text-gray-700 focus:outline-none font-normal mt-2"
+                                          rows="3"
+                                          placeholder="Enter your custom reason..."
+                                          value={answers[item.id]?.comment || ""}
+                                          onChange={(e) => handleChange(item.id, 0, e.target.value)}
+                                        ></textarea>
+                                      )}
+
+                                      <p className="text-right text-[10px] font-medium text-bChkRed">
+                                        Note: <span className="text-black">It is required to provide a reason</span>
+                                      </p>
+                                    </>
+                                  )}
+                                </div>
+                              );
+                            })}
+
+                            </div>
+                          </div>
+
+                        ))
+                      ) : (
+                        <div className="md:!h-[65vh] h-[60vh] flex flex-col gap-8 items-center justify-center">
+                          <img
+                            src="/assets/img/no-data.svg"
+                            alt="No data"
+                            className="w-1/4 h-auto"
+                          />
+                          <p className="text-center text-slate-500 font-montserrat font-medium text-base -mt-6">
+                            No questions available
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
               )}
 
-              {data?.status !== "created" &&
-                data?.status !== "completed" &&
-                data?.status !== "rejected" &&
-                data?.status !== "processing" && (
-                <PermissionWrapper
-                  permission={["e-check.process"]}
+              <div className="flex items-center gap-3 justify-end mt-2">
+                <Button
+                  radius="none"
+                  size="md"
+                  className="w-1/4 bg-black text-white font-medium !rounded-md"
+                  onClick={() => {
+                    setOpenDrawer(false);
+                    setData(null);
+                  }}
                 >
-                  <Button
-                    radius="none"
-                    className="bg-bChkRed text-white font-medium w-1/2 !rounded-md"
-                    size="md"
-                    onClick={() => changeStatusDisclosure.onOpen()}
+                  Close
+                </Button>
+
+                {data?.status == "processing" && (
+                  <PermissionWrapper
+                    permission={["e-check.cancel"]}
                   >
-                    {data?.status === "submitted"
-                      ? "Acknowledge Request"
-                      : data?.status === "received"
-                      ? "Verify Document"
-                      : "Acknowledge Request"}
-                  </Button>
-                </PermissionWrapper>
-                  
+                    <Button
+                      radius="none"
+                      size="md"
+                      className="w-1/2 bg-gray-300 text-gray-800 font-medium !rounded-md"
+                      onClick={() => declineDisclosure.onOpen()}
+                    >
+                      Decline Request
+                    </Button>
+                  </PermissionWrapper>
                 )}
-              {data?.status === "processing" && (
-                <PermissionWrapper
-                  permission={["e-check.process"]}
-                >
-                  <Button
-                    isLoading={isSaving}
-                    radius="none"
-                    className="bg-bChkRed text-white font-medium w-1/2 !rounded-md"
-                    size="md"
-                    onClick={handleSubmitVerification}
-                    disabled={Object.keys(answers).length === 0}
+
+                {data?.status !== "created" &&
+                  data?.status !== "completed" &&
+                  data?.status !== "rejected" &&
+                  data?.status !== "processing" && (
+                  <PermissionWrapper
+                    permission={["e-check.process"]}
                   >
-                    Submit Verifications
-                  </Button>
-                </PermissionWrapper>
-              )}
+                    <Button
+                      radius="none"
+                      className="bg-bChkRed text-white font-medium w-1/2 !rounded-md"
+                      size="md"
+                      onClick={() => changeStatusDisclosure.onOpen()}
+                    >
+                      {data?.status === "submitted"
+                        ? "Acknowledge Request"
+                        : data?.status === "received"
+                        ? "Verify Document"
+                        : "Acknowledge Request"}
+                    </Button>
+                  </PermissionWrapper>
+                    
+                  )}
+                {data?.status === "processing" && (
+                  <PermissionWrapper
+                    permission={["e-check.process"]}
+                  >
+                    <Button
+                      isLoading={isSaving}
+                      radius="none"
+                      className="bg-bChkRed text-white font-medium w-1/2 !rounded-md"
+                      size="md"
+                      onClick={handleSubmitVerification}
+                      disabled={Object.keys(answers).length === 0}
+                    >
+                      Submit Verifications
+                    </Button>
+                  </PermissionWrapper>
+                )}
+              </div>
             </div>
           </div>
+          
         </Drawer>
 
         <ConfirmModal

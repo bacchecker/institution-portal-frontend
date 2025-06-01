@@ -38,12 +38,12 @@ import { MdOutlineFilterAlt, MdOutlineFilterAltOff } from "react-icons/md";
 import secureLocalStorage from "react-secure-storage";
 import PermissionWrapper from "@/components/permissions/PermissionWrapper";
 import { IoIosOpen } from "react-icons/io";
+import { Worker, Viewer } from '@react-pdf-viewer/core';
 
 export default function ValidationRequest() {
   const changeStatusDisclosure = useDisclosure();
   const declineDisclosure = useDisclosure();
 
-  const [bulkDownloadLoading, setBulkDownloadLoading] = useState(false);
   const [openDrawer, setOpenDrawer] = useState(false);
   const [processing, setProcessing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -195,49 +195,7 @@ export default function ValidationRequest() {
       toast.error(error.response.data.message);
     }
   };
-
-  const handleBulkDownload = async (filePaths) => {
-    try {
-      const csrfTokenMeta = document?.querySelector('meta[name="csrf-token"]');
-      const csrfToken = csrfTokenMeta?.getAttribute("content");
-
-      const headers = {
-        "Content-Type": "application/json",
-      };
-
-      // Only add X-CSRF-TOKEN if the token exists
-      if (csrfToken) {
-        headers["X-CSRF-TOKEN"] = csrfToken;
-      }
-
-      const response = await fetch(
-        "https://backend.baccheck.online/api/document/bulk-download",
-        {
-          method: "POST",
-          headers: headers,
-          body: JSON.stringify({ files: filePaths }),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "bulk_download.zip";
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      window.URL.revokeObjectURL(url);
-      setBulkDownloadLoading(false);
-    } catch (error) {
-      console.error("Error downloading files:", error);
-    }
-  };
-
+  
   const handleSubmit = (event) => {
     event.preventDefault();
     setSubmittedFilters({ ...filters });
@@ -578,32 +536,49 @@ export default function ValidationRequest() {
         <Drawer
           title={
             data?.status != "processing"
-              ? "Request Details"
+              ? "Validation Request Details"
               : "Validation Questions"
           }
           isOpen={openDrawer}
           setIsOpen={setOpenDrawer}
-          classNames="w-[100vw] md:w-[45vw] xl:w-[35vw] z-10"
+          classNames="w-[100vw] 2xl:w-[85vw] h-[100dvh] z-10"
         >
-          <div className="w-full flex flex-col">
-            {/* <div className="flex-1">
-              {data?.file?.path && (
-                <iframe
-                  src={`https://admin-dev.baccheck.online/api/download-pdf?path=${encodeURIComponent(data.file.path)}`}
-                  width="100%"
-                  height="600px"
-                  style={{ border: "none" }}
-                  title="Document Preview"
-                />
-              )}
-            </div> */}
-            <div className="w-full h-full flex flex-col -mt-2 font-semibold justify-between">
+          <div className="w-full flex space-x-4 h-[100dvh] overflow-hidden -mt-4">
+
+            {data?.file?.path && (
+              <div className='hidden md:block w-full h-full overflow-hidden'>
+                {["jpg", "jpeg", "png", "gif"].includes(
+                    data?.file?.extension
+                ) ? (
+                    <div className='flex-1 w-full h-[90dvh] overflow-auto border md:rounded-[0.3vw] rounded-[1vw] p-[1vw]'>
+                      <img
+                        src={`${import.meta.env.VITE_BACCHECKER_API_URL}view-decrypted-file?path=${data?.file?.path}`
+                        }
+                        alt="Document preview"
+                        className="w-full max-h-[calc(100vh-170px)] object-contain"
+                      />
+                    </div>
+                ) : (
+                    <div className="flex-1">
+                      <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
+                        <div className="border md:rounded-[0.3vw] rounded-[1vw] h-[90dvh] overflow-auto">
+                          <Viewer
+                            fileUrl={`${import.meta.env.VITE_BACCHECKER_API_URL}view-decrypted-file?path=${data?.file?.path}`}
+                          />
+                        </div>
+                      </Worker>
+                    </div>
+                )}
+              </div>
+            )}
+            
+            <div className="w-full lg:w-[50vw] xl:w-[45vw] h-full overflow-y-auto flex flex-col font-semibold justify-between">
               {data?.status != "processing" ? (
                 <div className="flex flex-col gap-2 mb-6">
                   <div className="grid grid-cols-3 gap-y-4 gap-x-2 border-b pb-4">
                     <div className="text-gray-500">Request ID</div>
                     <div className="col-span-2">#{data?.unique_code}</div>
-                    <div className="text-gray-500">Requested Date</div>
+                    <div className="text-gray-500">Date</div>
                     <div className="col-span-2">
                       {moment(data?.created_at).format("Do MMMM, YYYY")}
                     </div>
@@ -640,7 +615,7 @@ export default function ValidationRequest() {
                           data?.status.slice(1)}
                       </p>
                     </div>
-                    <div className="text-gray-500">Total Cash</div>
+                    <div className="text-gray-500">Total Amount</div>
                     <div className="col-span-2">GH¢ {data?.total_amount}</div>
                   </div>
                   <div className="py-4">
@@ -648,12 +623,12 @@ export default function ValidationRequest() {
                       Applicant Details
                     </p>
                     <div className="grid grid-cols-3 gap-y-4 border-b pb-4">
-                      <div className="text-gray-500">Applicant Name</div>
+                      <div className="text-gray-500">Full Name</div>
                       <div className="col-span-2">
                         {data?.user?.first_name} {data?.user?.other_name}{" "}
                         {data?.user?.last_name}
                       </div>
-                      <div className="text-gray-500">Applicant Email</div>
+                      <div className="text-gray-500">Email Address</div>
                       <div className="col-span-2">{data?.user?.email}</div>
                       <div className="text-gray-500">Phone Number</div>
                       <div className="col-span-2">{data?.user?.phone}</div>
@@ -712,10 +687,6 @@ export default function ValidationRequest() {
                               <p className="font-semibold">
                                 {data?.institution_document_type?.document_type?.name}
                               </p>
-                              {/* <div className="flex gap-2 items-center text-xs font-semibold text-gray-500 -mt-1">
-                                <Chip size="sm">{data?.file?.extension}</Chip>
-                                <p>{filesize(data?.file?.size ?? 1000)}</p>
-                              </div> */}
                               <div className="text-xs font-semibold -mt-1">
                                 <p>
                                   From:{" "}

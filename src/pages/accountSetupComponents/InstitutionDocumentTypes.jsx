@@ -315,7 +315,7 @@ function InstitutionDocumentTypes({ setActiveStep }) {
                                 className="w-[10vw]"
                               />
                               <h4 className="md:text-[1vw] text-[3.5vw] font-[600]">
-                                No DocumentType Available
+                                No Document Type Available
                               </h4>
                             </div>
                           </td>
