@@ -534,7 +534,7 @@ export default function IncomingRequests() {
                 ) ? (
                     <div className='flex-1 w-full h-[90dvh] overflow-auto border md:rounded-[0.3vw] rounded-[1vw] p-[1vw]'>
                       <img
-                        src={`${import.meta.env.VITE_BACCHECKER_API_URL}view-decrypted-file?path=${data?.file?.path}`
+                        src={`${import.meta.env.VITE_BACCHECKER_API_URL}/view-decrypted-file?path=${data?.file?.path}`
                         }
                         alt="Document preview"
                         className="w-full max-h-[calc(100vh-170px)] object-contain"
