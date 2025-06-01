@@ -545,7 +545,7 @@ export default function IncomingRequests() {
                       <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
                         <div className="border md:rounded-[0.3vw] rounded-[1vw] h-[90dvh] overflow-auto">
                           <Viewer
-                            fileUrl={`${import.meta.env.VITE_BACCHECKER_API_URL}view-decrypted-file?path=${data?.file?.path}`}
+                            fileUrl={`${import.meta.env.VITE_BACCHECKER_API_URL}/view-decrypted-file?path=${data?.file?.path}`}
                           />
                         </div>
                       </Worker>
