@@ -13,9 +13,12 @@ import InstitutionDocTypes from "./InstitutionDocTypes";
 import SubscriptionManagement from "./SubscriptionManagement";
 import PaymentAccounts from "./PaymentAccounts";
 import { RiVipCrownFill } from "react-icons/ri";
+import { useSearchParams } from "react-router-dom";
 
 export default function AccountSettings() {
-  const [activeTab, setActiveTab] = useState("profile");
+  const [searchParams] = useSearchParams();
+  const defaultTab = searchParams.get("tab") || "profile";
+  const [activeTab, setActiveTab] = useState(defaultTab);
   return (
     <div className="bg-white text-sm w-full">
       <Navbar />

@@ -34,6 +34,7 @@ import AccountSuspended from "@/pages/AccountSuspended";
 import AccountSuspendedProtection from "@/components/AccountSuspendedProtection";
 import AccountSettings from "./pages/accountSettingsComponents/AccountSettings";
 import MainRequests from "./pages/accountSettingsComponents/updateRequestComponents/MainRequests";
+import '@react-pdf-viewer/core/lib/styles/index.css';
 
 function App() {
   
