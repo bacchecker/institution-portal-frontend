@@ -7,7 +7,13 @@ import PropTypes from "prop-types";
 import axios from "@/utils/axiosConfig";
 import { Radio, RadioGroup } from "@heroui/react";
 
-function EditApi({ setOpenModal, openModal, apiScopes, selectedApi, fetchApiKeys }) {
+function EditApi({
+  setOpenModal,
+  openModal,
+  apiScopes,
+  selectedApi,
+  fetchApiKeys,
+}) {
   const [userInput, setUserInput] = useState({});
   const [userInitialInput, setUserInitialInput] = useState({});
   const [groupedScopes, setGroupedScopes] = useState({});
@@ -15,17 +21,17 @@ function EditApi({ setOpenModal, openModal, apiScopes, selectedApi, fetchApiKeys
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-  if (selectedApi) {
-    setUserInput({
-      ...selectedApi,
-      environment: selectedApi.environment || "test",
-    });
+    if (selectedApi) {
+      setUserInput({
+        ...selectedApi,
+        environment: selectedApi.environment || "test",
+      });
 
-    // Ensure selected scopes are IDs
-    const perms = selectedApi?.scopes?.map((perm) => perm.name) || [];
-    setSelectedScopes(perms);
-  }
-}, [selectedApi]);
+      // Ensure selected scopes are IDs
+      const perms = selectedApi?.scopes?.map((perm) => perm.name) || [];
+      setSelectedScopes(perms);
+    }
+  }, [selectedApi]);
 
   // Reset form state when the modal closes
   useEffect(() => {
@@ -37,27 +43,25 @@ function EditApi({ setOpenModal, openModal, apiScopes, selectedApi, fetchApiKeys
   }, [openModal]);
 
   // Group scopes by category and subcategory
-    useEffect(() => {
-        if (openModal && Object.keys(apiScopes || {}).length > 0) {
-            setGroupedScopes(apiScopes);
-        }
-    }, [openModal, apiScopes]);
+  useEffect(() => {
+    if (openModal && Object.keys(apiScopes || {}).length > 0) {
+      setGroupedScopes(apiScopes);
+    }
+  }, [openModal, apiScopes]);
 
   const handleUserInput = (e) => {
     const { name, value } = e.target;
     setUserInput({ ...userInput, [name]: value });
   };
 
-    const handleCheckboxChange = (scopeName) => {
+  const handleCheckboxChange = (scopeName) => {
     setSelectedScopes((prev) => {
-        const prevArray = Array.isArray(prev) ? prev : [];
-        return prevArray.includes(scopeName)
+      const prevArray = Array.isArray(prev) ? prev : [];
+      return prevArray.includes(scopeName)
         ? prevArray.filter((name) => name !== scopeName)
         : [...prevArray, scopeName];
     });
-    };
-
-
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -74,63 +78,71 @@ function EditApi({ setOpenModal, openModal, apiScopes, selectedApi, fetchApiKeys
     }
 
     try {
-        const payload = {
-            name: userInput.name,
-            environment: userInput.environment,
-            scopes: selectedScopes,
-        };
-        const response = await axios.put(`/v1/institution/api-keys/${id}`, payload);
-        toast.success(response.data.message);
-        setOpenModal(false);
-        fetchApiKeys();
-
+      const payload = {
+        name: userInput.name,
+        environment: userInput.environment,
+        scopes: selectedScopes,
+      };
+      const response = await axios.put(
+        `/v1/institution/api-keys/${id}`,
+        payload
+      );
+      toast.success(response.data.message);
+      setOpenModal(false);
+      fetchApiKeys();
     } catch (err) {
-        console.error("Error updating API:", err);
+      console.error("Error updating API:", err);
       toast.error("Failed to update api");
     }
   };
 
-
   return (
-    <SideModal title="Edit Api" setOpenModal={setOpenModal} openModal={openModal}>
-      <form onSubmit={handleSubmit} className="px-3 w-full overflow-auto pt-[1vw]">
+    <SideModal
+      title="Edit Api"
+      setOpenModal={setOpenModal}
+      openModal={openModal}
+    >
+      <form
+        onSubmit={handleSubmit}
+        className="px-3 w-full overflow-auto pt-[1vw]"
+      >
         <div className="flex flex-col">
-            {/* Api Name */}
-            <div className="mb-4">
-                <h4 className="md:text-[1vw] text-[4vw] mb-1">
-                API Name <span className="text-[#f1416c]">*</span>
-                </h4>
-                <input
-                type="text"
-                name="name"
-                value={userInput.name || ""}
-                onChange={handleUserInput}
-                className="w-full border rounded-sm p-2 focus:outline-none"
-                />
-            </div>
+          {/* Api Name */}
+          <div className="mb-4">
+            <h4 className="md:text-[1vw] text-[4vw] mb-1">
+              API Name <span className="text-[#f1416c]">*</span>
+            </h4>
+            <input
+              type="text"
+              name="name"
+              value={userInput.name || ""}
+              onChange={handleUserInput}
+              className="w-full border rounded-sm p-2 focus:outline-none"
+            />
+          </div>
 
-            <div className="mb-2">
-                <h4 className="md:text-[1vw] text-[4vw] mb-1">
-                    Environment<span className="text-[#f1416c]">*</span>
-                </h4>
-                <RadioGroup
-                    orientation="horizontal"
-                    value={userInput.environment}
-                    onValueChange={(value) =>
-                        setUserInput((prev) => ({
-                        ...prev,
-                        environment: value,
-                        }))
-                    }
-                >
-                    <Radio size="sm" value="test">
-                        Test
-                    </Radio>
-                    <Radio size="sm" value="live">
-                        Live
-                    </Radio>
-                    </RadioGroup>
-            </div>
+          <div className="mb-2">
+            <h4 className="md:text-[1vw] text-[4vw] mb-1">
+              Environment<span className="text-[#f1416c]">*</span>
+            </h4>
+            <RadioGroup
+              orientation="horizontal"
+              value={userInput.environment}
+              onValueChange={(value) =>
+                setUserInput((prev) => ({
+                  ...prev,
+                  environment: value,
+                }))
+              }
+            >
+              <Radio size="sm" value="test">
+                Test
+              </Radio>
+              <Radio size="sm" value="live">
+                Live
+              </Radio>
+            </RadioGroup>
+          </div>
 
           {/* Scopes */}
           <div className="mt-4">
@@ -138,46 +150,49 @@ function EditApi({ setOpenModal, openModal, apiScopes, selectedApi, fetchApiKeys
               Scopes <span className="text-[#f1416c]">*</span>
             </h4>
             <div className="grid grid-cols-2 gap-4">
-                {Object.entries(groupedScopes || {}).map(([resource, scopes]) => (
-                    <div key={resource} className="mb-4">
-                        <div className="flex items-center gap-[0.5vw]">
-                        <h2 className="text-[14px] capitalize font-[600]">
-                            {`Manage ${resource.replace("-", " ")}`}
-                        </h2>
-                        <input
+              {Object.entries(groupedScopes || {}).map(([resource, scopes]) => (
+                <div key={resource} className="mb-4">
+                  <div className="flex items-center gap-[0.5vw]">
+                    <h2 className="text-[14px] capitalize font-[600]">
+                      {`Manage ${resource.replace("-", " ")}`}
+                    </h2>
+                    <input
+                      type="checkbox"
+                      className="checkbox-design1"
+                      onChange={(e) => {
+                        const names = scopes.map((s) => s.name);
+                        if (e.target.checked) {
+                          setSelectedScopes((prev) => [
+                            ...new Set([...prev, ...names]),
+                          ]);
+                        } else {
+                          setSelectedScopes((prev) =>
+                            prev.filter((name) => !names.includes(name))
+                          );
+                        }
+                      }}
+                      checked={scopes.every((s) =>
+                        selectedScopes.includes(s.name)
+                      )}
+                    />
+                  </div>
+                  <div className="ml-[0.1vw] mt-[0.3vw]">
+                    {scopes.map(({ name, action }) => (
+                      <div key={name} className="ml-[0.5vw]">
+                        <label className="flex items-center gap-[0.3vw] text-[0.9vw] cursor-pointer mb-1">
+                          <input
                             type="checkbox"
                             className="checkbox-design1"
-                            onChange={(e) => {
-                            const names = scopes.map((s) => s.name);
-                            if (e.target.checked) {
-                                setSelectedScopes((prev) => [...new Set([...prev, ...names])]);
-                            } else {
-                                setSelectedScopes((prev) =>
-                                prev.filter((name) => !names.includes(name))
-                                );
-                            }
-                            }}
-                            checked={scopes.every((s) => selectedScopes.includes(s.name))}
-                        />
-                        </div>
-                        <div className="ml-[0.1vw] mt-[0.3vw]">
-                        {scopes.map(({ name, action }) => (
-                            <div key={name} className="ml-[0.5vw]">
-                            <label className="flex items-center gap-[0.3vw] text-[0.9vw] cursor-pointer mb-1">
-                                <input
-                                type="checkbox"
-                                className="checkbox-design1"
-                                checked={selectedScopes.includes(name)}
-                                onChange={() => handleCheckboxChange(name)}
-                                />
-                                <span>{(action || "").replace("-", " ")}</span>
-                            </label>
-                            </div>
-                        ))}
-                        </div>
-                    </div>
+                            checked={selectedScopes.includes(name)}
+                            onChange={() => handleCheckboxChange(name)}
+                          />
+                          <span>{(action || "").replace("-", " ")}</span>
+                        </label>
+                      </div>
                     ))}
-
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
@@ -190,14 +205,10 @@ function EditApi({ setOpenModal, openModal, apiScopes, selectedApi, fetchApiKeys
           {isLoading ? (
             <div className="flex items-center justify-center gap-2">
               <LoadItems color={"#ffffff"} size={15} />
-              <h4 className="text-sm text-[#ffffff]">
-                Updating...
-              </h4>
+              <h4 className="text-sm text-[#ffffff]">Updating...</h4>
             </div>
           ) : (
-            <h4 className="text-sm text-[#ffffff]">
-              Update Api
-            </h4>
+            <h4 className="text-sm text-[#ffffff]">Update Api</h4>
           )}
         </button>
       </form>
@@ -229,7 +240,5 @@ EditApi.propTypes = {
     ),
   }),
 };
-
-
 
 export default EditApi;
