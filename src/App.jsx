@@ -34,11 +34,11 @@ import AccountSuspended from "@/pages/AccountSuspended";
 import AccountSuspendedProtection from "@/components/AccountSuspendedProtection";
 import AccountSettings from "./pages/accountSettingsComponents/AccountSettings";
 import MainRequests from "./pages/accountSettingsComponents/updateRequestComponents/MainRequests";
-import '@react-pdf-viewer/core/lib/styles/index.css';
+import "@react-pdf-viewer/core/lib/styles/index.css";
 import ApiDashboard from "./pages/developerApi/ApiDashboard";
+import ApiDetails from "./pages/developerApi/ApiDetails";
 
 function App() {
-  
   return (
     <>
       <Toaster richColors position="top-right" />
@@ -91,7 +91,7 @@ function App() {
                       </AuthenticatedSuccessProtectedRoute>
                     }
                   />
-                  
+
                   <Route
                     path="/dashboard"
                     element={
@@ -134,15 +134,13 @@ function App() {
                     path="/e-check"
                     element={
                       <AuthenticatedSuccessProtectedRoute>
-                        <PermissionProtectedRoute
-                          permission={["e-check.view"]}
-                        >
+                        <PermissionProtectedRoute permission={["e-check.view"]}>
                           <VerificationRequest />
                         </PermissionProtectedRoute>
                       </AuthenticatedSuccessProtectedRoute>
                     }
                   />
-                  
+
                   <Route
                     path="/search-all"
                     element={
@@ -191,15 +189,13 @@ function App() {
                     path="/subscription-plans"
                     element={
                       <AuthenticatedSuccessProtectedRoute>
-                        <PermissionProtectedRoute
-                          permission={["e-check.view"]}
-                        >
+                        <PermissionProtectedRoute permission={["e-check.view"]}>
                           <Plans />
                         </PermissionProtectedRoute>
                       </AuthenticatedSuccessProtectedRoute>
                     }
                   />
-                  
+
                   <Route
                     path="/account-settings"
                     element={
@@ -237,6 +233,20 @@ function App() {
                             permission={["institution.settings.view"]}
                           >
                             <ApiDashboard />
+                          </PermissionProtectedRoute>
+                        </AccountSetupProtectedRoute>
+                      </AuthenticatedSuccessProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/developers-api/:id"
+                    element={
+                      <AuthenticatedSuccessProtectedRoute>
+                        <AccountSetupProtectedRoute>
+                          <PermissionProtectedRoute
+                            permission={["institution.settings.view"]}
+                          >
+                            <ApiDetails />
                           </PermissionProtectedRoute>
                         </AccountSetupProtectedRoute>
                       </AuthenticatedSuccessProtectedRoute>

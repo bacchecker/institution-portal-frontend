@@ -19,8 +19,8 @@ import {
   PopoverContent,
 } from "@heroui/react";
 import { toast } from "sonner";
+import Swal from "sweetalert2";
 import moment from "moment";
-import { FaPlus, FaRegCircleUser } from "react-icons/fa6";
 import {
   MdEdit,
   MdMoreVert,
@@ -28,6 +28,7 @@ import {
   MdOutlineFilterAltOff,
 } from "react-icons/md";
 import { BsTrash3 } from "react-icons/bs";
+import { FaKey, FaEye } from "react-icons/fa";
 import EditApi from "./EditApi";
 import { FaPlusCircle } from "react-icons/fa";
 
@@ -46,7 +47,6 @@ const ApiDashboard = () => {
   const [userInput, setUserInput] = useState(initialUserInput);
   const [apiScopes, setApiScopes] = useState([]);
   const [apiKeys, setApiKeys] = useState([]);
-  const [data, setData] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [lastPage, setLastPage] = useState(1);
   const [total, setTotal] = useState(0);
@@ -57,15 +57,7 @@ const ApiDashboard = () => {
   });
   const [submittedFilters, setSubmittedFilters] = useState({});
   const [selectedScopes, setSelectedScopes] = useState([]);
-  const [scrollBehavior, setScrollBehavior] = React.useState("inside");
-
-  const handleChange = (permName) => {
-    setSelectedScopes((prev) =>
-      prev.includes(permName)
-        ? prev.filter((name) => name !== permName)
-        : [...prev, permName]
-    );
-  };
+  const [scrollBehavior] = React.useState("inside");
 
   const handleUserInput = (e) => {
     setUserInput((userInput) => ({
@@ -104,6 +96,7 @@ const ApiDashboard = () => {
       setIsLoading(false);
     }
   };
+
   useEffect(() => {
     fetchApiKeys();
     fetchScopes();
@@ -149,7 +142,7 @@ const ApiDashboard = () => {
     setSelectedApi(transformedItem);
   };
 
-  const handleClickDelete = async (item, i) => {
+  const handleClickDelete = async (item) => {
     try {
       // Display confirmation dialog
       const result = await Swal.fire({
@@ -168,12 +161,50 @@ const ApiDashboard = () => {
         );
 
         toast.success(response.data.message);
-        fetchApiData();
+        fetchApiKeys();
       }
     } catch (error) {
       // Error feedback
       toast.error(
         error.response?.data?.message || "Failed to delete api.",
+        "error"
+      );
+    }
+  };
+
+  const handleShowSecret = async (item) => {
+    try {
+      const result = await Swal.fire({
+        title: "Generate New Secret?",
+        text: "This will generate a new API secret and invalidate the old one. Are you sure?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#febf4c",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, generate new secret",
+        cancelButtonText: "Cancel",
+      });
+
+      if (result.isConfirmed) {
+        const response = await axios.post(
+          `/v1/institution/api-keys/${item?.id}/show-secret`
+        );
+
+        // Show the new secret in a modal
+        await Swal.fire({
+          title: "New API Secret Generated",
+          html: `<div style="background: #f5f5f5; padding: 10px; border-radius: 4px; margin: 10px 0;">
+            <strong>New Secret:</strong><br>
+            <code style="word-break: break-all;">${response.data.data.api_secret}</code>
+          </div>
+          <p><strong>Warning:</strong> This secret will not be shown again. Save it securely!</p>`,
+          icon: "success",
+          confirmButtonText: "I've saved it securely",
+        });
+      }
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message || "Failed to generate new secret.",
         "error"
       );
     }
@@ -577,7 +608,25 @@ const ApiDashboard = () => {
                           </button>
                           <button
                             onClick={() => {
-                              handleClickDelete(item, item?.id);
+                              handleShowSecret(item);
+                            }}
+                            className="text-left text-sm hover:bg-bChkRed hover:text-white px-4 py-1.5 rounded-md w-full flex space-x-2 items-center text-gray-700"
+                          >
+                            <FaKey size={17} />
+                            <p>Show Secret</p>
+                          </button>
+                          <button
+                            onClick={() => {
+                              window.location.href = `/developers-api/${item.id}`;
+                            }}
+                            className="text-left text-sm hover:bg-bChkRed hover:text-white px-4 py-1.5 rounded-md w-full flex space-x-2 items-center text-gray-700"
+                          >
+                            <FaEye size={17} />
+                            <p>View Details</p>
+                          </button>
+                          <button
+                            onClick={() => {
+                              handleClickDelete(item);
                             }}
                             className="text-left text-sm hover:bg-bChkRed hover:text-white px-4 py-1.5 rounded-md w-full flex space-x-2 items-center text-gray-700"
                           >
