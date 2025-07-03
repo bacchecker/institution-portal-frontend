@@ -35,6 +35,7 @@ import AccountSuspendedProtection from "@/components/AccountSuspendedProtection"
 import AccountSettings from "./pages/accountSettingsComponents/AccountSettings";
 import MainRequests from "./pages/accountSettingsComponents/updateRequestComponents/MainRequests";
 import '@react-pdf-viewer/core/lib/styles/index.css';
+import ApiDashboard from "./pages/developerApi/ApiDashboard";
 
 function App() {
   
@@ -222,6 +223,20 @@ function App() {
                             permission={["institution.settings.view"]}
                           >
                             <MainRequests />
+                          </PermissionProtectedRoute>
+                        </AccountSetupProtectedRoute>
+                      </AuthenticatedSuccessProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/developers-api"
+                    element={
+                      <AuthenticatedSuccessProtectedRoute>
+                        <AccountSetupProtectedRoute>
+                          <PermissionProtectedRoute
+                            permission={["institution.settings.view"]}
+                          >
+                            <ApiDashboard />
                           </PermissionProtectedRoute>
                         </AccountSetupProtectedRoute>
                       </AuthenticatedSuccessProtectedRoute>
