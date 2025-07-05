@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import SideModal from "@/components/SideModal";
-import LoadItems from "@/components/LoadItems";
 import Swal from "sweetalert2";
 import { toast } from "sonner";
 import PropTypes from "prop-types";
@@ -15,13 +14,12 @@ function EditApi({
   fetchApiKeys,
 }) {
   const [userInput, setUserInput] = useState({});
-  const [userInitialInput, setUserInitialInput] = useState({});
   const [groupedScopes, setGroupedScopes] = useState({});
   const [selectedScopes, setSelectedScopes] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    if (selectedApi) {
+    if (selectedApi && openModal) {
       setUserInput({
         ...selectedApi,
         environment: selectedApi.environment || "test",
@@ -31,16 +29,7 @@ function EditApi({
       const perms = selectedApi?.scopes?.map((perm) => perm.name) || [];
       setSelectedScopes(perms);
     }
-  }, [selectedApi]);
-
-  // Reset form state when the modal closes
-  useEffect(() => {
-    if (!openModal) {
-      setUserInput(userInitialInput);
-      const perms = selectedApi?.scopes?.map((perm) => perm.name) || [];
-      setSelectedScopes(perms);
-    }
-  }, [openModal]);
+  }, [selectedApi, openModal]);
 
   // Group scopes by category and subcategory
   useEffect(() => {
@@ -65,34 +54,51 @@ function EditApi({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const { name, environment, id } = userInput;
 
-    if (!name || !environment) {
+    if (isSubmitting) return; // Prevent double submission
+
+    setIsSubmitting(true);
+
+    const { name, id } = userInput;
+
+    if (!name) {
       Swal.fire("Error", "Fill all required fields", "error");
+      setIsSubmitting(false);
       return;
     }
 
     if (!selectedScopes.length) {
       Swal.fire("Error", "Select at least one scope", "error");
+      setIsSubmitting(false);
       return;
     }
 
     try {
       const payload = {
         name: userInput.name,
-        environment: userInput.environment,
         scopes: selectedScopes,
       };
+
       const response = await axios.put(
         `/v1/institution/api-keys/${id}`,
-        payload
+        payload,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
       );
       toast.success(response.data.message);
       setOpenModal(false);
       fetchApiKeys();
     } catch (err) {
       console.error("Error updating API:", err);
+      if (err.response && err.response.data && err.response.data.errors) {
+        console.log("Validation errors:", err.response.data.errors);
+      }
       toast.error("Failed to update api");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -199,17 +205,12 @@ function EditApi({
 
         <button
           type="submit"
-          disabled={isLoading}
-          className="bg-[#FF0404] mt-4 w-full py-2 rounded-md text-white hover:bg-[#ef4545] disabled:bg-[#fa6767]"
+          disabled={isSubmitting}
+          className="bg-[#FF0404] mt-4 w-full py-2 rounded-md text-white hover:bg-[#ef4545] disabled:bg-gray-400"
         >
-          {isLoading ? (
-            <div className="flex items-center justify-center gap-2">
-              <LoadItems color={"#ffffff"} size={15} />
-              <h4 className="text-sm text-[#ffffff]">Updating...</h4>
-            </div>
-          ) : (
-            <h4 className="text-sm text-[#ffffff]">Update Api</h4>
-          )}
+          <h4 className="text-sm text-[#ffffff]">
+            {isSubmitting ? "Updating..." : "Update Api"}
+          </h4>
         </button>
       </form>
     </SideModal>
@@ -219,6 +220,7 @@ function EditApi({
 EditApi.propTypes = {
   setOpenModal: PropTypes.func.isRequired,
   openModal: PropTypes.bool.isRequired,
+  fetchApiKeys: PropTypes.func.isRequired,
   apiScopes: PropTypes.objectOf(
     PropTypes.arrayOf(
       PropTypes.shape({
@@ -233,6 +235,7 @@ EditApi.propTypes = {
     id: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
     description: PropTypes.string,
+    environment: PropTypes.string,
     scopes: PropTypes.arrayOf(
       PropTypes.shape({
         name: PropTypes.string.isRequired,

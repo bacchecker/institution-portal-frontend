@@ -53,7 +53,7 @@ const ApiDashboard = () => {
   const [sortBy, setSortBy] = useState(null);
   const [sortOrder, setSortOrder] = useState("asc");
   const [filters, setFilters] = useState({
-    search_query: "",
+    search: "",
   });
   const [submittedFilters, setSubmittedFilters] = useState({});
   const [selectedScopes, setSelectedScopes] = useState([]);
@@ -117,7 +117,11 @@ const ApiDashboard = () => {
         scopes: selectedScopes,
       };
 
-      const response = await axios.post("/v1/institution/api-keys", payload);
+      const response = await axios.post("/v1/institution/api-keys", payload, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
       onOpenChange(false);
       fetchApiKeys();
       setUserInput(initialUserInput);
@@ -496,16 +500,10 @@ const ApiDashboard = () => {
                     onClick={() => {
                       setFilters({
                         search: "",
-                        document_type: null,
-                        start_date: null,
-                        end_date: null,
                       });
 
                       setSubmittedFilters({
                         search: "",
-                        document_type: null,
-                        start_date: null,
-                        end_date: null,
                       });
                     }}
                   >
