@@ -22,6 +22,7 @@ import { toast } from "sonner";
 import moment from "moment";
 import Swal from "sweetalert2";
 import {
+  MdBarChart,
   MdEdit,
   MdMoreVert,
   MdOutlineFilterAlt,
@@ -31,6 +32,8 @@ import { BsTrash3 } from "react-icons/bs";
 import { FaKey, FaEye } from "react-icons/fa";
 import EditApi from "./EditApi";
 import { FaPlusCircle } from "react-icons/fa";
+import { IoTimerOutline, IoWarningOutline } from "react-icons/io5";
+import { FaRegCircleCheck } from "react-icons/fa6";
 
 const ApiDashboard = () => {
   const [selectedRange, setSelectedRange] = useState("7");
@@ -250,7 +253,7 @@ const ApiDashboard = () => {
       <div className="bg-white min-h-screen p-6 text-gray-700">
         {/* Top Boxes */}
         <div className="mb-2 bg-[#f8f8f8] p-1 rounded-md border flex items-center justify-between">
-          <label className="ml-2 block md:text-[1.2vw] text-[3vw] font-[600] text-gray-700">
+          <label className="ml-2 block md:text-[1.2vw] text-[3vw] font-[500] text-gray-700">
             Institution API Keys
           </label>
           <select
@@ -265,15 +268,11 @@ const ApiDashboard = () => {
           </select>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mb-4">
           <div className="w-full bg-[#f8f8f8] md:p-[0.2vw] p-[1vw] md:rounded-[0.4vw] rounded-[1.1vw] border border-[#0000000f]">
             <div className="w-full bg-[#ffffff] border border-[#0000000f] md:rounded-[0.3vw] rounded-[1vw] flex md:p-[0.5vw] p-[2vw] items-center md:gap-[0.5vw] gap-[1vw]">
               <div className="md:w-[3vw] md:h-[3vw] w-[10vw] h-[10vw] bg-[#50199d] md:rounded-[0.2vw] rounded-[0.8vw] flex items-center justify-center">
-                <img
-                  src="/assets/img/docx.svg"
-                  alt=""
-                  className="md:w-[1.5vw] w-[5vw]"
-                />
+                <MdBarChart size={20} className="text-white"/>
               </div>
               <div className="flex flex-col">
                 <h4 className="md:text-[1vw] text-[3vw] font-[600]">Total Requests</h4>
@@ -289,11 +288,7 @@ const ApiDashboard = () => {
           <div className="w-full bg-[#f8f8f8] md:p-[0.2vw] p-[1vw] md:rounded-[0.4vw] rounded-[1.1vw] border border-[#0000000f]">
             <div className="w-full bg-[#ffffff] border border-[#0000000f] md:rounded-[0.3vw] rounded-[1vw] flex md:p-[0.5vw] p-[2vw] items-center md:gap-[0.5vw] gap-[1vw]">
               <div className="md:w-[3vw] md:h-[3vw] w-[10vw] h-[10vw] bg-[#1ec43c] md:rounded-[0.2vw] rounded-[0.8vw] flex items-center justify-center">
-                <img
-                  src="/assets/img/docx.svg"
-                  alt=""
-                  className="md:w-[1.5vw] w-[5vw]"
-                />
+                <FaRegCircleCheck size={20} className="text-white"/>
               </div>
               <div className="flex flex-col">
                 <h4 className="md:text-[1vw] text-[3vw] font-[600]">
@@ -312,11 +307,7 @@ const ApiDashboard = () => {
           <div className="w-full bg-[#f8f8f8] md:p-[0.2vw] p-[1vw] md:rounded-[0.4vw] rounded-[1.1vw] border border-[#0000000f]">
             <div className="w-full bg-[#ffffff] border border-[#0000000f] md:rounded-[0.3vw] rounded-[1vw] flex md:p-[0.5vw] p-[2vw] items-center md:gap-[0.5vw] gap-[1vw]">
               <div className="md:w-[3vw] md:h-[3vw] w-[10vw] h-[10vw] bg-[#ff0404] md:rounded-[0.2vw] rounded-[0.8vw] flex items-center justify-center">
-                <img
-                  src="/assets/img/docx.svg"
-                  alt=""
-                  className="md:w-[1.5vw] w-[5vw]"
-                />
+                <IoWarningOutline size={20} className="text-white"/>
               </div>
               <div className="flex flex-col">
                 <h4 className="md:text-[1vw] text-[3vw] font-[600]">Error Rate</h4>
@@ -332,11 +323,7 @@ const ApiDashboard = () => {
           <div className="w-full bg-[#f8f8f8] md:p-[0.2vw] p-[1vw] md:rounded-[0.4vw] rounded-[1.1vw] border border-[#0000000f]">
             <div className="w-full bg-[#ffffff] border border-[#0000000f] md:rounded-[0.3vw] rounded-[1vw] flex md:p-[0.5vw] p-[2vw] items-center md:gap-[0.5vw] gap-[1vw]">
               <div className="md:w-[3vw] md:h-[3vw] w-[10vw] h-[10vw] bg-[#818712] md:rounded-[0.2vw] rounded-[0.8vw] flex items-center justify-center">
-                <img
-                  src="/assets/img/docx.svg"
-                  alt=""
-                  className="md:w-[1.5vw] w-[5vw]"
-                />
+                <IoTimerOutline size={20} className="text-white"/>
               </div>
               <div className="flex flex-col">
                 <h4 className="md:text-[1vw] text-[3vw] font-[600]">Avg Response Time</h4>
@@ -346,17 +333,17 @@ const ApiDashboard = () => {
               </div>
             </div>
             <div className="flex justify-between items-center px-2">
-              <span className="text-lg font-semibold text-gray-800">{Number(apiStats?.avg_response_time || 0).toFixed(2)}</span>
+              <span className="text-lg font-semibold text-gray-800">{Number(apiStats?.avg_response_time || 0).toFixed(2)}<span className="md:text-[0.9vw] text-[3.5vw] text-gray-500">ms</span></span>
             </div>
           </div>
         </div>
-
         <Modal
           isOpen={isOpen}
           onOpenChange={onOpenChange}
-          size="4xl"
           scrollBehavior={scrollBehavior}
           radius="none"
+          size="5xl"
+          backdrop="opaque"
         >
           <ModalContent>
             {(onClose) => (
@@ -472,10 +459,7 @@ const ApiDashboard = () => {
                                         }}
                                       />
                                       <span>
-                                        <p>{scope.name}</p>
-                                        {/* {scope.description
-                                          ? ` — ${scope.description}`
-                                          : ""} */}
+                                        <p className="text-13px">{scope.name}</p>
                                       </span>
                                     </label>
                                   </div>
@@ -505,9 +489,9 @@ const ApiDashboard = () => {
             )}
           </ModalContent>
         </Modal>
-
+        
         <section className="mb-4">
-          <div className="relative md:w-full flex bg-gray-100 justify-between items-center w-full mx-auto rounded-none shadow-none border-none p-4">
+          <div className="relative md:w-full flex bg-[#f8f8f8] justify-between items-center w-full mx-auto rounded-none shadow-none border-none p-4">
             <div className="w-full flex items-center justify-between">
               <form
                 onSubmit={handleSubmit}
@@ -597,11 +581,8 @@ const ApiDashboard = () => {
             {apiKeys?.data?.map((item) => (
               <TableRow
                 key={item?.id}
-                className={`border-b ${item?.status == "revoked" ? "text-red-400 bg-red-100" : "odd:bg-gray-100 even:bg-gray-50 border-gray-300"}`}
+                className={`border-b ${item?.status == "revoked" ? "text-red-400 bg-red-100" : ""}`}
               >
-                {/* <TableCell className="font-semibold">
-                  {item?.created_by?.first_name} {item?.created_by?.last_name}
-                </TableCell> */}
                 <TableCell className="font-semibold">{item?.name}</TableCell>
                 <TableCell>
                   {moment(item?.created_at).format("MMM D, YYYY")}
