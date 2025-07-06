@@ -300,7 +300,13 @@ const ApiDashboard = () => {
               </div>
             </div>
             <div className="flex justify-between items-center px-2">
-              <span className="text-lg font-semibold text-gray-800">{Number((apiStats?.successful_requests / apiStats?.total_requests) * 100).toFixed(2)}%</span>
+              <span className="text-lg font-semibold text-gray-800">
+                {apiStats?.total_requests > 0
+                ? Number(
+                    (apiStats.successful_requests / apiStats.total_requests) * 100
+                  ).toFixed(2)
+                : "0.00"}%
+              </span>
             </div>
           </div>
           
@@ -312,12 +318,18 @@ const ApiDashboard = () => {
               <div className="flex flex-col">
                 <h4 className="md:text-[1vw] text-[3vw] font-[600]">Error Rate</h4>
                 <h4 className={`md:text-[0.8vw] text-[3.5vw] text-gray-500`}>
-                  3 Failed
+                  {apiStats?.failed_requests} Failed
                 </h4>
               </div>
             </div>
             <div className="flex justify-between items-center px-2">
-              <span className="text-lg font-semibold text-gray-800">{Number((apiStats?.failed_requests / apiStats?.total_requests) * 100).toFixed(2)}%</span>
+              <span className="text-lg font-semibold text-gray-800">
+                {apiStats?.total_requests > 0
+                ? Number(
+                    (apiStats.failed_requests / apiStats.total_requests) * 100
+                  ).toFixed(2)
+                : "0.00"}%
+              </span>
             </div>
           </div>
           <div className="w-full bg-[#f8f8f8] md:p-[0.2vw] p-[1vw] md:rounded-[0.4vw] rounded-[1.1vw] border border-[#0000000f]">
@@ -459,7 +471,7 @@ const ApiDashboard = () => {
                                         }}
                                       />
                                       <span>
-                                        <p className="text-13px">{scope.name}</p>
+                                        <p className="text-[13px]">{scope.name}</p>
                                       </span>
                                     </label>
                                   </div>
