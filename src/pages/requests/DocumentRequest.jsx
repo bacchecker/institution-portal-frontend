@@ -249,7 +249,7 @@ export default function DocumentRequest() {
   };
 
   return (
-    <div title="Document Request">
+    <div>
       <section className="px-0 lg:px-3">
         <Card className="md:w-full w-full mx-auto rounded-none shadow-none border-none">
           <CardBody className="w-full bg-gray-100 p-3 lg:p-6">
