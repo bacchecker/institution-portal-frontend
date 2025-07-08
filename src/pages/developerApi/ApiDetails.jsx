@@ -1,16 +1,8 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import axios from "@/utils/axiosConfig";
-import {
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Divider,
-  Chip,
-  Input,
-} from "@heroui/react";
+import { Button, Chip, Input } from "@heroui/react";
 import { toast } from "sonner";
 import Swal from "sweetalert2";
 import moment from "moment";
@@ -24,6 +16,8 @@ import {
   FaSave,
   FaTimes,
 } from "react-icons/fa";
+import { FaRegCircleCheck } from "react-icons/fa6";
+import { IoTimerOutline, IoWarningOutline } from "react-icons/io5";
 
 const ApiDetails = () => {
   const { id } = useParams();
@@ -114,15 +108,11 @@ const ApiDetails = () => {
         allowedDomains_isArray: Array.isArray(allowedDomains),
       });
 
-      const response = await axios.put(
-        `/v1/institution/api-keys/${id}`,
-        updateData,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      await axios.put(`/v1/institution/api-keys/${id}`, updateData, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
       toast.success("Whitelist updated successfully");
       setEditingIps(false);
@@ -227,146 +217,151 @@ const ApiDetails = () => {
           </Button>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           {/* API Key Information */}
-          <div className="lg:col-span-2">
-            <Card>
-              <CardHeader>
-                <h2 className="text-xl font-semibold">API Key Information</h2>
-              </CardHeader>
-              <Divider />
-              <CardBody className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-sm font-medium text-gray-600">
-                      API Key
-                    </label>
-                    <div className="mt-1 p-3 bg-gray-100 rounded-md font-mono text-sm">
-                      {apiKey.api_key}
-                    </div>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-600">
-                      Environment
-                    </label>
-                    <div className="mt-1">
-                      <Chip
-                        color={
-                          apiKey.environment === "live" ? "success" : "default"
-                        }
-                        variant="flat"
-                      >
-                        {apiKey.environment}
-                      </Chip>
-                    </div>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-600">
-                      Created
-                    </label>
-                    <div className="mt-1 text-sm text-gray-800">
-                      {moment(apiKey.created_at).format(
-                        "MMM D, YYYY [at] h:mm A"
-                      )}
-                    </div>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-600">
-                      Last Used
-                    </label>
-                    <div className="mt-1 text-sm text-gray-800">
-                      {apiKey.last_used_at
-                        ? moment(apiKey.last_used_at).format(
-                            "MMM D, YYYY [at] h:mm A"
-                          )
-                        : "Never"}
-                    </div>
-                  </div>
-                </div>
+          <div className="w-full bg-[#f8f8f8] md:p-[0.2vw] p-[1vw] md:rounded-[0.4vw] rounded-[1.1vw] border border-[#0000000f]">
+            <div className="w-full bg-[#ffffff] border border-[#0000000f] md:rounded-[0.3vw] rounded-[1vw] flex md:p-[0.5vw] p-[2vw] items-center md:gap-[0.5vw] gap-[1vw]">
+              <div className="md:w-[3vw] md:h-[3vw] w-[10vw] h-[10vw] bg-[#50199d] md:rounded-[0.2vw] rounded-[0.8vw] flex items-center justify-center">
+                <FaKey size={20} className="text-white" />
+              </div>
+              <div className="flex flex-col">
+                <h4 className="md:text-[1vw] text-[3vw] font-[600]">API Key</h4>
+                <h4 className="md:text-[0.8vw] text-[3.5vw] text-gray-500">
+                  {apiKey.api_key}
+                </h4>
+              </div>
+            </div>
+            <div className="flex justify-between items-center px-2">
+              <span className="text-lg font-semibold text-gray-800">
+                Environment
+              </span>
+              <Chip
+                color={apiKey.environment === "live" ? "success" : "default"}
+                variant="flat"
+                size="sm"
+              >
+                {apiKey.environment}
+              </Chip>
+            </div>
+          </div>
 
-                <div>
-                  <label className="text-sm font-medium text-gray-600">
-                    Scopes
-                  </label>
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    {apiKey.scopes?.map((scope, index) => (
-                      <Chip
-                        key={index}
-                        size="sm"
-                        variant="flat"
-                        color="primary"
-                      >
-                        {scope}
-                      </Chip>
-                    ))}
-                  </div>
-                </div>
-              </CardBody>
-            </Card>
+          {/* Created Date */}
+          <div className="w-full bg-[#f8f8f8] md:p-[0.2vw] p-[1vw] md:rounded-[0.4vw] rounded-[1.1vw] border border-[#0000000f]">
+            <div className="w-full bg-[#ffffff] border border-[#0000000f] md:rounded-[0.3vw] rounded-[1vw] flex md:p-[0.5vw] p-[2vw] items-center md:gap-[0.5vw] gap-[1vw]">
+              <div className="md:w-[3vw] md:h-[3vw] w-[10vw] h-[10vw] bg-[#1ec43c] md:rounded-[0.2vw] rounded-[0.8vw] flex items-center justify-center">
+                <FaRegCircleCheck size={20} className="text-white" />
+              </div>
+              <div className="flex flex-col">
+                <h4 className="md:text-[1vw] text-[3vw] font-[600]">Created</h4>
+                <h4 className="md:text-[0.8vw] text-[3.5vw] text-gray-500">
+                  {moment(apiKey.created_at).format("MMM D, YYYY")}
+                </h4>
+              </div>
+            </div>
+            <div className="flex justify-between items-center px-2">
+              <span className="text-lg font-semibold text-gray-800">
+                {moment(apiKey.created_at).format("h:mm A")}
+              </span>
+            </div>
+          </div>
+
+          {/* Last Used */}
+          <div className="w-full bg-[#f8f8f8] md:p-[0.2vw] p-[1vw] md:rounded-[0.4vw] rounded-[1.1vw] border border-[#0000000f]">
+            <div className="w-full bg-[#ffffff] border border-[#0000000f] md:rounded-[0.3vw] rounded-[1vw] flex md:p-[0.5vw] p-[2vw] items-center md:gap-[0.5vw] gap-[1vw]">
+              <div className="md:w-[3vw] md:h-[3vw] w-[10vw] h-[10vw] bg-[#ff0404] md:rounded-[0.2vw] rounded-[0.8vw] flex items-center justify-center">
+                <IoWarningOutline size={20} className="text-white" />
+              </div>
+              <div className="flex flex-col">
+                <h4 className="md:text-[1vw] text-[3vw] font-[600]">
+                  Last Used
+                </h4>
+                <h4 className="md:text-[0.8vw] text-[3.5vw] text-gray-500">
+                  {apiKey.last_used_at
+                    ? moment(apiKey.last_used_at).format("MMM D, YYYY")
+                    : "Never"}
+                </h4>
+              </div>
+            </div>
+            <div className="flex justify-between items-center px-2">
+              <span className="text-lg font-semibold text-gray-800">
+                {apiKey.last_used_at
+                  ? moment(apiKey.last_used_at).format("h:mm A")
+                  : "N/A"}
+              </span>
+            </div>
           </div>
 
           {/* Rate Limits */}
-          <div>
-            <Card>
-              <CardHeader>
-                <h2 className="text-xl font-semibold">Rate Limits</h2>
-              </CardHeader>
-              <Divider />
-              <CardBody className="space-y-4">
-                <div>
-                  <label className="text-sm font-medium text-gray-600">
-                    Per Minute
-                  </label>
-                  <div className="mt-1 text-lg font-semibold">
-                    {apiKey.rate_limit_per_minute}
-                  </div>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-600">
-                    Per Hour
-                  </label>
-                  <div className="mt-1 text-lg font-semibold">
-                    {apiKey.rate_limit_per_hour}
-                  </div>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-600">
-                    Per Day
-                  </label>
-                  <div className="mt-1 text-lg font-semibold">
-                    {apiKey.rate_limit_per_day}
-                  </div>
-                </div>
-              </CardBody>
-            </Card>
+          <div className="w-full bg-[#f8f8f8] md:p-[0.2vw] p-[1vw] md:rounded-[0.4vw] rounded-[1.1vw] border border-[#0000000f]">
+            <div className="w-full bg-[#ffffff] border border-[#0000000f] md:rounded-[0.3vw] rounded-[1vw] flex md:p-[0.5vw] p-[2vw] items-center md:gap-[0.5vw] gap-[1vw]">
+              <div className="md:w-[3vw] md:h-[3vw] w-[10vw] h-[10vw] bg-[#818712] md:rounded-[0.2vw] rounded-[0.8vw] flex items-center justify-center">
+                <IoTimerOutline size={20} className="text-white" />
+              </div>
+              <div className="flex flex-col">
+                <h4 className="md:text-[1vw] text-[3vw] font-[600]">
+                  Rate Limits
+                </h4>
+                <h4 className="md:text-[0.8vw] text-[3.5vw] text-gray-500">
+                  Per minute: {apiKey.rate_limit_per_minute}
+                </h4>
+              </div>
+            </div>
+            <div className="flex justify-between items-center px-2">
+              <span className="text-lg font-semibold text-gray-800">
+                {apiKey.rate_limit_per_hour}
+                <span className="md:text-[0.9vw] text-[3.5vw] text-gray-500">
+                  /hour
+                </span>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Scopes Section */}
+        <div className="mb-4">
+          <div className="w-full bg-[#f8f8f8] md:p-[0.2vw] p-[1vw] md:rounded-[0.4vw] rounded-[1.1vw] border border-[#0000000f]">
+            <div className="w-full bg-[#ffffff] border border-[#0000000f] md:rounded-[0.3vw] rounded-[1vw] md:p-[0.5vw] p-[2vw]">
+              <h4 className="md:text-[1vw] text-[3vw] font-[600] mb-2">
+                API Scopes
+              </h4>
+              <div className="flex flex-wrap gap-2">
+                {apiKey.scopes?.map((scope, index) => (
+                  <Chip key={index} size="sm" variant="flat" color="primary">
+                    {scope}
+                  </Chip>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
 
         {/* IP Whitelisting */}
         <div className="mt-6">
-          <Card>
-            <CardHeader className="flex justify-between items-center">
-              <div className="flex items-center gap-2">
-                <FaNetworkWired className="text-blue-500" />
-                <h2 className="text-xl font-semibold">IP Whitelisting</h2>
+          <div className="w-full bg-[#f8f8f8] md:p-[0.2vw] p-[1vw] md:rounded-[0.4vw] rounded-[1.1vw] border border-[#0000000f]">
+            <div className="w-full bg-[#ffffff] border border-[#0000000f] md:rounded-[0.3vw] rounded-[1vw] md:p-[0.5vw] p-[2vw]">
+              <div className="flex justify-between items-center mb-4">
+                <div className="flex items-center gap-2">
+                  <FaNetworkWired className="text-blue-500" />
+                  <h2 className="md:text-[1vw] text-[3vw] font-[600]">
+                    IP Whitelisting
+                  </h2>
+                </div>
+                <Button
+                  startContent={editingIps ? <FaSave /> : <FaEdit />}
+                  onClick={() =>
+                    editingIps ? handleUpdateWhitelist() : setEditingIps(true)
+                  }
+                  isLoading={saving}
+                  className={
+                    editingIps
+                      ? "bg-green-500 text-white rounded-sm"
+                      : "bg-blue-500 text-white rounded-sm"
+                  }
+                >
+                  {editingIps ? "Save Changes" : "Edit"}
+                </Button>
               </div>
-              <Button
-                startContent={editingIps ? <FaSave /> : <FaEdit />}
-                onClick={() =>
-                  editingIps ? handleUpdateWhitelist() : setEditingIps(true)
-                }
-                isLoading={saving}
-                className={
-                  editingIps
-                    ? "bg-green-500 text-white rounded-sm"
-                    : "bg-blue-500 text-white rounded-sm"
-                }
-              >
-                {editingIps ? "Save Changes" : "Edit"}
-              </Button>
-            </CardHeader>
-            <Divider />
-            <CardBody>
+
               {editingIps ? (
                 <div className="space-y-4">
                   <div className="flex gap-2">
@@ -428,37 +423,39 @@ const ApiDetails = () => {
                   )}
                 </div>
               )}
-            </CardBody>
-          </Card>
+            </div>
+          </div>
         </div>
 
         {/* Domain Whitelisting */}
         <div className="mt-6">
-          <Card>
-            <CardHeader className="flex justify-between items-center">
-              <div className="flex items-center gap-2">
-                <FaGlobe className="text-green-500" />
-                <h2 className="text-xl font-semibold">Domain Whitelisting</h2>
+          <div className="w-full bg-[#f8f8f8] md:p-[0.2vw] p-[1vw] md:rounded-[0.4vw] rounded-[1.1vw] border border-[#0000000f]">
+            <div className="w-full bg-[#ffffff] border border-[#0000000f] md:rounded-[0.3vw] rounded-[1vw] md:p-[0.5vw] p-[2vw]">
+              <div className="flex justify-between items-center mb-4">
+                <div className="flex items-center gap-2">
+                  <FaGlobe className="text-green-500" />
+                  <h2 className="md:text-[1vw] text-[3vw] font-[600]">
+                    Domain Whitelisting
+                  </h2>
+                </div>
+                <Button
+                  startContent={editingDomains ? <FaSave /> : <FaEdit />}
+                  onClick={() =>
+                    editingDomains
+                      ? handleUpdateWhitelist()
+                      : setEditingDomains(true)
+                  }
+                  isLoading={saving}
+                  className={
+                    editingDomains
+                      ? "bg-green-500 text-white rounded-sm"
+                      : "bg-blue-500 text-white rounded-sm"
+                  }
+                >
+                  {editingDomains ? "Save Changes" : "Edit"}
+                </Button>
               </div>
-              <Button
-                startContent={editingDomains ? <FaSave /> : <FaEdit />}
-                onClick={() =>
-                  editingDomains
-                    ? handleUpdateWhitelist()
-                    : setEditingDomains(true)
-                }
-                isLoading={saving}
-                className={
-                  editingDomains
-                    ? "bg-green-500 text-white rounded-sm"
-                    : "bg-blue-500 text-white rounded-sm"
-                }
-              >
-                {editingDomains ? "Save Changes" : "Edit"}
-              </Button>
-            </CardHeader>
-            <Divider />
-            <CardBody>
+
               {editingDomains ? (
                 <div className="space-y-4">
                   <div className="flex gap-2">
@@ -529,8 +526,8 @@ const ApiDetails = () => {
                   )}
                 </div>
               )}
-            </CardBody>
-          </Card>
+            </div>
+          </div>
         </div>
       </div>
     </div>
