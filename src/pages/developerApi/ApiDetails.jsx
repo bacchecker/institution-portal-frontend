@@ -97,10 +97,17 @@ const ApiDetails = () => {
     try {
       setSaving(true);
 
-      // Debug: Log the data being sent
-      console.log("Sending whitelist update:", {
+      // Include required fields from the current API key data
+      const updateData = {
+        name: apiKey.name,
+        scopes: apiKey.scopes || [],
         allowed_ips: allowedIps,
         allowed_domains: allowedDomains,
+      };
+
+      // Debug: Log the data being sent
+      console.log("Sending whitelist update:", {
+        ...updateData,
         allowedIps_type: typeof allowedIps,
         allowedDomains_type: typeof allowedDomains,
         allowedIps_isArray: Array.isArray(allowedIps),
@@ -109,10 +116,7 @@ const ApiDetails = () => {
 
       const response = await axios.put(
         `/v1/institution/api-keys/${id}`,
-        {
-          allowed_ips: allowedIps,
-          allowed_domains: allowedDomains,
-        },
+        updateData,
         {
           headers: {
             "Content-Type": "application/json",
