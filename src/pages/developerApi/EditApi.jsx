@@ -131,7 +131,7 @@ function EditApi({
             <h4 className="md:text-[1vw] text-[4vw] mb-1">
               Environment<span className="text-[#f1416c]">*</span>
             </h4>
-            <RadioGroup
+            {/* <RadioGroup
               orientation="horizontal"
               value={userInput.environment}
               onValueChange={(value) =>
@@ -147,7 +147,7 @@ function EditApi({
               <Radio size="sm" value="live">
                 Live
               </Radio>
-            </RadioGroup>
+            </RadioGroup> */}
           </div>
 
           {/* Scopes */}
