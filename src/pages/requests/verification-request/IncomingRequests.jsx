@@ -527,7 +527,7 @@ export default function IncomingRequests() {
           classNames="w-[100vw] 2xl:w-[85vw] h-[100dvh] z-10"
         >
           <div className="w-full flex space-x-4 h-[100dvh] overflow-hidden -mt-4">
-            {data?.file?.path && (
+            {data?.file?.path ? (
               <div className='hidden md:block w-full h-full overflow-hidden'>
                 {["jpg", "jpeg", "png", "gif"].includes(
                     data?.file?.extension
@@ -551,6 +551,12 @@ export default function IncomingRequests() {
                       </Worker>
                     </div>
                 )}
+              </div>
+            ): (
+              <div className="hidden md:flex w-full h-[90dvh] justify-center items-center border md:rounded-[0.3vw] rounded-[1vw]">
+                <p className="text-[#999] md:text-[1vw] text-[3vw] text-center">
+                  No document file has been attached for this request.
+                </p>
               </div>
             )}
             <div className="w-full lg:w-[50vw] xl:w-[45vw] h-full overflow-y-auto flex flex-col font-semibold justify-between">
@@ -646,21 +652,6 @@ export default function IncomingRequests() {
                       <div className="w-full flex gap-2 items-center">
                         <p className="font-semibold uppercase text-bChkRed">Request Attachment</p>
                       </div>
-
-                      {/* <Button
-                        variant="ghost"
-                        size="sm"
-                        color="primary"
-                        isLoading={bulkDownloadLoading}
-                        isDisabled={bulkDownloadLoading}
-                        onClick={() => {
-                          setBulkDownloadLoading(true);
-                          handleBulkDownload(data.files.map((f) => f.path));
-                        }}
-                      >
-                        <FaDownload className="text-red-600" />
-                        Download all
-                      </Button> */}
                     </section>
 
                     <section className="grid grid-cols-1 gap-2">
@@ -671,23 +662,38 @@ export default function IncomingRequests() {
                           </p>
                           {/* <p>GH¢ {data?.total_amount}</p> */}
 
-                          <div className="flex justify-between">
-                            <div className="flex gap-2 items-center">
-                              <Chip size="sm">{data?.file?.extension}</Chip>
-                              <p>{filesize(data?.file?.size ?? 1000)}</p>
+                          {!data?.file?.path ? (
+                            <div className="flex flex-col items-center justify-center py-8">
+                              <i className="bx bxs-file-pdf text-5xl text-gray-400"></i>
+                              <p className="text-gray-500 text-sm mt-2">
+                                No document attached
+                              </p>
                             </div>
-                            <div
-                              className="flex space-x-1 cursor-pointer py-1 px-2 rounded-sm bg-primary text-white text-xs"
-                              onClick={() => {
-                                window.location.href =
-                                  "https://admin-dev.baccheck.online/api/download-pdf?path=" +
-                                  encodeURIComponent(data?.file?.path);
-                              }}
-                            >
-                              <FaDownload />
-                              <p>Download</p>
-                            </div>
-                          </div>
+                          ) : (
+                            <>
+                              <div className="flex justify-between mt-2">
+                                <div className="flex gap-2 items-center">
+                                  <Chip size="sm">
+                                    {data?.file?.extension}
+                                  </Chip>
+                                  <p>
+                                    {filesize(data?.file?.size ?? 1000)}
+                                  </p>
+                                </div>
+                                <div
+                                  className="flex space-x-1 cursor-pointer py-1 px-2 rounded-sm bg-primary text-white text-xs"
+                                  onClick={() => {
+                                    window.location.href =
+                                      "https://admin-dev.baccheck.online/api/download-pdf?path=" +
+                                      encodeURIComponent(data?.file?.path);
+                                  }}
+                                >
+                                  <FaDownload />
+                                  <p>Download</p>
+                                </div>
+                              </div>
+                            </>
+                          )}
                         </div>
                       </div>
                       
