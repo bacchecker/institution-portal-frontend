@@ -156,14 +156,45 @@ const ApiDashboard = () => {
           "Content-Type": "application/json",
         },
       });
+
       onOpenChange(false);
       fetchApiKeys();
       setUserInput(initialUserInput);
       setSelectedScopes([]);
       toast.success(response.data.message);
+
+      // Show the secret popup immediately after creation
+      if (response.data.data.api_secret) {
+        await Swal.fire({
+          title: "API Key Created Successfully!",
+          html: `
+            <div style="margin: 20px 0;">
+              <div style="background: #f5f5f5; padding: 15px; border-radius: 4px; margin: 15px 0;">
+                <strong>API Key:</strong><br>
+                <code style="word-break: break-all; font-size: 14px;">${response.data.data.api_key}</code>
+              </div>
+              <div style="background: #f5f5f5; padding: 15px; border-radius: 4px; margin: 15px 0;">
+                <strong>API Secret:</strong><br>
+                <code style="word-break: break-all; font-size: 14px;">${response.data.data.api_secret}</code>
+              </div>
+              <div style="background: #fff3cd; padding: 15px; border-radius: 4px; margin: 15px 0; border: 1px solid #ffeaa7;">
+                <p style="margin: 0; color: #856404;"><strong>Important:</strong> This secret will not be shown again. Please save it securely!</p>
+              </div>
+            </div>
+          `,
+          icon: "success",
+          confirmButtonText: "I've saved the credentials securely",
+          confirmButtonColor: "#febf4c",
+          allowOutsideClick: false,
+          allowEscapeKey: false,
+          width: 600,
+        });
+      }
+
       setIsSaving(false);
     } catch (error) {
       console.error("Error creating API key:", error);
+      toast.error(error.response?.data?.message || "Failed to create API key");
       setIsSaving(false);
     }
   };
