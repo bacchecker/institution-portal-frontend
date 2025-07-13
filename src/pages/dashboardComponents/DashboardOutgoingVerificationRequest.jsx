@@ -278,10 +278,9 @@ function DashboardOutgoingVerificationRequest() {
                               )}
                             </td>
                             <td className="py-[1vw] px-[2.5vw] border-b ">
-                              {
+                              {request?.document_type?.name ??
                                 request?.institution_document_type
-                                  ?.document_type?.name
-                              }
+                                  ?.document_type?.name}
                             </td>
                             <td className="md:py-[1vw] py-[3vw] md:px-[2.5vw] px-[6vw] border-b ">
                               <div
