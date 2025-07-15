@@ -630,51 +630,52 @@ export default function OutgoingRequests() {
                 <div className="-mt-4">
                 <section className="mb-3 flex items-center justify-between">
                     <div className="w-full flex gap-2 items-center">
-                    <p className="font-semibold uppercase text-bChkRed">RequestAttachment</p>
+                    <p className="font-semibold uppercase text-bChkRed">Request Attachment</p>
                     </div>
 
-                    {/* <Button
-                    variant="ghost"
-                    size="sm"
-                    color="primary"
-                    isLoading={bulkDownloadLoading}
-                    isDisabled={bulkDownloadLoading}
-                    onClick={() => {
-                        setBulkDownloadLoading(true);
-                        handleBulkDownload(data.files.map((f) => f.path));
-                    }}
-                    >
-                    <FaDownload className="text-red-600" />
-                    Download all
-                    </Button> */}
                 </section>
 
                 <section className="grid grid-cols-1 gap-2">
                     <div className="gap-3 p-2 rounded-md border">
-                    <div className="w-full flex flex-col gap-1">
+                      <div className="w-full flex flex-col gap-1">
                         <p className="font-semibold">
-                        {data?.document_type?.name}
+                          {data?.document_type?.name}
                         </p>
-                        {/* <p>GH¢ {data?.total_amount}</p> */}
 
-                        <div className="flex justify-between">
-                        <div className="flex gap-2 items-center">
-                            <Chip size="sm">{data?.file?.extension}</Chip>
-                            <p>{filesize(data?.file?.size ?? 1000)}</p>
-                        </div>
-                        <div
-                            className="flex space-x-1 cursor-pointer py-1 px-2 rounded-sm bg-primary text-white text-xs"
-                            onClick={() => {
-                            window.location.href =
-                                "https://admin-dev.baccheck.online/api/download-pdf?path=" +
-                                encodeURIComponent(data?.file?.path);
-                            }}
-                        >
-                            <FaDownload />
-                            <p>Download</p>
-                        </div>
-                        </div>
-                    </div>
+                        {!data?.file?.path ? (
+                          <div className="flex flex-col items-center justify-center py-8">
+                            <i className="bx bxs-file-pdf text-5xl text-gray-400"></i>
+                            <p className="text-gray-500 text-sm mt-2">
+                              No document attached
+                            </p>
+                          </div>
+                        ) : (
+                          <>
+                            <div className="flex justify-between mt-2">
+                              <div className="flex gap-2 items-center">
+                                <Chip size="sm">
+                                  {data?.file?.extension}
+                                </Chip>
+                                <p>
+                                  {filesize(data?.file?.size ?? 1000)}
+                                </p>
+                              </div>
+                              <div
+                                className="flex space-x-1 cursor-pointer py-1 px-2 rounded-sm bg-primary text-white text-xs"
+                                onClick={() => {
+                                  window.location.href =
+                                    "https://admin-dev.baccheck.online/api/download-pdf?path=" +
+                                    encodeURIComponent(data?.file?.path);
+                                }}
+                              >
+                                <FaDownload />
+                                <p>Download</p>
+                              </div>
+                            </div>
+                          </>
+                        )}
+                      </div>
+
                     </div>
                 </section>
                 <section className="flex flex-col mt-2">

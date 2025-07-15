@@ -57,6 +57,7 @@ function NewApplicationForm({
   const [selectedNonInstitutionType, setSelectedNonInstitutionType] = useState(
     {}
   );
+  const [noDocumentAttached, setNoDocumentAttached] = useState(false);
   const [items, setItems] = useState([
     {
       document_type_id: "",
@@ -365,7 +366,7 @@ function NewApplicationForm({
     e.preventDefault();
     setIsSaving(true);
     const hasErrors = items.some((item) => {
-      if (item.document_type_id === "") {
+      if (item.document_type_id === "" && !noDocumentAttached) {
         toast.error("Document is missing", {
           position: "top-right",
           autoClose: 1202,
@@ -380,7 +381,7 @@ function NewApplicationForm({
         return true;
       }
 
-      if (!item.file) {
+    if (!item.file && !noDocumentAttached) {
         toast.error("Document file is missing", {
           position: "top-right",
           autoClose: 1202,
@@ -439,40 +440,41 @@ function NewApplicationForm({
     );
     formData.append("reason", userInput?.reason);
     items.forEach((item, index) => {
+      formData.append(
+        `documents[${index}][document_type_id]`,
+        item.document_type_id || ""
+      );
+      formData.append(
+        `documents[${index}][institution_document_type_id]`,
+        item.institution_document_type_id || ""
+      );
+
       if (item.file) {
-        formData.append(
-          `documents[${index}][document_type_id]`,
-          item.document_type_id
-        );
-        formData.append(
-          `documents[${index}][institution_document_type_id]`,
-          item.institution_document_type_id
-        );
         formData.append(`documents[${index}][file]`, item.file);
       }
+
       formData.append(
         `documents[${index}][doc_owner_email]`,
-        userInput[`doc_owner_email_${index}`]
+        userInput[`doc_owner_email_${index}`] || ""
       );
       formData.append(
         `documents[${index}][doc_owner_phone]`,
-        userInput[`doc_owner_phone_${index}`]
+        userInput[`doc_owner_phone_${index}`] || ""
       );
       formData.append(
         `documents[${index}][doc_owner_institution]`,
-        userInput[`doc_owner_institution_${index}`]
+        userInput[`doc_owner_institution_${index}`] || ""
       );
       formData.append(
         `documents[${index}][doc_owner_dob]`,
-        userInput[`doc_owner_dob_${index}`]
+        userInput[`doc_owner_dob_${index}`] || ""
       );
       formData.append(
         `documents[${index}][doc_owner_full_name]`,
-        userInput[`doc_owner_full_name_${index}`]
+        userInput[`doc_owner_full_name_${index}`] || ""
       );
-      /* formData.append(`documents[${index}][security_question]`, userInput[`security_question_${index}`] || "");
-      formData.append(`documents[${index}][security_answer]`, userInput[`security_answer_${index}`] || ""); */
     });
+
 
     try {
       const response = await axios.post(
@@ -907,7 +909,23 @@ function NewApplicationForm({
                     </div>
                   </div>
                 )} */}
-                <div className="md:mt-[2vw] mt-[8vw]">
+                <div className="flex items-center md:mt-[2vw] mt-[6vw] gap-[0.5vw]">
+                  <input
+                    type="checkbox"
+                    id={`no-doc-checkbox-${i}`}
+                    checked={noDocumentAttached}
+                    onChange={(e) => setNoDocumentAttached(e.target.checked)}
+                    className="checkbox-design accent-bChkRed md:w-[1.5vw] md:h-[1.5vw] w-[4vw] h-[4vw]"
+                  />
+                  <label
+                    htmlFor={`no-doc-checkbox-${i}`}
+                    className="md:text-[1vw] text-[3.5vw] font-bold"
+                  >
+                    I don't have the required document to attach
+                  </label>
+                </div>
+                {!noDocumentAttached && (
+                <div className="md:mt-[1vw] mt-[8vw]">
                   <h4 className="md:text-[1vw] text-[4vw] mb-1">
                     Upload Document File
                     <span className="text-[#f1416c]">*</span>
@@ -955,6 +973,7 @@ function NewApplicationForm({
                     .jpg, .jpeg, .pdf, .png
                   </h6>
                 </div>
+                )}
               </div>
               <div className="border rounded-md p-4 mt-4">
                 <p className="text-sm font-medium">
