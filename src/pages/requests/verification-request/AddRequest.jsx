@@ -919,7 +919,7 @@ function NewApplicationForm({
                   />
                   <label
                     htmlFor={`no-doc-checkbox-${i}`}
-                    className="md:text-[1vw] text-[3.5vw]"
+                    className="md:text-[1vw] text-[3.5vw] font-bold"
                   >
                     I don't have the required document to attach
                   </label>

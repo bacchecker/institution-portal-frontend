@@ -808,7 +808,7 @@ export default function Dashboard() {
 
                       <td className="px-2 py-4">
                         {/* <FaFilePdf size={20} className="text-bChkRed"/> */}
-                        <p>{verification.document_type.name}</p>
+                        <p>{verification?.document_type?.name}</p>
                       </td>
                     </tr>
                   ))}
