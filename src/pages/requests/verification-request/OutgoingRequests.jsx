@@ -40,7 +40,8 @@ export default function OutgoingRequests() {
   const changeStatusDisclosure = useDisclosure();
   const declineDisclosure = useDisclosure();
 
-  const [bulkDownloadLoading, setBulkDownloadLoading] = useState(false);
+  const [currentTab, setCurrentTab] = useState(1);
+  const [selectedStatus, setSelectedStatus] = useState({});
   const [openDrawer, setOpenDrawer] = useState(false);
   const [openAddDrawer, setOpenAddDrawer] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
@@ -533,7 +534,13 @@ export default function OutgoingRequests() {
 
             
         </section>
-        <AddRequest setOpenModal={setOpenAddDrawer} openModal={openAddDrawer} fetchVerificationRequests={institutionVerificationRequests}/>
+        <AddRequest 
+          setOpenModal={setOpenAddDrawer} 
+          openModal={openAddDrawer} 
+          setCurrentTab={setCurrentTab}
+          setSelectedStatus={(e) => setSelectedStatus(e)}
+          fetchVerificationRequests={institutionVerificationRequests}
+        />
         <Drawer
           title={
             "Request Details"

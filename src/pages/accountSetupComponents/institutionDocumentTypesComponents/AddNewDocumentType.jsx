@@ -20,7 +20,9 @@ function AddNewDocumentType({
       printing_fee: "",
       foreign_printing_fee: "",
       validation_fee: "",
+      verification_fee: "",
       foreign_validation_fee: "",
+      foreign_verification_fee: "",
       soft_copy: false,
       hard_copy: false,
     },
@@ -81,7 +83,9 @@ function AddNewDocumentType({
         printing_fee: "",
         foreign_printing_fee: "",
         validation_fee: "",
+        verification_fee: "",
         foreign_validation_fee: "",
+        foreign_verification_fee: "",
         soft_copy: false,
         hard_copy: false,
       },
@@ -103,7 +107,9 @@ function AddNewDocumentType({
           printing_fee: "",
           foreign_printing_fee: "",
           validation_fee: "",
+          verification_fee: "",
           foreign_validation_fee: "",
+          foreign_verification_fee: "",
           soft_copy: false,
           hard_copy: false,
         },
@@ -136,7 +142,9 @@ function AddNewDocumentType({
         item.foreign_base_fee === "" || 
         (item.hard_copy && item.printing_fee === "" && item.foreign_printing_fee === "") ||
         item.validation_fee === "" ||
+        item.verification_fee === "" ||
         item.foreign_validation_fee === "" ||
+        item.foreign_verification_fee === "" ||
         (!item?.hard_copy && !item?.soft_copy)
       ) {
         Swal.fire({
@@ -194,7 +202,9 @@ function AddNewDocumentType({
               printing_fee: "",
               foreign_printing_fee: "",
               validation_fee: "",
+              verification_fee: "",
               foreign_validation_fee: "",
+              foreign_verification_fee: "",
               soft_copy: false,
               hard_copy: false,
             },
@@ -358,6 +368,46 @@ function AddNewDocumentType({
                     
                   </div>
                   <h4 className="md:text-[0.8vw] text-[2.5vw] text-[#f1416c]">{`(A fee for confirming and validating the accuracy of specific information or credentials provided in institutional documents upon request.)`}</h4>
+                  <div className="md:mt-[2vw] mt-[10vw]">
+                    <h4 className="md:text-[1vw] text-[4vw] mb-1">
+                      Verification Request Fee
+                      <span className="text-[#f1416c]">*</span>
+                    </h4>
+                    <div className="w-full flex space-x-2">
+                      <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
+                        <input
+                          type="text"
+                          name="verification_fee"
+                          value={item.verification_fee}
+                          placeholder="Local Fees (GH₵)"
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            if (/^\d{0,20}(\.\d{0,20})?$/.test(value)) {
+                              handleItemChange(e, i);
+                            }
+                          }}
+                          className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0"
+                        />
+                      </div>
+                      <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
+                        <input
+                          type="text"
+                          name="foreign_verification_fee"
+                          value={item.foreign_verification_fee}
+                          placeholder="Foreign Fees ($)"
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            if (/^\d{0,20}(\.\d{0,20})?$/.test(value)) {
+                              handleItemChange(e, i);
+                            }
+                          }}
+                          className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0"
+                        />
+                      </div>
+                    </div>
+                    
+                  </div>
+                  <h4 className="md:text-[0.8vw] text-[2.5vw] text-[#f1416c]">{`(A fee for examining and verifying the authenticity of specific details or credentials presented in documents.)`}</h4>
 
                   <div className="md:mt-[2vw] mt-[10vw]">
                     <h4 className="md:text-[1vw] text-[4vw] mb-1">

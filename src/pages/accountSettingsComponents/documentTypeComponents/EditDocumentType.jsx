@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from "react";
 import SideModal from "@/components/SideModal";
-import SelectInput from "@/components/SelectInput";
-import Swal from "sweetalert2";
 import {
   useUpdateDocumentTypeMutation,
 } from "../../../redux/apiSlice";
@@ -40,7 +38,7 @@ function EditDocumentType({ setOpenModal, openModal, selectedDocumentType, fetch
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const { base_fee, foreign_base_fee, printing_fee, foreign_printing_fee, validation_fee, foreign_validation_fee, soft_copy, hard_copy, id } =
+    const { base_fee, foreign_base_fee, printing_fee, foreign_printing_fee, validation_fee, foreign_validation_fee, verification_fee, foreign_verification_fee, soft_copy, hard_copy, id } =
       userInput;
 
     if (
@@ -49,6 +47,8 @@ function EditDocumentType({ setOpenModal, openModal, selectedDocumentType, fetch
       (hard_copy && printing_fee === "" && foreign_printing_fee === "") ||
       validation_fee === "" ||
       foreign_validation_fee === "" ||
+      verification_fee === "" ||
+      foreign_verification_fee === "" ||
       (!hard_copy && !soft_copy)
     ) {
       toast.error("Fill All required fields", {
@@ -83,6 +83,8 @@ function EditDocumentType({ setOpenModal, openModal, selectedDocumentType, fetch
             printing_fee: !hard_copy ? 0 : printing_fee,
             validation_fee,
             foreign_validation_fee: foreign_validation_fee,
+            verification_fee,
+            foreign_verification_fee: foreign_verification_fee,
             soft_copy,
             hard_copy,
           },
@@ -270,6 +272,43 @@ function EditDocumentType({ setOpenModal, openModal, selectedDocumentType, fetch
             </div>
             
             <h4 className="md:text-[0.8vw] text-[2.5vw] text-[#f1416c]">{`(A fee for confirming and validating the accuracy of specific information or credentials provided in institutional documents upon request.)`}</h4>
+          </div>
+          <div className="md:mt-[2vw] mt-[10vw]">
+            <h4 className="md:text-[1vw] text-[4vw] mb-1">
+              Verification Request Fee<span className="text-[#f1416c]">*</span>
+            </h4>
+            <div className="w-full flex space-x-2">
+              <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
+                <input
+                  type="text"
+                  name="verification_fee"
+                  value={userInput.verification_fee}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (/^\d{0,20}(\.\d{0,20})?$/.test(value)) {
+                      handleUserInput(e);
+                    }
+                  }}
+                  className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0"
+                />
+              </div>
+              <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
+                <input
+                  type="text"
+                  name="foreign_verification_fee"
+                  value={userInput.foreign_verification_fee}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (/^\d{0,20}(\.\d{0,20})?$/.test(value)) {
+                      handleUserInput(e);
+                    }
+                  }}
+                  className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0"
+                />
+              </div>
+            </div>
+            
+            <h4 className="md:text-[0.8vw] text-[2.5vw] text-[#f1416c]">{`(A fee for examining and verifying the authenticity of specific details or credentials presented in documents.)`}</h4>
           </div>
 
           <div className="md:mt-[2vw] mt-[10vw]">
