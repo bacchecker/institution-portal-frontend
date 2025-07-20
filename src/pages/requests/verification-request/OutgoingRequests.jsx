@@ -546,9 +546,9 @@ export default function OutgoingRequests() {
                                     <div
                                       className="flex space-x-1 cursor-pointer py-1 px-2 rounded-sm bg-primary text-white text-xs"
                                       onClick={() => {
-                                        window.location.href =
-                                          "https://admin-dev.baccheck.online/api/download-pdf?path=" +
-                                          encodeURIComponent(data?.file?.path);
+                                        const baseUrl = import.meta.env.VITE_BACCHECKER_API_URL;
+                                        const filePath = encodeURIComponent(data?.file?.path);
+                                        window.location.href = `${baseUrl}/download-pdf?path=${filePath}`;
                                       }}
                                     >
                                       <FaDownload />
