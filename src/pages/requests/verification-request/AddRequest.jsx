@@ -229,13 +229,8 @@ function NewApplicationForm({
     const type = allDocuments?.find(
       (type) => type?.id === value || type?.document_type?.id === value
     );
-    return type?.verification_fee || 0;
+    return (type?.verification_fee || 0);
   };
-
-  const totalAmount = items.reduce((acc, item) => {
-    const fee = getDocumentVerificationFee(item?.document_type_id);
-    return acc + (fee || 0);
-  }, 0);
 
   const getDocumentName = (value) => {
     const type = allDocuments?.find((type) => type?.id === value);
@@ -514,11 +509,11 @@ function NewApplicationForm({
     }
   };
 
-  useEffect(() => {
+  /* useEffect(() => {
     if (!openModal && (currentScreen === 2 || currentScreen === 3)) {
       setCurrentTab(2);
     }
-  }, [openModal, currentScreen]);
+  }, [openModal, currentScreen]); */
 
   useEffect(() => {
     if (error) {
@@ -903,9 +898,7 @@ function NewApplicationForm({
                     <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
                       <input
                         type="text"
-                        value={(
-                          getDocumentVerificationFee(item?.document_type_id) * 1
-                        ).toFixed(2)}
+                        value={`GH₵ ${(getDocumentVerificationFee(item?.document_type_id) * 1).toFixed(2)}`}
                         readOnly
                         className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0 read-only:bg-[#d8d8d8]"
                       />
@@ -1194,7 +1187,6 @@ function NewApplicationForm({
         <NewApplicationForm2
           setCurrentScreen={setCurrentScreen}
           setOpenModal={(e) => setOpenModal(e)}
-          setCurrentTab={setCurrentTab}
         />
       )}
       {currentScreen === 3 && (

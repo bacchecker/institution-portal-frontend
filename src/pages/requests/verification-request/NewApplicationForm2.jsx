@@ -4,8 +4,6 @@ import Swal from "sweetalert2";
 function NewApplicationForm2({
   setCurrentScreen,
   setOpenModal,
-  openModal,
-  setCurrentTab,
 }) {
   const handleLaterPayment = async () => {
     const result = await Swal.fire({
@@ -21,7 +19,7 @@ function NewApplicationForm2({
 
     if (result.isConfirmed) {
       setOpenModal(false);
-      setCurrentTab(2);
+      
     }
   };
 

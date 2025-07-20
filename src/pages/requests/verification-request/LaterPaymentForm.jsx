@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { toast } from "sonner";
-import { useInitiatePaymentMutation } from "@/redux/apiSlice";
 import SelectInput from "@/components/SelectInput";
+import { useInitiatePaymentMutation } from "@/redux/apiSlice";
 import LoadItems from "@/components/LoadItems";
+import { toast } from "sonner";
 import axios from "@/utils/axiosConfig";
 import axiosDef from "axios";
 import secureLocalStorage from "react-secure-storage";
+import { use } from "react";
 
-function NewApplicationForm3({ uniqueRequestedCode, totalApplicationAmount }) {
+
+function LaterPaymentForm({ uniqueRequestedCode, requestBody }) {
   const initialUserInput = {
     payment_detail: "",
   };
@@ -27,16 +29,10 @@ function NewApplicationForm3({ uniqueRequestedCode, totalApplicationAmount }) {
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState({});
   const [preferredPlatform, setPreferredPlatform] = useState("paystack");
   const [isProcessing, setIsProcessing] = useState(false);
-  const [currency, setCurrency] = useState("");
   const [finalAmount, setFinalAmount] = useState(0);
+  const [currency, setCurrency] = useState("");
   const [instBill, setInstBill] = useState("Ghana");
   const [countryNames, setCountryNames] = useState([]);
-  const handleUserInput = (e) => {
-    setUserInput((userInput) => ({
-      ...userInput,
-      [e.target.name]: e.target.value,
-    }));
-  };
 
   useEffect(() => {
     const fetchInstitution = async () => {
@@ -50,6 +46,13 @@ function NewApplicationForm3({ uniqueRequestedCode, totalApplicationAmount }) {
 
     fetchInstitution();
   }, []);
+      
+  const handleUserInput = (e) => {
+    setUserInput((userInput) => ({
+      ...userInput,
+      [e.target.name]: e.target.value,
+    }));
+  };
   const handleSeletedPaymentChannel = (item) => {
     setSelectedPaymentChannel(item);
     setSelectedPaymentMethod({});
@@ -58,11 +61,12 @@ function NewApplicationForm3({ uniqueRequestedCode, totalApplicationAmount }) {
       payment_detail: "",
     }));
   };
+
   const handleSeletedPaymentMethod = (item) => {
     setSelectedPaymentMethod(item);
   };
 
-  const [initiatePayment, { data, isSuccess, isLoading, isError, error }] =
+  const [initiatePayment, { data, isSuccess, isLoading, error }] =
     useInitiatePaymentMutation();
 
     const handleSubmit = async (e) => {
@@ -79,7 +83,7 @@ function NewApplicationForm3({ uniqueRequestedCode, totalApplicationAmount }) {
           channel: selectedPaymentChannel?.value,
           payment_method: selectedPaymentMethod?.value,
           unique_code: uniqueRequestedCode,
-          amount: totalApplicationAmount?.verification_fee,
+          amount: parseFloat(requestBody?.institution_document_type?.verification_fee),
           payment_detail: userInput?.payment_detail,
           payment_type: "verification",
         });
@@ -88,7 +92,7 @@ function NewApplicationForm3({ uniqueRequestedCode, totalApplicationAmount }) {
         const payload = {
           channel: "card",
           unique_code: uniqueRequestedCode,
-          amount: totalApplicationAmount?.foreign_verification_fee,
+          amount: parseFloat(requestBody?.institution_document_type?.foreign_verification_fee),
           payment_type: "verification",
         };
     
@@ -98,11 +102,12 @@ function NewApplicationForm3({ uniqueRequestedCode, totalApplicationAmount }) {
           if (response.data.status === "success") {
             window.location.href = response.data.url;
           } else {
-            console.error("Unexpected Stripe response:", response.data);
+            toast.error("Unexpected Stripe response.");
+            console.error(response.data);
           }
         } catch (error) {
-          toast.error(error?.response?.data?.message || error.message);
-          console.error("Stripe Payment Error:", error.response?.data || error.message);
+          toast.error(error?.response?.data?.message || "Stripe Error");
+          console.error(error);
         } finally {
           setIsProcessing(false);
         }
@@ -114,15 +119,17 @@ function NewApplicationForm3({ uniqueRequestedCode, totalApplicationAmount }) {
     
 
   useEffect(() => {
-    const paystackRedirect = async () => {
-      if (isSuccess && data && preferredPlatform === 'paystack') {
-        window.location.href = data?.authorization_url;
+    const handlePaymentRedirect = async () => {
+      if (isSuccess && data) {
+        try {
+        window.location.href = data.authorization_url;
+        } catch (error) {
+          console.error("Payment failed:", error.response?.data || error.message);
+        }
       }
     };
-
-    paystackRedirect();
-  }, [isSuccess, data, preferredPlatform]);
-
+  handlePaymentRedirect();
+}, [isSuccess, data]);
 
   useEffect(() => {
     if (error) {
@@ -131,48 +138,42 @@ function NewApplicationForm3({ uniqueRequestedCode, totalApplicationAmount }) {
   }, [error]);
 
   useEffect(() => {
+    
     if (instBill === "Ghana") {
       setPreferredPlatform("paystack");
-      setFinalAmount(totalApplicationAmount?.verification_fee);
-      
+      setFinalAmount(requestBody?.institution_document_type?.verification_fee);
       setCurrency("GH₵");
     } else {
       setPreferredPlatform("stripe");
-      setFinalAmount(totalApplicationAmount?.foreign_verification_fee);
+      setFinalAmount(requestBody?.institution_document_type?.foreign_verification_fee);
       setCurrency("$");
     }
-    console.log(uniqueRequestedCode)
   }, [instBill]);
-  
-  useEffect(() => {
-    if (preferredPlatform === "stripe") {
-      setSelectedPaymentMethod("card");
-      console.log(uniqueRequestedCode)
-    }
-  }, [preferredPlatform]);
   
   useEffect(() => {
     axiosDef
       .get("https://restcountries.com/v3.1/all?fields=cca2,idd,name")
       .then((res) => {
         const names = res.data
-          .map((country) => ({
-            name: country.name.common,
-          }))
+          .map((country) => ({ name: country.name.common }))
           .sort((a, b) => a.name.localeCompare(b.name));
         setCountryNames(names);
       })
       .catch((err) => console.error("Error fetching countries:", err));
   }, []);
   
-
+  useEffect(() => {
+    if (preferredPlatform === "stripe") {
+      setSelectedPaymentMethod("card");
+    }
+  }, [preferredPlatform]);
   return (
     <form className="content" onSubmit={handleSubmit}>
       <h4 className="font-[600] md:text-[1.1vw] text-[4vw] md:my-[1vw!important] my-[4vw!important] md:px-[1vw] px-[5vw]">
         Enter your payment details
       </h4>
       <div className="md:px-[1vw] px-[5vw] w-full overflow-auto">
-        <div className="md:mt-[2vw] mt-[10vw]">
+        <div className="md:mt-[1vw] mt-[10vw]">
           <h4 className="md:text-[1vw] text-[4vw] mb-1">Total Amount</h4>
           <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
             <input
@@ -286,6 +287,9 @@ function NewApplicationForm3({ uniqueRequestedCode, totalApplicationAmount }) {
           </div>
         )}
 
+
+        
+
         <button
           type="submit"
           disabled={isLoading || isProcessing}
@@ -309,4 +313,4 @@ function NewApplicationForm3({ uniqueRequestedCode, totalApplicationAmount }) {
   );
 }
 
-export default NewApplicationForm3;
+export default LaterPaymentForm;
