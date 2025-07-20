@@ -19,7 +19,6 @@ function NewApplicationForm({
   setOpenModal,
   openModal,
   setCurrentTab,
-  setSelectedStatus,
   fetchVerificationRequests,
 }) {
   const initialUserInput = {
@@ -48,12 +47,13 @@ function NewApplicationForm({
   const [isSaving, setIsSaving] = useState(false);
   const [loading, setLoading] = useState(false);
   const [subscription, setSubscription] = useState([]);
-  const [totalApplicationAmount, setTotalApplicationAmount] = useState(null);
+  const [totalApplicationAmount, setTotalApplicationAmount] = useState({});
   const [uniqueRequestedCode, setUniqueRequestedCode] = useState(null);
   const [selectedInstitution, setSelectedInstitution] = useState({});
   const [selectedInstitutionType, setSelectedInstitutionType] = useState({});
   const [allInstitutions, setAllInstitutions] = useState([]);
   const [selectedCredentialType, setSelectedCredentialType] = useState({});
+  const [resData, setResData] = useState({});
   const [selectedNonInstitutionType, setSelectedNonInstitutionType] = useState(
     {}
   );
@@ -208,7 +208,6 @@ function NewApplicationForm({
 
         setAllInstitutions(insAffiliations);
       } else {
-        console.log(filteredInstitutions);
 
         setAllInstitutions(filteredInstitutions);
       }
@@ -230,7 +229,7 @@ function NewApplicationForm({
     const type = allDocuments?.find(
       (type) => type?.id === value || type?.document_type?.id === value
     );
-    return type?.verification_fee || 0;
+    return (type?.verification_fee || 0);
   };
 
   const getDocumentName = (value) => {
@@ -242,8 +241,8 @@ function NewApplicationForm({
     const updatedItems = [...items];
     updatedItems[index].institution_document_type_id = item?.id;
     updatedItems[index].document_type_id = item?.document_type.id;
-
     setItems(updatedItems);
+    setTotalApplicationAmount(item)
   };
 
   useEffect(() => {
@@ -481,7 +480,8 @@ function NewApplicationForm({
         "/institution/requests/verifications",
         formData
       );
-
+      setUniqueRequestedCode(response?.data?.data?.[0]?.unique_code)
+      setCurrentScreen(2);
       toast.success(response.data.message, {
         position: "top-right",
         autoClose: 1202,
@@ -492,7 +492,6 @@ function NewApplicationForm({
         progress: undefined,
         theme: "light",
       });
-      setOpenModal(!openModal);
       fetchVerificationRequests();
       setIsSaving(false);
     } catch (error) {
@@ -510,12 +509,11 @@ function NewApplicationForm({
     }
   };
 
-  useEffect(() => {
+  /* useEffect(() => {
     if (!openModal && (currentScreen === 2 || currentScreen === 3)) {
       setCurrentTab(2);
-      setSelectedStatus({ title: "Created", value: "created" });
     }
-  }, [openModal, currentScreen]);
+  }, [openModal, currentScreen]); */
 
   useEffect(() => {
     if (error) {
@@ -525,7 +523,7 @@ function NewApplicationForm({
 
   return (
     <SideModal
-      title={"New Application"}
+      title={"New Verification Request"}
       setOpenModal={setOpenModal}
       openModal={openModal}
     >
@@ -545,7 +543,7 @@ function NewApplicationForm({
               />
             </div>
           </div>
-          <div className="md:mt-[2vw] mt-[10vw]">
+          {/* <div className="md:mt-[2vw] mt-[10vw]">
             <h4 className="md:text-[1vw] text-[4vw] mb-1">
               Subscription Plan (Credits)
             </h4>
@@ -557,7 +555,7 @@ function NewApplicationForm({
                 className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0 read-only:bg-[#d8d8d8]"
               />
             </div>
-          </div>
+          </div> */}
           <div className="md:mt-[2vw] mt-[8vw]">
             <h4 className="md:text-[1vw] text-[4vw] mb-1">
               Credential Type<span className="text-[#f1416c]">*</span>
@@ -892,7 +890,7 @@ function NewApplicationForm({
                     className="custom-dropdown-class display-md-none"
                   />
                 </div>
-                {/* {item?.document_type_id && (
+                {item?.document_type_id && (
                   <div className="md:mt-[2vw] mt-[10vw]">
                     <h4 className="md:text-[1vw] text-[4vw] mb-1">
                       Verification Fee
@@ -900,15 +898,13 @@ function NewApplicationForm({
                     <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
                       <input
                         type="text"
-                        value={(
-                          getDocumentVerificationFee(item?.document_type_id) * 1
-                        ).toFixed(2)}
+                        value={`GH₵ ${(getDocumentVerificationFee(item?.document_type_id) * 1).toFixed(2)}`}
                         readOnly
                         className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0 read-only:bg-[#d8d8d8]"
                       />
                     </div>
                   </div>
-                )} */}
+                )}
                 <div className="flex items-center md:mt-[2vw] mt-[6vw] gap-[0.5vw]">
                   <input
                     type="checkbox"
@@ -1191,8 +1187,6 @@ function NewApplicationForm({
         <NewApplicationForm2
           setCurrentScreen={setCurrentScreen}
           setOpenModal={(e) => setOpenModal(e)}
-          setCurrentTab={setCurrentTab}
-          setSelectedStatus={(e) => setSelectedStatus(e)}
         />
       )}
       {currentScreen === 3 && (

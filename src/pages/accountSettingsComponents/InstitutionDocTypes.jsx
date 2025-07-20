@@ -208,7 +208,8 @@ export default function InstitutionDocTypes() {
                         "Formats",
                         "Request Fee",
                         "Validation Fee",
-                        "Printing Fee",
+                        "Verification Fee",
+                        /* "Printing Fee", */
                         "Actions",
                     ]}
                     loadingState={isLoading}
@@ -217,7 +218,8 @@ export default function InstitutionDocTypes() {
                         "Formats": "format",
                         "Request fee": "document_request_fee",
                         "Validation Fee": "validation_fee",
-                        "Printing Fee": "printing_fee",
+                        "Verification Fee": "verification_fee",
+                        /* "Printing Fee": "printing_fee", */
                     }}
                     sortBy={sortBy}
                     sortOrder={sortOrder}
@@ -278,13 +280,23 @@ export default function InstitutionDocTypes() {
                             <TableCell className="text-center">
                               <div className="text-right pr-10">
                                 <p className="text-[#FFA52D]">
+                                GH₵ {document?.verification_fee}
+                                </p>
+                                <p className="text-[#000000]">
+                                  $ {document?.foreign_verification_fee}
+                                </p>
+                              </div>
+                            </TableCell>
+                            {/* <TableCell className="text-center">
+                              <div className="text-right pr-10">
+                                <p className="text-[#FFA52D]">
                                 GH₵ {document?.printing_fee}
                                 </p>
                                 <p className="text-[#000000]">
                                   $ {document?.foreign_printing_fee}
                                 </p>
                               </div>
-                            </TableCell>
+                            </TableCell> */}
                             <TableCell className="text-center">
                               <div className="relative inline-block">
                                 <Popover

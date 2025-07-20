@@ -405,7 +405,7 @@ function InstitutionDepartments({ setActiveStep }) {
                 </div>
               ) : (
                 <h4 className="md:text-[1vw] text-[3.5vw] text-[#ffffff]">
-                  Save & Contitnue
+                  Save & Continue
                 </h4>
               )}
             </button>
