@@ -13,6 +13,9 @@ import { toast } from "sonner";
 import LoadItems from "@/components/LoadItems";
 import NewApplicationForm2 from "./NewApplicationForm2";
 import NewApplicationForm3 from "./NewApplicationForm3";
+import { MdSubscriptions } from "react-icons/md";
+import { FaCreditCard } from "react-icons/fa";
+
 import axios from "@/utils/axiosConfig";
 
 function NewApplicationForm({
@@ -98,7 +101,7 @@ function NewApplicationForm({
   useEffect(() => {
     if (!openModal) {
       fetchSubscription();
-      setCurrentScreen(1);
+      setCurrentScreen(0);
       setUserInput(initialUserInput);
       setIsChecked(false);
       setSelectedCredentialType({});
@@ -542,7 +545,57 @@ function NewApplicationForm({
       setOpenModal={setOpenModal}
       openModal={openModal}
     >
-      <div className="tab-container">
+    {currentScreen === 0 && (
+      <div className="w-full p-4">
+        <h2 className="text-xl font-semibold text-center mb-6">Choose Payment Method</h2>
+        <div className="flex flex-col gap-4">
+          <button
+            onClick={() => {
+              setBillingType("payg");
+              setCurrentScreen(1);
+            }} 
+            className="w-full bg-[#f8f8f8] md:p-[0.2vw] p-[1vw] md:rounded-[0.4vw] rounded-[1.1vw] border border-[#0000000f]  hover:opacity-80"
+          >
+            <div className="w-full bg-[#ffffff] border border-[#0000000f] md:rounded-[0.3vw] rounded-[1vw] flex md:p-[0.5vw] p-[2vw] items-center md:gap-[0.5vw] gap-[1vw]">
+              <div className="md:w-[3vw] md:h-[3vw] w-[10vw] h-[10vw] bg-bChkRed md:rounded-[0.2vw] rounded-[0.8vw] flex items-center justify-center">
+                <FaCreditCard size={20} className="text-white" />
+              </div>
+              <div className="flex flex-col">
+                <h4 className="text-left md:text-[1.1vw] text-[3vw] font-[600] text-bChkRed">
+                  Pay As You Go
+                </h4>
+                <h4 className="md:text-[0.8vw] text-[3vw] text-gray-500">
+                  You’ll be charged a one-time fee for each document you submit
+                </h4>
+              </div>
+            </div>
+          </button>
+          <button
+            onClick={() => {
+              setBillingType("subscription");
+              setCurrentScreen(1);
+            }} 
+            className="w-full bg-[#f8f8f8] md:p-[0.2vw] p-[1vw] md:rounded-[0.4vw] rounded-[1.1vw] border border-[#0000000f] hover:opacity-80"
+          >
+            <div className="w-full bg-[#ffffff] border border-[#0000000f] md:rounded-[0.3vw] rounded-[1vw] flex md:p-[0.5vw] p-[2vw] items-center md:gap-[0.5vw] gap-[1vw]">
+              <div className="md:w-[3vw] md:h-[3vw] w-[10vw] h-[10vw] bg-black md:rounded-[0.2vw] rounded-[0.8vw] flex items-center justify-center">
+                <MdSubscriptions size={20} className="text-white" />
+              </div>
+              <div className="flex flex-col">
+                <h4 className="text-left md:text-[1.1vw] text-[3vw] font-[600] text-black">
+                  Use Subscription Credits
+                </h4>
+                <h4 className="md:text-[0.8vw] text-[3vw] text-gray-500">
+                  Use your pre-paid credit balance to submit requests
+                </h4>
+              </div>
+            </div>
+          </button>
+        </div>
+      </div>
+    )}
+
+      {/* <div className="tab-container">
         <div className="flex flex-col sticky top-0 z-[40] -mt-4">
           <div className="tab_box bg-[#F4F4F4] md:mt-[1vw] mt-[2vw] md:p-[0.5vw] p-[3vw] flex justify-between">
             <button
@@ -563,7 +616,7 @@ function NewApplicationForm({
             </button>
           </div>
         </div>
-      </div>
+      </div> */}
       {currentScreen === 1 && (
         <form
           onSubmit={handleSubmit}
