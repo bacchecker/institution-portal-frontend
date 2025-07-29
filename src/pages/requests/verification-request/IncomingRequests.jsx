@@ -29,6 +29,7 @@ import { toast } from "sonner";
 import {
   FaDownload,
   FaRegCircleCheck,
+  FaCircleUser,
 } from "react-icons/fa6";
 import { FaFilePdf } from "react-icons/fa";
 import { GiCancel } from "react-icons/gi";
@@ -481,7 +482,7 @@ export default function IncomingRequests() {
                 </TableCell>
                 <TableCell className="font-semibold">
                   <CustomUser
-                    avatarSrc={`https://admin-dev.baccheck.online/storage/${item?.sending_institution?.logo}`}
+                    avatarSrc={`${import.meta.env.VITE_BACCHECKER_URL}storage/${item?.sending_institution?.logo}`}
                     name={`${item?.sending_institution?.name}`}
                     email={`${item?.sending_institution?.institution_email}`}
                   />
@@ -553,10 +554,50 @@ export default function IncomingRequests() {
                 )}
               </div>
             ): (
-              <div className="hidden md:flex w-full h-[90dvh] justify-center items-center border md:rounded-[0.3vw] rounded-[1vw]">
-                <p className="text-[#999] md:text-[1vw] text-[3vw] text-center">
-                  No document file has been attached for this request.
-                </p>
+              <div className="hidden md:flex flex-col w-full h-[90dvh] border md:rounded-[0.3vw] rounded-[1vw] p-6">
+                <div className="w-full flex space-x-6">
+                  <div className="flex flex-col space-y-2">
+                    <FaCircleUser size={41} className="text-gray-400"/>
+                    <p className="font-medium text-lg">{data?.doc_owner_full_name}</p>
+                    <p>{data?.doc_owner_dob}</p>
+                    <p>{data?.doc_owner_phone}</p>
+                    <p>{data?.doc_owner_email}</p>
+                    
+                  </div>
+                  <div className="mt-[48px]">
+                    <p className="text-base font-medium text-lg">Academic Info</p>
+                    <div className="flex flex-col space-y-2 mb-4">
+                      <div>
+                        <label>Student Number</label>
+                        <p className="border rounded-sm bg-gray-50 py-1.5 px-2 mt-1">{data?.doc_owner_index_number}</p>
+                      </div>
+                      <div>
+                        <label>Program of Study</label>
+                        <p className="border rounded-sm bg-gray-50 py-1.5 px-2 mt-1">{data?.doc_owner_program_of_study}</p>
+                      </div>
+                      <div>
+                        <label>Mode of Study</label>
+                        <p className="border rounded-sm bg-gray-50 py-1.5 px-2 mt-1">{data?.doc_owner_mode_of_study}</p>
+                      </div>
+                      <div>
+                        <label>Start Year</label>
+                        <p className="border rounded-sm bg-gray-50 py-1.5 px-2 mt-1">{data?.doc_owner_start_year}</p>
+                      </div>
+                      <div>
+                        <label>End Year</label>
+                        <p className="border rounded-sm bg-gray-50 py-1.5 px-2 mt-1">{data?.doc_owner_end_year}</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                </div>
+                <div className="flex flex-col items-center justify-center py-8">
+                  <i className="bx bxs-file-pdf text-5xl text-gray-400"></i>
+                  <p className="text-gray-500 text-sm mt-2">
+                    No document attached was attached to this request
+                  </p>
+                </div>
+                
               </div>
             )}
             <div className="w-full lg:w-[50vw] xl:w-[45vw] h-full overflow-y-auto flex flex-col font-semibold justify-between">
@@ -640,7 +681,7 @@ export default function IncomingRequests() {
                       <div className="text-gray-500 mt-2">Institution Logo</div>
                       <div className="col-span-2 w-10 h-10 rounded-full bg-gray-200">
                         <img
-                          src={`https://admin-dev.baccheck.online/storage/${data?.sending_institution?.logo}`}
+                          src={`${import.meta.env.VITE_BACCHECKER_URL}storage/${data?.sending_institution?.logo}`}
                           alt=""
                         />
                       </div>
@@ -684,7 +725,7 @@ export default function IncomingRequests() {
                                   className="flex space-x-1 cursor-pointer py-1 px-2 rounded-sm bg-primary text-white text-xs"
                                   onClick={() => {
                                     window.location.href =
-                                      "https://admin-dev.baccheck.online/api/download-pdf?path=" +
+                                      `${import.meta.env.VITE_BACCHECKER_API_URL}/download-pdf?path=` +
                                       encodeURIComponent(data?.file?.path);
                                   }}
                                 >
