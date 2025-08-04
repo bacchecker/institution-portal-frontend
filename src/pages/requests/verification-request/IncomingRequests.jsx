@@ -3,13 +3,8 @@ import {
   Button,
   Card,
   CardBody,
-  CardHeader,
   Chip,
   DateRangePicker,
-  Input,
-  Select,
-  Tabs,
-  Tab,
   TableCell,
   TableRow,
   Textarea,
@@ -554,50 +549,52 @@ export default function IncomingRequests() {
                 )}
               </div>
             ): (
-              <div className="hidden md:flex flex-col w-full h-[90dvh] border md:rounded-[0.3vw] rounded-[1vw] p-6">
-                <div className="w-full flex space-x-6">
-                  <div className="flex flex-col space-y-2">
-                    <FaCircleUser size={41} className="text-gray-400"/>
-                    <p className="font-medium text-lg">{data?.doc_owner_full_name}</p>
-                    <p>{data?.doc_owner_dob}</p>
-                    <p>{data?.doc_owner_phone}</p>
-                    <p>{data?.doc_owner_email}</p>
-                    
-                  </div>
-                  <div className="mt-[48px]">
-                    <p className="text-base font-medium text-lg">Academic Info</p>
-                    <div className="flex flex-col space-y-2 mb-4">
-                      <div>
-                        <label>Student Number</label>
-                        <p className="border rounded-sm bg-gray-50 py-1.5 px-2 mt-1">{data?.doc_owner_index_number}</p>
-                      </div>
-                      <div>
-                        <label>Program of Study</label>
-                        <p className="border rounded-sm bg-gray-50 py-1.5 px-2 mt-1">{data?.doc_owner_program_of_study}</p>
-                      </div>
-                      <div>
-                        <label>Mode of Study</label>
-                        <p className="border rounded-sm bg-gray-50 py-1.5 px-2 mt-1">{data?.doc_owner_mode_of_study}</p>
-                      </div>
-                      <div>
-                        <label>Start Year</label>
-                        <p className="border rounded-sm bg-gray-50 py-1.5 px-2 mt-1">{data?.doc_owner_start_year}</p>
-                      </div>
-                      <div>
-                        <label>End Year</label>
-                        <p className="border rounded-sm bg-gray-50 py-1.5 px-2 mt-1">{data?.doc_owner_end_year}</p>
-                      </div>
+              <div className="hidden md:flex flex-col w-full h-[90dvh] shadow md:rounded-[0.3vw] rounded-[1vw]">
+                <div className="h-32 w-full bg-gradient-to-r from-blue-200 to-yellow-200 rounded-t-md"></div>
+                <div className="w-full flex space-x-6 px-6 py-4">
+                  <div className="flex space-x-2">
+                    <FaCircleUser size={48} className="text-gray-400"/>
+                    <div className="">
+                      <p className="font-medium text-base">{data?.doc_owner_full_name}</p>
+                      <p>{data?.doc_owner_email}</p>
                     </div>
                   </div>
-                  
                 </div>
-                <div className='hidden md:block w-full h-full overflow-hidden'>
+                <div className="px-6">
+                  <div className="grid grid-cols-2 gap-x-4 gap-y-2 mb-6">
+                    <div>
+                      <label className="font-medium text-gray-800">Campus</label>
+                      <p className="border rounded-sm bg-gray-50 py-1.5 px-2 mt-1">{data?.doc_owner_campus}</p>
+                    </div>
+                    <div>
+                      <label className="font-medium text-gray-800">Student Number</label>
+                      <p className="border rounded-sm bg-gray-50 py-1.5 px-2 mt-1">{data?.doc_owner_index_number}</p>
+                    </div>
+                    <div>
+                      <label className="font-medium text-gray-800">Program of Study</label>
+                      <p className="border rounded-sm bg-gray-50 py-1.5 px-2 mt-1">{data?.doc_owner_program_of_study}</p>
+                    </div>
+                    <div>
+                      <label className="font-medium text-gray-800">Mode of Study</label>
+                      <p className="border rounded-sm bg-gray-50 py-1.5 px-2 mt-1">{data?.doc_owner_mode_of_study}</p>
+                    </div>
+                    <div>
+                      <label className="font-medium text-gray-800">Start Year</label>
+                      <p className="border rounded-sm bg-gray-50 py-1.5 px-2 mt-1">{data?.doc_owner_start_year}</p>
+                    </div>
+                    <div>
+                      <label className="font-medium text-gray-800">End Year</label>
+                      <p className="border rounded-sm bg-gray-50 py-1.5 px-2 mt-1">{data?.doc_owner_end_year}</p>
+                    </div>
+                  </div>
+                </div>
+                <div className='hidden md:block w-full h-full overflow-hidden pr-4'>
                   {["jpg", "jpeg", "png", "gif"].includes(
-                      data?.related_document?.extension
+                      data?.related_document?.split('.').pop()?.toLowerCase()
                   ) ? (
                       <div className='flex-1 w-full h-[90dvh] overflow-auto border md:rounded-[0.3vw] rounded-[1vw] p-[1vw]'>
                         <img
-                          src={`${import.meta.env.VITE_BACCHECKER_API_URL}/view-decrypted-file?path=${data?.file?.path}`
+                          src={`${import.meta.env.VITE_BACCHECKER_URL}storage/${data?.related_document}`
                           }
                           alt="Document preview"
                           className="w-full max-h-[calc(100vh-170px)] object-contain"
@@ -608,7 +605,7 @@ export default function IncomingRequests() {
                         <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
                           <div className="border md:rounded-[0.3vw] rounded-[1vw] h-[90dvh] overflow-auto">
                             <Viewer
-                              fileUrl={`${import.meta.env.VITE_BACCHECKER_API_URL}/view-decrypted-file?path=${data?.file?.path}`}
+                              fileUrl={`${import.meta.env.VITE_BACCHECKER_URL}storage/${data?.related_document}`}
                             />
                           </div>
                         </Worker>
