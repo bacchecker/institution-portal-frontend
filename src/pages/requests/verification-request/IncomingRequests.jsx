@@ -591,11 +591,29 @@ export default function IncomingRequests() {
                   </div>
                   
                 </div>
-                <div className="flex flex-col items-center justify-center py-8">
-                  <i className="bx bxs-file-pdf text-5xl text-gray-400"></i>
-                  <p className="text-gray-500 text-sm mt-2">
-                    No document attached was attached to this request
-                  </p>
+                <div className='hidden md:block w-full h-full overflow-hidden'>
+                  {["jpg", "jpeg", "png", "gif"].includes(
+                      data?.related_document?.extension
+                  ) ? (
+                      <div className='flex-1 w-full h-[90dvh] overflow-auto border md:rounded-[0.3vw] rounded-[1vw] p-[1vw]'>
+                        <img
+                          src={`${import.meta.env.VITE_BACCHECKER_API_URL}/view-decrypted-file?path=${data?.file?.path}`
+                          }
+                          alt="Document preview"
+                          className="w-full max-h-[calc(100vh-170px)] object-contain"
+                        />
+                      </div>
+                  ) : (
+                      <div className="flex-1">
+                        <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
+                          <div className="border md:rounded-[0.3vw] rounded-[1vw] h-[90dvh] overflow-auto">
+                            <Viewer
+                              fileUrl={`${import.meta.env.VITE_BACCHECKER_API_URL}/view-decrypted-file?path=${data?.file?.path}`}
+                            />
+                          </div>
+                        </Worker>
+                      </div>
+                  )}
                 </div>
                 
               </div>
