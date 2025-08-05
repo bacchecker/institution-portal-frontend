@@ -28,7 +28,7 @@ import {
 } from "react-icons/fa6";
 import { FaFilePdf } from "react-icons/fa";
 import { GiCancel } from "react-icons/gi";
-import { MdOutlineFilterAlt, MdOutlineFilterAltOff } from "react-icons/md";
+import { MdFileDownload, MdOutlineFilterAlt, MdOutlineFilterAltOff } from "react-icons/md";
 import secureLocalStorage from "react-secure-storage";
 import { IoIosOpen } from "react-icons/io";
 import { BsFillInfoCircleFill } from "react-icons/bs";
@@ -601,17 +601,15 @@ export default function IncomingRequests() {
                         />
                       </div>
                   ) : (
-                      <div className="flex-1">
-                        <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
-                          <div className="border md:rounded-[0.3vw] rounded-[1vw] h-[90dvh] overflow-auto">
-                            <Viewer
-                              fileUrl={`https://admin-dev.baccheck.online/storage/${data?.related_document}`}
-                            />
-                          </div>
-                        </Worker>
+                      <div className="h-[90dvh] overflow-auto">
+                        <iframe
+                          src={`${import.meta.env.VITE_BACCHECKER_URL}storage/${data?.related_document}#toolbar=0&navpanes=0&scrollbar=0`}
+                          className="w-full h-full"
+                        ></iframe>
                       </div>
                   )}
                 </div>
+                
                 
               </div>
             )}
