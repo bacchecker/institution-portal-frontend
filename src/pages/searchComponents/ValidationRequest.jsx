@@ -280,12 +280,12 @@ export default function ValidationRequest({data}) {
                         // onClick={() => downloadFile(itemData?.file?.name)}
                         onClick={() => {
                             window.location.href =
-                            "https://admin-dev.baccheck.online/api/download-pdf?path=" +
+                            "${import.meta.env.VITE_BACCHECKER_API_URL}/download-pdf?path=" +
                             encodeURIComponent(itemData?.file?.path);
                         }}
                         /* onClick={() => {
                             window.location.href =
-                            "https://admin-dev.baccheck.online/api/document/download" +
+                            "${import.meta.env.VITE_BACCHECKER_API_URL}/document/download" +
                             "?path=" +
                             encodeURIComponent(itemData?.file?.path);
                         }} */

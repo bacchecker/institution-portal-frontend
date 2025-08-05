@@ -233,7 +233,7 @@ function UpdateTicket({ setOpenModal, openModal, selectedTicket, fetchTickets })
                 <div className="md:w-[4vw] w-[15vw] md:h-[4vw] h-[15vw]">
                   <img
                     src={
-                      `https://admin-dev.baccheck.online/storage/${userInput?.file?.path}` ??
+                      `${import.meta.env.VITE_BACCHECKER_URL}storage/${userInput?.file?.path}` ??
                       "/assets/img/default.png"
                     }
                     alt=""

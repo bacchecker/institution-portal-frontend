@@ -186,7 +186,7 @@ function EditTicket({
                     <img
                       src={
                         userInput?.file && userInput?.file !== "default.png"
-                          ? `https://admin-dev.baccheck.online/storage/${userInput?.file}`
+                          ? `${import.meta.env.VITE_BACCHECKER_URL}storage/${userInput?.file}`
                           : "/images/upload-t.svg"
                       }
                       alt=""
