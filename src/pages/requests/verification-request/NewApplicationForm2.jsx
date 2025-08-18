@@ -4,13 +4,10 @@ import Swal from "sweetalert2";
 function NewApplicationForm2({
   setCurrentScreen,
   setOpenModal,
-  openModal,
-  setCurrentTab,
-  setSelectedStatus,
 }) {
   const handleLaterPayment = async () => {
     const result = await Swal.fire({
-      title: "Are you sure you want to make payment?",
+      title: "Are you sure you do not want to make payment?",
       text: "The institution will not receive this document unless payment is made.",
       icon: "warning",
       showCancelButton: true,
@@ -22,8 +19,7 @@ function NewApplicationForm2({
 
     if (result.isConfirmed) {
       setOpenModal(false);
-      setCurrentTab(2);
-      setSelectedStatus({ title: "Created", value: "created" });
+      
     }
   };
 
@@ -42,7 +38,7 @@ function NewApplicationForm2({
           <span className="text-[#ff0404] font-[400]">created</span>. You can
           continue with the payment to submit your application to the
           institution for processing, or choose to make the payment later.
-          Please note that the institution will only process your request once
+          Please note that the verifying institution will only receive your request once
           the{" "}
           <span className="text-[#ff0404] font-[400]">
             payment is completed.

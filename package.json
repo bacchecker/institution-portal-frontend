@@ -10,12 +10,16 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@heroui/react": "^2.7.11",
     "@nextui-org/react": "^2.4.8",
+    "@react-pdf-viewer/core": "^3.12.0",
+    "@react-pdf-viewer/default-layout": "^3.12.0",
     "@reduxjs/toolkit": "^2.3.0",
     "@stripe/react-stripe-js": "^3.5.1",
     "@stripe/stripe-js": "^6.1.0",
     "axios": "^1.7.9",
     "chart.js": "^4.4.7",
+    "dayjs": "^1.11.13",
     "filesize": "^10.1.6",
     "framer-motion": "^11.11.9",
     "laravel-echo": "^1.17.1",

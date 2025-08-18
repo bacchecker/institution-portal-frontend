@@ -7,6 +7,7 @@ import Dropdown from "./Dropdown";
 import { useGetNotificationsQuery, useUpdateNotificationMutation } from "../redux/apiSlice";
 import Echo from "laravel-echo";
 import Pusher from "pusher-js";
+import { toast } from "sonner";
 import { useDispatch, useSelector } from "react-redux";
 import { setMessage, setSelectedTab } from "../redux/baccheckerSlice";
 
@@ -68,6 +69,10 @@ const Navbar = () => {
 
   const handleSearch = async (event) => {
     event.preventDefault();
+    if (!searchQuery.trim()) {
+      toast.error("Please enter a search query.");
+      return;
+    }
     setIsLoading(true)
 
     try {

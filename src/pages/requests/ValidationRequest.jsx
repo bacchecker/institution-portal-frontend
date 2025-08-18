@@ -38,12 +38,12 @@ import { MdOutlineFilterAlt, MdOutlineFilterAltOff } from "react-icons/md";
 import secureLocalStorage from "react-secure-storage";
 import PermissionWrapper from "@/components/permissions/PermissionWrapper";
 import { IoIosOpen } from "react-icons/io";
+import { Worker, Viewer } from '@react-pdf-viewer/core';
 
 export default function ValidationRequest() {
   const changeStatusDisclosure = useDisclosure();
   const declineDisclosure = useDisclosure();
 
-  const [bulkDownloadLoading, setBulkDownloadLoading] = useState(false);
   const [openDrawer, setOpenDrawer] = useState(false);
   const [processing, setProcessing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -139,7 +139,6 @@ export default function ValidationRequest() {
         if (response && response.data) {
             const blobUrl = URL.createObjectURL(response.data);
             setValidationReport(blobUrl);
-            console.log("Validation Report URL:", blobUrl);
         } else {
             setValidationReport(null);
             console.warn("No data received in response.");
@@ -196,49 +195,7 @@ export default function ValidationRequest() {
       toast.error(error.response.data.message);
     }
   };
-
-  const handleBulkDownload = async (filePaths) => {
-    try {
-      const csrfTokenMeta = document?.querySelector('meta[name="csrf-token"]');
-      const csrfToken = csrfTokenMeta?.getAttribute("content");
-
-      const headers = {
-        "Content-Type": "application/json",
-      };
-
-      // Only add X-CSRF-TOKEN if the token exists
-      if (csrfToken) {
-        headers["X-CSRF-TOKEN"] = csrfToken;
-      }
-
-      const response = await fetch(
-        "https://backend.baccheck.online/api/document/bulk-download",
-        {
-          method: "POST",
-          headers: headers,
-          body: JSON.stringify({ files: filePaths }),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "bulk_download.zip";
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      window.URL.revokeObjectURL(url);
-      setBulkDownloadLoading(false);
-    } catch (error) {
-      console.error("Error downloading files:", error);
-    }
-  };
-
+  
   const handleSubmit = (event) => {
     event.preventDefault();
     setSubmittedFilters({ ...filters });
@@ -579,411 +536,438 @@ export default function ValidationRequest() {
         <Drawer
           title={
             data?.status != "processing"
-              ? "Request Details"
+              ? "Validation Request Details"
               : "Validation Questions"
           }
           isOpen={openDrawer}
           setIsOpen={setOpenDrawer}
-          classNames="w-[100vw] md:w-[45vw] xl:w-[35vw] z-10"
+          classNames="w-[100vw] 2xl:w-[85vw] h-[100dvh] z-10"
         >
-          <div className="h-full flex flex-col -mt-2 font-semibold justify-between">
-            {data?.status != "processing" ? (
-              <div className="flex flex-col gap-2 mb-6">
-                <div className="grid grid-cols-3 gap-y-4 gap-x-2 border-b pb-4">
-                  <div className="text-gray-500">Request ID</div>
-                  <div className="col-span-2">#{data?.unique_code}</div>
-                  <div className="text-gray-500">Requested Date</div>
-                  <div className="col-span-2">
-                    {moment(data?.created_at).format("Do MMMM, YYYY")}
-                  </div>
-                  <div className="text-gray-500">Status</div>
-                  <div
-                    className={`col-span-2 flex items-center justify-center py-1 space-x-2 w-28 
-                      ${
-                        data?.status === "cancelled" ||
-                        data?.status === "rejected"
-                          ? "text-red-600 bg-red-200"
-                          : data?.status === "completed"
-                          ? "text-green-600 bg-green-200"
-                          : data?.status === "processing" ||
-                            data?.status === "received"
-                          ? "text-yellow-600 bg-yellow-200"
-                          : "text-gray-600 bg-gray-200"
-                      }`}
-                  >
+          <div className="w-full flex space-x-4 h-[100dvh] overflow-hidden -mt-4">
+
+            {data?.file?.path && (
+              <div className='hidden md:block w-full h-full overflow-hidden'>
+                {["jpg", "jpeg", "png", "gif"].includes(
+                    data?.file?.extension
+                ) ? (
+                    <div className='flex-1 w-full h-[90dvh] overflow-auto border md:rounded-[0.3vw] rounded-[1vw] p-[1vw]'>
+                      <img
+                        src={`${import.meta.env.VITE_BACCHECKER_API_URL}/view-decrypted-file?path=${data?.file?.path}`
+                        }
+                        alt="Document preview"
+                        className="w-full max-h-[calc(100vh-170px)] object-contain"
+                      />
+                    </div>
+                ) : (
+                    <div className="flex-1">
+                      <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
+                        <div className="border md:rounded-[0.3vw] rounded-[1vw] h-[90dvh] overflow-auto">
+                          <Viewer
+                            fileUrl={`${import.meta.env.VITE_BACCHECKER_API_URL}/view-decrypted-file?path=${data?.file?.path}`}
+                          />
+                        </div>
+                      </Worker>
+                    </div>
+                )}
+              </div>
+            )}
+            
+            <div className="w-full lg:w-[50vw] xl:w-[45vw] h-full overflow-y-auto flex flex-col font-semibold justify-between">
+              {data?.status != "processing" ? (
+                <div className="flex flex-col gap-2 mb-6">
+                  <div className="grid grid-cols-3 gap-y-4 gap-x-2 border-b pb-4">
+                    <div className="text-gray-500">Request ID</div>
+                    <div className="col-span-2">#{data?.unique_code}</div>
+                    <div className="text-gray-500">Date</div>
+                    <div className="col-span-2">
+                      {moment(data?.created_at).format("Do MMMM, YYYY")}
+                    </div>
+                    <div className="text-gray-500">Status</div>
                     <div
-                      className={`h-2 w-2 rounded-full ${
-                        data?.status === "cancelled" ||
-                        data?.status === "rejected"
-                          ? "bg-red-600"
-                          : data?.status === "completed"
-                          ? "bg-green-600"
-                          : data?.status === "processing" ||
-                            data?.status === "received"
-                          ? "bg-yellow-600"
-                          : "bg-gray-600"
-                      }`}
-                    ></div>
-                    <p>
-                      {data?.status.charAt(0).toUpperCase() +
-                        data?.status.slice(1)}
+                      className={`col-span-2 flex items-center justify-center py-1 space-x-2 w-28 
+                        ${
+                          data?.status === "cancelled" ||
+                          data?.status === "rejected"
+                            ? "text-red-600 bg-red-200"
+                            : data?.status === "completed"
+                            ? "text-green-600 bg-green-200"
+                            : data?.status === "processing" ||
+                              data?.status === "received"
+                            ? "text-yellow-600 bg-yellow-200"
+                            : "text-gray-600 bg-gray-200"
+                        }`}
+                    >
+                      <div
+                        className={`h-2 w-2 rounded-full ${
+                          data?.status === "cancelled" ||
+                          data?.status === "rejected"
+                            ? "bg-red-600"
+                            : data?.status === "completed"
+                            ? "bg-green-600"
+                            : data?.status === "processing" ||
+                              data?.status === "received"
+                            ? "bg-yellow-600"
+                            : "bg-gray-600"
+                        }`}
+                      ></div>
+                      <p>
+                        {data?.status.charAt(0).toUpperCase() +
+                          data?.status.slice(1)}
+                      </p>
+                    </div>
+                    <div className="text-gray-500">Total Amount</div>
+                    <div className="col-span-2">GH¢ {data?.total_amount}</div>
+                  </div>
+                  <div className="py-4">
+                    <p className="font-semibold mb-4 text-base">
+                      Applicant Details
                     </p>
-                  </div>
-                  <div className="text-gray-500">Total Cash</div>
-                  <div className="col-span-2">GH¢ {data?.total_amount}</div>
-                </div>
-                <div className="py-4">
-                  <p className="font-semibold mb-4 text-base">
-                    Applicant Details
-                  </p>
-                  <div className="grid grid-cols-3 gap-y-4 border-b pb-4">
-                    <div className="text-gray-500">Applicant Name</div>
-                    <div className="col-span-2">
-                      {data?.user?.first_name} {data?.user?.other_name}{" "}
-                      {data?.user?.last_name}
-                    </div>
-                    <div className="text-gray-500">Applicant Email</div>
-                    <div className="col-span-2">{data?.user?.email}</div>
-                    <div className="text-gray-500">Phone Number</div>
-                    <div className="col-span-2">{data?.user?.phone}</div>
-                    <div className="text-gray-500 mt-2">Applicant Picture</div>
-                    <div className="col-span-2 w-10 h-10 rounded-full bg-gray-200 overflow-hidden">
-                      {data?.user?.photo && (
-                        <img
-                          src={`https://admin-dev.baccheck.online/storage/${data?.user?.photo}`}
-                          alt=""
-                          className="w-full h-full object-cover"
-                        />
-                      )}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="pb-4">
-                  <p className="font-semibold mb-4 text-base">
-                    Academic Details
-                  </p>
-                  <div className="grid grid-cols-3 gap-y-4 border-b pb-4">
-                    <div className="text-gray-500">Student Number</div>
-                    <div className="col-span-2">
-                      {data?.index_number}
-                    </div>
-                    <div className="text-gray-500">Program of Study</div>
-                    <div className="col-span-2">{data?.program_of_study}</div>
-                    <div className="text-gray-500">Start Year</div>
-                    <div className="col-span-2">{data?.start_year}</div>
-                    <div className="text-gray-500">End Year</div>
-                    <div className="col-span-2">{data?.end_year}</div>
-                  </div>
-                </div>
-
-                <div className="-mt-4">
-                  <section className="flex items-center justify-between">
-                    <div className="w-full flex gap-2 items-center">
-                      <p className="uppercase font-semibold py-2 text-bChkRed">Attachments</p>
-                    </div>
-
-                    
-                  </section>
-
-                  <section className="grid grid-cols-1">
-                    <div className="gap-3 p-2 rounded-md border">
-                      <div className="w-full flex justify-between">
-                        {/* Left: Document Info */}
-                        <div className="w-full flex space-x-2 items-center">
-                        {["png", "jpg", "jpeg"].includes(data?.file?.extension?.toLowerCase()) ? (
-                          <FaRegFileImage size={36} className="text-bChkRed" />
-                        ) : (
-                          <FaFilePdf size={36} className="text-bChkRed" />
+                    <div className="grid grid-cols-3 gap-y-4 border-b pb-4">
+                      <div className="text-gray-500">Full Name</div>
+                      <div className="col-span-2">
+                        {data?.user?.first_name} {data?.user?.other_name}{" "}
+                        {data?.user?.last_name}
+                      </div>
+                      <div className="text-gray-500">Email Address</div>
+                      <div className="col-span-2">{data?.user?.email}</div>
+                      <div className="text-gray-500">Phone Number</div>
+                      <div className="col-span-2">{data?.user?.phone}</div>
+                      <div className="text-gray-500 mt-2">Applicant Picture</div>
+                      <div className="col-span-2 w-10 h-10 rounded-full bg-gray-200 overflow-hidden">
+                        {data?.user?.photo && (
+                          <img
+                            src={`https://admin-dev.baccheck.online/storage/${data?.user?.photo}`}
+                            alt=""
+                            className="w-full h-full object-cover"
+                          />
                         )}
- 
-                          <div className="flex flex-col space-y-1">
-                            <p className="font-semibold">
-                              {data?.institution_document_type?.document_type?.name}
-                            </p>
-                            {/* <div className="flex gap-2 items-center text-xs font-semibold text-gray-500 -mt-1">
-                              <Chip size="sm">{data?.file?.extension}</Chip>
-                              <p>{filesize(data?.file?.size ?? 1000)}</p>
-                            </div> */}
-                            <div className="text-xs font-semibold -mt-1">
-                              <p>
-                                From:{" "}
-                                <span className="font-normal text-gray-500">
-                                  {data?.user?.first_name} {data?.user?.last_name}
-                                </span>
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Right: Download Button */}
-                        <div
-                          className="flex self-end space-x-1 items-center cursor-pointer py-1 px-2 rounded-sm bg-blue-600 text-white text-xs w-24 justify-center"
-                          onClick={() => {
-                            window.location.href =
-                              "https://admin-dev.baccheck.online/api/download-pdf?path=" +
-                              encodeURIComponent(data?.file?.path);
-                          }}
-                        >
-                          <FaDownload />
-                          <p>Download</p>
-                        </div>
                       </div>
                     </div>
-                  </section>
-                  <section className="flex flex-col mt-2">
-                    <p className="uppercase font-semibold py-2 text-bChkRed">Validation Report</p>
-                    <div className="flex flex-col space-y-2">
-                      {/* Show Loading Spinner */}
-                      {isFetching ? (
-                        <div className="flex justify-center items-center col-span-2">
-                          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-gray-900"></div>
+                  </div>
+
+                  <div className="pb-4">
+                    <p className="font-semibold mb-4 text-base">
+                      Academic Details
+                    </p>
+                    <div className="grid grid-cols-3 gap-y-4 border-b pb-4">
+                      <div className="text-gray-500">Student Number</div>
+                      <div className="col-span-2">
+                        {data?.index_number}
+                      </div>
+                      <div className="text-gray-500">Program of Study</div>
+                      <div className="col-span-2">{data?.program_of_study}</div>
+                      <div className="text-gray-500">Start Year</div>
+                      <div className="col-span-2">{data?.start_year}</div>
+                      <div className="text-gray-500">End Year</div>
+                      <div className="col-span-2">{data?.end_year}</div>
+                    </div>
+                  </div>
+
+                  <div className="-mt-4">
+                    <section className="flex items-center justify-between">
+                      <div className="w-full flex gap-2 items-center">
+                        <p className="uppercase font-semibold py-2 text-bChkRed">Attachments</p>
+                      </div>
+
+                      
+                    </section>
+
+                    <section className="grid grid-cols-1">
+                      <div className="gap-3 p-2 rounded-md border">
+                        <div className="w-full flex justify-between">
+                          {/* Left: Document Info */}
+                          <div className="w-full flex space-x-2 items-center">
+                          {["png", "jpg", "jpeg"].includes(data?.file?.extension?.toLowerCase()) ? (
+                            <FaRegFileImage size={36} className="text-bChkRed" />
+                          ) : (
+                            <FaFilePdf size={36} className="text-bChkRed" />
+                          )}
+  
+                            <div className="flex flex-col space-y-1">
+                              <p className="font-semibold">
+                                {data?.institution_document_type?.document_type?.name}
+                              </p>
+                              <div className="text-xs font-semibold -mt-1">
+                                <p>
+                                  From:{" "}
+                                  <span className="font-normal text-gray-500">
+                                    {data?.user?.first_name} {data?.user?.last_name}
+                                  </span>
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Right: Download Button */}
+                          <div
+                            className="flex self-end space-x-1 items-center cursor-pointer py-1 px-2 rounded-sm bg-blue-600 text-white text-xs w-24 justify-center"
+                            onClick={() => {
+                              window.location.href =
+                                "https://admin-dev.baccheck.online/api/download-pdf?path=" +
+                                encodeURIComponent(data?.file?.path);
+                            }}
+                          >
+                            <FaDownload />
+                            <p>Download</p>
+                          </div>
                         </div>
-                      ) : (
-                        <>
-                          {/* Display Reports if available */}
-                          {validationReport && data?.status === "completed" ? (
-                            <div className="gap-3 p-2 rounded-md border">
-                              <div className="w-full flex justify-between">
-                                <div className="w-full flex space-x-2 items-center">
-                                  <FaFilePdf size={36} className="text-bChkRed" />
-                                  <div className="flex flex-col space-y-1">
-                                    <p>Validation Report</p>
-                                    <div className="text-xs font-semibold -mt-1">
-                                      <p>
-                                        From:{" "}
-                                        <span className="font-normal text-gray-500">
-                                          {data?.institution?.name}
-                                        </span>
-                                      </p>
+                      </div>
+                    </section>
+                    <section className="flex flex-col mt-2">
+                      <p className="uppercase font-semibold py-2 text-bChkRed">Validation Report</p>
+                      <div className="flex flex-col space-y-2">
+                        {/* Show Loading Spinner */}
+                        {isFetching ? (
+                          <div className="flex justify-center items-center col-span-2">
+                            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-gray-900"></div>
+                          </div>
+                        ) : (
+                          <>
+                            {/* Display Reports if available */}
+                            {validationReport && data?.status === "completed" ? (
+                              <div className="gap-3 p-2 rounded-md border">
+                                <div className="w-full flex justify-between">
+                                  <div className="w-full flex space-x-2 items-center">
+                                    <FaFilePdf size={36} className="text-bChkRed" />
+                                    <div className="flex flex-col space-y-1">
+                                      <p>Validation Report</p>
+                                      <div className="text-xs font-semibold -mt-1">
+                                        <p>
+                                          From:{" "}
+                                          <span className="font-normal text-gray-500">
+                                            {data?.institution?.name}
+                                          </span>
+                                        </p>
+                                      </div>
                                     </div>
                                   </div>
-                                </div>
 
-                                <div
-                                  className="flex self-end space-x-1 items-center cursor-pointer py-1 px-2 rounded-sm bg-blue-600 text-white text-xs w-20"
-                                  onClick={() => window.open(validationReport, "_blank")}
-                                >
-                                  <IoIosOpen size={16} />
-                                  <p>Open</p>
+                                  <div
+                                    className="flex self-end space-x-1 items-center cursor-pointer py-1 px-2 rounded-sm bg-blue-600 text-white text-xs w-20"
+                                    onClick={() => window.open(validationReport, "_blank")}
+                                  >
+                                    <IoIosOpen size={16} />
+                                    <p>Open</p>
+                                  </div>
                                 </div>
                               </div>
-                            </div>
-                          ) : (
-                            <div className="col-span-2 text-center text-gray-500 text-sm py-4">
-                              No reports found.
-                            </div>
-                          )}
-                        </>
-                      )}
-                    </div>
-                  </section>
-                </div>
+                            ) : (
+                              <div className="col-span-2 text-center text-gray-500 text-sm py-4">
+                                No reports found.
+                              </div>
+                            )}
+                          </>
+                        )}
+                      </div>
+                    </section>
+                  </div>
 
-                <div>
-                  {data?.status == "rejected" && (
-                    <div className="mt-3">
-                      <Card className="">
-                        <CardHeader>
-                          <p className="font-bold">Rejection Reason</p>
-                        </CardHeader>
-                        <CardBody>
-                          <p>{data?.rejection_reason}</p>
-                        </CardBody>
-                      </Card>
-
+                  <div>
+                    {data?.status == "rejected" && (
                       <div className="mt-3">
                         <Card className="">
-                          <CardBody className="flex-row">
-                            <div className="flex-1">
-                              <p className="font-semibold">Rejected By:</p>
-                              <p className="col-span-4">
-                                {data?.rejected_by?.first_name}{" "}
-                                {data?.rejected_by?.last_name}
-                              </p>
-                            </div>
-
-                            <div className="flex-1">
-                              <p className="font-bold">Rejection Date</p>
-                              <p>
-                                {moment(data?.updated_at).format(
-                                  "Do MMMM, YYYY"
-                                )}
-                              </p>
-                            </div>
+                          <CardHeader>
+                            <p className="font-bold">Rejection Reason</p>
+                          </CardHeader>
+                          <CardBody>
+                            <p>{data?.rejection_reason}</p>
                           </CardBody>
                         </Card>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            ) : (
-              <div className="-mt-12">
-                <div className="">
-                  <div className="space-y-4">
-                    {checklistItems.sections &&
-                    checklistItems.sections.length > 0 ? (
-                      checklistItems.sections.map((section, sectionIndex) => (
-                        <div
-                          className="md:mt-[3vw] border p-2.5 rounded-md"
-                          key={section.id}
-                        >
-                          <h4 className="text-sm mb-1 font-bold">
-                            {section.name}
-                          </h4>
-                          <h4 className="text-xs mb-4 font-normal">
-                            {section.description}
-                          </h4>
-                          <div className="flex flex-col gap-4">
-                          {Array.isArray(section?.checklist_items) &&
-                            section.checklist_items.map((question, questionIndex) => (
-                              <div className="" key={question.id}>
-                                <h4 className="text-sm mb-1 font-normal">
-                                  {question.question_text}
-                                  {question.is_mandatory && (
-                                    <span className="text-[#f1416c]">
-                                      *
-                                    </span>
-                                  )}
-                                </h4>
-                                {(question.input_type === "yes_no" || question.input_type === "radio") && (
-                                  <SelectInput
-                                    placeholder={"Select Option"}
-                                    data={boolData}
-                                    inputValue={question.answer || ""}
-                                    onItemSelect={(selectedItem) =>
-                                      handleAnswerChange(sectionIndex, questionIndex, selectedItem.value)
-                                    }
-                                    className="custom-dropdown-class display-md-none"
-                                  />
-                                )}
-                                {(question.input_type === "text" || question.input_type === "date") && (
-                                  <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
-                                    <input
-                                      type={question.input_type}
-                                      value={question.answer || ""}
-                                      required={question.is_mandatory}
-                                      onChange={(e) =>
-                                        handleAnswerChange(sectionIndex, questionIndex, e.target.value)
-                                      }
-                                      className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0 read-only:bg-[#d8d8d8]"
-                                    />
-                                  </div>
-                                )}
-                                {question.input_type === "dropdown" && (
-                                  <SelectInput
-                                    placeholder={"Select Option"}
-                                    data={
-                                      JSON.parse(question.options || "[]").map((opt) => ({
-                                        title: opt,
-                                        value: opt
-                                      }))
-                                    }
-                                    inputValue={question.answer || ""}
-                                    onItemSelect={(selectedItem) =>
-                                      handleAnswerChange(sectionIndex, questionIndex, selectedItem.value)
-                                    }
-                                    className="custom-dropdown-class display-md-none"
-                                  />
-                                )}
-                                {question.input_type === "textarea" && (
-                                  <div className="relative w-full md:h-[7vw] h-[30vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
-                                    <textarea
-                                      value={question.answer || ""}
-                                      required={question.is_mandatory}
-                                      onChange={(e) =>
-                                        handleAnswerChange(sectionIndex, questionIndex, e.target.value)
-                                      }
-                                      className="w-full h-full md:p-[0.8vw] p-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0"
-                                    ></textarea>
-                                  </div>
-                                )}
+
+                        <div className="mt-3">
+                          <Card className="">
+                            <CardBody className="flex-row">
+                              <div className="flex-1">
+                                <p className="font-semibold">Rejected By:</p>
+                                <p className="col-span-4">
+                                  {data?.rejected_by?.first_name}{" "}
+                                  {data?.rejected_by?.last_name}
+                                </p>
                               </div>
-                            ))}
-                            
-                          </div>
+
+                              <div className="flex-1">
+                                <p className="font-bold">Rejection Date</p>
+                                <p>
+                                  {moment(data?.updated_at).format(
+                                    "Do MMMM, YYYY"
+                                  )}
+                                </p>
+                              </div>
+                            </CardBody>
+                          </Card>
                         </div>
-                      ))
-                    ) : (
-                      <div className="md:!h-[65vh] h-[60vh] flex flex-col gap-8 items-center justify-center">
-                        <img
-                          src="/assets/img/no-data.svg"
-                          alt="No data"
-                          className="w-1/4 h-auto"
-                        />
-                        <p className="text-center text-slate-500 font-montserrat font-medium text-base -mt-6">
-                          No questions available
-                        </p>
                       </div>
                     )}
                   </div>
                 </div>
-              </div>
-            )}
+              ) : (
+                <div className="-mt-12">
+                  <div className="">
+                    <div className="space-y-4">
+                      {checklistItems.sections &&
+                      checklistItems.sections.length > 0 ? (
+                        checklistItems.sections.map((section, sectionIndex) => (
+                          <div
+                            className="md:mt-[3vw] border p-2.5 rounded-md"
+                            key={section.id}
+                          >
+                            <h4 className="text-sm mb-1 font-bold">
+                              {section.name}
+                            </h4>
+                            <h4 className="text-xs mb-4 font-normal">
+                              {section.description}
+                            </h4>
+                            <div className="flex flex-col gap-4">
+                            {Array.isArray(section?.checklist_items) &&
+                              section.checklist_items.map((question, questionIndex) => (
+                                <div className="" key={question.id}>
+                                  <h4 className="text-sm mb-1 font-normal">
+                                    {question.question_text}
+                                    {question.is_mandatory && (
+                                      <span className="text-[#f1416c]">
+                                        *
+                                      </span>
+                                    )}
+                                  </h4>
+                                  {(question.input_type === "yes_no" || question.input_type === "radio") && (
+                                    <SelectInput
+                                      placeholder={"Select Option"}
+                                      data={boolData}
+                                      inputValue={question.answer || ""}
+                                      onItemSelect={(selectedItem) =>
+                                        handleAnswerChange(sectionIndex, questionIndex, selectedItem.value)
+                                      }
+                                      className="custom-dropdown-class display-md-none"
+                                    />
+                                  )}
+                                  {(question.input_type === "text" || question.input_type === "date") && (
+                                    <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
+                                      <input
+                                        type={question.input_type}
+                                        value={question.answer || ""}
+                                        required={question.is_mandatory}
+                                        onChange={(e) =>
+                                          handleAnswerChange(sectionIndex, questionIndex, e.target.value)
+                                        }
+                                        className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0 read-only:bg-[#d8d8d8]"
+                                      />
+                                    </div>
+                                  )}
+                                  {question.input_type === "dropdown" && (
+                                    <SelectInput
+                                      placeholder={"Select Option"}
+                                      data={
+                                        JSON.parse(question.options || "[]").map((opt) => ({
+                                          title: opt,
+                                          value: opt
+                                        }))
+                                      }
+                                      inputValue={question.answer || ""}
+                                      onItemSelect={(selectedItem) =>
+                                        handleAnswerChange(sectionIndex, questionIndex, selectedItem.value)
+                                      }
+                                      className="custom-dropdown-class display-md-none"
+                                    />
+                                  )}
+                                  {question.input_type === "textarea" && (
+                                    <div className="relative w-full md:h-[7vw] h-[30vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
+                                      <textarea
+                                        value={question.answer || ""}
+                                        required={question.is_mandatory}
+                                        onChange={(e) =>
+                                          handleAnswerChange(sectionIndex, questionIndex, e.target.value)
+                                        }
+                                        className="w-full h-full md:p-[0.8vw] p-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0"
+                                      ></textarea>
+                                    </div>
+                                  )}
+                                </div>
+                              ))}
+                              
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="md:!h-[65vh] h-[60vh] flex flex-col gap-8 items-center justify-center">
+                          <img
+                            src="/assets/img/no-data.svg"
+                            alt="No data"
+                            className="w-1/4 h-auto"
+                          />
+                          <p className="text-center text-slate-500 font-montserrat font-medium text-base -mt-6">
+                            No questions available
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
 
-            <div className="flex items-center gap-3 justify-end mt-2">
-              <Button
-                radius="none"
-                size="md"
-                className="w-1/4 bg-black text-white font-medium !rounded-md"
-                onClick={() => {
-                  setOpenDrawer(false);
-                  setData(null);
-                }}
-              >
-                Close
-              </Button>
-              <PermissionWrapper permission={["validation-requests.cancel"]}>
-                {(data?.status == "received" ||
-                  data?.status == "submitted") && (
-                  <Button
-                    radius="none"
-                    size="md"
-                    className="w-1/2 bg-gray-300 text-gray-800 font-medium !rounded-md"
-                    onClick={() => declineDisclosure.onOpen()}
-                  >
-                    Decline Request
-                  </Button>
-                )}
-              </PermissionWrapper>
-
-              <PermissionWrapper permission={["validation-requests.process"]}>
-                {data?.status !== "created" &&
-                  data?.status !== "completed" &&
-                  data?.status !== "processing" && (
+              <div className="flex items-center gap-3 justify-end mt-2">
+                <Button
+                  radius="none"
+                  size="md"
+                  className="w-1/4 bg-black text-white font-medium !rounded-md"
+                  onClick={() => {
+                    setOpenDrawer(false);
+                    setData(null);
+                  }}
+                >
+                  Close
+                </Button>
+                <PermissionWrapper permission={["validation-requests.cancel"]}>
+                  {(data?.status == "received" ||
+                    data?.status == "submitted") && (
                     <Button
+                      radius="none"
+                      size="md"
+                      className="w-1/2 bg-gray-300 text-gray-800 font-medium !rounded-md"
+                      onClick={() => declineDisclosure.onOpen()}
+                    >
+                      Decline Request
+                    </Button>
+                  )}
+                </PermissionWrapper>
+
+                <PermissionWrapper permission={["validation-requests.process"]}>
+                  {data?.status !== "created" &&
+                    data?.status !== "completed" &&
+                    data?.status !== "processing" && (
+                      <Button
+                        radius="none"
+                        className="bg-bChkRed text-white font-medium w-1/2 !rounded-md"
+                        size="md"
+                        onClick={() => changeStatusDisclosure.onOpen()}
+                      >
+                        {data?.status === "submitted"
+                          ? "Acknowledge Request"
+                          : data?.status === "received"
+                          ? "Process Request"
+                          : data?.status === "rejected" || "cancelled"
+                          ? "Revert Rejection"
+                          : "Acknowledge Request"}
+                      </Button>
+                    )}
+                  {data?.status === "processing" && (
+                    <Button
+                      isLoading={isSaving}
                       radius="none"
                       className="bg-bChkRed text-white font-medium w-1/2 !rounded-md"
                       size="md"
-                      onClick={() => changeStatusDisclosure.onOpen()}
+                      onClick={handleSubmitchecklistItems}
+                      disabled={
+                        !checklistItems?.sections ||
+                        checklistItems?.sections.length === 0
+                      } // Disable if no sections
                     >
-                      {data?.status === "submitted"
-                        ? "Acknowledge Request"
-                        : data?.status === "received"
-                        ? "Process Request"
-                        : data?.status === "rejected" || "cancelled"
-                        ? "Revert Rejection"
-                        : "Acknowledge Request"}
+                      Confirm Validations
                     </Button>
                   )}
-                {data?.status === "processing" && (
-                  <Button
-                    isLoading={isSaving}
-                    radius="none"
-                    className="bg-bChkRed text-white font-medium w-1/2 !rounded-md"
-                    size="md"
-                    onClick={handleSubmitchecklistItems}
-                    disabled={
-                      !checklistItems?.sections ||
-                      checklistItems?.sections.length === 0
-                    } // Disable if no sections
-                  >
-                    Confirm Validations
-                  </Button>
-                )}
-              </PermissionWrapper>
+                </PermissionWrapper>
+              </div>
             </div>
+            
           </div>
         </Drawer>
 

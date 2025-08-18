@@ -157,7 +157,7 @@ function AddNewDepartment({ setOpenModal, openModal, allPermissions }) {
             </h4>
             <div className="relative w-full md:h-[10vw] h-[30vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
               <textarea
-                placeholder="Enter institution desription"
+                placeholder="Enter institution description"
                 value={userInput?.description}
                 name="description"
                 required

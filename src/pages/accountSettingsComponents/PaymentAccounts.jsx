@@ -106,38 +106,49 @@ export default function PaymentAccounts() {
 
   const [selectedCountry, setSelectedCountry] = useState("nigeria");
 
-  const fetchBanks = useCallback(async (country = null, currency = null) => {
-    setLoadingBanks(true);
-    try {
-      // Use provided country/currency or fall back to state values
-      const countryToUse = country || selectedCountry;
-      const currencyToUse = currency || formData.currency;
-      
-      console.log('Fetching banks for:', { country: countryToUse, currency: currencyToUse });
-      
-      const response = await axios.get("/institution/payment-accounts/banks", {
-        params: {
+  const fetchBanks = useCallback(
+    async (country = null, currency = null) => {
+      setLoadingBanks(true);
+      try {
+        // Use provided country/currency or fall back to state values
+        const countryToUse = country || selectedCountry;
+        const currencyToUse = currency || formData.currency;
+
+        console.log("Fetching banks for:", {
           country: countryToUse,
           currency: currencyToUse,
-        },
-      });
+        });
 
-      if (response.data.status === "success") {
-        // Sort banks alphabetically for better user experience
-        const sortedBanks = (response.data.data || []).sort((a, b) =>
-          a.name.localeCompare(b.name)
+        const response = await axios.get(
+          "/institution/payment-accounts/banks",
+          {
+            params: {
+              country: countryToUse,
+              currency: currencyToUse,
+            },
+          }
         );
-        setBanks(sortedBanks);
-      } else {
-        toast.error("Failed to load bank list");
+
+        if (response.data.status === "success") {
+          // Sort banks alphabetically for better user experience
+          const sortedBanks = (response.data.data || []).sort((a, b) =>
+            a.name.localeCompare(b.name)
+          );
+          setBanks(sortedBanks);
+        } else {
+          toast.error("Failed to load bank list");
+        }
+      } catch (error) {
+        console.error("Error fetching banks:", error);
+        toast.error(
+          error.response?.data?.message || "Failed to load bank list"
+        );
+      } finally {
+        setLoadingBanks(false);
       }
-    } catch (error) {
-      console.error("Error fetching banks:", error);
-      toast.error(error.response?.data?.message || "Failed to load bank list");
-    } finally {
-      setLoadingBanks(false);
-    }
-  }, [selectedCountry, formData.currency]);
+    },
+    [selectedCountry, formData.currency]
+  );
 
   // Debounce verification to prevent too many API calls
   const debouncedVerify = useCallback(
@@ -174,35 +185,38 @@ export default function PaymentAccounts() {
       } finally {
         setVerifying(false);
       }
-    }, 500),
+    }, 2000),
     [selectedCountry]
   );
 
-  const handleInputChange = useCallback((key, value) => {
-    setFormData((prev) => {
-      const newData = {
-        ...prev,
-        [key]: value,
-      };
+  const handleInputChange = useCallback(
+    (key, value) => {
+      setFormData((prev) => {
+        const newData = {
+          ...prev,
+          [key]: value,
+        };
 
-      // If account number or bank code changes, trigger verification
-      if (
-        (key === "account_number" || key === "bank_code") &&
-        newData.bank_code &&
-        newData.account_number
-      ) {
-        debouncedVerify(newData.account_number, newData.bank_code);
-      }
+        // If account number or bank code changes, trigger verification
+        if (
+          (key === "account_number" || key === "bank_code") &&
+          newData.bank_code &&
+          newData.account_number
+        ) {
+          debouncedVerify(newData.account_number, newData.bank_code);
+        }
 
-      // If currency changes, reload the bank list
-      if (key === "currency") {
-        setBanks([]);
-        fetchBanks();
-      }
+        // If currency changes, reload the bank list
+        if (key === "currency") {
+          setBanks([]);
+          fetchBanks();
+        }
 
-      return newData;
-    });
-  }, [debouncedVerify, fetchBanks]);
+        return newData;
+      });
+    },
+    [debouncedVerify, fetchBanks]
+  );
 
   const handleCountryChange = useCallback(
     (country) => {
@@ -211,17 +225,17 @@ export default function PaymentAccounts() {
         // Clear banks and reset verification first
         setBanks([]);
         setVerified(false);
-        
+
         // Get the currency for this country
         const newCurrency = selectedCountryData.currency;
-        
+
         // Update state
         setSelectedCountry(country);
         setFormData((prev) => ({
           ...prev,
           currency: newCurrency,
         }));
-        
+
         // Fetch banks with the new country and currency directly
         // This ensures we use the new values immediately
         fetchBanks(country, newCurrency);
@@ -433,6 +447,7 @@ export default function PaymentAccounts() {
               <ModalBody>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <Select
+                    description="Only the listed countries are supported for payment accounts"
                     label="Country"
                     placeholder="Select country"
                     value={selectedCountry}
@@ -565,10 +580,12 @@ export default function PaymentAccounts() {
                   <div className="mt-2 text-sm text-gray-500">
                     <p className="font-semibold">Note:</p>
                     <p>
-                      Bank accounts must be verified before saving.
-                      This helps ensure your payouts will be processed
-                      correctly.
+                      Bank accounts must be verified before saving. This helps
+                      ensure your payouts will be processed correctly.
                     </p>
+                    {/* <p className="text-red-700 italic">
+                      Account Holder Names should be unique.
+                    </p> */}
                   </div>
                 )}
               </ModalBody>
@@ -580,9 +597,7 @@ export default function PaymentAccounts() {
                   className="bg-bChkRed text-white"
                   onPress={handleSubmit}
                   isLoading={submitting}
-                  isDisabled={
-                    selectedCountry && !verified && !editId
-                  }
+                  isDisabled={selectedCountry && !verified && !editId}
                 >
                   {editId ? "Update" : "Save"}
                 </Button>

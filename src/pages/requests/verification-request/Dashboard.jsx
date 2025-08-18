@@ -3,9 +3,11 @@ import axios from "@/utils/axiosConfig";
 import axiosDef from "axios";
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
-import { FaCreditCard, FaCrown } from "react-icons/fa6";
+import { FaCreditCard, FaCrown, FaRegCircleQuestion } from "react-icons/fa6";
 import { RiAddBoxFill, RiAlarmWarningFill } from "react-icons/ri";
 import { HiMiniUsers } from "react-icons/hi2";
+import { useNavigate } from 'react-router-dom';
+import dayjs from "dayjs";
 import {
   IoIosArrowDroprightCircle,
   IoIosStar,
@@ -28,7 +30,7 @@ import { fetchSubscription } from "../../subscription/fetchSubscription";
 import StripeCheckoutForm from "../../subscription/StripeCheckoutForm";
 import LoadItems from "@/components/LoadItems";
 import { toast } from "sonner";
-import { GiUpgrade } from "react-icons/gi";
+import { GiLaurelCrown, GiUpgrade } from "react-icons/gi";
 import secureLocalStorage from "react-secure-storage";
 
 export default function Dashboard() {
@@ -61,6 +63,15 @@ export default function Dashboard() {
   const stripePromise = loadStripe(
     "pk_test_51QwBccH83VZsct6SO27tERuGE1I5mPFIB6BUoZNrdcr1VPPhCf5aTZtzMMXR5ORBjFrejCcTexxJaCyKUGAtQmJq00uoUnSctK"
   );
+
+  const hasValidPackage = () =>
+    currentPackage && typeof currentPackage === "object" && subscription?.status === "Active";
+
+
+  const daysLeft = subscription?.current_period_end
+    ? dayjs(subscription.current_period_end).diff(dayjs(), "day")
+    : null;
+
   // Payment States
   const [selectedPayment, setSelectedPayment] = useState("card");
   const [paymentDetails, setPaymentDetails] = useState({
@@ -78,6 +89,8 @@ export default function Dashboard() {
   const [currentPage, setCurrentPage] = useState(1);
   const [lastPage, setLastPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
+
+  const navigate = useNavigate();
   
   const handleEcheckChange = async (e) => {
     const isChecked = e.target.checked;
@@ -228,134 +241,84 @@ export default function Dashboard() {
         </ol>
       </div>
     </div>,
-    <div className="w-full flex flex-col justify-center h-full">
-      <div className="">
-        <p className="font-semibold mb-1 text-lg">Choose Plan</p>
-        <p className="w-full xl:w-2/3 text-xs">
-          E-Check makes document verification fast, secure, and hassle-free.
-          Choose a plan that fits your needs and start verifying instantly!
-        </p>
-      </div>
-      {loading ? (
-        <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 lg:gap-5 mt-4 lg:mt-8">
-          {[...Array(3)].map((_, index) => (
-            <div
-              key={index}
-              role="status"
-              className="max-w-sm p-4 border border-gray-200 rounded shadow animate-pulse md:p-6 dark:border-gray-700"
-            >
-              <div className="flex items-center justify-center h-48 mb-4 bg-gray-300 rounded dark:bg-gray-700">
-                <svg
-                  className="w-10 h-10 text-gray-200 dark:text-gray-600"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="currentColor"
-                  viewBox="0 0 16 20"
-                >
-                  <path d="M14.066 0H7v5a2 2 0 0 1-2 2H0v11a1.97 1.97 0 0 0 1.934 2h12.132A1.97 1.97 0 0 0 16 18V2a1.97 1.97 0 0 0-1.934-2ZM10.5 6a1.5 1.5 0 1 1 0 2.999A1.5 1.5 0 0 1 10.5 6Zm2.221 10.515a1 1 0 0 1-.858.485h-8a1 1 0 0 1-.9-1.43L5.6 10.039a.978.978 0 0 1 .936-.57 1 1 0 0 1 .9.632l1.181 2.981.541-1a.945.945 0 0 1 .883-.522 1 1 0 0 1 .879.529l1.832 3.438a1 1 0 0 1-.031.988Z" />
-                  <path d="M5 5V.13a2.96 2.96 0 0 0-1.293.749L.879 3.707A2.98 2.98 0 0 0 .13 5H5Z" />
-                </svg>
-              </div>
-              <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-48 mb-4"></div>
-              <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 mb-2.5"></div>
-              <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 mb-2.5"></div>
-              <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700"></div>
-            </div>
-          ))}
-        </div>
-      ) : plans.length === 0 ? (
-        <div className="text-center mt-8">
-          <div className="md:!h-[40vh] h-[30vh] flex flex-col gap-8 items-center justify-center">
-            <img
-              src="/assets/img/no-data.svg"
-              alt="No data"
-              className="w-1/4 md:w-[10%] h-auto"
-            />
-            <p className="text-center text-slate-500 font-montserrat font-medium text-base -mt-6">
-              No plans available at the moment. Please check back later.
-            </p>
-          </div>
-        </div>
-      ) : (
-        <div
-          className={`grid ${
-            plans.length === 1
-              ? "grid-cols-1"
-              : plans.length === 2
-              ? "grid-cols-1 sm:grid-cols-2"
-              : "grid-cols-2 lg:grid-cols-3"
-          } gap-3 lg:gap-5 mt-4 lg:mt-8`}
-        >
-          {plans.map((plan) => (
-            <div
-              key={plan.id}
-              className="w-full rounded-xl px-3 lg:px-5 py-5 lg:py-7 bg-gray-100 shadow-sm hover:shadow-md flex flex-col justify-between"
-            >
-              <div className="w-full flex flex-col text-[13px] pb-3 border-b mb-2">
-                <p className="text-center">{plan?.name}</p>
-                <p className="font-semibold text-base text-center">
-                  GH₵ {plan?.amount}
-                </p>
-                <p className="font-light text-center -mt-1">
-                  {plan?.expires_in} Days
-                </p>
-              </div>
-              <div className="my-2">
-                <p className="font-semibold text-xs">Description</p>
-                <p className="text-gray-500 text-xs text-justify mt-2">
-                  {plan?.description}
-                </p>
-              </div>
-              <div className="flex flex-col space-y-1 mt-4 text-xs">
-                <p className="font-semibold">Package Benefits</p>
-                <div className="flex space-x-1.5 text-xs">
-                  <IoIosStar className="text-yellow-500" />
-                  <p>
-                    {plan?.number_of_departments} Departments{" "}
-                    {plan?.number_of_users} Users
-                  </p>
-                </div>
-                <div className="flex space-x-1.5 text-xs">
-                  <IoIosStar className="text-yellow-500" />
-                  <p>{plan?.credit} Credits</p>
-                </div>
-                <div className="flex space-x-1.5 text-xs">
-                  <IoIosStar className="text-yellow-500" />
-                  <p>{plan?.bonus} Bonus</p>
-                </div>
-                <div className="flex space-x-1.5 text-xs">
-                  <IoIosStar className="text-yellow-500" />
-                  <p>{plan?.total_credit} Total Credits</p>
-                </div>
-              </div>
-              {currentPackage == plan?.name ? (
-                <div className="border border-bChkRed rounded-md text-xs p-2 text-gray-700 font-medium">
-                  <div className="flex space-x-2 items-center text-xs">
-                    <RiAlarmWarningFill />
-                    Note
-                  </div>
-                  You are subscribed to this package, you cannot choose the same
-                  plan
-                </div>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setPaymentData(plan);
+    <div className="w-full flex flex-col items-center justify-center h-full">
+      
+      <div className="max-w-md mx-auto mt-6 px-6 py-10 bg-white rounded-xl border border-gray-200">
+      {/* Title */}
+      <div className="text-base font-semibold text-gray-900 text-center mb-2">BacChecker E-Check Plan</div>
+      <div className="text-xs text-center text-gray-600 font-light mb-4">Manage your E-Check subscription</div>
 
-                    setOpenPaymentDrawer(true);
-                    setOpenSubDrawer(false);
-                  }}
-                  className="w-full hover:text-white text-gray-500 hover:bg-gray-500 bg-gray-300 rounded-md mt-6 py-2 text-xs"
-                >
-                  Choose Plan
-                </button>
-              )}
-            </div>
-          ))}
+      {/* Badge and Plan Status */}
+      <div className="flex flex-col items-center mb-4">
+        <div className="w-24 h-24 flex items-center justify-center rounded-full border-4 border-bChkRed bg-white mb-2">
+          <GiLaurelCrown size={36} className="text-bChkRed" />
         </div>
-      )}
-    </div>,
+        <div className="text-sm text-gray-900 font-semibold">Active Plan</div>
+      </div>
+
+      {/* Plan Name */}
+      <div className="text-center font-semibold text-lg mb-4 text-bChkRed">
+        <p>
+          {typeof currentPackage === "object"
+            ? currentPackage.name.endsWith("Package")
+              ? currentPackage.name
+              : `${currentPackage.name} Package`
+            : "No Package"}
+        </p>
+
+      </div>
+
+      <div className="relative bg-gray-100 p-4 rounded-md text-sm text-center mb-4">
+        <div className="absolute top-2 right-2">
+          <FaRegCircleQuestion className="text-gray-400" />
+        </div>
+
+        {currentPackage && typeof currentPackage === "object" ? (
+          <>
+            <p className="mb-1">
+              Your current <strong>{currentPackage.name} Plan</strong> will renew in{" "}
+              <strong>{daysLeft} day{daysLeft !== 1 ? "s" : ""}</strong>.
+            </p>
+            <p className="text-gray-500 text-xs">
+              You will be automatically billed <strong>${subscription.amount}</strong>.
+            </p>
+
+            {/* <ul className="mt-4 text-left text-xs text-gray-700 list-disc list-inside">
+              <li>
+                Departments Allowed: <strong>{currentPackage.number_of_departments}</strong>
+              </li>
+              <li>
+                Users Allowed: <strong>{currentPackage.number_of_users}</strong>
+              </li>
+              <li>
+                Total Credits: <strong>{currentPackage.total_credit}</strong>
+              </li>
+            </ul> */}
+          </>
+        ) : (
+          <>
+            <p className="mb-1 font-medium text-gray-800">
+              You don’t have an active subscription plan.
+            </p>
+            <p className="text-gray-500 text-xs">
+              Subscribe to a plan to access our eCheck services and unlock premium features.
+            </p>
+          </>
+        )}
+      </div>
+
+      {/* Button */}
+      <div className="flex">
+        <button
+          onClick={() => navigate("/account-settings?tab=subscription")}
+          className="w-full bg-bChkRed text-white px-4 py-2 rounded-md text-sm hover:bg-opacity-80 transition-colors"
+        >
+          {hasValidPackage() ? "Upgrade Plan" : "Subscribe to a Plan"}
+        </button>
+      </div>
+
+    </div>
+    </div>
   ];
 
   const handlePrevious = () => {
@@ -388,12 +351,7 @@ export default function Dashboard() {
         setSentRequest(response.data.sent_requests);
         setReceivedRequest(response.data.received_requests);
         setSubscription(response.data.subscription);
-        const currentPackage =
-          typeof response.data.current_package === "string"
-            ? response.data.current_package
-            : response.data.current_package?.name;
-
-        setCurrentPackage(currentPackage);
+        setCurrentPackage(response.data.current_package || "No Package");
         setCreditValue(response.data.current_package?.topup_credit_value);
         const resData = response.data.results;
         if (tab === "day") {
@@ -698,13 +656,13 @@ export default function Dashboard() {
             <div className="w-full flex justify-end mb-2">
               <div className="flex items-center space-x-2 text-green-600 bg-green-100 border border-green-600 rounded-full px-4 py-1">
                 <p>
-                  {typeof currentPackage === "string" &&
-                  currentPackage !== "No Package"
-                    ? currentPackage.split(" ").pop() === "Package"
-                      ? currentPackage
-                      : `${currentPackage} Package`
+                  {typeof currentPackage === "object"
+                    ? currentPackage.name.endsWith("Package")
+                      ? currentPackage.name
+                      : `${currentPackage.name} Package`
                     : "No Package"}
                 </p>
+
 
                 <FaCrown size={20} className="text-yellow-400" />
               </div>
@@ -850,7 +808,7 @@ export default function Dashboard() {
 
                       <td className="px-2 py-4">
                         {/* <FaFilePdf size={20} className="text-bChkRed"/> */}
-                        <p>{verification.document_type.name}</p>
+                        <p>{verification?.document_type?.name}</p>
                       </td>
                     </tr>
                   ))}
@@ -936,770 +894,6 @@ export default function Dashboard() {
           </div>
         </Modal>
 
-        <Modal
-          isOpen={openSubDrawer}
-          setIsOpen={setOpenSubDrawer}
-          classNames="w-[98vw] md:w-[80vw] xl:w-[70vw] z-10 rounded-md"
-        >
-          <div className="h-full flex flex-col relative p-4 text-black">
-            <div className="w-full flex justify-end">
-              <button
-                type="button"
-                onClick={() => {
-                  setOpenSubDrawer(false);
-                }}
-              >
-                Close
-              </button>
-            </div>
-            <div className="">
-              <p className="font-semibold mb-1 text-lg">Choose Plan</p>
-              <p className="w-full xl:w-2/3 text-xs">
-                E-Check makes document verification fast, secure, and
-                hassle-free. Choose a plan that fits your needs and start
-                verifying instantly!
-              </p>
-            </div>
-            {loading ? (
-              <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 lg:gap-5 mt-4 lg:mt-6">
-                {[...Array(3)].map((_, index) => (
-                  <div
-                    key={index}
-                    role="status"
-                    className="max-w-sm p-4 border border-gray-200 rounded shadow animate-pulse md:p-6 dark:border-gray-700"
-                  >
-                    <div className="flex items-center justify-center h-48 mb-4 bg-gray-300 rounded dark:bg-gray-700">
-                      <svg
-                        className="w-10 h-10 text-gray-200 dark:text-gray-600"
-                        aria-hidden="true"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="currentColor"
-                        viewBox="0 0 16 20"
-                      >
-                        <path d="M14.066 0H7v5a2 2 0 0 1-2 2H0v11a1.97 1.97 0 0 0 1.934 2h12.132A1.97 1.97 0 0 0 16 18V2a1.97 1.97 0 0 0-1.934-2ZM10.5 6a1.5 1.5 0 1 1 0 2.999A1.5 1.5 0 0 1 10.5 6Zm2.221 10.515a1 1 0 0 1-.858.485h-8a1 1 0 0 1-.9-1.43L5.6 10.039a.978.978 0 0 1 .936-.57 1 1 0 0 1 .9.632l1.181 2.981.541-1a.945.945 0 0 1 .883-.522 1 1 0 0 1 .879.529l1.832 3.438a1 1 0 0 1-.031.988Z" />
-                        <path d="M5 5V.13a2.96 2.96 0 0 0-1.293.749L.879 3.707A2.98 2.98 0 0 0 .13 5H5Z" />
-                      </svg>
-                    </div>
-                    <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-48 mb-4"></div>
-                    <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 mb-2.5"></div>
-                    <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 mb-2.5"></div>
-                    <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700"></div>
-                  </div>
-                ))}
-              </div>
-            ) : plans.length === 0 ? (
-              <div className="text-center mt-8">
-                <div className="md:!h-[40vh] h-[30vh] flex flex-col gap-8 items-center justify-center">
-                  <img
-                    src="/assets/img/no-data.svg"
-                    alt="No data"
-                    className="w-1/4 md:w-[10%] h-auto"
-                  />
-                  <p className="text-center text-slate-500 font-montserrat font-medium text-base -mt-6">
-                    No plans available at the moment. Please check back later.
-                  </p>
-                </div>
-              </div>
-            ) : (
-              <div
-                className={`grid ${
-                  plans.length === 1
-                    ? "grid-cols-1"
-                    : plans.length === 2
-                    ? "grid-cols-1 sm:grid-cols-2"
-                    : "grid-cols-2 lg:grid-cols-3"
-                } gap-3 lg:gap-5 mt-4 lg:mt-8`}
-              >
-                {plans.map((plan) => (
-                  <div
-                    key={plan.id}
-                    className="w-full rounded-xl px-3 lg:px-5 py-5 lg:py-7 bg-gray-100 shadow-sm hover:shadow-md flex flex-col justify-between"
-                  >
-                    <div className="w-full flex flex-col text-[13px] pb-3 border-b mb-2">
-                      <p className="text-center">{plan?.name}</p>
-                      <p className="font-semibold text-base text-center">
-                        GH₵ {plan?.amount}
-                      </p>
-                      <p className="font-light text-center -mt-1">
-                        {plan?.expires_in} Days
-                      </p>
-                    </div>
-                    <div className="my-2">
-                      <p className="font-semibold text-xs">Description</p>
-                      <p className="text-gray-500 text-xs text-justify mt-2">
-                        {plan?.description}
-                      </p>
-                    </div>
-                    <div className="flex flex-col space-y-1 mt-2 text-xs">
-                      <p className="font-semibold">Package Benefits</p>
-                      <div className="flex space-x-1.5 text-xs">
-                        <IoIosStar className="text-yellow-500" />
-                        <p>
-                          {plan?.number_of_departments} Departments{" "}
-                          {plan?.number_of_users} Users
-                        </p>
-                      </div>
-                      <div className="flex space-x-1.5 text-xs">
-                        <IoIosStar className="text-yellow-500" />
-                        <p>{plan?.credit} Credits</p>
-                      </div>
-                      <div className="flex space-x-1.5 text-xs">
-                        <IoIosStar className="text-yellow-500" />
-                        <p>{plan?.bonus} Bonus</p>
-                      </div>
-                      <div className="flex space-x-1.5 text-xs">
-                        <IoIosStar className="text-yellow-500" />
-                        <p>{plan?.total_credit} Total Credits</p>
-                      </div>
-                    </div>
-                    {currentPackage == plan?.name ? (
-                      <div className="border border-bChkRed rounded-md text-xs p-2 text-gray-700 font-medium">
-                        <div className="flex space-x-1 text-sm text-bChkRed font-semibold">
-                          <RiAlarmWarningFill size={16} />
-                          <p className="self">Notice</p>
-                        </div>
-                        You are subscribed to this package, you cannot choose
-                        the same plan
-                      </div>
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setPaymentData(plan);
-                          setOpenPaymentDrawer(true);
-                          setOpenSubDrawer(false);
-                        }}
-                        className="w-full hover:text-white text-gray-500 hover:bg-gray-500 bg-gray-300 rounded-md mt-6 py-2 text-xs"
-                      >
-                        Choose Plan
-                      </button>
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
-            <div className="w-full absolute bottom-0 left-0 bg-white mt-2">
-              <div className="flex justify-between items-center px-4">
-                {/* Previous Button */}
-                <button
-                  type="button"
-                  disabled={currentPage === 0}
-                  className={`${
-                    currentPage === 0
-                      ? "bg-gray-300 text-gray-600 cursor-not-allowed"
-                      : "bg-bChkRed text-white hover:bg-red-500"
-                  } px-6 py-1 rounded-sm text-xs`}
-                  onClick={handlePrevious}
-                >
-                  Previous
-                </button>
-
-                {/* Page Indicators */}
-                <div className="flex space-x-2">
-                  {Array.from({ length: totalPages }).map((_, index) => (
-                    <div
-                      key={index}
-                      className={`w-8 h-1 transition-all rounded-xl ${
-                        currentPage === index ? "bg-bChkRed" : "bg-gray-200"
-                      }`}
-                    ></div>
-                  ))}
-                </div>
-
-                {/* Next Button */}
-                <button
-                  type="button"
-                  disabled={currentPage === totalPages - 1}
-                  className={`${
-                    currentPage === totalPages - 1
-                      ? "bg-gray-300 text-gray-600 cursor-not-allowed"
-                      : "bg-bChkRed text-white hover:bg-red-500"
-                  } px-6 py-1 rounded-sm text-xs`}
-                  onClick={handleNext}
-                >
-                  Next
-                </button>
-              </div>
-            </div>
-          </div>
-        </Modal>
-        <SideModal
-          title={"Top Up Subscription Credits"}
-          setOpenModal={setOpenTopUpDrawer}
-          openModal={openTopUpDrawer}
-          classNames="w-[98vw] md:w-[80vw] xl:w-[60vw] z-10 rounded-md"
-        >
-          <div className="h-full flex flex-col relative p-4 text-black">
-            <form
-              onSubmit={handleTopupSubmit}
-              className="relative space-y-4 h-[85dvh] text-sm"
-            >
-              <div className="flex flex-col font-semibold py-2">
-                <div className="">
-                  <h4 className="md:text-[1vw] text-[4vw] mb-1">
-                    Number of Credits
-                  </h4>
-                  <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
-                    <input
-                      type="number"
-                      name="numberOfCredits"
-                      value={paymentDetails.numberOfCredits}
-                      onChange={handleCreditChange}
-                      className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-white absolute left-0 right-0 bottom-0 top-0"
-                    />
-                  </div>
-                </div>
-                <div className=" mt-4">
-                  <h4 className="md:text-[1vw] text-[4vw]">Bonus Credits</h4>
-                  <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
-                    <input
-                      type="text"
-                      readOnly
-                      value={paymentDetails.bonus_amount}
-                      className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0 read-only:bg-[#d8d8d8]"
-                    />
-                  </div>
-                </div>
-                <div className="mt-4">
-                  <h4 className="md:text-[1vw] text-[4vw]">
-                    Amount to be Paid
-                  </h4>
-                  <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
-                    <input
-                      type="text"
-                      readOnly
-                      value={paymentDetails.amount}
-                      className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0 read-only:bg-[#d8d8d8]"
-                    />
-                  </div>
-                </div>
-                <div className="w-full mt-4">
-                  <h4 className="md:text-[1vw] text-[4vw] mb-1">
-                    Billing Address
-                  </h4>
-                  <div className="relative w-full md:h-[2.7vw] h-[12vw] flex items-center border overflow-hidden bg-white rounded-md">
-                    <select
-                      className="w-full px-1 md:h-[2.7vw] h-[12vw] md:text-[1vw] text-[3.5vw] bg-white border-r border-gray-300 focus:outline-none rounded-md"
-                      value={instBill || ""}
-                      onChange={(e) => setInstBill(e.target.value)}
-                    >
-                      {countryNames.map((country) => (
-                        <option key={country.name} value={country.name}>
-                          {country.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-                {preferredPlatform == "paystack" && (
-                  <div className="flex flex-row space-x-4 mt-4">
-                    <div className="flex items-center">
-                      <input
-                        id="card-option"
-                        type="radio"
-                        name="payment"
-                        value="card"
-                        checked={selectedPayment === "card"}
-                        onChange={() => setSelectedPayment("card")}
-                        className="w-5 h-5 bg-gray-100 border-gray-300 accent-bChkRed"
-                      />
-                      <label
-                        htmlFor="card-option"
-                        className="ms-2 md:text-[1vw] text-[4vw] font-medium text-gray-900 dark:text-gray-300"
-                      >
-                        Debit Card
-                      </label>
-                    </div>
-
-                    <div className="flex items-center">
-                      <input
-                        id="mobile-money-option"
-                        type="radio"
-                        name="payment"
-                        value="mobile_money"
-                        checked={selectedPayment === "mobile_money"}
-                        onChange={() => setSelectedPayment("mobile_money")}
-                        className="w-5 h-5 bg-gray-100 border-gray-300 accent-bChkRed"
-                      />
-                      <label
-                        htmlFor="mobile-money-option"
-                        className="ms-2 md:text-[1vw] text-[4vw] font-medium text-gray-900 dark:text-gray-300"
-                      >
-                        Mobile Wallet
-                      </label>
-                    </div>
-                  </div>
-                )}
-                {preferredPlatform === "stripe" && (
-                  <div className="p-[2px] rounded-xl bg-gradient-to-r from-bChkRed to-black mt-4">
-                    <div
-                      className={`relative p-4 w-full bg-white cursor-pointer rounded-lg ${
-                        selectedPayment === "card"
-                          ? "border-gradient-to-r from-bChkRed to-black"
-                          : "border-gray-300"
-                      }`}
-                      onClick={() => setSelectedPayment("card")}
-                    >
-                      <input
-                        type="radio"
-                        id="stripe-card"
-                        name="payment"
-                        value="card"
-                        checked={selectedPayment === "card"}
-                        onChange={() => setSelectedPayment("card")}
-                        className="absolute top-2 left-2 w-5 h-5 accent-bChkRed"
-                      />
-                      <label
-                        htmlFor="stripe-card"
-                        className="block h-full w-full pl-8"
-                      >
-                        <div className="font-bold text-[1.2vw]">Debit Card</div>
-                        <div className="text-gray-500 text-[0.9vw] mt-1">
-                          Pay with Visa / MasterCard
-                        </div>
-                      </label>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Additional Fields for Card Payment */}
-              {selectedPayment === "card" &&
-                preferredPlatform === "paystack" && (
-                  <div className="">
-                    <div className="mb-4">
-                      <h4 className="md:text-[1vw] text-[4vw] mb-1">
-                        Card Number
-                      </h4>
-                      <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
-                        <input
-                          type="text"
-                          name="cardNumber"
-                          value={paymentDetails.cardNumber}
-                          onChange={handleInputChange}
-                          className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-white absolute left-0 right-0 bottom-0 top-0"
-                        />
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                      <div className="">
-                        <h4 className="md:text-[1vw] text-[4vw] mb-1">
-                          Expiration Date
-                        </h4>
-                        <div className="flex gap-2">
-                          {/* Expiry Month */}
-                          <div className="relative w-1/2 md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
-                            <input
-                              type="number"
-                              name="expiryMonth"
-                              placeholder="MM"
-                              value={paymentDetails.expiryMonth}
-                              onChange={(e) => {
-                                let value = e.target.value;
-                                if (value.length <= 2) {
-                                  if (value > 12) value = "12"; // Restrict to 12 max
-                                  if (value < 1 && value !== "") value = "01"; // Restrict to 01 min
-                                  handleInputChange({
-                                    target: { name: "expiryMonth", value },
-                                  });
-                                }
-                              }}
-                              className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-white absolute left-0 right-0 bottom-0 top-0 text-center"
-                            />
-                          </div>
-
-                          {/* Expiry Year */}
-                          <div className="relative w-1/2 md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
-                            <input
-                              type="number"
-                              name="expiryYear"
-                              placeholder="YYYY"
-                              value={paymentDetails.expiryYear}
-                              onChange={(e) => {
-                                let value = e.target.value;
-                                if (value.length <= 4) {
-                                  handleInputChange({
-                                    target: { name: "expiryYear", value },
-                                  });
-                                }
-                              }}
-                              className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-white absolute left-0 right-0 bottom-0 top-0 text-center"
-                            />
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="">
-                        <h4 className="md:text-[1vw] text-[4vw] mb-1">CVC</h4>
-                        <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
-                          <input
-                            type="text"
-                            name="cvcCode"
-                            value={paymentDetails.cvcCode}
-                            onChange={handleInputChange}
-                            className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-white absolute left-0 right-0 bottom-0 top-0"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-              {clientSecret && preferredPlatform === "stripe" && (
-                <Elements stripe={stripePromise} options={{ clientSecret }}>
-                  <Modal
-                    isOpen={showStripeForm}
-                    setIsOpen={setShowStripeForm}
-                    classNames="w-[100vw] bg-red-600 md:w-[80vw] lg:w-[60vw] z-50 rounded-sm"
-                  >
-                    <div className="p-4">
-                      <StripeCheckoutForm
-                        onSuccess={() => {
-                          setShowStripeForm(false);
-                          setClientSecret(null);
-                        }}
-                      />
-                    </div>
-                  </Modal>
-                </Elements>
-              )}
-
-              {/* Additional Fields for Mobile Money */}
-              {selectedPayment === "mobile_money" && (
-                <div className="space-y-6">
-                  <div className="mt-4">
-                    <h4 className="md:text-[1vw] text-[4vw] mb-1">
-                      Mobile Network
-                    </h4>
-                    <select
-                      name="mobileNetwork"
-                      value={paymentDetails.mobileNetwork}
-                      onChange={handleInputChange}
-                      className="w-full border border-gray-300 px-3 py-2 text-sm rounded-md focus:outline-none"
-                    >
-                      <option value="">Select Mobile Network</option>
-                      <option value="MTN">MTN</option>
-                      <option value="Telecel">Telecel</option>
-                    </select>
-                  </div>
-
-                  <div className="md:mt-[2vw] mt-[10vw]">
-                    <h4 className="md:text-[1vw] text-[4vw] mb-1">
-                      Mobile Number
-                    </h4>
-                    <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
-                      <input
-                        type="text"
-                        name="mobileNumber"
-                        value={paymentDetails.mobileNumber}
-                        onChange={handleInputChange}
-                        className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-white absolute left-0 right-0 bottom-0 top-0"
-                      />
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              <div className="w-full absolute flex items-center space-x-2 justify-between pt-2 text-sm bottom-0">
-                <button
-                  type="submit"
-                  className="w-full bg-bChkRed text-white py-2 rounded-md hover:bg-red-700"
-                >
-                  {isSaving ? (
-                    <div className="flex items-center justify-center gap-2">
-                      <LoadItems color={"#ffffff"} size={15} />
-                      <h4 className=" text-[#ffffff]">Processing...</h4>
-                    </div>
-                  ) : (
-                    <h4 className=" text-[#ffffff]">
-                      {preferredPlatform == "paystack"
-                        ? "Complete Top-up"
-                        : "Proceed to Payment"}
-                    </h4>
-                  )}
-                </button>
-              </div>
-            </form>
-          </div>
-        </SideModal>
-        <Modal
-          title="Payment Details"
-          isOpen={openPaymentDrawer}
-          setIsOpen={setOpenPaymentDrawer}
-          classNames="w-[100vw] md:w-[80vw] lg:w-[60vw] z-10 rounded-md"
-        >
-          <div className="h-full flex flex-col relative p-4">
-            <form
-              onSubmit={handleFormSubmit}
-              className="relative space-y-4 h-full text-sm"
-            >
-              <div className="flex flex-col font-semibold py-2">
-                <div className="">
-                  <p className="font-semibold text-black text-base">
-                    Add a billing method
-                  </p>
-                  <p className="font-normal text-black w-full xl:w-2/3">
-                    E-Check makes document verification fast, secure and
-                    hassle-free. Choose a plan that fits your needs and start
-                    verifying instantly
-                  </p>
-                </div>
-                <div className="w-full mt-2">
-                  <h4 className="md:text-[1vw] text-[4vw] mb-1">
-                    Billing Address
-                  </h4>
-                  <div className="relative w-full md:h-[2.7vw] h-[12vw] flex items-center border overflow-hidden bg-white rounded-sm">
-                    <select
-                      className="w-full px-1 md:h-[2.7vw] h-[12vw] md:text-[1vw] text-[3.5vw] bg-white border-r border-gray-300 focus:outline-none rounded-sm"
-                      value={instBill || ""}
-                      onChange={(e) => setInstBill(e.target.value)}
-                    >
-                      {countryNames.map((country) => (
-                        <option key={country.name} value={country.name}>
-                          {country.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-                {preferredPlatform == "paystack" && (
-                  <div className="flex flex-row space-x-4 mt-6">
-                    <div className="flex items-center">
-                      <input
-                        id="card-option"
-                        type="radio"
-                        name="payment"
-                        value="card"
-                        checked={selectedPayment === "card"}
-                        onChange={() => setSelectedPayment("card")}
-                        className="w-5 h-5 bg-gray-100 border-gray-300 accent-bChkRed"
-                      />
-                      <label
-                        htmlFor="card-option"
-                        className="ms-2 md:text-[1vw] text-[4vw] font-medium text-gray-900 dark:text-gray-300"
-                      >
-                        Debit Card
-                      </label>
-                    </div>
-
-                    <div className="flex items-center">
-                      <input
-                        id="mobile-money-option"
-                        type="radio"
-                        name="payment"
-                        value="mobile_money"
-                        checked={selectedPayment === "mobile_money"}
-                        onChange={() => setSelectedPayment("mobile_money")}
-                        className="w-5 h-5 bg-gray-100 border-gray-300 accent-bChkRed"
-                      />
-                      <label
-                        htmlFor="mobile-money-option"
-                        className="ms-2 md:text-[1vw] text-[4vw] font-medium text-gray-900 dark:text-gray-300"
-                      >
-                        Mobile Wallet
-                      </label>
-                    </div>
-                  </div>
-                )}
-                {preferredPlatform === "stripe" && (
-                  <div className="p-[2px] rounded-xl bg-gradient-to-r from-bChkRed to-black mt-4">
-                    <div
-                      className={`relative p-4 w-full bg-white cursor-pointer rounded-lg ${
-                        selectedPayment === "card"
-                          ? "border-gradient-to-r from-bChkRed to-black"
-                          : "border-gray-300"
-                      }`}
-                      onClick={() => setSelectedPayment("card")}
-                    >
-                      <input
-                        type="radio"
-                        id="stripe-card"
-                        name="payment"
-                        value="card"
-                        checked={selectedPayment === "card"}
-                        onChange={() => setSelectedPayment("card")}
-                        className="absolute top-2 left-2 w-5 h-5 accent-bChkRed"
-                      />
-                      <label
-                        htmlFor="stripe-card"
-                        className="block h-full w-full pl-8"
-                      >
-                        <div className="font-bold text-[1.2vw]">Debit Card</div>
-                        <div className="text-gray-500 text-[0.9vw] mt-1">
-                          Pay with Visa / MasterCard
-                        </div>
-                      </label>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Additional Fields for Card Payment */}
-              {selectedPayment === "card" &&
-                preferredPlatform === "paystack" && (
-                  <div className="-mt-3">
-                    <div className="mb-5">
-                      <h4 className="md:text-[1vw] text-[4vw] mb-1">
-                        Card Number
-                      </h4>
-                      <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
-                        <input
-                          type="text"
-                          name="cardNumber"
-                          value={paymentDetails.cardNumber}
-                          onChange={handleInputChange}
-                          className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-white absolute left-0 right-0 bottom-0 top-0"
-                        />
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                      <div className="">
-                        <h4 className="md:text-[1vw] text-[4vw] mb-1">
-                          First Name
-                        </h4>
-                        <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
-                          <input
-                            type="text"
-                            name="firstName"
-                            value={paymentDetails.firstName}
-                            onChange={handleInputChange}
-                            className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-white absolute left-0 right-0 bottom-0 top-0"
-                          />
-                        </div>
-                      </div>
-                      <div className="">
-                        <h4 className="md:text-[1vw] text-[4vw] mb-1">
-                          Last Name
-                        </h4>
-                        <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
-                          <input
-                            type="text"
-                            name="lastName"
-                            value={paymentDetails.lastName}
-                            onChange={handleInputChange}
-                            className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-white absolute left-0 right-0 bottom-0 top-0"
-                          />
-                        </div>
-                      </div>
-                      <div className="">
-                        <h4 className="md:text-[1vw] text-[4vw] mb-1">
-                          Expiration Date
-                        </h4>
-                        <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
-                          <input
-                            type="text"
-                            name="expirationDate"
-                            value={paymentDetails.expirationDate}
-                            onChange={handleInputChange}
-                            className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-white absolute left-0 right-0 bottom-0 top-0"
-                          />
-                        </div>
-                      </div>
-                      <div className="">
-                        <h4 className="md:text-[1vw] text-[4vw] mb-1">CVC</h4>
-                        <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
-                          <input
-                            type="text"
-                            name="cvcCode"
-                            value={paymentDetails.cvcCode}
-                            onChange={handleInputChange}
-                            className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-white absolute left-0 right-0 bottom-0 top-0"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-              {clientSecret && preferredPlatform === "stripe" && (
-                <Elements stripe={stripePromise} options={{ clientSecret }}>
-                  <Modal
-                    isOpen={showStripeForm}
-                    setIsOpen={setShowStripeForm}
-                    classNames="w-[100vw] md:w-[80vw] lg:w-[60vw] z-50 rounded-md"
-                  >
-                    <div className="p-4">
-                      <StripeCheckoutForm
-                        onSuccess={() => {
-                          setShowStripeForm(false);
-                          setClientSecret(null);
-                        }}
-                      />
-                    </div>
-                  </Modal>
-                </Elements>
-              )}
-
-              {/* Additional Fields for Mobile Money */}
-              {selectedPayment === "mobile_money" && (
-                <div className="space-y-6">
-                  <div className="md:mt-[2vw] mt-[10vw]">
-                    <h4 className="md:text-[1vw] text-[4vw] mb-1">
-                      Mobile Network
-                    </h4>
-                    <select
-                      name="mobileNetwork"
-                      value={paymentDetails.mobileNetwork}
-                      onChange={handleInputChange}
-                      className="w-full border border-gray-300 px-3 py-2 text-sm rounded-md focus:outline-none"
-                    >
-                      <option value="">Select Mobile Network</option>
-                      <option value="MTN">MTN</option>
-                      <option value="Telecel">Telecel</option>
-                    </select>
-                  </div>
-
-                  <div className="md:mt-[2vw] mt-[10vw]">
-                    <h4 className="md:text-[1vw] text-[4vw] mb-1">
-                      Mobile Number
-                    </h4>
-                    <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
-                      <input
-                        type="text"
-                        name="mobileNumber"
-                        value={paymentDetails.mobileNumber}
-                        onChange={handleInputChange}
-                        className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-white absolute left-0 right-0 bottom-0 top-0"
-                      />
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              <div className="w-full absolute flex items-center space-x-2 justify-between pt-2 text-sm bottom-0">
-                <button
-                  type="button"
-                  className=" bg-bChkRed py-2 px-4 text-white font-medium !rounded-sm"
-                  onClick={() => {
-                    setOpenPaymentDrawer(false);
-                    setOpenSubDrawer(true);
-                    setData(null);
-                    handleClear();
-                  }}
-                >
-                  Back
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 bg-bChkRed text-white py-2 rounded-sm hover:bg-red-700"
-                >
-                  {isSaving ? (
-                    <div className="flex items-center justify-center gap-2">
-                      <LoadItems color={"#ffffff"} size={15} />
-                      <h4 className=" text-[#ffffff]">Processing...</h4>
-                    </div>
-                  ) : (
-                    <h4 className=" text-[#ffffff]">
-                      {preferredPlatform == "paystack"
-                        ? "Complete Subscription"
-                        : "Proceed to Payment"}
-                    </h4>
-                  )}
-                </button>
-              </div>
-            </form>
-          </div>
-        </Modal>
       </div>
     </>
   );

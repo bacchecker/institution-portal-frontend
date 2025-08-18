@@ -19,7 +19,6 @@ function NewApplicationForm({
   setOpenModal,
   openModal,
   setCurrentTab,
-  setSelectedStatus,
   fetchVerificationRequests,
 }) {
   const initialUserInput = {
@@ -48,15 +47,17 @@ function NewApplicationForm({
   const [isSaving, setIsSaving] = useState(false);
   const [loading, setLoading] = useState(false);
   const [subscription, setSubscription] = useState([]);
-  const [totalApplicationAmount, setTotalApplicationAmount] = useState(null);
+  const [totalApplicationAmount, setTotalApplicationAmount] = useState({});
   const [uniqueRequestedCode, setUniqueRequestedCode] = useState(null);
   const [selectedInstitution, setSelectedInstitution] = useState({});
   const [selectedInstitutionType, setSelectedInstitutionType] = useState({});
   const [allInstitutions, setAllInstitutions] = useState([]);
   const [selectedCredentialType, setSelectedCredentialType] = useState({});
+  const [resData, setResData] = useState({});
   const [selectedNonInstitutionType, setSelectedNonInstitutionType] = useState(
     {}
   );
+  const [noDocumentAttached, setNoDocumentAttached] = useState(false);
   const [items, setItems] = useState([
     {
       document_type_id: "",
@@ -207,7 +208,6 @@ function NewApplicationForm({
 
         setAllInstitutions(insAffiliations);
       } else {
-        console.log(filteredInstitutions);
 
         setAllInstitutions(filteredInstitutions);
       }
@@ -229,7 +229,7 @@ function NewApplicationForm({
     const type = allDocuments?.find(
       (type) => type?.id === value || type?.document_type?.id === value
     );
-    return type?.verification_fee || 0;
+    return (type?.verification_fee || 0);
   };
 
   const getDocumentName = (value) => {
@@ -241,8 +241,8 @@ function NewApplicationForm({
     const updatedItems = [...items];
     updatedItems[index].institution_document_type_id = item?.id;
     updatedItems[index].document_type_id = item?.document_type.id;
-
     setItems(updatedItems);
+    setTotalApplicationAmount(item)
   };
 
   useEffect(() => {
@@ -365,7 +365,7 @@ function NewApplicationForm({
     e.preventDefault();
     setIsSaving(true);
     const hasErrors = items.some((item) => {
-      if (item.document_type_id === "") {
+      if (item.document_type_id === "" && !noDocumentAttached) {
         toast.error("Document is missing", {
           position: "top-right",
           autoClose: 1202,
@@ -380,7 +380,7 @@ function NewApplicationForm({
         return true;
       }
 
-      if (!item.file) {
+    if (!item.file && !noDocumentAttached) {
         toast.error("Document file is missing", {
           position: "top-right",
           autoClose: 1202,
@@ -439,47 +439,49 @@ function NewApplicationForm({
     );
     formData.append("reason", userInput?.reason);
     items.forEach((item, index) => {
+      formData.append(
+        `documents[${index}][document_type_id]`,
+        item.document_type_id || ""
+      );
+      formData.append(
+        `documents[${index}][institution_document_type_id]`,
+        item.institution_document_type_id || ""
+      );
+
       if (item.file) {
-        formData.append(
-          `documents[${index}][document_type_id]`,
-          item.document_type_id
-        );
-        formData.append(
-          `documents[${index}][institution_document_type_id]`,
-          item.institution_document_type_id
-        );
         formData.append(`documents[${index}][file]`, item.file);
       }
+
       formData.append(
         `documents[${index}][doc_owner_email]`,
-        userInput[`doc_owner_email_${index}`]
+        userInput[`doc_owner_email_${index}`] || ""
       );
       formData.append(
         `documents[${index}][doc_owner_phone]`,
-        userInput[`doc_owner_phone_${index}`]
+        userInput[`doc_owner_phone_${index}`] || ""
       );
       formData.append(
         `documents[${index}][doc_owner_institution]`,
-        userInput[`doc_owner_institution_${index}`]
+        userInput[`doc_owner_institution_${index}`] || ""
       );
       formData.append(
         `documents[${index}][doc_owner_dob]`,
-        userInput[`doc_owner_dob_${index}`]
+        userInput[`doc_owner_dob_${index}`] || ""
       );
       formData.append(
         `documents[${index}][doc_owner_full_name]`,
-        userInput[`doc_owner_full_name_${index}`]
+        userInput[`doc_owner_full_name_${index}`] || ""
       );
-      /* formData.append(`documents[${index}][security_question]`, userInput[`security_question_${index}`] || "");
-      formData.append(`documents[${index}][security_answer]`, userInput[`security_answer_${index}`] || ""); */
     });
+
 
     try {
       const response = await axios.post(
         "/institution/requests/verifications",
         formData
       );
-
+      setUniqueRequestedCode(response?.data?.data?.[0]?.unique_code)
+      setCurrentScreen(2);
       toast.success(response.data.message, {
         position: "top-right",
         autoClose: 1202,
@@ -490,7 +492,6 @@ function NewApplicationForm({
         progress: undefined,
         theme: "light",
       });
-      setOpenModal(!openModal);
       fetchVerificationRequests();
       setIsSaving(false);
     } catch (error) {
@@ -508,12 +509,11 @@ function NewApplicationForm({
     }
   };
 
-  useEffect(() => {
+  /* useEffect(() => {
     if (!openModal && (currentScreen === 2 || currentScreen === 3)) {
       setCurrentTab(2);
-      setSelectedStatus({ title: "Created", value: "created" });
     }
-  }, [openModal, currentScreen]);
+  }, [openModal, currentScreen]); */
 
   useEffect(() => {
     if (error) {
@@ -523,7 +523,7 @@ function NewApplicationForm({
 
   return (
     <SideModal
-      title={"New Application"}
+      title={"New Verification Request"}
       setOpenModal={setOpenModal}
       openModal={openModal}
     >
@@ -543,7 +543,7 @@ function NewApplicationForm({
               />
             </div>
           </div>
-          <div className="md:mt-[2vw] mt-[10vw]">
+          {/* <div className="md:mt-[2vw] mt-[10vw]">
             <h4 className="md:text-[1vw] text-[4vw] mb-1">
               Subscription Plan (Credits)
             </h4>
@@ -555,7 +555,7 @@ function NewApplicationForm({
                 className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0 read-only:bg-[#d8d8d8]"
               />
             </div>
-          </div>
+          </div> */}
           <div className="md:mt-[2vw] mt-[8vw]">
             <h4 className="md:text-[1vw] text-[4vw] mb-1">
               Credential Type<span className="text-[#f1416c]">*</span>
@@ -890,7 +890,7 @@ function NewApplicationForm({
                     className="custom-dropdown-class display-md-none"
                   />
                 </div>
-                {/* {item?.document_type_id && (
+                {item?.document_type_id && (
                   <div className="md:mt-[2vw] mt-[10vw]">
                     <h4 className="md:text-[1vw] text-[4vw] mb-1">
                       Verification Fee
@@ -898,16 +898,30 @@ function NewApplicationForm({
                     <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
                       <input
                         type="text"
-                        value={(
-                          getDocumentVerificationFee(item?.document_type_id) * 1
-                        ).toFixed(2)}
+                        value={`GH₵ ${(getDocumentVerificationFee(item?.document_type_id) * 1).toFixed(2)}`}
                         readOnly
                         className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0 read-only:bg-[#d8d8d8]"
                       />
                     </div>
                   </div>
-                )} */}
-                <div className="md:mt-[2vw] mt-[8vw]">
+                )}
+                <div className="flex items-center md:mt-[2vw] mt-[6vw] gap-[0.5vw]">
+                  <input
+                    type="checkbox"
+                    id={`no-doc-checkbox-${i}`}
+                    checked={noDocumentAttached}
+                    onChange={(e) => setNoDocumentAttached(e.target.checked)}
+                    className="checkbox-design accent-bChkRed md:w-[1.5vw] md:h-[1.5vw] w-[4vw] h-[4vw]"
+                  />
+                  <label
+                    htmlFor={`no-doc-checkbox-${i}`}
+                    className="md:text-[1vw] text-[3.5vw] font-bold"
+                  >
+                    I don't have the required document to attach
+                  </label>
+                </div>
+                {!noDocumentAttached && (
+                <div className="md:mt-[1vw] mt-[8vw]">
                   <h4 className="md:text-[1vw] text-[4vw] mb-1">
                     Upload Document File
                     <span className="text-[#f1416c]">*</span>
@@ -955,6 +969,7 @@ function NewApplicationForm({
                     .jpg, .jpeg, .pdf, .png
                   </h6>
                 </div>
+                )}
               </div>
               <div className="border rounded-md p-4 mt-4">
                 <p className="text-sm font-medium">
@@ -1172,8 +1187,6 @@ function NewApplicationForm({
         <NewApplicationForm2
           setCurrentScreen={setCurrentScreen}
           setOpenModal={(e) => setOpenModal(e)}
-          setCurrentTab={setCurrentTab}
-          setSelectedStatus={(e) => setSelectedStatus(e)}
         />
       )}
       {currentScreen === 3 && (

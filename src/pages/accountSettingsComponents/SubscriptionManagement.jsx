@@ -22,8 +22,6 @@ import {
   useElements,
 } from "@stripe/react-stripe-js";
 
-console.log("Stripe Public Key:", import.meta.env.VITE_STRIPE_PUBLIC_KEY);
-
 const stripePromise = loadStripe(
   import.meta.env.VITE_STRIPE_PUBLIC_KEY || "pk_test_placeholder"
 );
