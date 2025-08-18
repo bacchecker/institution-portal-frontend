@@ -489,7 +489,7 @@ export default function ValidationRequest() {
                 </TableCell>
                 <TableCell className="font-semibold">
                   <CustomUser
-                    avatarSrc={`https://admin-dev.baccheck.online/storage/${item?.user?.photo}`}
+                    avatarSrc={`${import.meta.env.VITE_BACCHECKER_URL}storage/${item?.user?.photo}`}
                     name={`${item?.user?.first_name} ${item?.user?.last_name}`}
                     email={`${item?.user?.email}`}
                   />
@@ -636,7 +636,7 @@ export default function ValidationRequest() {
                       <div className="col-span-2 w-10 h-10 rounded-full bg-gray-200 overflow-hidden">
                         {data?.user?.photo && (
                           <img
-                            src={`https://admin-dev.baccheck.online/storage/${data?.user?.photo}`}
+                            src={`${import.meta.env.VITE_BACCHECKER_URL}storage/${data?.user?.photo}`}
                             alt=""
                             className="w-full h-full object-cover"
                           />
@@ -703,7 +703,7 @@ export default function ValidationRequest() {
                             className="flex self-end space-x-1 items-center cursor-pointer py-1 px-2 rounded-sm bg-blue-600 text-white text-xs w-24 justify-center"
                             onClick={() => {
                               window.location.href =
-                                "https://admin-dev.baccheck.online/api/download-pdf?path=" +
+                                "${import.meta.env.VITE_BACCHECKER_API_URL}/download-pdf?path=" +
                                 encodeURIComponent(data?.file?.path);
                             }}
                           >

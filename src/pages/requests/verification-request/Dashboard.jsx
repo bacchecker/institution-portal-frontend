@@ -792,7 +792,7 @@ export default function Dashboard() {
                         <div className="w-8 h-8 flex items-center justify-center bg-gray-200 rounded-md border border-gray-100">
                           {verification?.sending_institution?.logo && (
                             <img
-                              src={`https://admin-dev.baccheck.online/storage/${verification?.sending_institution?.logo}`}
+                              src={`${import.meta.env.VITE_BACCHECKER_URL}storage/${verification?.sending_institution?.logo}`}
                               alt=""
                               className="w-full h-full object-cover rounded-md"
                             />

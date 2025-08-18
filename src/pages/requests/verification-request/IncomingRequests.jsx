@@ -3,13 +3,8 @@ import {
   Button,
   Card,
   CardBody,
-  CardHeader,
   Chip,
   DateRangePicker,
-  Input,
-  Select,
-  Tabs,
-  Tab,
   TableCell,
   TableRow,
   Textarea,
@@ -29,10 +24,11 @@ import { toast } from "sonner";
 import {
   FaDownload,
   FaRegCircleCheck,
+  FaCircleUser,
 } from "react-icons/fa6";
 import { FaFilePdf } from "react-icons/fa";
 import { GiCancel } from "react-icons/gi";
-import { MdOutlineFilterAlt, MdOutlineFilterAltOff } from "react-icons/md";
+import { MdFileDownload, MdOutlineFilterAlt, MdOutlineFilterAltOff } from "react-icons/md";
 import secureLocalStorage from "react-secure-storage";
 import { IoIosOpen } from "react-icons/io";
 import { BsFillInfoCircleFill } from "react-icons/bs";
@@ -481,7 +477,7 @@ export default function IncomingRequests() {
                 </TableCell>
                 <TableCell className="font-semibold">
                   <CustomUser
-                    avatarSrc={`https://admin-dev.baccheck.online/storage/${item?.sending_institution?.logo}`}
+                    avatarSrc={`${import.meta.env.VITE_BACCHECKER_URL}storage/${item?.sending_institution?.logo}`}
                     name={`${item?.sending_institution?.name}`}
                     email={`${item?.sending_institution?.institution_email}`}
                   />
@@ -553,10 +549,68 @@ export default function IncomingRequests() {
                 )}
               </div>
             ): (
-              <div className="hidden md:flex w-full h-[90dvh] justify-center items-center border md:rounded-[0.3vw] rounded-[1vw]">
-                <p className="text-[#999] md:text-[1vw] text-[3vw] text-center">
-                  No document file has been attached for this request.
-                </p>
+              <div className="hidden md:flex flex-col w-full h-[90dvh] shadow md:rounded-[0.3vw] rounded-[1vw]">
+                <div className="h-32 w-full bg-gradient-to-r from-blue-200 to-yellow-200 rounded-t-md"></div>
+                <div className="w-full flex space-x-6 px-6 py-4">
+                  <div className="flex space-x-2">
+                    <FaCircleUser size={48} className="text-gray-400"/>
+                    <div className="">
+                      <p className="font-medium text-base">{data?.doc_owner_full_name}</p>
+                      <p>{data?.doc_owner_email}</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="px-6">
+                  <div className="grid grid-cols-2 gap-x-4 gap-y-2 mb-6">
+                    <div>
+                      <label className="font-medium text-gray-800">Campus</label>
+                      <p className="border rounded-sm bg-gray-50 py-1.5 px-2 mt-1">{data?.doc_owner_campus}</p>
+                    </div>
+                    <div>
+                      <label className="font-medium text-gray-800">Student Number</label>
+                      <p className="border rounded-sm bg-gray-50 py-1.5 px-2 mt-1">{data?.doc_owner_index_number}</p>
+                    </div>
+                    <div>
+                      <label className="font-medium text-gray-800">Program of Study</label>
+                      <p className="border rounded-sm bg-gray-50 py-1.5 px-2 mt-1">{data?.doc_owner_program_of_study}</p>
+                    </div>
+                    <div>
+                      <label className="font-medium text-gray-800">Mode of Study</label>
+                      <p className="border rounded-sm bg-gray-50 py-1.5 px-2 mt-1">{data?.doc_owner_mode_of_study}</p>
+                    </div>
+                    <div>
+                      <label className="font-medium text-gray-800">Start Year</label>
+                      <p className="border rounded-sm bg-gray-50 py-1.5 px-2 mt-1">{data?.doc_owner_start_year}</p>
+                    </div>
+                    <div>
+                      <label className="font-medium text-gray-800">End Year</label>
+                      <p className="border rounded-sm bg-gray-50 py-1.5 px-2 mt-1">{data?.doc_owner_end_year}</p>
+                    </div>
+                  </div>
+                </div>
+                <div className='hidden md:block w-full h-full overflow-hidden pr-4'>
+                  {["jpg", "jpeg", "png", "gif"].includes(
+                      data?.related_document?.split('.').pop()?.toLowerCase()
+                  ) ? (
+                      <div className='flex-1 w-full h-[90dvh] overflow-auto border md:rounded-[0.3vw] rounded-[1vw] p-[1vw]'>
+                        <img
+                          src={`${import.meta.env.VITE_BACCHECKER_URL}storage/${data?.related_document}`
+                          }
+                          alt="Document preview"
+                          className="w-full max-h-[calc(100vh-170px)] object-contain"
+                        />
+                      </div>
+                  ) : (
+                      <div className="h-[90dvh] overflow-auto">
+                        <iframe
+                          src={`${import.meta.env.VITE_BACCHECKER_URL}storage/${data?.related_document}#toolbar=0&navpanes=0&scrollbar=0`}
+                          className="w-full h-full"
+                        ></iframe>
+                      </div>
+                  )}
+                </div>
+                
+                
               </div>
             )}
             <div className="w-full lg:w-[50vw] xl:w-[45vw] h-full overflow-y-auto flex flex-col font-semibold justify-between">
@@ -640,7 +694,7 @@ export default function IncomingRequests() {
                       <div className="text-gray-500 mt-2">Institution Logo</div>
                       <div className="col-span-2 w-10 h-10 rounded-full bg-gray-200">
                         <img
-                          src={`https://admin-dev.baccheck.online/storage/${data?.sending_institution?.logo}`}
+                          src={`${import.meta.env.VITE_BACCHECKER_URL}storage/${data?.sending_institution?.logo}`}
                           alt=""
                         />
                       </div>
@@ -684,7 +738,7 @@ export default function IncomingRequests() {
                                   className="flex space-x-1 cursor-pointer py-1 px-2 rounded-sm bg-primary text-white text-xs"
                                   onClick={() => {
                                     window.location.href =
-                                      "https://admin-dev.baccheck.online/api/download-pdf?path=" +
+                                      `${import.meta.env.VITE_BACCHECKER_API_URL}/download-pdf?path=` +
                                       encodeURIComponent(data?.file?.path);
                                   }}
                                 >

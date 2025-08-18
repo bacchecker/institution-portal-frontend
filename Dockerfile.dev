@@ -1,0 +1,20 @@
+FROM node:lts-alpine
+LABEL authors="Kingsley B. Brew"
+
+WORKDIR /usr/app
+
+COPY package*.json ./
+
+RUN npm ci
+
+COPY . .
+
+RUN mv .env.locale .env
+
+RUN addgroup -g 1001 -S nodejs
+RUN adduser -S nextjs -u 1001
+
+RUN chown -R nextjs:nodejs /usr/app
+USER nextjs
+
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]

@@ -64,7 +64,7 @@ function OverviewDepartment({ setOpenModal, openModal, selectedDepartment }) {
                         <div className="w-8 h-8 flex items-center justify-center bg-gray-200 rounded-md border border-gray-100">
                             {user?.photo ? (
                             <img
-                                src={`https://admin-dev.baccheck.online/storage/${user?.photo}`}
+                                src={`${import.meta.env.VITE_BACCHECKER_URL}storage/${user?.photo}`}
                                 alt="User Photo"
                                 className="w-full h-full object-cover rounded-md"
                             />
