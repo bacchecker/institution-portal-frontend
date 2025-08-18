@@ -139,7 +139,7 @@ export default function InstitutionProfile() {
                     <div className="col-span-2 flex space-x-3 items-center">
                         <div className="w-24 h-24 border rounded-md flex items-center justify-center overflow-hidden">
                             <img 
-                                src={`https://admin-dev.baccheck.online/storage/${profileData?.institution?.logo}`} 
+                                src={`${import.meta.env.VITE_BACCHECKER_URL}storage/${profileData?.institution?.logo}`} 
                                 alt="Institution Logo" 
                                 className="rounded-md w-full h-full object-contain"
                             />
@@ -200,14 +200,14 @@ export default function InstitutionProfile() {
                     <p className="font-semibold mb-2">Business Registration Document</p>
                     <div className="w-full h-72 border rounded-lg overflow-hidden relative">
                         <iframe
-                            src={`https://admin-dev.baccheck.online/storage/${businessCertPath}#toolbar=0&navpanes=0&scrollbar=0`}
+                            src={`${import.meta.env.VITE_BACCHECKER_URL}storage/${businessCertPath}#toolbar=0&navpanes=0&scrollbar=0`}
                             className="w-full h-full"
                         ></iframe>
 
                         {/* Download Button */}
                         <div className="absolute top-2 right-2">
                             <a
-                            href={`https://admin-dev.baccheck.online/storage/${businessCertPath}`}
+                            href={`${import.meta.env.VITE_BACCHECKER_URL}storage/${businessCertPath}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="p-3 bg-bChkRed text-white rounded-full shadow-md flex items-center justify-center"
@@ -223,14 +223,14 @@ export default function InstitutionProfile() {
                     <p className="font-semibold mb-2">Operation Certificate</p>
                     <div className="w-full h-72 border rounded-lg overflow-hidden relative">
                         <iframe
-                            src={`https://admin-dev.baccheck.online/storage/${pdfPath}#toolbar=0&navpanes=0&scrollbar=0`}
+                            src={`${import.meta.env.VITE_BACCHECKER_URL}storage/${pdfPath}#toolbar=0&navpanes=0&scrollbar=0`}
                             className="w-full h-full"
                         ></iframe>
 
                         {/* Download Button */}
                         <div className="absolute top-2 right-2">
                             <a
-                            href={`https://admin-dev.baccheck.online/storage/${pdfPath}`}
+                            href={`${import.meta.env.VITE_BACCHECKER_URL}storage/${pdfPath}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="p-3 bg-bChkRed text-white rounded-full shadow-md flex items-center justify-center"

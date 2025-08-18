@@ -250,7 +250,7 @@ function DashboardIncomingVerificationRequest() {
                                 <div className="w-[2.5vw] h-[2.5vw] bg-[#cb3cff33] rounded-[50%] flex overflow-hidden">
                                   {request?.sending_institution?.logo && (
                                     <img
-                                      src={`https://admin-dev.baccheck.online/storage/${request?.sending_institution?.logo}`}
+                                      src={`${import.meta.env.VITE_BACCHECKER_URL}storage/${request?.sending_institution?.logo}`}
                                       alt=""
                                       className="w-full h-full object-cover"
                                     />

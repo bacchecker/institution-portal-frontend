@@ -13,6 +13,9 @@ import { toast } from "sonner";
 import LoadItems from "@/components/LoadItems";
 import NewApplicationForm2 from "./NewApplicationForm2";
 import NewApplicationForm3 from "./NewApplicationForm3";
+import { MdSubscriptions } from "react-icons/md";
+import { FaCreditCard } from "react-icons/fa";
+
 import axios from "@/utils/axiosConfig";
 
 function NewApplicationForm({
@@ -57,6 +60,7 @@ function NewApplicationForm({
   const [selectedNonInstitutionType, setSelectedNonInstitutionType] = useState(
     {}
   );
+  const [billingType, setBillingType] = useState("payg");
   const [noDocumentAttached, setNoDocumentAttached] = useState(false);
   const [items, setItems] = useState([
     {
@@ -97,7 +101,7 @@ function NewApplicationForm({
   useEffect(() => {
     if (!openModal) {
       fetchSubscription();
-      setCurrentScreen(1);
+      setCurrentScreen(0);
       setUserInput(initialUserInput);
       setIsChecked(false);
       setSelectedCredentialType({});
@@ -229,8 +233,13 @@ function NewApplicationForm({
     const type = allDocuments?.find(
       (type) => type?.id === value || type?.document_type?.id === value
     );
-    return (type?.verification_fee || 0);
+    return type?.verification_fee || 0;
   };
+
+  const totalAmount = items.reduce((acc, item) => {
+    const fee = getDocumentVerificationFee(item?.document_type_id);
+    return acc + (fee || 0);
+  }, 0);
 
   const getDocumentName = (value) => {
     const type = allDocuments?.find((type) => type?.id === value);
@@ -422,6 +431,10 @@ function NewApplicationForm({
 
     formData.append("institution_id", selectedInstitution?.id || "");
     formData.append(
+      "billing_type",
+      billingType || ""
+    );
+    formData.append(
       "other_institution_name",
       userInput?.otherInstitution || ""
     );
@@ -481,7 +494,12 @@ function NewApplicationForm({
         formData
       );
       setUniqueRequestedCode(response?.data?.data?.[0]?.unique_code)
-      setCurrentScreen(2);
+      if (billingType === "subscription") {
+        setOpenModal(false); // close the modal
+      } else {
+        setUniqueRequestedCode(response?.data?.data?.[0]?.unique_code);
+        setCurrentScreen(2); // go to payment screen
+      }
       toast.success(response.data.message, {
         position: "top-right",
         autoClose: 1202,
@@ -509,11 +527,11 @@ function NewApplicationForm({
     }
   };
 
-  /* useEffect(() => {
+  useEffect(() => {
     if (!openModal && (currentScreen === 2 || currentScreen === 3)) {
       setCurrentTab(2);
     }
-  }, [openModal, currentScreen]); */
+  }, [openModal, currentScreen]);
 
   useEffect(() => {
     if (error) {
@@ -527,10 +545,82 @@ function NewApplicationForm({
       setOpenModal={setOpenModal}
       openModal={openModal}
     >
+    {currentScreen === 0 && (
+      <div className="w-full p-4">
+        <h2 className="text-xl font-semibold text-center mb-6">Choose Payment Method</h2>
+        <div className="flex flex-col gap-4">
+          <button
+            onClick={() => {
+              setBillingType("payg");
+              setCurrentScreen(1);
+            }} 
+            className="w-full bg-[#f8f8f8] md:p-[0.2vw] p-[1vw] md:rounded-[0.4vw] rounded-[1.1vw] border border-[#0000000f]  hover:opacity-80"
+          >
+            <div className="w-full bg-[#ffffff] border border-[#0000000f] md:rounded-[0.3vw] rounded-[1vw] flex md:p-[0.5vw] p-[2vw] items-center md:gap-[0.5vw] gap-[1vw]">
+              <div className="md:w-[3vw] md:h-[3vw] w-[10vw] h-[10vw] bg-bChkRed md:rounded-[0.2vw] rounded-[0.8vw] flex items-center justify-center">
+                <FaCreditCard size={20} className="text-white" />
+              </div>
+              <div className="flex flex-col">
+                <h4 className="text-left md:text-[1.1vw] text-[3vw] font-[600] text-bChkRed">
+                  Pay As You Go
+                </h4>
+                <h4 className="md:text-[0.8vw] text-[3vw] text-gray-500">
+                  You’ll be charged a one-time fee for each document you submit
+                </h4>
+              </div>
+            </div>
+          </button>
+          <button
+            onClick={() => {
+              setBillingType("subscription");
+              setCurrentScreen(1);
+            }} 
+            className="w-full bg-[#f8f8f8] md:p-[0.2vw] p-[1vw] md:rounded-[0.4vw] rounded-[1.1vw] border border-[#0000000f] hover:opacity-80"
+          >
+            <div className="w-full bg-[#ffffff] border border-[#0000000f] md:rounded-[0.3vw] rounded-[1vw] flex md:p-[0.5vw] p-[2vw] items-center md:gap-[0.5vw] gap-[1vw]">
+              <div className="md:w-[3vw] md:h-[3vw] w-[10vw] h-[10vw] bg-black md:rounded-[0.2vw] rounded-[0.8vw] flex items-center justify-center">
+                <MdSubscriptions size={20} className="text-white" />
+              </div>
+              <div className="flex flex-col">
+                <h4 className="text-left md:text-[1.1vw] text-[3vw] font-[600] text-black">
+                  Use Subscription Credits
+                </h4>
+                <h4 className="md:text-[0.8vw] text-[3vw] text-gray-500">
+                  Use your pre-paid credit balance to submit requests
+                </h4>
+              </div>
+            </div>
+          </button>
+        </div>
+      </div>
+    )}
+
+      {/* <div className="tab-container">
+        <div className="flex flex-col sticky top-0 z-[40] -mt-4">
+          <div className="tab_box bg-[#F4F4F4] md:mt-[1vw] mt-[2vw] md:p-[0.5vw] p-[3vw] flex justify-between">
+            <button
+              onClick={() => setBillingType("payg")}
+              className={`w-full tab_btn md:py-[0.5vw] md:px-[3.5vw] py-[3vw] px-[5vw] md:text-[1vw] text-[3vw] md:rounded-[0.2vw] rounded-[1vw] ${
+                billingType === "payg" && "active-tab"
+              }`}
+            >
+              Pay as you go
+            </button>
+            <button
+              onClick={() => setBillingType("subscription")}
+              className={`w-full tab_btn md:py-[0.5vw] md:px-[3.5vw] py-[3vw] px-[5vw] md:text-[1vw] text-[3vw] md:rounded-[0.2vw] rounded-[1vw] ${
+                billingType === "subscription" && "active-tab"
+              }`}
+            >
+              Subscription
+            </button>
+          </div>
+        </div>
+      </div> */}
       {currentScreen === 1 && (
         <form
           onSubmit={handleSubmit}
-          className="md:px-[1vw] px-[5vw] w-full overflow-auto"
+          className="md:px-[1vw] px-[5vw] w-full overflow-auto -mt-2"
         >
           <div className="md:mt-[2vw] mt-[10vw]">
             <h4 className="md:text-[1vw] text-[4vw] mb-1">Name</h4>
@@ -543,19 +633,22 @@ function NewApplicationForm({
               />
             </div>
           </div>
-          {/* <div className="md:mt-[2vw] mt-[10vw]">
-            <h4 className="md:text-[1vw] text-[4vw] mb-1">
-              Subscription Plan (Credits)
-            </h4>
-            <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
-              <input
-                type="text"
-                readOnly
-                value={`${subscription?.credit_balance || 0}`}
-                className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0 read-only:bg-[#d8d8d8]"
-              />
+          {billingType === "subscription" && (
+            <div className="md:mt-[2vw] mt-[10vw]">
+              <h4 className="md:text-[1vw] text-[4vw] mb-1">
+                Subscription Plan (Credits)
+              </h4>
+              <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
+                <input
+                  type="text"
+                  readOnly
+                  value={`${subscription?.credit_balance || 0}`}
+                  className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0 read-only:bg-[#d8d8d8]"
+                />
+              </div>
             </div>
-          </div> */}
+          )}
+
           <div className="md:mt-[2vw] mt-[8vw]">
             <h4 className="md:text-[1vw] text-[4vw] mb-1">
               Credential Type<span className="text-[#f1416c]">*</span>
@@ -890,21 +983,22 @@ function NewApplicationForm({
                     className="custom-dropdown-class display-md-none"
                   />
                 </div>
-                {item?.document_type_id && (
+                {item?.document_type_id && billingType === "payg" && (
                   <div className="md:mt-[2vw] mt-[10vw]">
-                    <h4 className="md:text-[1vw] text-[4vw] mb-1">
-                      Verification Fee
-                    </h4>
+                    <h4 className="md:text-[1vw] text-[4vw] mb-1">Verification Fee</h4>
                     <div className="relative w-full md:h-[2.7vw] h-[12vw] md:rounded-[0.3vw!important] rounded-[1.5vw!important] overflow-hidden border-[1.5px] border-[#E5E5E5]">
                       <input
                         type="text"
-                        value={`GH₵ ${(getDocumentVerificationFee(item?.document_type_id) * 1).toFixed(2)}`}
+                        value={(
+                          getDocumentVerificationFee(item?.document_type_id) * 1
+                        ).toFixed(2)}
                         readOnly
                         className="w-full h-full md:px-[0.8vw] px-[2vw] md:text-[1vw] text-[3.5vw] focus:outline-none bg-[#f7f7f7] absolute left-0 right-0 bottom-0 top-0 read-only:bg-[#d8d8d8]"
                       />
                     </div>
                   </div>
                 )}
+
                 <div className="flex items-center md:mt-[2vw] mt-[6vw] gap-[0.5vw]">
                   <input
                     type="checkbox"
@@ -1187,6 +1281,7 @@ function NewApplicationForm({
         <NewApplicationForm2
           setCurrentScreen={setCurrentScreen}
           setOpenModal={(e) => setOpenModal(e)}
+          setCurrentTab={setCurrentTab}
         />
       )}
       {currentScreen === 3 && (

@@ -81,7 +81,7 @@ function SystemLogs() {
       theme: "colored",
     });
 
-    const apiUrl = `https://admin-dev.baccheck.online/api/system-logs/institution/export`;
+    const apiUrl = `${import.meta.env.VITE_BACCHECKER_API_URL}/system-logs/institution/export`;
     const params = new URLSearchParams({
       page: 1,
       selectedFrom: selectedFrom != "" ? selectedFrom : currentDate,

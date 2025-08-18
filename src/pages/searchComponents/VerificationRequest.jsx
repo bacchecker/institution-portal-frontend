@@ -124,7 +124,7 @@ export default function VerificationRequest({data}) {
                         </TableCell>
                         <TableCell className="font-semibold">
                             <CustomUser
-                                avatarSrc={`https://admin-dev.baccheck.online/storage/${item?.sending_institution?.logo}`}
+                                avatarSrc={`${import.meta.env.VITE_BACCHECKER_URL}storage/${item?.sending_institution?.logo}`}
                                 name={`${item?.sending_institution?.name}`}
                                 email={`${item?.sending_institution?.institution_email}`}
                             />
@@ -255,7 +255,7 @@ export default function VerificationRequest({data}) {
                     <div className="text-gray-500 mt-2">Institution Logo</div>
                     <div className="col-span-2 w-10 h-10 rounded-full bg-gray-200">
                     <img
-                        src={`https://admin-dev.baccheck.online/storage/${itemData?.receiving_institution?.logo}`}
+                        src={`${import.meta.env.VITE_BACCHECKER_URL}storage/${itemData?.receiving_institution?.logo}`}
                         alt=""
                     />
                     </div>
@@ -302,12 +302,12 @@ export default function VerificationRequest({data}) {
                             // onClick={() => downloadFile(itemData?.file?.name)}
                             onClick={() => {
                             window.location.href =
-                                "https://admin-dev.baccheck.online/api/download-pdf?path=" +
+                                "${import.meta.env.VITE_BACCHECKER_API_URL}/download-pdf?path=" +
                                 encodeURIComponent(itemData?.file?.path);
                             }}
                             /* onClick={() => {
                             window.location.href =
-                                "https://admin-dev.baccheck.online/api/document/download" +
+                                "${import.meta.env.VITE_BACCHECKER_API_URL}/document/download" +
                                 "?path=" +
                                 encodeURIComponent(itemData?.file?.path);
                             }} */
