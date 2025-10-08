@@ -61,7 +61,7 @@ export default function Notifications() {
   const fetchNotifications = async (cancelled = false) => {
     try {
       setLoading(true);
-      const res = await axios.get("/institution/notifications");
+      const res = await axios.get("/institution/all-notifications");
       const data = res.data?.data?.notifications || [];
 
       const parsedData = data.map(mapApiToUi);
@@ -200,7 +200,7 @@ export default function Notifications() {
           <div className="flex items-center gap-2">
             {/* <FiBell className="w-6 h-6" /> */}
             <h1 className="text-lg md:text-xl font-semibold">Notifications</h1>
-            {badge && <Chip color="danger" size="sm" variant="solid">{badge}</Chip>}
+            {badge && <Chip className="bg-bChkRed text-white" size="sm" variant="solid">{badge}</Chip>}
           </div>
 
           <div className="flex items-center gap-2">
