@@ -125,11 +125,11 @@ function Sidebar() {
           }`}
       >
         <div className="w-full h-[80%]">
-          <div className="flex w-full justify-center py-[5px] md:border-b-2 border-[#E5E5E5]">
+          <div className="flex w-full justify-center py-[4px] md:border-b-2 border-[#E5E5E5]">
             <img
               src="/assets/img/back-logo.png"
               alt=""
-              className="md:w-[165px] display-no-sm"
+              className="md:w-[152px] display-no-sm"
             />
             <div className="flex flex-col justify-center items-center display-no-md">
               <img src="/assets/img/logo1.svg" alt="" className="w-[13vw]" />
