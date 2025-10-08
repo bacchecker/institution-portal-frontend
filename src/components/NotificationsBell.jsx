@@ -24,7 +24,7 @@ import {
   FiChevronRight,
   FiRefreshCw,
 } from "react-icons/fi";
-import { NavLink } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import axios from "@/utils/axiosConfig";
 
 // --- helpers -------------------------------------------------
@@ -94,8 +94,9 @@ export default function NotificationsBell({
 }) {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
-  const unreadCount = useMemo(() => items.filter((n) => !n.read).length, [items]);
+  const unreadCount = useMemo(() => items.filter((n) => !n.is_read).length, [items]);
 
   const fetchLatest = async () => {
     try {
@@ -125,6 +126,7 @@ export default function NotificationsBell({
     setItems((prev) => prev.map((x) => (x.id === n.id ? { ...x, read: true } : x)));
     try {
       await axios.post(`/institution/notifications/${encodeURIComponent(n.id)}`, { read: true });
+      navigate("/notifications");
     } catch (e) {
       setItems((prev) => prev.map((x) => (x.id === n.id ? { ...x, read: false } : x)));
       console.error(e);
@@ -253,15 +255,15 @@ export default function NotificationsBell({
           </CardBody>
 
           <Divider />
-
-          {/* <CardFooter className="px-4 py-3">
-            <NavLink
-              to="/admin/notifications"
-              className="w-full bg-foreground text-background py-1.5 rounded-sm text-center hover:opacity-90 transition"
+          <CardFooter className="px-4 py-3">
+            <Button
+              size="sm"
+              className="w-full bg-foreground text-background hover:opacity-90 transition"
+              onPress={() => navigate("/notifications")}
             >
               View all notifications
-            </NavLink>
-          </CardFooter> */}
+            </Button>
+          </CardFooter>
         </Card>
       </PopoverContent>
     </Popover>

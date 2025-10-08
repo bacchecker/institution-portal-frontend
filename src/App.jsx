@@ -19,6 +19,7 @@ import AccountSetup from "@/pages/AccountSetup";
 import ManageRequest from "@/pages/requests/ManageRequest";
 import Tickets from "@/pages/support/Tickets";
 import Dashboard from "@/pages/Dashboard";
+import Notifications from "@/pages/Notifications";
 import AccountSetupProtectedRoute from "@/components/AccountSetupProtectedRoute";
 import AccountUnderReviewProtection from "@/components/AccountUnderReviewProtection";
 import RevenueOverview from "@/pages/reports/RevenueOverview";
@@ -98,6 +99,16 @@ function App() {
                       <AuthenticatedSuccessProtectedRoute>
                         <AccountSetupProtectedRoute>
                           <Dashboard />
+                        </AccountSetupProtectedRoute>
+                      </AuthenticatedSuccessProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/notifications"
+                    element={
+                      <AuthenticatedSuccessProtectedRoute>
+                        <AccountSetupProtectedRoute>
+                          <Notifications />
                         </AccountSetupProtectedRoute>
                       </AuthenticatedSuccessProtectedRoute>
                     }
