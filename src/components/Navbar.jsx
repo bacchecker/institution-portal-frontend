@@ -10,17 +10,29 @@ import Pusher from "pusher-js";
 import { toast } from "sonner";
 import { useDispatch, useSelector } from "react-redux";
 import { setMessage, setSelectedTab } from "../redux/baccheckerSlice";
+import NotificationsBell from "./NotificationsBell";
 
 const Navbar = () => {
-  const user = JSON?.parse(secureLocalStorage?.getItem("user"))?.user;
+  /* const user = JSON?.parse(secureLocalStorage?.getItem("user"))?.user;
   const token = JSON?.parse(secureLocalStorage?.getItem("userToken")).token;
-  const institution = JSON?.parse(secureLocalStorage?.getItem("user"))?.institution;
+  const institution = JSON?.parse(secureLocalStorage?.getItem("user"))?.institution; */
   const dispatch = useDispatch()
   const [openDropDownFilter, setOpenDropDownFilter] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  let permissions = secureLocalStorage.getItem("userPermissions") || [];
+  const rawPerms = secureLocalStorage.getItem("userPermissions");
+  const permissions = Array.isArray(rawPerms)
+    ? rawPerms
+    : (rawPerms ? JSON.parse(rawPerms) : []);
   const isAdmin = JSON.parse(secureLocalStorage.getItem("userRole"))?.isAdmin;
+  const safeParse = (s) => { try { return JSON.parse(s); } catch { return null; } };
+
+  const userObj   = safeParse(secureLocalStorage.getItem("user")) || {};
+  const user      = userObj.user;
+  const institution = userObj.institution;
+
+  const tokenObj  = safeParse(secureLocalStorage.getItem("userToken")) || {};
+  const token     = tokenObj.token || null;
   const { data: notifications, refetch } = useGetNotificationsQuery();
 
   let message = useSelector((state) => state.bacchecker.message);
@@ -29,42 +41,52 @@ const Navbar = () => {
   const navigate = useNavigate();
 
 
-  window.Pusher = Pusher;
-  window.Echo = new Echo({
-    broadcaster: "reverb",
-    key: import.meta.env.VITE_REVERB_APP_KEY,
-    wsHost: import.meta.env.VITE_REVERB_HOST,
-    forceTLS: true,
-    // encrypted: false,
-    auth: {
-      headers: {
-        authorization: `Bearer ${token}`,
-      },
-    },
-    enabledTransports: ["ws", "wss"],
-  });
+  useEffect(() => {
+    if (!token || window.Echo) return;
 
-  window.Echo.connector.pusher.connection.bind("error", (error) => {
-    console.error("WebSocket connection error:", error);
-  });
+    window.Pusher = Pusher;
+    window.Echo = new Echo({
+      broadcaster: "reverb",
+      key: import.meta.env.VITE_REVERB_APP_KEY,
+      wsHost: import.meta.env.VITE_REVERB_HOST,
+      wsPort: import.meta.env.VITE_REVERB_PORT ?? 80,
+      wssPort: import.meta.env.VITE_REVERB_PORT ?? 443,
+      forceTLS: window.location.protocol === "https:",
+      enabledTransports: ["ws", "wss"],
+      auth: { headers: { authorization: `Bearer ${token}` } },
+    });
 
+    window.Echo.connector.pusher.connection.bind("error", console.error);
+
+    return () => {
+      try { window.Echo.disconnect(); } catch {}
+      window.Echo = undefined;
+    };
+  }, [token]);
 
   useEffect(() => {
-    if (institution?.id) {
-      window.Echo.channel(`institution.${institution?.id}`).listen(
-        "ReceiveInstitutionEvent",
-        async (event) => {
-          if (event) {
-            await refetch()
-            dispatch(setMessage(event))
-          }
-          if (event?.data?.type === "user_permissions" && event?.data?.content?.user_id === user?.id) {
-            navigate("/")
-          }
-        }
-      );
-    }
-  }, [institution?.id, refetch]);
+    if (!institution?.id || !window.Echo) return;
+
+    const channelName = `institution.${institution.id}`;
+    const channel = window.Echo.channel(channelName);
+
+    const handler = async (event) => {
+      if (event) {
+        await refetch?.();
+        dispatch(setMessage(event));
+      }
+      if (event?.data?.type === "user_permissions" &&
+          event?.data?.content?.user_id === user?.id) {
+        navigate("/");
+      }
+    };
+
+    channel.listen("ReceiveInstitutionEvent", handler);
+
+    return () => {
+      try { window.Echo.leaveChannel(channelName); } catch {}
+    };
+  }, [institution?.id, user?.id, refetch, dispatch, navigate]);
 
 
   const handleSearch = async (event) => {
@@ -89,31 +111,24 @@ const Navbar = () => {
   const [updateNotification, { data, isSuccess, isError, error }] =
     useUpdateNotificationMutation();
   const handleSubmit = async (notification) => {
+    const meta = (() => { try { return JSON.parse(notification?.data); } catch { return {}; } })();
+
     navigate("/e-check");
-    if (message?.data?.type === "verification_request" && message?.data?.content?.sending_institution === institution?.name) {
-      dispatch(setSelectedTab("music"));
-    } else {
-      dispatch(setSelectedTab("document"));
-    }
+
+    const isOutgoing =
+      notification?.type === "verification_request" &&
+      meta?.sending_institution === institution?.name;
+
+    dispatch(setSelectedTab(isOutgoing ? "music" : "document"));
 
     try {
-      await updateNotification({
-        id: notification.id,
-      });
-    } catch (error) {
-      toast.error("Not error", {
-        position: "top-right",
-        autoClose: 1202,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-      });
+      await updateNotification({ id: notification.id });
+    } catch {
+      toast.error("Failed to update notification");
     }
-    setOpenDropDownFilter(false)
+    setOpenDropDownFilter(false);
   };
+
 
 
   useEffect(() => {
@@ -123,7 +138,7 @@ const Navbar = () => {
   }, [isError]);
   return (
 
-    <div className="flex justify-between w-full h-[62px] border-b bg-[#f8f8f8] p-4 md:mt-0 mt-[20vw]  z-[-50]">
+    <div className="flex justify-between w-full h-[55px] border-b bg-[#f8f8f8] px-4 md:mt-0 mt-[20vw]  z-[-50]">
       <div className="w-full lg:w-96 flex justify-center">
         <form onSubmit={handleSearch} className="relative w-full lg:w-96 flex items-center">
           <input
@@ -150,7 +165,7 @@ const Navbar = () => {
           ) : (
             <button
               type="submit"
-              className="absolute right-0 bg-bChkRed hover:bg-red-500 px-2 py-[17.5px] text-white h-full border border-white rounded-full flex items-center justify-center"
+              className="absolute right-0 bg-bChkRed hover:bg-red-500 px-2 h-[38px] text-white border border-white rounded-full flex items-center justify-center"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -168,51 +183,17 @@ const Navbar = () => {
       <div className="hidden lg:flex items-center justify-center space-x-2">
         {((permissions?.includes("e-check.view") ||
           permissions.includes("e-check.create") || permissions.includes("e-check.process") || permissions.includes("e-check.cancel")) || isAdmin) && (
-            <Dropdown
-              buttonContent={
-                <>
-                  <div className='w-fit h-fit relative pt-[1vw]'>
-                    <i className='bx bx-bell text-[2vw]'></i>
-                    <div className='rounded-[50%] w-[1.8vw] h-[1.8vw] bg-[#ff0404] flex justify-center items-center absolute top-[0.2vw] right-[-0.8vw]'>
-                      <h4 className='text-[0.9vw] text-white font-[600]'>{notifications?.data?.notifications?.length || 0}</h4>
-                    </div>
-                  </div>
-                </>
-              }
-              buttonClass="action-button-class"
-              dropdownClass="action-dropdown-class1"
-              openDropDownFilter={openDropDownFilter}
-              setOpenDropDownFilter={setOpenDropDownFilter}
-            >
-              <div className="action-dropdown-content1">
-                <div className='max-h-[10vw] nav-sco'>
-                  {notifications?.data?.notifications?.length > 0 ? (
-                    <>
-                      {notifications?.data?.notifications?.map((notification, i) => {
-                        return (
-                          <div
-                            key={i}
-                            onClick={() => handleSubmit(notification)}
-                            className='w-full p-[0.5vw] border-b hover:bg-[#E5E5E5] cursor-pointer'>
-                            <h4 className='text-[1vw]'>{notification?.message}</h4>
-                          </div>
-                        )
-                      })}
-                    </>
-                  ) : (
-                    <div className='w-full flex justify-center items-center h-[2vw]'>
-                      <h4 className='text-[1vw]'>No notification</h4>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </Dropdown>
+            <NotificationsBell
+              items={notifications?.data?.notifications ?? []}
+              onRefresh={refetch}
+              onItemClick={handleSubmit}
+            />
           )}
-        <div className="rounded-full bg-gray-200 text-white p-3">
-          <FaUser size={20} />
+        <div className="rounded-full bg-gray-200 text-white p-2.5">
+          <FaUser size={17} />
         </div>
         <div className="">
-          <p className="font-medium">
+          <p className="font-medium text-sm">
             {`${user?.first_name || ""} ${user?.last_name || ""
               }`}
           </p>
