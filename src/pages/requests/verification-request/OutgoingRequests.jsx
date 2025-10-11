@@ -572,7 +572,7 @@ export default function OutgoingRequests() {
                             </div>
                           ) : (
                             <>
-                              {verificationReport && (
+                              {verificationReport && data?.status === "completed" && (
                                 <div className="gap-3 p-2 rounded-md border">
                                   <div className="w-full flex justify-between">
                                     <div className="w-full flex space-x-2 items-center">
@@ -597,9 +597,9 @@ export default function OutgoingRequests() {
                               )}
 
                               {/* No Reports Found Message */}
-                              {!verificationReport && (
+                              {!verificationReport || data?.status !== "completed" && (
                                 <div className="col-span-2 text-center text-gray-500 text-sm py-4">
-                                  No reports found.
+                                  No reports found. Verification is not completed yet.
                                 </div>
                               )}
                             </>
