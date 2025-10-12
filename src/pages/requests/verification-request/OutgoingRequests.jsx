@@ -50,6 +50,9 @@ export default function OutgoingRequests() {
   const [sortOrder, setSortOrder] = useState("asc");
   const [currentPaymentScreen, setCurrentPaymentScreen] = useState(1);
   const [verificationReport, setVerificationReport] = useState("");
+  const [requestLetter, setRequestLetter] = useState(null);
+  const [consentLetter, setConsentLetter] = useState(null);
+  const [authLetter, setAuthLetter] = useState(null);
   const [filters, setFilters] = useState({
     search_query: "",
     status: null,
@@ -66,56 +69,6 @@ export default function OutgoingRequests() {
     { value: "rejected", name: "Rejected" },
     { value: "completed", name: "Completed" },
 ];
-  
-
-  useEffect(() => {
-    if (!data?.id || !data?.status) return; // Ensure ID and status exist
-  
-    setIsFetching(true);
-  
-    const fetchReports = async () => {
-      try {
-        const requests = [];
-  
-        // ✅ Fetch Request Letter (for all statuses)
-        requests.push(
-          axios.get(`/pdf/request-letter/${data.id}`, { responseType: "blob" })
-        );
-  
-        // ✅ Fetch Authorization Letter (Only if status is NOT "created" or "rejected")
-        if (!["created", "rejected"].includes(data.status)) {
-          requests.push(
-            axios.get(`/pdf/authorization-letter/${data.id}`, { responseType: "blob" })
-          );
-        } else {
-          requests.push(Promise.resolve(null)); // Placeholder to maintain order
-        }
-  
-        // ✅ Fetch Verification Report (Only if status is "completed")
-        if (data.status === "completed") {
-          requests.push(
-            axios.get(`/pdf/verification-report/${data.id}`, { responseType: "blob" })
-          );
-        } else {
-          requests.push(Promise.resolve(null)); // Placeholder to maintain order
-        }
-  
-        // Execute all API requests
-        const [verificationReport] = await Promise.all(requests);
-  
-        // Convert blobs to URLs only if response is valid
-        setVerificationReport(verificationReport ? URL.createObjectURL(verificationReport.data) : null);
-  
-        setIsFetching(false);
-      } catch (error) {
-        setIsFetching(false);
-        console.error("Error fetching reports:", error);
-      }
-    };
-  
-    fetchReports();
-  }, [data?.id, data?.status]); // ✅ Runs when `data.id` or `data.status` changes
-   
 
   const institutionVerificationRequests = async () => {
     setIsLoading(true);
@@ -145,29 +98,63 @@ export default function OutgoingRequests() {
     }
   };
 
-  /* useEffect(() => {
-    const fetchInstitutionDocs = async () => {
-      try {
-        const response = await axios.get("/institution/document_types");
-        const uniqueDocumentTypes = [
-          ...new Map(
-            response.data.documents.map((doc) => [
-              doc.document_type.id,
-              { key: doc.document_type.id, name: doc.document_type.name },
-            ])
-          ).values(),
-        ];
-        setDocumentTypes(uniqueDocumentTypes);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-    fetchInstitutionDocs();
-  }, []); */
 
   useEffect(() => {
     institutionVerificationRequests();
   }, [submittedFilters, currentPage, sortBy, sortOrder]);
+
+  useEffect(() => {
+    if (!data?.id || !data?.status) return;
+    setIsFetching(true);
+  
+    const fetchReports = async () => {
+      try {
+        const requests = [];
+  
+        requests.push(
+          axios.get(`/pdf/verification-request-package/${data.id}`, { responseType: "blob" })
+        );
+
+        if (!["created", "rejected"].includes(data.status)) {
+          requests.push(
+            axios.get(`/pdf/verification-report/${data.id}`, { responseType: "blob" })
+          );
+        } else {
+          requests.push(Promise.resolve(null));
+        }
+  
+        if (!["created", "rejected"].includes(data.status)) {
+          requests.push(
+            axios.get(`/pdf/delegation-authority/${data.id}`, { responseType: "blob" })
+          );
+        } else {
+          requests.push(Promise.resolve(null));
+        }
+  
+        if (data.status === "completed") {
+          requests.push(
+            axios.get(`/pdf/verification-report/${data.id}`, { responseType: "blob" })
+          );
+        } else {
+          requests.push(Promise.resolve(null));
+        }
+  
+        const [reqLetter, consLetter, authLetter, verificationReport] = await Promise.all(requests);
+  
+        setRequestLetter(reqLetter ? URL.createObjectURL(reqLetter.data) : null);
+        setConsentLetter(consLetter ? URL.createObjectURL(consLetter.data) : null);
+        setAuthLetter(authLetter ? URL.createObjectURL(authLetter.data) : null);
+        setVerificationReport(verificationReport ? URL.createObjectURL(verificationReport.data) : null);
+  
+        setIsFetching(false);
+      } catch (error) {
+        setIsFetching(false);
+        console.error("Error fetching reports:", error);
+      }
+    };
+  
+    fetchReports();
+  }, [data?.id, data?.status]);
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -572,11 +559,80 @@ export default function OutgoingRequests() {
                             </div>
                           ) : (
                             <>
+                            {requestLetter && (
+                              <div className="gap-3 p-2 rounded-md border">
+                                <div className="w-full flex justify-between">
+                                  <div className="w-full flex space-x-2 items-center">
+                                    <FaFilePdf size={36} className="text-bChkRed" />
+                                    <div className="flex flex-col space-y-1">
+                                      <p>Verification Request Letter</p>
+                                      <div className="text-xs font-semibold -mt-1">
+                                        <p>From: <span className="font-normal text-gray-500">Bacchecker</span></p>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  
+                                  <div
+                                    className="flex self-end space-x-1 items-center cursor-pointer py-1 px-2 rounded-sm bg-blue-600 text-white text-xs w-20"
+                                    onClick={() => window.open(requestLetter, "_blank")}
+                                  >
+                                    <IoIosOpen size={16} />
+                                    <p>Open</p>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+                            {consentLetter && (
+                              <div className="gap-3 p-2 rounded-md border">
+                                <div className="w-full flex justify-between">
+                                  <div className="w-full flex space-x-2 items-center">
+                                    <FaFilePdf size={36} className="text-bChkRed" />
+                                    <div className="flex flex-col space-y-1">
+                                      <p>Document Owner Consent Letter</p>
+                                      <div className="text-xs font-semibold -mt-1">
+                                        <p>From: <span className="font-normal text-gray-500">{data?.doc_owner_full_name}</span></p>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  
+                                  <div
+                                    className="flex self-end space-x-1 items-center cursor-pointer py-1 px-2 rounded-sm bg-blue-600 text-white text-xs w-20"
+                                    onClick={() => window.open(consentLetter, "_blank")}
+                                  >
+                                    <IoIosOpen size={16} />
+                                    <p>Open</p>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+                            {authLetter && (
+                              <div className="gap-3 p-2 rounded-md border">
+                                <div className="w-full flex justify-between">
+                                  <div className="w-full flex space-x-2 items-center">
+                                    <FaFilePdf size={36} className="text-bChkRed" />
+                                    <div className="flex flex-col space-y-1">
+                                      <p>Delegation Authority Letter</p>
+                                      <div className="text-xs font-semibold -mt-1">
+                                        <p>From: <span className="font-normal text-gray-500">{data?.sending_institution?.name}</span></p>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  
+                                  <div
+                                    className="flex self-end space-x-1 items-center cursor-pointer py-1 px-2 rounded-sm bg-blue-600 text-white text-xs w-20"
+                                    onClick={() => window.open(authLetter, "_blank")}
+                                  >
+                                    <IoIosOpen size={16} />
+                                    <p>Open</p>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
                               {verificationReport && data?.status === "completed" && (
                                 <div className="gap-3 p-2 rounded-md border">
                                   <div className="w-full flex justify-between">
                                     <div className="w-full flex space-x-2 items-center">
-                                      <FaFilePdf size={36} className="text-bChkRed" />
+                                      <FaFilePdf size={36} className="text-black" />
                                       <div className="flex flex-col space-y-1">
                                         <p>Verification Report</p>
                                         <div className="text-xs font-semibold">
@@ -597,9 +653,9 @@ export default function OutgoingRequests() {
                               )}
 
                               {/* No Reports Found Message */}
-                              {!verificationReport || data?.status !== "completed" && (
+                              {!consentLetter && !authLetter && !requestLetter && !verificationReport && (
                                 <div className="col-span-2 text-center text-gray-500 text-sm py-4">
-                                  No reports found. Verification is not completed yet.
+                                  No reports found.
                                 </div>
                               )}
                             </>
