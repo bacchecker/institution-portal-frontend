@@ -206,7 +206,7 @@ export default function IncomingRequests() {
 
         if (!["created", "rejected"].includes(data.status)) {
           requests.push(
-            axios.get(`/pdf/verification-report/${data.id}`, { responseType: "blob" })
+            axios.get(`/pdf/consent-report/${data.id}`, { responseType: "blob" })
           );
         } else {
           requests.push(Promise.resolve(null));
