@@ -112,12 +112,12 @@ export default function OutgoingRequests() {
         const requests = [];
   
         requests.push(
-          axios.get(`/pdf/verification-request-package/${data.id}`, { responseType: "blob" })
+          axios.get(`/pdf/request-letter/${data.id}`, { responseType: "blob" })
         );
 
         if (!["created", "rejected"].includes(data.status)) {
           requests.push(
-            axios.get(`/pdf/consent-report/${data.id}`, { responseType: "blob" })
+            axios.get(`/pdf/consent-form/${data.id}`, { responseType: "blob" })
           );
         } else {
           requests.push(Promise.resolve(null));
