@@ -54,6 +54,7 @@ export default function IncomingRequests() {
   const [documentTypes, setDocumentTypes] = useState([]);
   const [verificationReport, setVerificationReport] = useState(null);
   const [requestLetter, setRequestLetter] = useState(null);
+  const [consentLetter, setConsentLetter] = useState(null);
   const [authLetter, setAuthLetter] = useState(null);
   const [checkListSections, setCheckListSections] = useState([]);
   const [isChecked, setIsChecked] = useState(false);
@@ -202,10 +203,18 @@ export default function IncomingRequests() {
         requests.push(
           axios.get(`/pdf/request-letter/${data.id}`, { responseType: "blob" })
         );
+
+        if (!["created", "rejected"].includes(data.status)) {
+          requests.push(
+            axios.get(`/pdf/consent-form/${data.id}`, { responseType: "blob" })
+          );
+        } else {
+          requests.push(Promise.resolve(null));
+        }
   
         if (!["created", "rejected"].includes(data.status)) {
           requests.push(
-            axios.get(`/pdf/authorization-letter/${data.id}`, { responseType: "blob" })
+            axios.get(`/pdf/delegation-authority/${data.id}`, { responseType: "blob" })
           );
         } else {
           requests.push(Promise.resolve(null));
@@ -219,9 +228,10 @@ export default function IncomingRequests() {
           requests.push(Promise.resolve(null));
         }
   
-        const [reqLetter, authLetter, verificationReport] = await Promise.all(requests);
+        const [reqLetter, consLetter, authLetter, verificationReport] = await Promise.all(requests);
   
         setRequestLetter(reqLetter ? URL.createObjectURL(reqLetter.data) : null);
+        setConsentLetter(consLetter ? URL.createObjectURL(consLetter.data) : null);
         setAuthLetter(authLetter ? URL.createObjectURL(authLetter.data) : null);
         setVerificationReport(verificationReport ? URL.createObjectURL(verificationReport.data) : null);
   
@@ -613,7 +623,7 @@ export default function IncomingRequests() {
                 
               </div>
             )}
-            <div className="w-full lg:w-[50vw] xl:w-[45vw] h-full overflow-y-auto flex flex-col font-semibold justify-between">
+            <div className="w-full lg:w-[55vw] xl:w-[50vw] h-full overflow-y-auto flex flex-col font-semibold justify-between">
               {data?.status != "processing" ? (
                 <div className="flex flex-col gap-2 mb-6">
                   <div className="grid grid-cols-3 gap-y-4 gap-x-2 border-b pb-4">
@@ -714,7 +724,6 @@ export default function IncomingRequests() {
                           <p className="font-semibold">
                             {data?.document_type?.name}
                           </p>
-                          {/* <p>GH¢ {data?.total_amount}</p> */}
 
                           {!data?.file?.path ? (
                             <div className="flex flex-col items-center justify-center py-8">
@@ -769,9 +778,9 @@ export default function IncomingRequests() {
                                   <div className="w-full flex space-x-2 items-center">
                                     <FaFilePdf size={36} className="text-bChkRed" />
                                     <div className="flex flex-col space-y-1">
-                                      <p>Request Letter</p>
+                                      <p>Verification Request Letter</p>
                                       <div className="text-xs font-semibold -mt-1">
-                                        <p>From: <span className="font-normal text-gray-500">{data?.sending_institution?.name}</span></p>
+                                        <p>From: <span className="font-normal text-gray-500">Bacchecker</span></p>
                                       </div>
                                     </div>
                                   </div>
@@ -786,15 +795,38 @@ export default function IncomingRequests() {
                                 </div>
                               </div>
                             )}
+                            {consentLetter && (
+                              <div className="gap-3 p-2 rounded-md border">
+                                <div className="w-full flex justify-between">
+                                  <div className="w-full flex space-x-2 items-center">
+                                    <FaFilePdf size={36} className="text-bChkRed" />
+                                    <div className="flex flex-col space-y-1">
+                                      <p>Document Owner Consent Letter</p>
+                                      <div className="text-xs font-semibold -mt-1">
+                                        <p>From: <span className="font-normal text-gray-500">{data?.doc_owner_full_name}</span></p>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  
+                                  <div
+                                    className="flex self-end space-x-1 items-center cursor-pointer py-1 px-2 rounded-sm bg-blue-600 text-white text-xs w-20"
+                                    onClick={() => window.open(consentLetter, "_blank")}
+                                  >
+                                    <IoIosOpen size={16} />
+                                    <p>Open</p>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
                             {authLetter && (
                               <div className="gap-3 p-2 rounded-md border">
                                 <div className="w-full flex justify-between">
                                   <div className="w-full flex space-x-2 items-center">
                                     <FaFilePdf size={36} className="text-bChkRed" />
                                     <div className="flex flex-col space-y-1">
-                                      <p>Authorisation Letter</p>
+                                      <p>Delegation Authority Letter</p>
                                       <div className="text-xs font-semibold -mt-1">
-                                        <p>From: <span className="font-normal text-gray-500">{data?.doc_owner_full_name}</span></p>
+                                        <p>From: <span className="font-normal text-gray-500">{data?.sending_institution?.name}</span></p>
                                       </div>
                                     </div>
                                   </div>
