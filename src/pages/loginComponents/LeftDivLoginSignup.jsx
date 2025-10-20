@@ -2,7 +2,7 @@ import React from "react";
 
 function LeftDivLoginSignup() {
   return (
-    <div className="w-[50%] h-full rounded-tr-[0.7vw] rounded-br-[0.7vw] overflow-hidden display-sm-none sticky top-0">
+    <div className="w-[50%] h-full overflow-hidden display-sm-none sticky top-0">
       <img
         src="/assets/img/j.png"
         alt=""
@@ -39,7 +39,7 @@ function LeftDivLoginSignup() {
               />
             </div>
             <div className="flex items-center px-[5.5vw] gap-[0.5vw]">
-              <img src="/assets/img/hr.svg" alt="" className="w-[3vw]" />
+              <img src="/assets/img/hr.png" alt="" className="w-[3vw]" />
               <h4 className="text-[1vw] text-white font-[700!important]">
                 John D., HR Manager
               </h4>
@@ -64,7 +64,7 @@ function LeftDivLoginSignup() {
               />
             </div>
             <div className="flex items-center px-[5.5vw] gap-[0.5vw]">
-              <img src="/assets/img/hr.svg" alt="" className="w-[3vw]" />
+              <img src="/assets/img/hr.png" alt="" className="w-[3vw]" />
               <h4 className="text-[1vw] text-white font-[700!important]">
                 John D., HR Manager
               </h4>
@@ -89,7 +89,7 @@ function LeftDivLoginSignup() {
               />
             </div>
             <div className="flex items-center px-[5.5vw] gap-[0.5vw]">
-              <img src="/assets/img/hr.svg" alt="" className="w-[3vw]" />
+              <img src="/assets/img/hr.png" alt="" className="w-[3vw]" />
               <h4 className="text-[1vw] text-white font-[700!important]">
                 John D., HR Manager
               </h4>
