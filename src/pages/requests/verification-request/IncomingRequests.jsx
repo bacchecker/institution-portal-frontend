@@ -559,8 +559,8 @@ export default function IncomingRequests() {
                 )}
               </div>
             ): (
-              <div className="hidden md:flex flex-col w-full h-[90dvh] shadow md:rounded-[0.3vw] rounded-[1vw]">
-                <div className="h-32 w-full bg-gradient-to-r from-blue-200 to-yellow-200 rounded-t-md"></div>
+              <div className="hidden md:flex flex-col w-full min-h-[100vh] border md:rounded-[0.3vw] rounded-[1vw] overflow-y-auto">
+                <div className="h-12 w-full bg-gradient-to-r from-blue-200 to-yellow-200 rounded-t-md"></div>
                 <div className="w-full flex space-x-6 px-6 py-4">
                   <div className="flex space-x-2">
                     <FaCircleUser size={48} className="text-gray-400"/>
@@ -598,27 +598,23 @@ export default function IncomingRequests() {
                     </div>
                   </div>
                 </div>
-                <div className='hidden md:block w-full h-full overflow-hidden pr-4'>
+                <div className=" flex-1 overflow-auto px-4 pb-4">
                   {["jpg", "jpeg", "png", "gif"].includes(
-                      data?.related_document?.split('.').pop()?.toLowerCase()
+                    data?.related_document?.split('.').pop()?.toLowerCase()
                   ) ? (
-                      <div className='flex-1 w-full h-[90dvh] overflow-auto border md:rounded-[0.3vw] rounded-[1vw] p-[1vw]'>
-                        <img
-                          src={`${import.meta.env.VITE_BACCHECKER_URL}storage/${data?.related_document}`
-                          }
-                          alt="Document preview"
-                          className="w-full max-h-[calc(100vh-170px)] object-contain"
-                        />
-                      </div>
+                    <img
+                      src={`${import.meta.env.VITE_BACCHECKER_URL}storage/${data?.related_document}`}
+                      alt="Document preview"
+                      className="w-full h-auto object-contain"
+                    />
                   ) : (
-                      <div className="h-[90dvh] overflow-auto">
-                        <iframe
-                          src={`${import.meta.env.VITE_BACCHECKER_URL}storage/${data?.related_document}#toolbar=0&navpanes=0&scrollbar=0`}
-                          className="w-full h-full"
-                        ></iframe>
-                      </div>
+                    <iframe
+                      src={`${import.meta.env.VITE_BACCHECKER_URL}storage/${data?.related_document}#toolbar=0&navpanes=0&scrollbar=0`}
+                      className="w-full h-[calc(90vh-200px)] rounded-md border"
+                    ></iframe>
                   )}
                 </div>
+
                 
                 
               </div>
